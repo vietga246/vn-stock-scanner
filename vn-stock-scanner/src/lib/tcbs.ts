@@ -283,32 +283,38 @@ export async function fetchSingleStock(ticker: string): Promise<StockData | null
 // fetchMarketOverview
 // ============================================================
 export async function fetchMarketOverview() {
-  // Thử lấy VN-Index từ VNDirect
+  // Lấy index từ SSI iBoard — cùng nguồn với bảng giá cổ phiếu
   try {
-    const today = new Date().toISOString().split('T')[0]
     const res = await fetch(
-      `https://api-finfo.vndirect.com.vn/v4/stock_prices?sort=date:desc&size=3&page=1&q=code:VNINDEX~code:VN30~code:HNXINDEX~date:gte:${today}`,
-      { headers: HEADERS, cache: 'no-store', signal: AbortSignal.timeout(8000) }
+      'https://iboard.ssi.com.vn/dchart/api/1.1/defaultAllIndices',
+      {
+        headers: { ...HEADERS, 'Origin': 'https://iboard.ssi.com.vn', 'Referer': 'https://iboard.ssi.com.vn/' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      }
     )
 
     if (res.ok) {
       const json = await res.json()
-      const items: Record<string, unknown>[] = json.data ?? []
+      const items: Record<string, unknown>[] = Array.isArray(json) ? json : (json.data ?? json.items ?? [])
 
-      const find = (code: string) => {
-        const d = items.find(i => String(i.code).toUpperCase() === code)
-        const close = Number(d?.close ?? 0)
-        const pct = Number(d?.pctChange ?? 0)
-        const refClose = close / (1 + pct / 100) || close
-        return { value: close, change: close - refClose, percentChange: pct }
+      const find = (codes: string[]) => {
+        const d = items.find((i: Record<string, unknown>) => {
+          const code = String(i.ic ?? i.indexCode ?? i.code ?? i.s ?? '').toUpperCase()
+          return codes.some(c => code.includes(c))
+        })
+        const value = Number(d?.iv ?? d?.indexValue ?? d?.c ?? d?.lastValue ?? 0)
+        const change = Number(d?.ch ?? d?.change ?? d?.indexChange ?? 0)
+        const pct = Number(d?.cp ?? d?.percentChange ?? d?.pctChange ?? 0)
+        return { value, change, percentChange: pct }
       }
 
-      const vnindex = find('VNINDEX')
+      const vnindex = find(['VNINDEX', 'VNI'])
       if (vnindex.value > 0) {
         return {
           vnindex,
-          vn30: find('VN30'),
-          hnx: find('HNXINDEX'),
+          vn30: find(['VN30']),
+          hnx: find(['HNXINDEX', 'HNX']),
           advancing: 0, declining: 0, unchanged: 0, totalValue: 0,
           timestamp: new Date().toISOString(),
         }
