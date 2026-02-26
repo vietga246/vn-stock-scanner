@@ -88,13 +88,9 @@ export default function DashboardPage() {
       setSummary(summary)
       setLastUpdated(new Date().toLocaleString('vi-VN'))
 
-      // Xác định nguồn data
+      // Chỉ báo nguồn data thật
       if (stocks.length > 0) {
-        const hasRealPrice = stocks.some(s => s.price > 10000)
-        const isRealTime = stocks.some(s => s.volume > 0 && s.percentChange !== 0)
-        if (isRealTime) setDataSource('📡 Dữ liệu thật')
-        else if (hasRealPrice) setDataSource('📋 Dữ liệu demo')
-        else setDataSource('⚠️ Thị trường đóng cửa')
+        setDataSource('📡 Dữ liệu thật từ SSI')
       }
 
     } catch (err) {
@@ -181,7 +177,14 @@ export default function DashboardPage() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:'12px', marginBottom:'32px' }}>
           <IndexCard label="VN-Index" data={market?.vnindex} />
           <IndexCard label="VN30" data={market?.vn30} />
-          <IndexCard label="HNX" data={market?.hnx} />
+          {market && (market.advancing > 0 || market.declining > 0) ? (
+            <>
+              <StatCard label="Mã tăng" value={market.advancing} color="text-up" sub="cổ phiếu tăng giá" />
+              <StatCard label="Mã giảm" value={market.declining} color="text-down" sub="cổ phiếu giảm giá" />
+            </>
+          ) : (
+            <IndexCard label="HNX" data={market?.hnx} />
+          )}
           {summary && <>
             <StatCard label="Mã qua lọc" value={summary.passed} sub={`/ ${summary.total} mã quét`} />
             <StatCard label="Tín hiệu MUA" value={summary.buy} color="text-up" sub="cổ phiếu" />
@@ -245,11 +248,31 @@ export default function DashboardPage() {
           </>
         )}
 
-        {/* Loading skeleton khi chưa có data */}
+        {/* Trạng thái khi đang load */}
         {stocks.length === 0 && loading && (
           <div style={{ padding:'60px 24px', textAlign:'center', color:'var(--muted)' }}>
             <div className="spinner" style={{ margin:'0 auto 20px' }} />
-            <p className="mono" style={{ fontSize:'13px' }}>Đang tải dữ liệu...</p>
+            <p className="mono" style={{ fontSize:'13px' }}>Đang kết nối SSI iBoard...</p>
+          </div>
+        )}
+
+        {/* Trạng thái khi không lấy được data */}
+        {stocks.length === 0 && !loading && lastUpdated && (
+          <div style={{ padding:'60px 24px', textAlign:'center' }}>
+            <div style={{ fontSize:'48px', marginBottom:'20px' }}>📡</div>
+            <p className="mono" style={{ fontSize:'14px', color:'var(--muted)', lineHeight:2 }}>
+              Không lấy được dữ liệu từ SSI iBoard.<br/>
+              <span style={{ color:'var(--accent3)' }}>Thị trường có thể đang đóng cửa</span> (HoSE: 9:00–15:00)<br/>
+              hoặc API tạm thời bị giới hạn. Thử lại sau vài phút.
+            </p>
+            <button
+              className="scan-btn"
+              style={{ marginTop:'24px' }}
+              onClick={startScan}
+              disabled={loading}
+            >
+              ↺ THỬ LẠI
+            </button>
           </div>
         )}
       </main>
