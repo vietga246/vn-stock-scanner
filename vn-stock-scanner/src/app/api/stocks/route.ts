@@ -13,6 +13,8 @@ import { fetchMultipleStocks, scoreStock, passesHardGates } from '@/lib/tcbs'
 import { ALL_TICKERS } from '@/lib/tickers'
 import { ApiResponse, StockData } from '@/types/stock'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
