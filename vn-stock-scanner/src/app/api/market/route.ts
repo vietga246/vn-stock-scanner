@@ -14,6 +14,8 @@ import { NextResponse } from 'next/server'
 import { fetchMarketOverview } from '@/lib/tcbs'
 import { ApiResponse, MarketOverview } from '@/types/stock'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const data = await fetchMarketOverview()
