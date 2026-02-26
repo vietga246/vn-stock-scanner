@@ -206,13 +206,14 @@ export function scoreStock(stock: StockData): { score: number; signal: 'buy' | '
 // Lọc hard gates trước khi chấm điểm
 // ============================================================
 export function passesHardGates(stock: StockData): boolean {
-  // Gate 1: Giá > 0 (loại mã không có dữ liệu)
+  // Chỉ lọc mã không có giá
   if (stock.price <= 0) return false
 
-  // Gate 2: Khối lượng tối thiểu 500k cp/phiên
-  if (stock.volume < 500_000) return false
+  // Volume = 0 khi thị trường đóng cửa → vẫn cho qua
+  // Chỉ filter khi có volume nhưng quá thấp
+  if (stock.volume > 0 && stock.volume < 100_000) return false
 
-  // Gate 3: Biến động không cực đoan (tránh mã bị kiểm soát đột biến)
+  // Biến động cực đoan
   if (stock.volatility > 15) return false
 
   return true
