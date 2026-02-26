@@ -175,66 +175,7 @@ async function fetchFromSSI(tickers: string[]): Promise<StockData[]> {
   } catch { return [] }
 }
 
-// ============================================================
-// SOURCE 4: Mock data cập nhật theo ngày — luôn hoạt động
-// ============================================================
-function getMockStocks(tickers: string[]): StockData[] {
-  // Giá tham khảo gần thị trường thực (cập nhật 26/02/2026)
-  const mockPrices: Record<string, { p: number; c: number; v: number }> = {
-    FPT:  { p: 145200, c: 2.1,  v: 8200000  },
-    VCB:  { p: 92400,  c: 0.8,  v: 5100000  },
-    HPG:  { p: 28600,  c: 3.4,  v: 22400000 },
-    MBB:  { p: 27300,  c: 1.2,  v: 12600000 },
-    ACB:  { p: 24900,  c: 0.6,  v: 7800000  },
-    TCB:  { p: 53600,  c: -0.5, v: 6300000  },
-    VNM:  { p: 77600,  c: -1.1, v: 2100000  },
-    GAS:  { p: 82100,  c: 0.9,  v: 1800000  },
-    SSI:  { p: 32150,  c: 0.0,  v: 13259500 }, // Giá thực từ Vietstock
-    VPB:  { p: 21600,  c: -0.9, v: 14200000 },
-    STB:  { p: 38900,  c: 2.8,  v: 8900000  },
-    BID:  { p: 48300,  c: 0.4,  v: 4600000  },
-    MSN:  { p: 85100,  c: -1.8, v: 2900000  },
-    VHM:  { p: 42700,  c: 1.5,  v: 7100000  },
-    REE:  { p: 68600,  c: 1.9,  v: 1500000  },
-    GMD:  { p: 74300,  c: 3.1,  v: 1200000  },
-    DGC:  { p: 89100,  c: 0.2,  v: 1800000  },
-    PNJ:  { p: 115100, c: -0.4, v: 1400000  },
-    CTG:  { p: 39600,  c: 0.1,  v: 3800000  },
-    HDB:  { p: 31200,  c: 1.7,  v: 5200000  },
-    MWG:  { p: 62300,  c: 1.3,  v: 3100000  },
-    VIC:  { p: 38200,  c: -0.3, v: 2400000  },
-    PLX:  { p: 45800,  c: 0.7,  v: 1900000  },
-    SAB:  { p: 198000, c: 0.5,  v: 800000   },
-    TPB:  { p: 18900,  c: 1.1,  v: 6700000  },
-    SHB:  { p: 14200,  c: 2.2,  v: 18500000 },
-    VIB:  { p: 21400,  c: 0.9,  v: 4200000  },
-    HAH:  { p: 52000,  c: 5.3,  v: 900000   },
-    NVL:  { p: 13800,  c: -1.4, v: 8900000  },
-    VJC:  { p: 112500, c: 0.4,  v: 1600000  },
-  }
 
-  return tickers
-    .map(ticker => {
-      const m = mockPrices[ticker.toUpperCase()]
-      if (!m) return null
-      const price = m.p
-      const pct = m.c
-      const priceChange = price * pct / 100
-      const volatility = Math.abs(pct) * 0.8 + 0.5
-      return {
-        ticker: ticker.toUpperCase(),
-        companyName: ticker,
-        price,
-        priceChange,
-        percentChange: pct,
-        volume: m.v,
-        volatility: parseFloat(volatility.toFixed(2)),
-        score: 0,
-        signal: 'watch' as const,
-      }
-    })
-    .filter(Boolean) as StockData[]
-}
 
 // ============================================================
 // PUBLIC: fetchMultipleStocks — thử từng nguồn
@@ -267,11 +208,10 @@ export async function fetchMultipleStocks(
     return results
   }
 
-  // Fallback mock
-  console.log('[fetch] Tất cả API lỗi → dùng mock data (⚠️ giá không realtime)')
-  results = getMockStocks(tickers)
+  // Tất cả API lỗi → trả về mảng rỗng, không dùng mock
+  console.log('[fetch] Tất cả API lỗi, trả về rỗng')
   onProgress?.(tickers.length, tickers.length)
-  return results
+  return []
 }
 
 export async function fetchSingleStock(ticker: string): Promise<StockData | null> {
@@ -283,14 +223,15 @@ export async function fetchSingleStock(ticker: string): Promise<StockData | null
 // fetchMarketOverview
 // ============================================================
 export async function fetchMarketOverview() {
-  // Lấy index từ SSI iBoard — cùng nguồn với bảng giá cổ phiếu
+  // SSI iBoard index endpoint bị block từ Vercel
+  // → Tính thống kê từ data cổ phiếu SSI đã fetch được
   try {
     const res = await fetch(
-      'https://iboard.ssi.com.vn/dchart/api/1.1/defaultAllIndices',
+      'https://iboard.ssi.com.vn/dchart/api/1.1/defaultAllStocks',
       {
         headers: { ...HEADERS, 'Origin': 'https://iboard.ssi.com.vn', 'Referer': 'https://iboard.ssi.com.vn/' },
         cache: 'no-store',
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(10000),
       }
     )
 
@@ -298,24 +239,45 @@ export async function fetchMarketOverview() {
       const json = await res.json()
       const items: Record<string, unknown>[] = Array.isArray(json) ? json : (json.data ?? json.items ?? [])
 
-      const find = (codes: string[]) => {
-        const d = items.find((i: Record<string, unknown>) => {
-          const code = String(i.ic ?? i.indexCode ?? i.code ?? i.s ?? '').toUpperCase()
-          return codes.some(c => code.includes(c))
+      if (items.length > 10) {
+        // Tìm index VN-Index trong danh sách (SSI có thể trả về cả index)
+        const vnItem = items.find((i: Record<string, unknown>) => {
+          const code = String(i.s ?? i.code ?? '').toUpperCase()
+          return code === 'VNINDEX' || code === 'VNI'
         })
-        const value = Number(d?.iv ?? d?.indexValue ?? d?.c ?? d?.lastValue ?? 0)
-        const change = Number(d?.ch ?? d?.change ?? d?.indexChange ?? 0)
-        const pct = Number(d?.cp ?? d?.percentChange ?? d?.pctChange ?? 0)
-        return { value, change, percentChange: pct }
-      }
+        const vn30Item = items.find((i: Record<string, unknown>) => String(i.s ?? i.code ?? '').toUpperCase() === 'VN30')
 
-      const vnindex = find(['VNINDEX', 'VNI'])
-      if (vnindex.value > 0) {
+        if (vnItem) {
+          const parseIndex = (d: Record<string, unknown>) => {
+            const value = Number(d.c ?? d.iv ?? d.lastValue ?? 0)
+            const change = Number(d.ch ?? d.change ?? 0)
+            const pct = Number(d.cp ?? d.percentChange ?? 0)
+            return { value, change, percentChange: pct }
+          }
+          return {
+            vnindex: parseIndex(vnItem),
+            vn30: vn30Item ? parseIndex(vn30Item) : { value: 0, change: 0, percentChange: 0 },
+            hnx: { value: 0, change: 0, percentChange: 0 },
+            advancing: items.filter((i: Record<string, unknown>) => Number(i.c ?? 0) > Number(i.r ?? i.c ?? 0)).length,
+            declining: items.filter((i: Record<string, unknown>) => Number(i.c ?? 0) < Number(i.r ?? i.c ?? 1)).length,
+            unchanged: 0,
+            totalValue: 0,
+            timestamp: new Date().toISOString(),
+          }
+        }
+
+        // Nếu không tìm thấy index riêng, tính thống kê tăng/giảm từ cổ phiếu
+        const advancing = items.filter((i: Record<string, unknown>) => Number(i.cp ?? i.percentChange ?? 0) > 0).length
+        const declining = items.filter((i: Record<string, unknown>) => Number(i.cp ?? i.percentChange ?? 0) < 0).length
+
         return {
-          vnindex,
-          vn30: find(['VN30']),
-          hnx: find(['HNXINDEX', 'HNX']),
-          advancing: 0, declining: 0, unchanged: 0, totalValue: 0,
+          vnindex: { value: 0, change: 0, percentChange: 0 },
+          vn30: { value: 0, change: 0, percentChange: 0 },
+          hnx: { value: 0, change: 0, percentChange: 0 },
+          advancing,
+          declining,
+          unchanged: items.length - advancing - declining,
+          totalValue: 0,
           timestamp: new Date().toISOString(),
         }
       }
