@@ -1,0 +1,4 @@
+git clone https://github.com/vietga246/vn-stock-scanner.git
+cd vn-stock-scanner
+
+# Copy toàn bộ thư mục scripts/, .github/, .gitignore, README.md vào đây
