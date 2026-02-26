@@ -12,6 +12,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchSingleStock, scoreStock } from '@/lib/tcbs'
 import { ApiResponse, StockData } from '@/types/stock'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: { ticker: string } }
