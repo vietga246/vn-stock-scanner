@@ -1,86 +1,82 @@
-// ============================================================
-// app/api/stocks/route.ts
-//
-// Route: GET /api/stocks?tickers=FPT,VCB,HPG
-//        GET /api/stocks        (dùng danh sách mặc định)
-//
-// Đây là route chính — quét toàn bộ danh sách và trả về
-// kết quả đã lọc + chấm điểm
-// ============================================================
-
-import { NextRequest, NextResponse } from 'next/server'
-import { fetchMultipleStocks, scoreStock, passesHardGates } from '@/lib/tcbs'
-import { ALL_TICKERS } from '@/lib/tickers'
-import { ApiResponse, StockData } from '@/types/stock'
+// DEBUG VERSION - xem TCBS trả về gì
+import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
+  const results: Record<string, unknown> = {}
+
+  // Test 1: Gọi trực tiếp TCBS market overview
   try {
-    const { searchParams } = new URL(request.url)
-
-    // Cho phép client truyền danh sách ticker tùy chỉnh
-    // Ví dụ: /api/stocks?tickers=FPT,VCB,HPG
-    const tickersParam = searchParams.get('tickers')
-    const tickers = tickersParam
-      ? tickersParam.split(',').map(t => t.trim().toUpperCase())
-      : ALL_TICKERS
-
-    console.log(`[API/stocks] Bắt đầu quét ${tickers.length} mã...`)
-    const startTime = Date.now()
-
-    // Lấy dữ liệu tất cả mã
-    const rawStocks = await fetchMultipleStocks(tickers)
-    console.log(`[API/stocks] Lấy được ${rawStocks.length} mã thô`)
-
-    // Bước 1: Hard gates — lọc mã không đủ điều kiện
-    const filtered = rawStocks.filter(passesHardGates)
-    console.log(`[API/stocks] ${filtered.length} mã qua hard gates`)
-
-    // Bước 2: Chấm điểm
-    const scored: StockData[] = filtered.map(stock => {
-      const { score, signal } = scoreStock(stock)
-      return { ...stock, score, signal }
-    })
-
-    // Bước 3: Sắp xếp theo điểm cao → thấp
-    scored.sort((a, b) => b.score - a.score)
-
-    const elapsed = Date.now() - startTime
-    console.log(`[API/stocks] Hoàn thành sau ${elapsed}ms`)
-
-    // Thống kê tóm tắt
-    const summary = {
-      total: tickers.length,
-      fetched: rawStocks.length,
-      passed: filtered.length,
-      buy: scored.filter(s => s.signal === 'buy').length,
-      watch: scored.filter(s => s.signal === 'watch').length,
-      avoid: scored.filter(s => s.signal === 'avoid').length,
-      elapsedMs: elapsed,
+    const r1 = await fetch(
+      'https://apipubaws.tcbs.com.vn/stock-insight/v1/index/overview',
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'application/json',
+          'Origin': 'https://tcinvest.tcbs.com.vn',
+          'Referer': 'https://tcinvest.tcbs.com.vn/',
+        },
+        cache: 'no-store',
+      }
+    )
+    results.market_status = r1.status
+    results.market_ok = r1.ok
+    if (r1.ok) {
+      const data = await r1.json()
+      results.market_data = data
+    } else {
+      results.market_error = await r1.text()
     }
-
-    const response: ApiResponse<{ stocks: StockData[]; summary: typeof summary }> = {
-      success: true,
-      data: { stocks: scored, summary },
-      timestamp: new Date().toISOString(),
-    }
-
-    return NextResponse.json(response, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=60',
-      },
-    })
-
-  } catch (error) {
-    console.error('[API/stocks] Lỗi nghiêm trọng:', error)
-
-    const response: ApiResponse<null> = {
-      success: false,
-      error: error instanceof Error ? error.message : 'Lỗi server',
-      timestamp: new Date().toISOString(),
-    }
-
-    return NextResponse.json(response, { status: 500 })
+  } catch (e) {
+    results.market_exception = String(e)
   }
+
+  // Test 2: Gọi 1 mã cổ phiếu FPT
+  try {
+    const r2 = await fetch(
+      'https://apipubaws.tcbs.com.vn/stock-insight/v1/stock/ticker-overview/FPT',
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'application/json',
+          'Origin': 'https://tcinvest.tcbs.com.vn',
+          'Referer': 'https://tcinvest.tcbs.com.vn/',
+        },
+        cache: 'no-store',
+      }
+    )
+    results.fpt_status = r2.status
+    results.fpt_ok = r2.ok
+    if (r2.ok) {
+      const data = await r2.json()
+      results.fpt_data = data
+    } else {
+      results.fpt_error = await r2.text()
+    }
+  } catch (e) {
+    results.fpt_exception = String(e)
+  }
+
+  // Test 3: Thử endpoint khác của TCBS
+  try {
+    const r3 = await fetch(
+      'https://apipubaws.tcbs.com.vn/stock-insight/v1/stock/ticker-overview/VCB',
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0',
+          'Accept': '*/*',
+        },
+        cache: 'no-store',
+      }
+    )
+    results.vcb_status = r3.status
+    if (r3.ok) {
+      results.vcb_data = await r3.json()
+    }
+  } catch (e) {
+    results.vcb_exception = String(e)
+  }
+
+  return NextResponse.json(results, { status: 200 })
 }
