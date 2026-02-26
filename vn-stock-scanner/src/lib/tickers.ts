@@ -36,9 +36,9 @@ export const BANKS: string[] = [
 ]
 
 /** Tổng hợp tất cả, loại trùng */
-export const ALL_TICKERS: string[] = [
-  ...new Set([...VN30, ...MID_CAP, ...BANKS])
-]
+export const ALL_TICKERS: string[] = Array.from(
+  new Set([...VN30, ...MID_CAP, ...BANKS])
+)
 
 /** Mapping sector đơn giản (mở rộng sau) */
 export const SECTOR_MAP: Record<string, string> = {
