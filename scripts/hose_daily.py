@@ -1,22 +1,26 @@
 """
-hose_daily.py — High Performance Daily Updater
-- HOSE + HNX only
-- Rate-limit aware (60 req/min sliding window)
+hose_daily.py — High Performance Daily Updater (Adaptive + Production)
+
+- HOSE + HNX only, loại bỏ trái phiếu
+- Adaptive sliding-window rate limiter (deque-based)
+- Auto-detect server wait time (VI + EN)
+- Catch SystemExit từ vnstock
 - Batch commit every 20 tickers
 - WAL mode enabled
-- Retry with exponential backoff
 - Chạy mỗi ngày lúc 17:00 ICT qua GitHub Actions
 """
 
 from vnstock import Listing, Quote
 from datetime import datetime, timedelta
 from tqdm import tqdm
+from collections import deque
 import sqlite3
 import pandas as pd
 import logging
 import sys
 import os
 import time
+import re
 
 # ---------------- CONFIG ---------------- #
 
@@ -36,9 +40,69 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
+# ---------------- ADAPTIVE RATE LIMITER ---------------- #
+
+class AdaptiveRateLimiter:
+    def __init__(self, rpm: int, safety_ratio: float = 0.9):
+        self.rpm       = rpm
+        self.threshold = int(rpm * safety_ratio)
+        self.window    = 60
+        self.requests  = deque()
+
+    def acquire(self):
+        now = time.time()
+
+        while self.requests and now - self.requests[0] > self.window:
+            self.requests.popleft()
+
+        current = len(self.requests)
+
+        if current >= self.rpm:
+            sleep_time = self.window - (now - self.requests[0]) + 0.1
+            log.info(f"[Limiter] Hard limit -> sleep {sleep_time:.2f}s")
+            time.sleep(sleep_time)
+            return self.acquire()
+
+        if current >= self.threshold:
+            overload      = current - self.threshold
+            dynamic_delay = overload * (60 / self.rpm)
+            time.sleep(dynamic_delay)
+
+        self.requests.append(time.time())
+
+    def reset(self):
+        self.requests.clear()
+
+# ---------------- WAIT TIME PARSER ---------------- #
+
+def extract_wait_time(error_message: str, default: int = 60) -> int:
+    if not error_message:
+        return default
+
+    patterns = [
+        r"chờ\s+(\d+)\s*gi",
+        r"wait\s+(\d+)\s*second",
+        r"retry\s*after\s*(\d+)",
+        r"(\d+)\s*second",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, error_message.lower())
+        if match:
+            return int(match.group(1)) + 1
+
+    return default
+
+# ---------------- BOND FILTER ---------------- #
+
+BOND_PATTERN = re.compile(r'^[A-Z]{2,4}\d{4,}$')
+
+def is_bond(symbol: str) -> bool:
+    return bool(BOND_PATTERN.match(symbol)) and len(symbol) > 6
+
 # ---------------- DB ---------------- #
 
-def init_db(conn: sqlite3.Connection):
+def init_db(conn):
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA synchronous=NORMAL;")
     conn.executescript("""
@@ -62,12 +126,12 @@ def upsert_df(cursor, ticker: str, df: pd.DataFrame):
     rows = [
         (
             ticker,
-            str(getattr(row, "time", getattr(row, "date", ""))),
+            str(getattr(row, "time",   getattr(row, "date", ""))),
             float(getattr(row, "open",   0) or 0),
             float(getattr(row, "high",   0) or 0),
             float(getattr(row, "low",    0) or 0),
             float(getattr(row, "close",  0) or 0),
-            int(getattr(row, "volume",   0) or 0),
+            int(getattr(row,   "volume", 0) or 0),
         )
         for row in df.itertuples(index=False)
     ]
@@ -80,21 +144,22 @@ def upsert_df(cursor, ticker: str, df: pd.DataFrame):
 # ---------------- TICKERS ---------------- #
 
 def get_tickers() -> list:
-    """Lấy danh sách mã HOSE + HNX, bỏ UPCOM."""
     listing = Listing()
     try:
         df = listing.symbols_by_exchange()
         if "exchange" in df.columns:
-            df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
+            df      = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
             tickers = df["symbol"].tolist()
-            log.info(f"HOSE+HNX: {len(tickers)} mã (đã bỏ UPCOM)")
+            before  = len(tickers)
+            tickers = [t for t in tickers if not is_bond(t)]
+            log.info(f"HOSE+HNX: {len(tickers)} mã (bỏ UPCOM + {before - len(tickers)} trái phiếu)")
             return tickers
     except Exception as e:
         log.warning(f"symbols_by_exchange() lỗi: {e} — fallback all_symbols()")
 
-    df = listing.all_symbols()
-    tickers = df["symbol"].tolist()
-    log.warning(f"Fallback all_symbols(): {len(tickers)} mã (bao gồm UPCOM)")
+    df      = listing.all_symbols()
+    tickers = [t for t in df["symbol"].tolist() if not is_bond(t)]
+    log.warning(f"Fallback: {len(tickers)} mã")
     return tickers
 
 # ---------------- MAIN ---------------- #
@@ -106,12 +171,13 @@ def update_daily():
     else:
         log.warning("⚠️  Guest mode (20 req/min)")
 
+    limiter    = AdaptiveRateLimiter(MAX_REQUEST_PER_MIN, safety_ratio=0.9)
     tickers    = get_tickers()
     end_date   = datetime.now()
     start_date = end_date - timedelta(days=DAYS_LOOKBACK)
     start_str  = start_date.strftime("%Y-%m-%d")
     end_str    = end_date.strftime("%Y-%m-%d")
-    log.info(f"Khoảng thời gian: {start_str} → {end_str}")
+    log.info(f"Period: {start_str} -> {end_str}")
 
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn   = sqlite3.connect(DB_PATH)
@@ -119,8 +185,6 @@ def update_daily():
     init_db(conn)
 
     ok = fail = skipped = 0
-    request_count = 0
-    window_start  = time.time()
     batch_counter = 0
 
     for ticker in tqdm(tickers, desc="Daily update"):
@@ -129,16 +193,7 @@ def update_daily():
 
         while retry < MAX_RETRY:
             try:
-                # Rate limit sliding window
-                request_count += 1
-                if request_count >= MAX_REQUEST_PER_MIN:
-                    elapsed = time.time() - window_start
-                    if elapsed < 60:
-                        sleep_time = 60 - elapsed
-                        log.info(f"Rate window full → sleep {sleep_time:.1f}s")
-                        time.sleep(sleep_time)
-                    window_start  = time.time()
-                    request_count = 0
+                limiter.acquire()
 
                 quote = Quote(symbol=ticker, source="VCI")
                 df    = quote.history(start=start_str, end=end_str)
@@ -153,12 +208,20 @@ def update_daily():
                 success = True
                 break
 
+            except SystemExit:
+                wait = 65
+                log.warning(f"[{ticker}] SystemExit (rate limit) -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                time.sleep(wait)
+                limiter.reset()
+                retry += 1
+
             except Exception as e:
                 err = str(e).lower()
-                if "429" in err or "rate limit" in err:
-                    wait = 2 ** retry * 5  # 5s, 10s, 20s
-                    log.warning(f"[{ticker}] Rate limit → sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                if any(x in err for x in ["429", "rate limit", "giới hạn", "exceeded"]):
+                    wait = extract_wait_time(str(e), default=65)
+                    log.warning(f"[{ticker}] Rate limit -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
                     time.sleep(wait)
+                    limiter.reset()
                     retry += 1
                 else:
                     log.warning(f"[{ticker}] Error: {e}")
@@ -169,7 +232,6 @@ def update_daily():
             log.warning(f"[{ticker}] Hết retry — bỏ qua")
             fail += 1
 
-        # Batch commit
         if batch_counter >= COMMIT_BATCH:
             conn.commit()
             batch_counter = 0
