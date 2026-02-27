@@ -67,7 +67,9 @@ def upsert_df(cursor: sqlite3.Cursor, ticker: str, df: pd.DataFrame):
 def update_daily():
     log.info("Bắt đầu cập nhật giá hàng ngày...")
     listing = Listing()
-    tickers = listing.all_symbols()["symbol"].tolist()
+    all_symbols = listing.all_symbols()
+    all_symbols = all_symbols[all_symbols["exchange"].str.upper() != "UPCOM"]
+    tickers = all_symbols["symbol"].tolist()
     log.info(f"Tổng số mã: {len(tickers)}")
 
     end_date   = datetime.now()
