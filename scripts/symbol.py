@@ -199,16 +199,8 @@ def fetch_symbols():
             try:
                 limiter.acquire()
 
-                # Thử VCI trước, fallback TCBS
-                overview = None
-                for source in ["VCI", "TCBS"]:
-                    try:
-                        company  = Company(symbol=symbol, source=source)
-                        overview = company.overview()
-                        if overview is not None and not overview.empty:
-                            break
-                    except Exception:
-                        continue
+                company  = Company(symbol=symbol, source="VCI")
+                overview = company.overview()
 
                 if overview is not None and not overview.empty:
                     ov = overview.iloc[0].to_dict()
