@@ -140,11 +140,27 @@ def should_skip(updated_at_map: dict, symbol: str) -> bool:
     return False
 
 
+def flatten_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Flatten MultiIndex columns thành string, ví dụ ('PE', 'Q1') -> 'PE_Q1'."""
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = ["_".join(str(c) for c in col).strip("_") for col in df.columns]
+    else:
+        df.columns = [str(c) for c in df.columns]
+    return df
+
+
 def upsert_financial(cursor, table: str, symbol: str, df: pd.DataFrame):
     """Lưu từng dòng của DataFrame tài chính vào DB dưới dạng JSON."""
     import json
+
+    # Flatten MultiIndex columns trước khi xử lý
+    df = flatten_df(df.copy())
+
     for _, row in df.iterrows():
         d = row.to_dict()
+        # Normalize key về string (phòng trường hợp còn sót tuple)
+        d = {str(k): v for k, v in d.items()}
+
         year    = int(d.get("year",    d.get("Năm",    0) or 0))
         quarter = int(d.get("quarter", d.get("Quý",    0) or 0))
         period  = "quarter" if quarter else "annual"
