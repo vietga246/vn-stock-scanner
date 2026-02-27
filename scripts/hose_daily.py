@@ -68,13 +68,11 @@ def update_daily():
     log.info("Bắt đầu cập nhật giá hàng ngày...")
     listing = Listing()
     all_symbols = listing.all_symbols()
-    log.info(f"Các cột có sẵn: {all_symbols.columns.tolist()}")
-    if "exchange" in all_symbols.columns:
-        all_symbols = all_symbols[all_symbols["exchange"].str.upper() != "UPCOM"]
-    elif "comGroupCode" in all_symbols.columns:
-        all_symbols = all_symbols[all_symbols["comGroupCode"].str.upper() != "UPCOM"]
-    tickers = all_symbols["symbol"].tolist()
-    log.info(f"Tổng số mã: {len(tickers)}")
+    # Lọc chỉ lấy HOSE và HNX dựa theo organ_name
+    hose_hnx = listing.symbols_by_exchange()
+    hose_hnx = hose_hnx[hose_hnx["exchange"].str.upper().isin(["HOSE", "HNX"])]
+    tickers = hose_hnx["symbol"].tolist()
+    log.info(f"Sau khi lọc HOSE+HNX: {len(tickers)} mã")
 
     end_date   = datetime.now()
     start_date = end_date - timedelta(days=DAYS_LOOKBACK)
