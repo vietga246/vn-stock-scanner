@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 DB_PATH = os.getenv("DB_PATH", "data/stock.db")
 START_DATE = "2000-01-01"
-SLEEP_BETWEEN = float(os.getenv("SLEEP_BETWEEN", "1.5"))
+SLEEP_BETWEEN = float(os.getenv("SLEEP_BETWEEN", "15"))
 
 
 def init_db(conn: sqlite3.Connection):
@@ -89,7 +89,11 @@ def fetch_all_history():
                 ok += 1
         except Exception as e:
             log.warning(f"[{ticker}] Lỗi: {e}")
-            fail += 1
+            if "Rate Limit" in str(e) or "rate limit" in str(e).lower():
+                log.info("Rate limit hit — chờ 60 giây...")
+                time.sleep(60)
+            else:
+                fail += 1
         time.sleep(SLEEP_BETWEEN)
 
     conn.close()
