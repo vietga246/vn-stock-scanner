@@ -199,9 +199,14 @@ def fetch_symbols():
             try:
                 limiter.acquire()
 
-                company  = Company(symbol=symbol, source="VCI")
-                overview = company.overview()
-
+                try:
+                    company  = Company(symbol=symbol, source="VCI")
+                    overview = company.overview()
+                except AttributeError:
+                    log.warning(f"⚠️  {symbol} — VCI không hỗ trợ overview, bỏ qua")
+                    fail += 1
+                    success = True   # Không retry, bỏ qua luôn
+                    break
                 if overview is not None and not overview.empty:
                     ov = overview.iloc[0].to_dict()
                     cursor.execute("""
