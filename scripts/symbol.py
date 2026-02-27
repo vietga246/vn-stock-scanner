@@ -1,28 +1,32 @@
 """
-symbol.py — High Performance Symbol Overview Fetcher
-- HOSE + HNX only
+symbol.py — High Performance Symbol Overview Fetcher (Adaptive + Production)
+
+- HOSE + HNX only, loại bỏ trái phiếu
 - True incremental (skip mã đã cập nhật trong 7 ngày)
-- Rate-limit aware (60 req/min sliding window)
+- Adaptive sliding-window rate limiter (deque-based)
+- Auto-detect server wait time (VI + EN)
+- Catch SystemExit từ vnstock
+- Thử VCI trước, fallback TCBS
 - WAL mode enabled
-- Retry with exponential backoff
-- source='VCI' (TCBS deprecated từ 15/12/2024)
 """
 
 from vnstock import Listing, Company
 from datetime import datetime, timedelta
+from collections import deque
 import sqlite3
 import logging
 import sys
 import os
 import time
+import re
 
 # ---------------- CONFIG ---------------- #
 
-DB_PATH             = os.getenv("DB_PATH", "data/stock.db")
-API_KEY             = os.getenv("VNSTOCK_API_KEY", "")
-MAX_REQUEST_PER_MIN = 60
-MAX_RETRY           = 3
-SKIP_IF_UPDATED_DAYS = 7   # Skip nếu đã update trong vòng 7 ngày
+DB_PATH              = os.getenv("DB_PATH", "data/stock.db")
+API_KEY              = os.getenv("VNSTOCK_API_KEY", "")
+MAX_REQUEST_PER_MIN  = 60
+MAX_RETRY            = 3
+SKIP_IF_UPDATED_DAYS = 7
 
 # ---------------- LOGGING ---------------- #
 
@@ -33,9 +37,72 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
+# ---------------- ADAPTIVE RATE LIMITER ---------------- #
+
+class AdaptiveRateLimiter:
+    def __init__(self, rpm: int, safety_ratio: float = 0.9):
+        self.rpm       = rpm
+        self.threshold = int(rpm * safety_ratio)
+        self.window    = 60
+        self.requests  = deque()
+
+    def acquire(self):
+        now = time.time()
+
+        while self.requests and now - self.requests[0] > self.window:
+            self.requests.popleft()
+
+        current = len(self.requests)
+
+        if current >= self.rpm:
+            sleep_time = self.window - (now - self.requests[0]) + 0.1
+            log.info(f"[Limiter] Hard limit -> sleep {sleep_time:.2f}s")
+            time.sleep(sleep_time)
+            return self.acquire()
+
+        if current >= self.threshold:
+            overload      = current - self.threshold
+            dynamic_delay = overload * (60 / self.rpm)
+            log.debug(f"[Limiter] Near limit ({current}/{self.rpm}) -> delay {dynamic_delay:.3f}s")
+            time.sleep(dynamic_delay)
+
+        self.requests.append(time.time())
+
+    def reset(self):
+        self.requests.clear()
+
+# ---------------- WAIT TIME PARSER ---------------- #
+
+def extract_wait_time(error_message: str, default: int = 60) -> int:
+    """Parse thời gian chờ từ message lỗi của server (VI + EN)."""
+    if not error_message:
+        return default
+
+    patterns = [
+        r"chờ\s+(\d+)\s*gi",
+        r"wait\s+(\d+)\s*second",
+        r"retry\s*after\s*(\d+)",
+        r"(\d+)\s*second",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, error_message.lower())
+        if match:
+            return int(match.group(1)) + 1
+
+    return default
+
+# ---------------- BOND FILTER ---------------- #
+
+BOND_PATTERN = re.compile(r'^[A-Z]{2,4}\d{4,}$')
+
+def is_bond(symbol: str) -> bool:
+    """Lọc mã trái phiếu dạng CACB2510, CVMM2520..."""
+    return bool(BOND_PATTERN.match(symbol)) and len(symbol) > 6
+
 # ---------------- DB ---------------- #
 
-def init_db(conn: sqlite3.Connection):
+def init_db(conn):
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA synchronous=NORMAL;")
     conn.executescript("""
@@ -66,13 +133,11 @@ def init_db(conn: sqlite3.Connection):
 
 
 def preload_updated_at(cursor) -> dict:
-    """Load updated_at của tất cả mã vào dict 1 lần."""
     cursor.execute("SELECT symbol, updated_at FROM symbols")
     return {row[0]: row[1] for row in cursor.fetchall()}
 
 
 def should_skip(updated_at_map: dict, symbol: str) -> bool:
-    """Skip nếu đã cập nhật trong vòng SKIP_IF_UPDATED_DAYS ngày."""
     updated_at = updated_at_map.get(symbol)
     if updated_at:
         cutoff = (datetime.now() - timedelta(days=SKIP_IF_UPDATED_DAYS)).isoformat()
@@ -82,21 +147,23 @@ def should_skip(updated_at_map: dict, symbol: str) -> bool:
 # ---------------- TICKERS ---------------- #
 
 def get_tickers() -> list:
-    """Lấy danh sách mã HOSE + HNX, bỏ UPCOM."""
+    """Lấy danh sách mã HOSE + HNX, bỏ UPCOM và trái phiếu."""
     listing = Listing()
     try:
         df = listing.symbols_by_exchange()
         if "exchange" in df.columns:
-            df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
+            df      = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
             tickers = df["symbol"].tolist()
-            log.info(f"HOSE+HNX: {len(tickers)} mã (đã bỏ UPCOM)")
+            before  = len(tickers)
+            tickers = [t for t in tickers if not is_bond(t)]
+            log.info(f"HOSE+HNX: {len(tickers)} mã (bỏ UPCOM + {before - len(tickers)} trái phiếu)")
             return tickers
     except Exception as e:
         log.warning(f"symbols_by_exchange() lỗi: {e} — fallback all_symbols()")
 
-    df = listing.all_symbols()
-    tickers = df["symbol"].tolist()
-    log.warning(f"Fallback all_symbols(): {len(tickers)} mã (bao gồm UPCOM)")
+    df      = listing.all_symbols()
+    tickers = [t for t in df["symbol"].tolist() if not is_bond(t)]
+    log.warning(f"Fallback: {len(tickers)} mã")
     return tickers
 
 # ---------------- MAIN ---------------- #
@@ -108,6 +175,7 @@ def fetch_symbols():
     else:
         log.warning("⚠️  Guest mode (20 req/min)")
 
+    limiter = AdaptiveRateLimiter(MAX_REQUEST_PER_MIN, safety_ratio=0.9)
     tickers = get_tickers()
     log.info(f"Bắt đầu lấy overview cho {len(tickers)} mã...")
 
@@ -118,11 +186,8 @@ def fetch_symbols():
 
     updated_at_map = preload_updated_at(cursor)
     ok = fail = skipped = 0
-    request_count = 0
-    window_start  = time.time()
 
     for symbol in tickers:
-        # Skip mã đã cập nhật gần đây
         if should_skip(updated_at_map, symbol):
             skipped += 1
             continue
@@ -132,19 +197,18 @@ def fetch_symbols():
 
         while retry < MAX_RETRY:
             try:
-                # Rate limit sliding window
-                request_count += 1
-                if request_count >= MAX_REQUEST_PER_MIN:
-                    elapsed = time.time() - window_start
-                    if elapsed < 60:
-                        sleep_time = 60 - elapsed
-                        log.info(f"Rate window full → sleep {sleep_time:.1f}s")
-                        time.sleep(sleep_time)
-                    window_start  = time.time()
-                    request_count = 0
+                limiter.acquire()
 
-                company  = Company(symbol=symbol, source="VCI")
-                overview = company.overview()
+                # Thử VCI trước, fallback TCBS
+                overview = None
+                for source in ["VCI", "TCBS"]:
+                    try:
+                        company  = Company(symbol=symbol, source=source)
+                        overview = company.overview()
+                        if overview is not None and not overview.empty:
+                            break
+                    except Exception:
+                        continue
 
                 if overview is not None and not overview.empty:
                     ov = overview.iloc[0].to_dict()
@@ -186,12 +250,20 @@ def fetch_symbols():
                 success = True
                 break
 
+            except SystemExit:
+                wait = 65
+                log.warning(f"[{symbol}] SystemExit (rate limit) -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                time.sleep(wait)
+                limiter.reset()
+                retry += 1
+
             except Exception as e:
                 err = str(e).lower()
-                if "429" in err or "rate limit" in err:
-                    wait = 2 ** retry * 5  # 5s, 10s, 20s
-                    log.warning(f"[{symbol}] Rate limit → sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                if any(x in err for x in ["429", "rate limit", "giới hạn", "exceeded"]):
+                    wait = extract_wait_time(str(e), default=65)
+                    log.warning(f"[{symbol}] Rate limit -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
                     time.sleep(wait)
+                    limiter.reset()
                     retry += 1
                 else:
                     log.warning(f"❌ {symbol} — {e}")
