@@ -64,7 +64,7 @@ def fetch_symbols():
     for _, row in all_tickers.iterrows():
         symbol = row["symbol"]
         try:
-            company  = Company(symbol=symbol, source="TCBS")
+            company = Company(symbol=symbol, source='VCI')
             overview = company.overview()
 
             if not overview.empty:
