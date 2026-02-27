@@ -1,5 +1,4 @@
 # Database — không commit lên git (quá nặng)
-data/stock.db
 data/stock.db-shm
 data/stock.db-wal
 
