@@ -75,7 +75,9 @@ def fetch_all_history():
 
     log.info("Lấy danh sách tất cả mã cổ phiếu...")
     listing = Listing()
-    tickers = listing.all_symbols()["symbol"].tolist()
+    all_symbols = listing.all_symbols()
+    all_symbols = all_symbols[all_symbols["exchange"].str.upper() != "UPCOM"]
+    tickers = all_symbols["symbol"].tolist()
     log.info(f"Tổng số mã: {len(tickers)}")
 
     end_date = datetime.now().strftime("%Y-%m-%d")
