@@ -20,7 +20,7 @@ jobs:
           cache-dependency-path: scripts/requirements.txt
 
       - name: 📦 Install dependencies
-        run: pip install -r scripts/requirements.txt
+        run: pip install --no-cache-dir -r scripts/requirements.txt
 
       - name: 🗄️ Load full price history (2000 → now)
         env:
