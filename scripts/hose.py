@@ -145,7 +145,7 @@ def fetch_all_history():
         retry = 0
         success = False
 
-        while retry < MAX_RETRY:
+while retry < MAX_RETRY:
             try:
                 # Rate limit sliding window
                 request_count += 1
@@ -168,6 +168,24 @@ def fetch_all_history():
 
                 success = True
                 break
+
+            except SystemExit:
+                wait = 2 ** retry * 10
+                log.warning(f"[{ticker}] vnstock exit (rate limit) → sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                time.sleep(wait)
+                retry += 1
+
+            except Exception as e:
+                err = str(e).lower()
+                if "429" in err or "rate limit" in err or "exceeded" in err:
+                    wait = 2 ** retry * 10
+                    log.warning(f"[{ticker}] Rate limit → sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                    time.sleep(wait)
+                    retry += 1
+                else:
+                    log.warning(f"[{ticker}] Error: {e}")
+                    fail += 1
+                    break
 
                 except (Exception, SystemExit, BaseException) as e:
                                 err = str(e).lower()
