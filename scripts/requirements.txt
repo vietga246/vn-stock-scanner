@@ -1,4 +1,4 @@
-vnstock>=0.3.0
+vnstock==0.3.13
 pandas>=2.0.0
 tqdm>=4.65.0
 pytz>=2023.3
