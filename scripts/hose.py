@@ -169,9 +169,9 @@ def fetch_all_history():
                 success = True
                 break
 
-            except Exception as e:
-                err = str(e).lower()
-                if "429" in err or "rate limit" in err:
+                except (Exception, SystemExit, BaseException) as e:
+                                err = str(e).lower()
+                                if "429" in err or "rate limit" in err or "exceeded" in err or "chờ" in str(e):
                     wait = 2 ** retry * 5  # 5s, 10s, 20s
                     log.warning(f"[{ticker}] Rate limit → sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
                     time.sleep(wait)
