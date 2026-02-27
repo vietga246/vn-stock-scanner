@@ -21,8 +21,9 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          pip install --no-cache-dir pytz
-          pip install --no-cache-dir -r scripts/requirements.txt
+          pip install --no-cache-dir pytz>=2023.3
+          pip install --no-cache-dir vnstock==0.3.13
+          pip install --no-cache-dir pandas tqdm
 
       - name: 🗄️ Load full price history (2000 → now)
         env:
