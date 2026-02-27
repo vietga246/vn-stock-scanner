@@ -51,8 +51,9 @@ def init_db(conn: sqlite3.Connection):
 
 def fetch_symbols():
     log.info("Lấy danh sách tất cả mã cổ phiếu...")
-    listing  = Listing()
+    listing = Listing()
     all_tickers = listing.all_symbols()
+    all_tickers = all_tickers[all_tickers["exchange"].str.upper() != "UPCOM"]
     log.info(f"Tổng số mã: {len(all_tickers)}")
 
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
