@@ -39,7 +39,8 @@ jobs:
         env:
           DB_PATH: data/stock.db
           DAYS_LOOKBACK: "7"
-          SLEEP_BETWEEN: "1.5"
+          SLEEP_BETWEEN: "3"
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: python scripts/hose_daily.py
 
       - name: 📤 Export JSON for web
