@@ -38,7 +38,8 @@ jobs:
       - name: 🔄 Update symbol overviews
         env:
           DB_PATH: data/stock.db
-          SLEEP_BETWEEN: "2.0"
+          SLEEP_BETWEEN: "3"
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: python scripts/symbol.py
 
       - name: 📤 Export JSON for web
