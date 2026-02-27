@@ -66,6 +66,7 @@ class AdaptiveRateLimiter:
         if current >= self.threshold:
             overload      = current - self.threshold
             dynamic_delay = overload * (60 / self.rpm)
+            log.debug(f"[Limiter] Near limit ({current}/{self.rpm}) -> delay {dynamic_delay:.3f}s")
             time.sleep(dynamic_delay)
 
         self.requests.append(time.time())
@@ -75,7 +76,8 @@ class AdaptiveRateLimiter:
 
 # ---------------- WAIT TIME PARSER ---------------- #
 
-def extract_wait_time(error_message: str, default: int = 60) -> int:
+def extract_wait_time(error_message: str, default: int = 65) -> int:
+    """Parse thời gian chờ từ message lỗi của server (VI + EN)."""
     if not error_message:
         return default
 
@@ -98,6 +100,7 @@ def extract_wait_time(error_message: str, default: int = 60) -> int:
 BOND_PATTERN = re.compile(r'^[A-Z]{2,4}\d{4,}$')
 
 def is_bond(symbol: str) -> bool:
+    """Lọc mã trái phiếu dạng CACB2510, CVMM2520..."""
     return bool(BOND_PATTERN.match(symbol)) and len(symbol) > 6
 
 # ---------------- DB ---------------- #
@@ -144,6 +147,7 @@ def upsert_df(cursor, ticker: str, df: pd.DataFrame):
 # ---------------- TICKERS ---------------- #
 
 def get_tickers() -> list:
+    """Lấy danh sách mã HOSE + HNX, bỏ UPCOM và trái phiếu."""
     listing = Listing()
     try:
         df = listing.symbols_by_exchange()
@@ -209,7 +213,7 @@ def update_daily():
                 break
 
             except SystemExit:
-                wait = 65
+                wait = extract_wait_time("", default=65)
                 log.warning(f"[{ticker}] SystemExit (rate limit) -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
                 time.sleep(wait)
                 limiter.reset()
