@@ -1,0 +1,56 @@
+name: 🏢 Weekly Symbol Update (Sunday)
+
+on:
+  schedule:
+    # 01:00 UTC Chủ nhật = 08:00 ICT Chủ nhật
+    - cron: "0 1 * * 0"
+  workflow_dispatch:
+
+jobs:
+  update-symbols:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240   # symbol.py chạy lâu hơn
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: 📦 Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: 📂 Restore database cache
+        uses: actions/cache@v4
+        with:
+          path: data/stock.db
+          key: stock-db-${{ github.run_id }}
+          restore-keys: |
+            stock-db-
+
+      - name: 🔄 Update symbol overviews
+        env:
+          DB_PATH: data/stock.db
+          SLEEP_BETWEEN: "2.0"
+        run: python scripts/symbol.py
+
+      - name: 📤 Export JSON for web
+        env:
+          DB_PATH: data/stock.db
+          EXPORT_DIR: data/exports
+        run: python scripts/export_json.py
+
+      - name: 💾 Commit & push data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/exports/
+          git diff --cached --quiet || git commit -m "chore: update symbols $(date +'%Y-%m-%d')"
+          git push
