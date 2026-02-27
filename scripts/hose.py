@@ -1,22 +1,26 @@
 """
-hose.py — High Performance Bootstrap Engine
-- HOSE + HNX only
+hose.py — High Performance Bootstrap Engine (Adaptive + Production)
+
+- HOSE + HNX only, loại bỏ trái phiếu
 - True incremental (resume from last date)
-- Rate-limit aware (60 req/min sliding window)
+- Adaptive sliding-window rate limiter (deque-based)
+- Auto-detect server wait time (VI + EN)
+- Catch SystemExit từ vnstock
 - Batch commit every 20 tickers
 - WAL mode enabled
-- Retry with exponential backoff
 """
 
 from vnstock import Listing, Quote
 from datetime import datetime, timedelta
 from tqdm import tqdm
+from collections import deque
 import sqlite3
 import pandas as pd
 import logging
 import sys
 import os
 import time
+import re
 
 # ---------------- CONFIG ---------------- #
 
@@ -35,6 +39,72 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 log = logging.getLogger(__name__)
+
+# ---------------- ADAPTIVE RATE LIMITER ---------------- #
+
+class AdaptiveRateLimiter:
+    def __init__(self, rpm: int, safety_ratio: float = 0.9):
+        self.rpm       = rpm
+        self.threshold = int(rpm * safety_ratio)
+        self.window    = 60
+        self.requests  = deque()
+
+    def acquire(self):
+        now = time.time()
+
+        # Remove expired timestamps
+        while self.requests and now - self.requests[0] > self.window:
+            self.requests.popleft()
+
+        current = len(self.requests)
+
+        # HARD LIMIT — chờ đến khi window trống slot
+        if current >= self.rpm:
+            sleep_time = self.window - (now - self.requests[0]) + 0.1
+            log.info(f"[Limiter] Hard limit -> sleep {sleep_time:.2f}s")
+            time.sleep(sleep_time)
+            return self.acquire()
+
+        # SOFT SLOWDOWN — tự giảm tốc khi gần limit
+        if current >= self.threshold:
+            overload      = current - self.threshold
+            dynamic_delay = overload * (60 / self.rpm)
+            log.debug(f"[Limiter] Near limit ({current}/{self.rpm}) -> delay {dynamic_delay:.3f}s")
+            time.sleep(dynamic_delay)
+
+        self.requests.append(time.time())
+
+    def reset(self):
+        self.requests.clear()
+
+# ---------------- WAIT TIME PARSER ---------------- #
+
+def extract_wait_time(error_message: str, default: int = 60) -> int:
+    """Parse thời gian chờ từ message lỗi của server (VI + EN)."""
+    if not error_message:
+        return default
+
+    patterns = [
+        r"chờ\s+(\d+)\s*gi",        # Chờ 27 giây
+        r"wait\s+(\d+)\s*second",   # Wait 27 seconds
+        r"retry\s*after\s*(\d+)",   # retry after 27
+        r"(\d+)\s*second",          # fallback
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, error_message.lower())
+        if match:
+            return int(match.group(1)) + 1
+
+    return default
+
+# ---------------- BOND FILTER ---------------- #
+
+BOND_PATTERN = re.compile(r'^[A-Z]{2,4}\d{4,}$')
+
+def is_bond(symbol: str) -> bool:
+    """Lọc mã trái phiếu dạng CACB2510, CVMM2520..."""
+    return bool(BOND_PATTERN.match(symbol)) and len(symbol) > 6
 
 # ---------------- DB ---------------- #
 
@@ -58,16 +128,16 @@ def init_db(conn):
     conn.commit()
 
 
-def preload_last_dates(cursor):
+def preload_last_dates(cursor) -> dict:
     cursor.execute("SELECT symbol, MAX(date) FROM stock_prices GROUP BY symbol")
     return {row[0]: row[1] for row in cursor.fetchall()}
 
 
-def upsert_df(cursor, ticker, df):
+def upsert_df(cursor, ticker: str, df: pd.DataFrame):
     rows = [
         (
             ticker,
-            str(getattr(row, "time", getattr(row, "date", ""))),
+            str(getattr(row, "time",   getattr(row, "date", ""))),
             float(getattr(row, "open",   0) or 0),
             float(getattr(row, "high",   0) or 0),
             float(getattr(row, "low",    0) or 0),
@@ -82,41 +152,38 @@ def upsert_df(cursor, ticker, df):
         VALUES (?, ?, ?, ?, ?, ?, ?)
     """, rows)
 
+# ---------------- TICKERS ---------------- #
 
-def get_tickers():
+def get_tickers() -> list:
+    """Lấy danh sách mã HOSE + HNX, bỏ UPCOM và trái phiếu."""
     listing = Listing()
     try:
         df = listing.symbols_by_exchange()
         if "exchange" in df.columns:
-            df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
+            df      = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
             tickers = df["symbol"].tolist()
-            log.info(f"HOSE+HNX: {len(tickers)} ma")
+            before  = len(tickers)
+            tickers = [t for t in tickers if not is_bond(t)]
+            log.info(f"HOSE+HNX: {len(tickers)} mã (bỏ UPCOM + {before - len(tickers)} trái phiếu)")
             return tickers
     except Exception as e:
-        log.warning(f"symbols_by_exchange() loi: {e} — fallback all_symbols()")
-    df = listing.all_symbols()
-    return df["symbol"].tolist()
+        log.warning(f"symbols_by_exchange() lỗi: {e} — fallback all_symbols()")
 
+    df      = listing.all_symbols()
+    tickers = [t for t in df["symbol"].tolist() if not is_bond(t)]
+    log.warning(f"Fallback all_symbols(): {len(tickers)} mã")
+    return tickers
 
-def rate_limit_check(request_count, window_start):
-    request_count += 1
-    if request_count >= MAX_REQUEST_PER_MIN:
-        elapsed = time.time() - window_start
-        if elapsed < 60:
-            sleep_time = 60 - elapsed
-            log.info(f"Rate window full -> sleep {sleep_time:.1f}s")
-            time.sleep(sleep_time)
-        return 0, time.time()
-    return request_count, window_start
-
+# ---------------- MAIN ---------------- #
 
 def fetch_all_history():
     if API_KEY:
         os.environ["VNSTOCK_API_KEY"] = API_KEY
-        log.info("Using API key")
+        log.info("✅ Using API key")
     else:
-        log.warning("Guest mode (20 req/min)")
+        log.warning("⚠️  Guest mode (20 req/min)")
 
+    limiter  = AdaptiveRateLimiter(MAX_REQUEST_PER_MIN, safety_ratio=0.9)
     tickers  = get_tickers()
     end_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -127,12 +194,11 @@ def fetch_all_history():
 
     last_dates    = preload_last_dates(cursor)
     ok = fail = skipped = 0
-    request_count = 0
-    window_start  = time.time()
     batch_counter = 0
 
     for ticker in tqdm(tickers, desc="Bootstrap prices"):
 
+        # Incremental: chỉ tải từ ngày chưa có
         last_date = last_dates.get(ticker)
         if last_date:
             start_date = (
@@ -150,28 +216,34 @@ def fetch_all_history():
 
         while retry < MAX_RETRY:
             try:
-                request_count, window_start = rate_limit_check(request_count, window_start)
+                limiter.acquire()
+
                 quote = Quote(symbol=ticker, source="VCI")
                 df    = quote.history(start=start_date, end=end_date)
+
                 if df is not None and not df.empty:
                     upsert_df(cursor, ticker, df)
                     batch_counter += 1
                     ok += 1
+
                 success = True
                 break
 
             except SystemExit:
-                wait = 2 ** retry * 10
-                log.warning(f"[{ticker}] SystemExit rate limit -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
+                # vnstock gọi sys.exit() khi bị rate limit
+                wait = 65
+                log.warning(f"[{ticker}] SystemExit (rate limit) -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
                 time.sleep(wait)
+                limiter.reset()
                 retry += 1
 
             except Exception as e:
                 err = str(e).lower()
-                if "429" in err or "rate limit" in err or "exceeded" in err:
-                    wait = 2 ** retry * 10
+                if any(x in err for x in ["429", "rate limit", "giới hạn", "exceeded"]):
+                    wait = extract_wait_time(str(e), default=65)
                     log.warning(f"[{ticker}] Rate limit -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
                     time.sleep(wait)
+                    limiter.reset()
                     retry += 1
                 else:
                     log.warning(f"[{ticker}] Error: {e}")
@@ -179,7 +251,7 @@ def fetch_all_history():
                     break
 
         if not success and retry >= MAX_RETRY:
-            log.warning(f"[{ticker}] Het retry — bo qua")
+            log.warning(f"[{ticker}] Hết retry — bỏ qua")
             fail += 1
 
         if batch_counter >= COMMIT_BATCH:
@@ -188,7 +260,7 @@ def fetch_all_history():
 
     conn.commit()
     conn.close()
-    log.info(f"Done — OK: {ok}, Skipped: {skipped}, Failed: {fail}")
+    log.info(f"✅ Done — OK: {ok}, Skipped: {skipped}, Failed: {fail}")
 
 
 if __name__ == "__main__":
