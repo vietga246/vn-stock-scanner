@@ -13,7 +13,6 @@ import logging
 import sys
 import os
 
-# ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -21,9 +20,10 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-DB_PATH = os.getenv("DB_PATH", "data/stock.db")
-START_DATE = "2000-01-01"
-SLEEP_BETWEEN = float(os.getenv("SLEEP_BETWEEN", "15"))
+DB_PATH       = os.getenv("DB_PATH", "data/stock.db")
+START_DATE    = "2000-01-01"
+SLEEP_BETWEEN = float(os.getenv("SLEEP_BETWEEN", "3"))
+API_KEY       = os.getenv("VNSTOCK_API_KEY", "")
 
 
 def init_db(conn: sqlite3.Connection):
@@ -49,11 +49,11 @@ def upsert_df(cursor: sqlite3.Cursor, ticker: str, df: pd.DataFrame):
         (
             ticker,
             str(row.get("time", "")),
-            float(row.get("open", 0) or 0),
-            float(row.get("high", 0) or 0),
-            float(row.get("low",  0) or 0),
-            float(row.get("close",0) or 0),
-            int(row.get("volume", 0) or 0),
+            float(row.get("open",   0) or 0),
+            float(row.get("high",   0) or 0),
+            float(row.get("low",    0) or 0),
+            float(row.get("close",  0) or 0),
+            int(row.get("volume",   0) or 0),
         )
         for _, row in df.iterrows()
     ]
@@ -66,9 +66,16 @@ def upsert_df(cursor: sqlite3.Cursor, ticker: str, df: pd.DataFrame):
 
 
 def fetch_all_history():
+    # Set API key nếu có
+    if API_KEY:
+        os.environ["VNSTOCK_API_KEY"] = API_KEY
+        log.info("✅ Sử dụng API key từ environment")
+    else:
+        log.warning("⚠️  Không có API key — dùng gói Guest (giới hạn 20 req/phút)")
+
     log.info("Lấy danh sách tất cả mã cổ phiếu...")
-    listing  = Listing()
-    tickers  = listing.all_symbols()["symbol"].tolist()
+    listing = Listing()
+    tickers = listing.all_symbols()["symbol"].tolist()
     log.info(f"Tổng số mã: {len(tickers)}")
 
     end_date = datetime.now().strftime("%Y-%m-%d")
@@ -80,20 +87,29 @@ def fetch_all_history():
 
     ok, fail = 0, 0
     for ticker in tqdm(tickers, desc="Tải lịch sử giá"):
-        try:
-            quote = Quote(symbol=ticker, source="VCI")
-            df    = quote.history(start=START_DATE, end=end_date)
-            if not df.empty:
-                upsert_df(cursor, ticker, df)
-                conn.commit()
-                ok += 1
-        except Exception as e:
-            log.warning(f"[{ticker}] Lỗi: {e}")
-            if "Rate Limit" in str(e) or "rate limit" in str(e).lower():
-                log.info("Rate limit hit — chờ 60 giây...")
-                time.sleep(60)
-            else:
-                fail += 1
+        retry = 0
+        while retry < 3:
+            try:
+                quote = Quote(symbol=ticker, source="VCI")
+                df    = quote.history(start=START_DATE, end=end_date)
+                if not df.empty:
+                    upsert_df(cursor, ticker, df)
+                    conn.commit()
+                    ok += 1
+                break  # thành công, thoát vòng retry
+
+            except Exception as e:
+                err = str(e)
+                if "Rate Limit" in err or "rate limit" in err.lower() or "429" in err:
+                    wait = 60
+                    log.warning(f"[{ticker}] Rate limit — chờ {wait}s rồi thử lại...")
+                    time.sleep(wait)
+                    retry += 1
+                else:
+                    log.warning(f"[{ticker}] Lỗi: {e}")
+                    fail += 1
+                    break
+
         time.sleep(SLEEP_BETWEEN)
 
     conn.close()
