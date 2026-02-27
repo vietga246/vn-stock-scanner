@@ -1,0 +1,24 @@
+name: 🔍 Test vnstock API
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r scripts/requirements.txt
+      - run: |
+          python -c "
+          from vnstock import Company
+          c = Company(symbol='VNM', source='VCI')
+          print('Methods:', [m for m in dir(c) if not m.startswith('_')])
+          try:
+              print('overview:', c.overview())
+          except Exception as e:
+              print('overview error:', e)
+          "
+        env:
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
