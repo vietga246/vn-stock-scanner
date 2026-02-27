@@ -1,24 +1,22 @@
-name: 🔍 Test vnstock API
-on:
-  workflow_dispatch:
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r scripts/requirements.txt
-      - run: |
+- run: |
           python -c "
-          from vnstock import Company
+          from vnstock import Company, Listing
+          import pandas as pd
+
+          # Test listing để xem có field gì
+          lst = Listing()
+          df = lst.all_symbols()
+          print('Listing columns:', df.columns.tolist())
+          print(df[df['symbol']=='VNM'])
+
+          # Test Company methods
           c = Company(symbol='VNM', source='VCI')
-          print('Methods:', [m for m in dir(c) if not m.startswith('_')])
-          try:
-              print('overview:', c.overview())
-          except Exception as e:
-              print('overview error:', e)
+          for method in ['overview', 'profile', 'shareholders', 'officers']:
+              try:
+                  result = getattr(c, method)()
+                  print(f'{method} OK:', result.columns.tolist() if hasattr(result, 'columns') else result)
+              except Exception as e:
+                  print(f'{method} ERROR:', e)
           "
         env:
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
