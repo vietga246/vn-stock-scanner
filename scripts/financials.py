@@ -182,8 +182,11 @@ def get_tickers() -> list:
         warrants = set()
     try:
         df = listing.symbols_by_exchange()
-        if "exchange" in df.columns:
-            df      = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
+if "exchange" in df.columns:
+            df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
+            # Lọc thêm: chỉ giữ type == STOCK, bỏ ETF, BOND, FUND
+            if "type" in df.columns:
+                df = df[df["type"].str.upper() == "STOCK"]
             tickers = [t for t in df["symbol"].tolist() if t not in warrants]
             log.info(f"HOSE+HNX: {len(tickers)} mã")
             return tickers
