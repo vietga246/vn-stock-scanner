@@ -52,8 +52,13 @@ def init_db(conn: sqlite3.Connection):
 def fetch_symbols():
     log.info("Lấy danh sách tất cả mã cổ phiếu...")
     listing = Listing()
-    all_tickers = listing.all_symbols()
-    all_tickers = all_tickers[all_tickers["exchange"].str.upper() != "UPCOM"]
+    all_symbols = listing.all_symbols()
+    log.info(f"Các cột có sẵn: {all_symbols.columns.tolist()}")
+    if "exchange" in all_symbols.columns:
+        all_symbols = all_symbols[all_symbols["exchange"].str.upper() != "UPCOM"]
+    elif "comGroupCode" in all_symbols.columns:
+        all_symbols = all_symbols[all_symbols["comGroupCode"].str.upper() != "UPCOM"]
+    tickers = all_symbols["symbol"].tolist()
     log.info(f"Tổng số mã: {len(all_tickers)}")
 
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
