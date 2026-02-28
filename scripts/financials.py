@@ -1,22 +1,12 @@
-“””
-financials.py – Lấy báo cáo tài chính & chỉ số tài chính
+# financials.py - Lay bao cao tai chinh & chi so tai chinh
 
-- HOSE + HNX only, chỉ type=STOCK, loại chứng quyền
-- Lấy: ratio, income_statement, balance_sheet, cash_flow
-- Incremental: skip mã đã cập nhật trong 80 ngày (~1 quý)
-- ThreadPoolExecutor (10 workers) + SmartRateLimiter thread-safe (60 RPM)
+# HOSE + HNX only, type=STOCK, loai chung quyen
 
-BUG FIX v2:
-LỖI 1 - income/balance/cashflow:
-upsert tìm field ‘year’/‘Năm’ nhưng API trả về ‘yearReport’/‘lengthReport’
-→ year=0 cho tất cả rows → PRIMARY KEY collision → chỉ giữ 1 row/mã
-FIX: extract_year_quarter() nhận đúng field name của từng report type
+# ratio, income_statement, balance_sheet, cash_flow
 
-LỖI 2 - ratio():
-Finance.ratio() trả về DataFrame WIDE: rows=metrics, cols=MultiIndex(năm/quý)
-iterrows() cho ra 1 row = 1 metric → không phải 1 năm
-FIX: transpose DataFrame trước, mỗi row = 1 period
-“””
+# Incremental skip 80 ngay, ThreadPool 10 workers, SmartRateLimiter 60 RPM
+
+# BUG FIX: upsert_ratio transpose + upsert_report dung yearReport field
 
 from vnstock import Listing, Finance
 from datetime import datetime, timedelta
@@ -32,7 +22,7 @@ import re
 import json
 import threading
 
-# ================= CONFIG =================
+# ===== CONFIG =====
 
 DB_PATH              = os.getenv(“DB_PATH”, “data/stock.db”)
 API_KEY              = os.getenv(“VNSTOCK_API_KEY”, “”)
@@ -41,7 +31,7 @@ MAX_WORKERS          = 10
 MAX_RETRY            = 4
 SKIP_IF_UPDATED_DAYS = 80
 
-# ================= LOGGING =================
+# ===== LOGGING =====
 
 logging.basicConfig(
 level=logging.INFO,
@@ -50,7 +40,7 @@ handlers=[logging.StreamHandler(sys.stdout)],
 )
 log = logging.getLogger(**name**)
 
-# ================= SMART RATE LIMITER =================
+# ===== SMART RATE LIMITER (thread-safe) =====
 
 class SmartRateLimiter:
 def **init**(self, rpm: int):
@@ -85,7 +75,7 @@ def reset(self):
 
 limiter = SmartRateLimiter(MAX_REQUEST_PER_MIN)
 
-# ================= WAIT TIME PARSER =================
+# ===== WAIT TIME PARSER =====
 
 def extract_wait_time(msg: str, default: int = 65) -> int:
 for pattern in [
@@ -99,7 +89,7 @@ if m:
 return int(m.group(1)) + 1
 return default
 
-# ================= DATABASE =================
+# ===== DATABASE =====
 
 def create_connection() -> sqlite3.Connection:
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
@@ -154,7 +144,7 @@ updated_at TEXT
 “””)
 conn.commit()
 
-# ================= UTILS =================
+# ===== UTILS =====
 
 def should_skip(updated_at_map: dict, symbol: str) -> bool:
 updated_at = updated_at_map.get(symbol)
@@ -164,101 +154,74 @@ cutoff = (datetime.now() - timedelta(days=SKIP_IF_UPDATED_DAYS)).isoformat()
 return updated_at >= cutoff
 
 def upsert_ratio(cursor: sqlite3.Cursor, symbol: str, df: pd.DataFrame):
-“””
-FIX LỖI 2: Finance.ratio() trả về DataFrame WIDE:
-- Index = tên các chỉ tiêu (PE, ROE, ROA…)
-- Columns = MultiIndex (yearReport, quarter) hoặc (year, lengthReport)
-Cần TRANSPOSE để mỗi row = 1 period.
-“””
+# Finance.ratio() tra ve DataFrame WIDE: rows=metrics, cols=MultiIndex(year,quarter)
+# Can TRANSPOSE de moi row = 1 period
 now = datetime.now().isoformat()
-
-```
-# Transpose: rows → columns (metric names), index → periods
 df_T = df.T.copy()
-
-# Flatten index nếu là MultiIndex → (2024, 1) → year=2024, quarter=1
 records = []
 for idx, row in df_T.iterrows():
-    if isinstance(idx, tuple):
-        year    = int(idx[0]) if idx[0] else 0
-        quarter = int(idx[1]) if len(idx) > 1 and idx[1] else 0
-    else:
-        # Index là string dạng "2024" hoặc "2024Q1"
-        idx_str = str(idx)
-        m = re.match(r"(\d{4})(?:Q(\d))?", idx_str)
-        if m:
-            year    = int(m.group(1))
-            quarter = int(m.group(2)) if m.group(2) else 0
-        else:
-            year = quarter = 0
-
-    period = "quarter" if quarter else "annual"
-    row_dict = {str(k): v for k, v in row.to_dict().items()}
-    row_dict["symbol"] = symbol
-    row_dict["year"]   = year
-    row_dict["quarter"] = quarter
-
-    records.append((
-        symbol, period, year, quarter,
-        json.dumps(row_dict, ensure_ascii=False, default=str),
-        now,
-    ))
-
+if isinstance(idx, tuple):
+year    = int(idx[0]) if idx[0] else 0
+quarter = int(idx[1]) if len(idx) > 1 and idx[1] else 0
+else:
+idx_str = str(idx)
+m = re.match(r”(\d{4})(?:Q(\d))?”, idx_str)
+if m:
+year    = int(m.group(1))
+quarter = int(m.group(2)) if m.group(2) else 0
+else:
+year = quarter = 0
+period   = “quarter” if quarter else “annual”
+row_dict = {str(k): v for k, v in row.to_dict().items()}
+row_dict[“symbol”]  = symbol
+row_dict[“year”]    = year
+row_dict[“quarter”] = quarter
+records.append((
+symbol, period, year, quarter,
+json.dumps(row_dict, ensure_ascii=False, default=str),
+now,
+))
 if records:
-    cursor.executemany("""
-        INSERT OR REPLACE INTO financials_ratio
-        (symbol, period, year, quarter, data_json, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, records)
+cursor.executemany(”””
+INSERT OR REPLACE INTO financials_ratio
+(symbol, period, year, quarter, data_json, updated_at)
+VALUES (?, ?, ?, ?, ?, ?)
+“””, records)
 return len(records)
-```
 
 def upsert_report(cursor: sqlite3.Cursor, table: str, symbol: str, df: pd.DataFrame):
-“””
-FIX LỖI 1: income/balance/cashflow trả về DataFrame LONG:
-- Mỗi row = 1 period
-- Field năm: ‘yearReport’ (không phải ‘year’ hay ‘Năm’)
-- Field quý: ‘lengthReport’ (1=Q1, 2=Q2, 3=Q3, 4=Q4, 5=annual)
-“””
+# income/balance/cashflow: moi row = 1 period
+# Field nam: ‘yearReport’, field quy: ‘lengthReport’ (5=annual, 1-4=Q1-Q4)
 now = datetime.now().isoformat()
 records = []
-
-```
 for _, row in df.iterrows():
-    d = {str(k): v for k, v in row.to_dict().items()}
-
-    # FIX: dùng đúng field name của vnstock API
-    year    = int(d.get("yearReport", d.get("year", d.get("N\u0103m", 0)) or 0))
-    length  = int(d.get("lengthReport", d.get("quarter", d.get("Qu\u00fd", 0)) or 0))
-
-    # lengthReport: 5 = annual, 1-4 = Q1-Q4
-    if length == 5:
-        quarter = 0
-        period  = "annual"
-    else:
-        quarter = length
-        period  = "quarter"
-
-    d["year"]    = year
-    d["quarter"] = quarter
-    d["symbol"]  = symbol
-
-    records.append((
-        symbol, period, year, quarter,
-        json.dumps(d, ensure_ascii=False, default=str),
-        now,
-    ))
-
+d = {str(k): v for k, v in row.to_dict().items()}
+year   = int(d.get(“yearReport”,   d.get(“year”,    0)) or 0)
+length = int(d.get(“lengthReport”, d.get(“quarter”, 0)) or 0)
+if length == 5:
+quarter = 0
+period  = “annual”
+else:
+quarter = length
+period  = “quarter”
+d[“year”]    = year
+d[“quarter”] = quarter
+d[“symbol”]  = symbol
+records.append((
+symbol, period, year, quarter,
+json.dumps(d, ensure_ascii=False, default=str),
+now,
+))
 if records:
-    cursor.executemany(f"""
-        INSERT OR REPLACE INTO {table}
-        (symbol, period, year, quarter, data_json, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, records)
+cursor.executemany(
+f”INSERT OR REPLACE INTO {table} “
+“(symbol, period, year, quarter, data_json, updated_at) “
+“VALUES (?, ?, ?, ?, ?, ?)”,
+records
+)
 return len(records)
-```
 
-# ================= TICKERS =================
+# ===== TICKERS =====
 
 def get_tickers() -> list:
 listing = Listing()
@@ -280,80 +243,65 @@ log.warning(f”symbols_by_exchange() loi: {e}”)
 df = listing.all_symbols()
 return [t for t in df[“symbol”].tolist() if t not in warrants]
 
-# ================= WORKER =================
+# ===== WORKER =====
 
 def process_symbol(symbol: str, updated_at_map: dict) -> str:
 if should_skip(updated_at_map, symbol):
 return “skipped”
-
-```
 conn   = create_connection()
 cursor = conn.cursor()
 retry  = 0
-
 while retry < MAX_RETRY:
-    try:
-        limiter.acquire()
-        f = Finance(symbol=symbol, source="VCI", period="quarter", get_all=True)
-
-        # ratio: dùng upsert_ratio (transpose)
-        try:
-            df = f.ratio()
-            if df is not None and not df.empty:
-                n = upsert_ratio(cursor, symbol, df)
-                log.debug(f"[{symbol}] ratio: {n} periods")
-        except Exception as e:
-            log.warning(f"[{symbol}] financials_ratio loi: {e}")
-
-        # income/balance/cashflow: dùng upsert_report (yearReport field)
-        for table, method in [
-            ("financials_income",   f.income_statement),
-            ("financials_balance",  f.balance_sheet),
-            ("financials_cashflow", f.cash_flow),
-        ]:
-            try:
-                df = method()
-                if df is not None and not df.empty:
-                    n = upsert_report(cursor, table, symbol, df)
-                    log.debug(f"[{symbol}] {table}: {n} periods")
-            except Exception as e:
-                log.warning(f"[{symbol}] {table} loi: {e}")
-
-        cursor.execute("""
-            INSERT OR REPLACE INTO financials_meta (symbol, updated_at)
-            VALUES (?, ?)
-        """, (symbol, datetime.now().isoformat()))
-
-        conn.commit()
-        conn.close()
-        log.info(f"OK {symbol}")
-        return "ok"
-
-    except SystemExit:
-        log.warning(f"[{symbol}] SystemExit -> sleep 65s (retry {retry+1}/{MAX_RETRY})")
-        time.sleep(65)
-        limiter.reset()
-        retry += 1
-
-    except Exception as e:
-        err = str(e).lower()
-        if any(x in err for x in ["429", "rate limit", "exceeded", "gi\u1edbi h\u1ea1n"]):
-            wait = extract_wait_time(str(e))
-            log.warning(f"[{symbol}] Rate limit -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})")
-            time.sleep(wait)
-            limiter.reset()
-        else:
-            sleep_time = 2 ** retry
-            log.warning(f"[{symbol}] Loi: {e} -> retry {retry+1}/{MAX_RETRY} sau {sleep_time}s")
-            time.sleep(sleep_time)
-        retry += 1
-
+try:
+limiter.acquire()
+f = Finance(symbol=symbol, source=“VCI”, period=“quarter”, get_all=True)
+try:
+df = f.ratio()
+if df is not None and not df.empty:
+upsert_ratio(cursor, symbol, df)
+except Exception as e:
+log.warning(f”[{symbol}] financials_ratio loi: {e}”)
+for table, method in [
+(“financials_income”,   f.income_statement),
+(“financials_balance”,  f.balance_sheet),
+(“financials_cashflow”, f.cash_flow),
+]:
+try:
+df = method()
+if df is not None and not df.empty:
+upsert_report(cursor, table, symbol, df)
+except Exception as e:
+log.warning(f”[{symbol}] {table} loi: {e}”)
+cursor.execute(
+“INSERT OR REPLACE INTO financials_meta (symbol, updated_at) VALUES (?, ?)”,
+(symbol, datetime.now().isoformat())
+)
+conn.commit()
 conn.close()
-log.warning(f"FAIL {symbol} -- het retry")
-return "fail"
-```
+log.info(f”OK {symbol}”)
+return “ok”
+except SystemExit:
+log.warning(f”[{symbol}] SystemExit -> sleep 65s (retry {retry+1}/{MAX_RETRY})”)
+time.sleep(65)
+limiter.reset()
+retry += 1
+except Exception as e:
+err = str(e).lower()
+if any(x in err for x in [“429”, “rate limit”, “exceeded”, “gi\u1edbi h\u1ea1n”]):
+wait = extract_wait_time(str(e))
+log.warning(f”[{symbol}] Rate limit -> sleep {wait}s (retry {retry+1}/{MAX_RETRY})”)
+time.sleep(wait)
+limiter.reset()
+else:
+sleep_time = 2 ** retry
+log.warning(f”[{symbol}] Loi: {e} -> retry {retry+1}/{MAX_RETRY} sau {sleep_time}s”)
+time.sleep(sleep_time)
+retry += 1
+conn.close()
+log.warning(f”FAIL {symbol}”)
+return “fail”
 
-# ================= MAIN =================
+# ===== MAIN =====
 
 def fetch_financials():
 if API_KEY:
@@ -361,41 +309,26 @@ os.environ[“VNSTOCK_API_KEY”] = API_KEY
 log.info(“Using API key”)
 else:
 log.warning(“Guest mode”)
-
-```
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-
 conn = create_connection()
 init_db(conn)
 cursor = conn.cursor()
-cursor.execute("SELECT symbol, updated_at FROM financials_meta")
+cursor.execute(“SELECT symbol, updated_at FROM financials_meta”)
 updated_at_map = dict(cursor.fetchall())
 conn.close()
-
 tickers = get_tickers()
-log.info(f"Bat dau lay tai chinh cho {len(tickers)} ma...")
-
-results = {"ok": 0, "fail": 0, "skipped": 0}
-
+log.info(f”Bat dau lay tai chinh cho {len(tickers)} ma…”)
+results = {“ok”: 0, “fail”: 0, “skipped”: 0}
 with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-    futures = {
-        executor.submit(process_symbol, s, updated_at_map): s
-        for s in tickers
-    }
-    for future in as_completed(futures):
-        try:
-            result = future.result()
-        except Exception as e:
-            log.warning(f"Future exception: {e}")
-            result = "fail"
-        results[result] += 1
-
-log.info(
-    f"Done -- OK: {results['ok']} | "
-    f"Skipped: {results['skipped']} | "
-    f"Failed: {results['fail']}"
-)
-```
+futures = {executor.submit(process_symbol, s, updated_at_map): s for s in tickers}
+for future in as_completed(futures):
+try:
+result = future.result()
+except Exception as e:
+log.warning(f”Future exception: {e}”)
+result = “fail”
+results[result] += 1
+log.info(f”Done – OK: {results[‘ok’]} | Skipped: {results[‘skipped’]} | Failed: {results[‘fail’]}”)
 
 if **name** == “**main**”:
 fetch_financials()
