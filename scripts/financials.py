@@ -1,7 +1,6 @@
 # financials.py
 from vnstock import Listing, Finance
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import deque
 import sqlite3
 import pandas as pd
@@ -15,10 +14,9 @@ import threading
 
 DB_PATH              = os.getenv('DB_PATH', 'data/stock.db')
 API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
-MAX_REQUEST_PER_MIN  = 60
-MAX_WORKERS          = 3
-MAX_RETRY            = 4
+MAX_REQUEST_PER_MIN  = 55
 SKIP_IF_UPDATED_DAYS = 80
+RATE_WINDOW          = 60
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,11 +28,10 @@ log = logging.getLogger(__name__)
 
 class SmartRateLimiter:
     def __init__(self, rpm):
-        self.rpm        = rpm
-        self.soft_limit = int(rpm * 0.85)
-        self.window     = 60
-        self.requests   = deque()
-        self.lock       = threading.Lock()
+        self.rpm      = rpm
+        self.window   = RATE_WINDOW
+        self.requests = deque()
+        self.lock     = threading.Lock()
 
     def acquire(self):
         while True:
@@ -42,15 +39,10 @@ class SmartRateLimiter:
                 now = time.time()
                 while self.requests and now - self.requests[0] > self.window:
                     self.requests.popleft()
-                current = len(self.requests)
-                if current >= self.rpm:
-                    sleep_time = self.window - (now - self.requests[0]) + 0.05
-                elif current >= self.soft_limit:
-                    ratio      = (current - self.soft_limit) / (self.rpm - self.soft_limit)
-                    sleep_time = ratio * 0.8
-                else:
+                if len(self.requests) < self.rpm:
                     self.requests.append(time.time())
                     return
+                sleep_time = self.window - (now - self.requests[0]) + 0.1
             time.sleep(sleep_time)
 
     def reset(self):
@@ -59,7 +51,6 @@ class SmartRateLimiter:
 
 
 limiter = SmartRateLimiter(MAX_REQUEST_PER_MIN)
-db_lock = threading.Lock()
 
 
 def extract_wait_time(msg, default=65):
@@ -71,17 +62,17 @@ def extract_wait_time(msg, default=65):
     ]:
         m = re.search(pattern, msg.lower())
         if m:
-            return int(m.group(1)) + 1
+            return int(m.group(1)) + 2
     return default
 
 
 def create_connection():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False, timeout=30)
+    conn = sqlite3.connect(DB_PATH, timeout=60)
     conn.execute('PRAGMA journal_mode=WAL;')
     conn.execute('PRAGMA synchronous=NORMAL;')
     conn.execute('PRAGMA temp_store=MEMORY;')
     conn.execute('PRAGMA cache_size=-20000;')
-    conn.execute('PRAGMA busy_timeout=30000;')
+    conn.execute('PRAGMA busy_timeout=60000;')
     return conn
 
 
@@ -120,7 +111,7 @@ def should_skip(updated_at_map, symbol):
     return updated_at >= cutoff
 
 
-def upsert_ratio(cursor, symbol, df):
+def upsert_ratio(conn, symbol, df):
     now  = datetime.now().isoformat()
     df_T = df.T.copy()
     records = []
@@ -139,7 +130,7 @@ def upsert_ratio(cursor, symbol, df):
         except (ValueError, TypeError):
             year = quarter = 0
         if year == 0:
-            continue  # skip Meta rows and unparseable indexes
+            continue
         period   = 'quarter' if quarter else 'annual'
         row_dict = {str(k): v for k, v in row.to_dict().items()}
         row_dict['symbol']  = symbol
@@ -150,7 +141,7 @@ def upsert_ratio(cursor, symbol, df):
             json.dumps(row_dict, ensure_ascii=False, default=str), now,
         ))
     if records:
-        cursor.executemany(
+        conn.executemany(
             'INSERT OR REPLACE INTO financials_ratio '
             '(symbol, period, year, quarter, data_json, updated_at) '
             'VALUES (?, ?, ?, ?, ?, ?)',
@@ -159,7 +150,7 @@ def upsert_ratio(cursor, symbol, df):
     return len(records)
 
 
-def upsert_report(cursor, table, symbol, df):
+def upsert_report(conn, table, symbol, df):
     now = datetime.now().isoformat()
     records = []
     for _, row in df.iterrows():
@@ -185,7 +176,7 @@ def upsert_report(cursor, table, symbol, df):
             ' (symbol, period, year, quarter, data_json, updated_at)'
             ' VALUES (?, ?, ?, ?, ?, ?)'
         )
-        cursor.executemany(sql, records)
+        conn.executemany(sql, records)
     return len(records)
 
 
@@ -210,62 +201,73 @@ def get_tickers():
     return [t for t in df['symbol'].tolist() if t not in warrants]
 
 
-def process_symbol(symbol, updated_at_map):
-    if should_skip(updated_at_map, symbol):
-        return 'skipped'
-    conn   = create_connection()
-    cursor = conn.cursor()
-    retry  = 0
-    while retry < MAX_RETRY:
+def fetch_symbol(symbol):
+    retry = 0
+    while retry < 4:
         try:
             limiter.acquire()
             f = Finance(symbol=symbol, source='VCI', period='quarter', get_all=True)
+            result = {}
             try:
                 df = f.ratio()
                 if df is not None and not df.empty:
-                    upsert_ratio(cursor, symbol, df)
+                    result['ratio'] = df
             except Exception as e:
                 log.warning('[%s] ratio loi: %s', symbol, e)
-            for table, method in [
-                ('financials_income',   f.income_statement),
-                ('financials_balance',  f.balance_sheet),
-                ('financials_cashflow', f.cash_flow),
+            for key, method in [
+                ('income',   f.income_statement),
+                ('balance',  f.balance_sheet),
+                ('cashflow', f.cash_flow),
             ]:
                 try:
                     df = method()
                     if df is not None and not df.empty:
-                        upsert_report(cursor, table, symbol, df)
+                        result[key] = df
                 except Exception as e:
-                    log.warning('[%s] %s loi: %s', symbol, table, e)
-            cursor.execute(
-                'INSERT OR REPLACE INTO financials_meta (symbol, updated_at) VALUES (?, ?)',
-                (symbol, datetime.now().isoformat())
-            )
-            with db_lock:
-                conn.commit()
-            conn.close()
-            log.info('OK %s', symbol)
-            return 'ok'
+                    log.warning('[%s] %s loi: %s', symbol, key, e)
+            return result
         except SystemExit:
-            log.warning('[%s] SystemExit -> sleep 65s (retry %d/%d)', symbol, retry+1, MAX_RETRY)
-            time.sleep(65)
+            wait = 65
+            log.warning('[%s] SystemExit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
+            time.sleep(wait)
             limiter.reset()
             retry += 1
         except Exception as e:
             err = str(e).lower()
             if any(x in err for x in ['429', 'rate limit', 'exceeded', 'gi\u1edbi h\u1ea1n']):
                 wait = extract_wait_time(str(e))
-                log.warning('[%s] Rate limit -> sleep %ds (retry %d/%d)', symbol, wait, retry+1, MAX_RETRY)
+                log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
                 time.sleep(wait)
                 limiter.reset()
             else:
                 sleep_time = 2 ** retry
-                log.warning('[%s] Loi: %s -> retry %d/%d sau %ds', symbol, e, retry+1, MAX_RETRY, sleep_time)
+                log.warning('[%s] Loi: %s -> retry %d/4 sau %ds', symbol, e, retry+1, sleep_time)
                 time.sleep(sleep_time)
             retry += 1
-    conn.close()
-    log.warning('FAIL %s', symbol)
-    return 'fail'
+    return None
+
+
+def save_symbol(conn, symbol, data):
+    try:
+        if 'ratio' in data:
+            upsert_ratio(conn, symbol, data['ratio'])
+        for key, table in [
+            ('income',   'financials_income'),
+            ('balance',  'financials_balance'),
+            ('cashflow', 'financials_cashflow'),
+        ]:
+            if key in data:
+                upsert_report(conn, table, symbol, data[key])
+        conn.execute(
+            'INSERT OR REPLACE INTO financials_meta (symbol, updated_at) VALUES (?, ?)',
+            (symbol, datetime.now().isoformat())
+        )
+        conn.commit()
+        return True
+    except Exception as e:
+        log.warning('[%s] Save loi: %s', symbol, e)
+        conn.rollback()
+        return False
 
 
 def fetch_financials():
@@ -275,26 +277,33 @@ def fetch_financials():
     else:
         log.warning('Guest mode')
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+
     conn = create_connection()
     init_db(conn)
     cursor = conn.cursor()
     cursor.execute('SELECT symbol, updated_at FROM financials_meta')
     updated_at_map = dict(cursor.fetchall())
-    conn.close()
+
     tickers = get_tickers()
-    log.info('Bat dau lay tai chinh cho %d ma...', len(tickers))
-    results = {'ok': 0, 'fail': 0, 'skipped': 0}
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(process_symbol, s, updated_at_map): s for s in tickers}
-        for future in as_completed(futures):
-            try:
-                result = future.result()
-            except Exception as e:
-                log.warning('Future exception: %s', e)
-                result = 'fail'
-            results[result] += 1
-    log.info('Done -- OK: %d | Skipped: %d | Failed: %d',
-             results['ok'], results['skipped'], results['fail'])
+    todo    = [s for s in tickers if not should_skip(updated_at_map, s)]
+    skipped = len(tickers) - len(todo)
+    log.info('Bat dau: %d ma (skip %d da co data)', len(todo), skipped)
+
+    ok = fail = 0
+    for i, symbol in enumerate(todo):
+        data = fetch_symbol(symbol)
+        if data is None:
+            fail += 1
+            log.warning('FAIL %s', symbol)
+        else:
+            if save_symbol(conn, symbol, data):
+                ok += 1
+                log.info('OK %s (%d/%d)', symbol, i+1, len(todo))
+            else:
+                fail += 1
+
+    conn.close()
+    log.info('Done -- OK: %d | Skipped: %d | Failed: %d', ok, skipped, fail)
 
 
 if __name__ == '__main__':
