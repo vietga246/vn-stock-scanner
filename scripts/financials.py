@@ -16,7 +16,7 @@ import threading
 DB_PATH              = os.getenv('DB_PATH', 'data/stock.db')
 API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
 MAX_REQUEST_PER_MIN  = 60
-MAX_WORKERS          = 10
+MAX_WORKERS          = 3
 MAX_RETRY            = 4
 SKIP_IF_UPDATED_DAYS = 80
 
@@ -59,6 +59,7 @@ class SmartRateLimiter:
 
 
 limiter = SmartRateLimiter(MAX_REQUEST_PER_MIN)
+db_lock = threading.Lock()
 
 
 def extract_wait_time(msg, default=65):
@@ -75,11 +76,12 @@ def extract_wait_time(msg, default=65):
 
 
 def create_connection():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False, timeout=30)
     conn.execute('PRAGMA journal_mode=WAL;')
     conn.execute('PRAGMA synchronous=NORMAL;')
     conn.execute('PRAGMA temp_store=MEMORY;')
     conn.execute('PRAGMA cache_size=-20000;')
+    conn.execute('PRAGMA busy_timeout=30000;')
     return conn
 
 
@@ -239,7 +241,8 @@ def process_symbol(symbol, updated_at_map):
                 'INSERT OR REPLACE INTO financials_meta (symbol, updated_at) VALUES (?, ?)',
                 (symbol, datetime.now().isoformat())
             )
-            conn.commit()
+            with db_lock:
+                conn.commit()
             conn.close()
             log.info('OK %s', symbol)
             return 'ok'
