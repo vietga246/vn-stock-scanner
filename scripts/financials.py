@@ -1,5 +1,5 @@
 “””
-financials.py — Lấy báo cáo tài chính & chỉ số tài chính
+financials.py – Lấy báo cáo tài chính & chỉ số tài chính
 
 - HOSE + HNX only, chỉ type=STOCK, loại chứng quyền
 - Lấy: ratio, income_statement, balance_sheet, cash_flow
@@ -349,7 +349,7 @@ while retry < MAX_RETRY:
         retry += 1
 
 conn.close()
-log.warning(f"FAIL {symbol} — het retry")
+log.warning(f"FAIL {symbol} -- het retry")
 return "fail"
 ```
 
@@ -391,7 +391,7 @@ with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results[result] += 1
 
 log.info(
-    f"Done — OK: {results['ok']} | "
+    f"Done -- OK: {results['ok']} | "
     f"Skipped: {results['skipped']} | "
     f"Failed: {results['fail']}"
 )
