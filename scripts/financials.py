@@ -123,16 +123,21 @@ def upsert_ratio(cursor, symbol, df):
     df_T = df.T.copy()
     records = []
     for idx, row in df_T.iterrows():
-        if isinstance(idx, tuple):
-            year    = int(idx[0]) if idx[0] else 0
-            quarter = int(idx[1]) if len(idx) > 1 and idx[1] else 0
-        else:
-            m = re.match(r'(\d{4})(?:Q(\d))?', str(idx))
-            if m:
-                year    = int(m.group(1))
-                quarter = int(m.group(2)) if m.group(2) else 0
+        try:
+            if isinstance(idx, tuple):
+                year    = int(idx[0]) if idx[0] else 0
+                quarter = int(idx[1]) if len(idx) > 1 and idx[1] else 0
             else:
-                year = quarter = 0
+                m = re.match(r'(\d{4})(?:Q(\d))?', str(idx))
+                if m:
+                    year    = int(m.group(1))
+                    quarter = int(m.group(2)) if m.group(2) else 0
+                else:
+                    year = quarter = 0
+        except (ValueError, TypeError):
+            year = quarter = 0
+        if year == 0:
+            continue  # skip Meta rows and unparseable indexes
         period   = 'quarter' if quarter else 'annual'
         row_dict = {str(k): v for k, v in row.to_dict().items()}
         row_dict['symbol']  = symbol
