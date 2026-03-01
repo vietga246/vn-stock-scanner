@@ -360,8 +360,13 @@ def fetch_financials():
     updated_at_map = dict(cursor.fetchall())
 
     tickers = get_tickers()
-    todo    = [s for s in tickers if not should_skip(updated_at_map, s)]
-    skipped = len(tickers) - len(todo)
+    if TEST_MODE:
+        todo    = tickers  # TEST MODE: luon fetch lai, khong skip
+        skipped = 0
+        log.info('[TEST MODE] Buoc qua kiem tra skip, luon fetch lai')
+    else:
+        todo    = [s for s in tickers if not should_skip(updated_at_map, s)]
+        skipped = len(tickers) - len(todo)
     log.info('Todo: %d | Skip: %d | Cutoff: %d nam tro lai', len(todo), skipped, YEARS_HISTORY)
 
     ok = fail = 0
