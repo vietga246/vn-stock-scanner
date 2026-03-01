@@ -13,17 +13,16 @@ def sep(title=''):
         print(f'  {title}')
         print('='*60)
 
-def run(conn, sql, *args):
-    cur = conn.execute(sql, args)
+def run(conn, sql):
+    cur = conn.execute(sql)
     cols = [d[0] for d in cur.description]
     rows = cur.fetchall()
-    # Header
     widths = [max(len(c), max((len(str(r[i])) for r in rows), default=0)) for i, c in enumerate(cols)]
     fmt = '  ' + '  '.join(f'{{:<{w}}}' for w in widths)
     print(fmt.format(*cols))
     print('  ' + '  '.join('-'*w for w in widths))
     for row in rows:
-        print(fmt.format(*[str(v) for v in row]))
+        print(fmt.format(*[str(v) if v is not None else 'NULL' for v in row]))
     return rows
 
 if not os.path.exists(DB_PATH):
@@ -32,31 +31,24 @@ if not os.path.exists(DB_PATH):
 
 conn = sqlite3.connect(DB_PATH)
 
-sep('TABLES & ROW COUNTS')
-run(conn, """
-    SELECT name,
-           (SELECT COUNT(*) FROM sqlite_master sm2
-            WHERE sm2.name = sm.name) as exists
-    FROM sqlite_master sm WHERE type='table' ORDER BY name
-""")
-
-# Row counts per table
+sep('ROW COUNTS')
 tables = [r[0] for r in conn.execute(
     "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
 ).fetchall()]
-
-sep('ROW COUNTS')
 for t in tables:
     n = conn.execute(f'SELECT COUNT(*) FROM {t}').fetchone()[0]
-    print(f'  {t:<30} {n:>8} rows')
+    print(f'  {t:<35} {n:>8} rows')
 
 sep('FINANCIALS_META - 10 dong moi nhat')
-run(conn, """
-    SELECT symbol, updated_at
-    FROM financials_meta
-    ORDER BY updated_at DESC
-    LIMIT 10
-""")
+try:
+    run(conn, """
+        SELECT symbol, updated_at
+        FROM financials_meta
+        ORDER BY updated_at DESC
+        LIMIT 10
+    """)
+except Exception as e:
+    print(f'  Loi: {e}')
 
 sep('FINANCIALS_RATIO - mau VCB')
 try:
