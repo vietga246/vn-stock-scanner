@@ -1,214 +1,211 @@
-import sqlite3
+import os
 import time
 import logging
+import sqlite3
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-DB_PATH = "data/stock.db"
-MAX_WORKERS = 8
-RPM_LIMIT = 60
-SAFE_ZONE = 55  # bắt đầu giảm tốc khi vượt 55 rpm
-REQUEST_WINDOW = 60
+from vnstock import Stock
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-log = logging.getLogger("VCI-Financials")
+# =============================
+# CONFIG
+# =============================
 
-# =========================
-# Adaptive Rate Limiter
-# =========================
+DB_PATH = "data/financials.db"
+MAX_WORKERS = 5
+MAX_RPM = 55          # giữ dưới 60 để an toàn
+SLOWDOWN_THRESHOLD = 50
+RETRY = 3
+YEARS_LIMIT = 10      # chỉ lấy 10 năm gần nhất
+
+# =============================
+# LOGGING
+# =============================
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
+# =============================
+# RATE LIMITER
+# =============================
 
 class AdaptiveRateLimiter:
-    def __init__(self, rpm):
-        self.rpm = rpm
+    def __init__(self, max_rpm, slowdown_threshold):
+        self.max_rpm = max_rpm
+        self.slowdown_threshold = slowdown_threshold
+        self.calls = []
         self.lock = threading.Lock()
-        self.timestamps = []
 
     def wait(self):
-        while True:
-            with self.lock:
-                now = time.time()
-                self.timestamps = [t for t in self.timestamps if now - t < REQUEST_WINDOW]
-                current_rpm = len(self.timestamps)
+        with self.lock:
+            now = time.time()
+            self.calls = [t for t in self.calls if now - t < 60]
 
-                if current_rpm < self.rpm:
-                    if current_rpm >= SAFE_ZONE:
-                        time.sleep(0.3)
-                    self.timestamps.append(now)
-                    return
-            time.sleep(0.05)
+            if len(self.calls) >= self.max_rpm:
+                sleep_time = 60 - (now - self.calls[0])
+                logging.info(f"Rate limit hit → sleeping {sleep_time:.2f}s")
+                time.sleep(sleep_time)
+                return self.wait()
 
-rate_limiter = AdaptiveRateLimiter(RPM_LIMIT)
+            if len(self.calls) >= self.slowdown_threshold:
+                logging.info("Approaching limit → slowing down")
+                time.sleep(0.5)
 
-# =========================
-# DB SCHEMA
-# =========================
+            self.calls.append(time.time())
 
-RATIO_MAP = {
-    "PE": "pe",
-    "PB": "pb",
-    "ROE": "roe",
-    "ROA": "roa",
-}
+rate_limiter = AdaptiveRateLimiter(MAX_RPM, SLOWDOWN_THRESHOLD)
 
-INCOME_MAP = {
-    "Revenue": "revenue",
-    "NetProfit": "net_profit",
-    "RevenueGrowth": "revenue_growth"
-}
+# =============================
+# DATABASE
+# =============================
 
-def table_columns(conn, table):
-    return {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+def init_db():
+    os.makedirs("data", exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
 
-def needs_recreate(conn, table, expected_cols):
-    cols = table_columns(conn, table)
-    if not cols:
-        return False
-    return not expected_cols.issubset(cols)
-
-def init_db(conn):
-    schema_map = {
-        "financials_ratio": set(
-            ["symbol", "year", "quarter"] +
-            list(RATIO_MAP.values()) +
-            ["updated_at"]
-        ),
-        "financials_income": set(
-            ["symbol", "year", "quarter"] +
-            list(INCOME_MAP.values()) +
-            ["updated_at"]
-        )
-    }
-
-    for table, expected_cols in schema_map.items():
-        if needs_recreate(conn, table, expected_cols):
-            log.info("Schema mismatch -> drop table %s", table)
-            conn.execute(f"DROP TABLE IF EXISTS {table}")
-
-    conn.executescript("""
-        CREATE TABLE IF NOT EXISTS financials_ratio (
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS income_statement (
             symbol TEXT,
             year INTEGER,
-            quarter INTEGER,
-            pe REAL,
-            pb REAL,
-            roe REAL,
-            roa REAL,
-            updated_at TEXT,
-            PRIMARY KEY (symbol, year, quarter)
-        );
-
-        CREATE TABLE IF NOT EXISTS financials_income (
-            symbol TEXT,
-            year INTEGER,
-            quarter INTEGER,
             revenue REAL,
             net_profit REAL,
-            revenue_growth REAL,
-            updated_at TEXT,
-            PRIMARY KEY (symbol, year, quarter)
-        );
-
-        CREATE TABLE IF NOT EXISTS financials_meta (
-            symbol TEXT PRIMARY KEY,
-            updated_at TEXT
-        );
+            PRIMARY KEY(symbol, year)
+        )
     """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS financial_ratio (
+            symbol TEXT,
+            year INTEGER,
+            roe REAL,
+            roa REAL,
+            eps REAL,
+            PRIMARY KEY(symbol, year)
+        )
+    """)
+
     conn.commit()
+    conn.close()
 
-# =========================
-# VCI FETCH
-# =========================
+def get_latest_year(symbol, table):
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(f"SELECT MAX(year) FROM {table} WHERE symbol=?", (symbol,))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row and row[0] else None
 
-def fetch_vci_financials(symbol):
-    rate_limiter.wait()
-    url = f"https://api-finfo.vcbs.com.vn/financial/{symbol}"
-    try:
-        res = requests.get(url, timeout=15)
-        if res.status_code == 200:
-            return res.json()
-    except Exception as e:
-        log.warning("Fetch error %s: %s", symbol, e)
-    return None
+# =============================
+# FETCH DATA FROM VCI
+# =============================
 
-# =========================
-# UPSERT LOGIC
-# =========================
+def fetch_financials(symbol):
+    for attempt in range(RETRY):
+        try:
+            rate_limiter.wait()
 
-def upsert_ratio(conn, symbol, year, quarter, data):
-    conn.execute("""
-        INSERT OR REPLACE INTO financials_ratio
-        (symbol, year, quarter, pe, pb, roe, roa, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        symbol, year, quarter,
-        data.get("pe"),
-        data.get("pb"),
-        data.get("roe"),
-        data.get("roa"),
-        datetime.utcnow().isoformat()
-    ))
+            stock = Stock(symbol=symbol, source="VCI")
 
-def upsert_income(conn, symbol, year, quarter, data):
-    conn.execute("""
-        INSERT OR REPLACE INTO financials_income
-        (symbol, year, quarter, revenue, net_profit, revenue_growth, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        symbol, year, quarter,
-        data.get("revenue"),
-        data.get("net_profit"),
-        data.get("revenue_growth"),
-        datetime.utcnow().isoformat()
-    ))
+            income = stock.finance.income_statement()
+            ratio = stock.finance.ratio()
 
-# =========================
-# PROCESS SYMBOL
-# =========================
+            return income, ratio
+
+        except Exception as e:
+            logging.warning(f"{symbol} retry {attempt+1}: {e}")
+            time.sleep(1)
+
+    logging.error(f"{symbol} failed after {RETRY} retries")
+    return None, None
+
+# =============================
+# PROCESS + SAVE
+# =============================
 
 def process_symbol(symbol):
-    conn = sqlite3.connect(DB_PATH)
-    data = fetch_vci_financials(symbol)
-    if not data:
-        log.warning("No data for %s", symbol)
+    logging.info(f"Processing {symbol}")
+
+    income_df, ratio_df = fetch_financials(symbol)
+
+    if income_df is None:
         return
 
-    try:
-        for record in data.get("ratio", []):
-            upsert_ratio(conn, symbol, record["year"], record["quarter"], record)
+    current_year = datetime.now().year
+    cutoff_year = current_year - YEARS_LIMIT
 
-        for record in data.get("income", []):
-            upsert_income(conn, symbol, record["year"], record["quarter"], record)
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
 
-        conn.execute("""
-            INSERT OR REPLACE INTO financials_meta
-            (symbol, updated_at)
-            VALUES (?, ?)
-        """, (symbol, datetime.utcnow().isoformat()))
+    # ---- Income Statement ----
+    if not income_df.empty:
+        income_df = income_df[income_df["year"] >= cutoff_year]
 
-        conn.commit()
-        log.info("Updated %s", symbol)
+        latest_year = get_latest_year(symbol, "income_statement")
 
-    except Exception as e:
-        log.error("Error processing %s: %s", symbol, e)
-    finally:
-        conn.close()
+        for _, row in income_df.iterrows():
+            year = int(row["year"])
 
-# =========================
-# MAIN RUNNER
-# =========================
+            if latest_year and year <= latest_year:
+                continue
+
+            cur.execute("""
+                INSERT OR REPLACE INTO income_statement
+                VALUES (?, ?, ?, ?)
+            """, (
+                symbol,
+                year,
+                row.get("revenue"),
+                row.get("net_profit"),
+            ))
+
+    # ---- Ratio ----
+    if not ratio_df.empty:
+        ratio_df = ratio_df[ratio_df["year"] >= cutoff_year]
+
+        latest_year = get_latest_year(symbol, "financial_ratio")
+
+        for _, row in ratio_df.iterrows():
+            year = int(row["year"])
+
+            if latest_year and year <= latest_year:
+                continue
+
+            cur.execute("""
+                INSERT OR REPLACE INTO financial_ratio
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                symbol,
+                year,
+                row.get("roe"),
+                row.get("roa"),
+                row.get("eps"),
+            ))
+
+    conn.commit()
+    conn.close()
+
+    logging.info(f"{symbol} done")
+
+# =============================
+# MAIN
+# =============================
 
 def run(symbols):
-    conn = sqlite3.connect(DB_PATH)
-    init_db(conn)
-    conn.close()
+    init_db()
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = [executor.submit(process_symbol, s) for s in symbols]
-        for f in as_completed(futures):
-            f.result()
+
+        for future in as_completed(futures):
+            future.result()
+
+    logging.info("All symbols completed")
+
 
 if __name__ == "__main__":
-    symbols = ["HPG", "NLG", "VIC"]  # test
+    symbols = ["HPG"]  # test trước 1 mã
     run(symbols)
