@@ -109,6 +109,15 @@ def create_connection():
     return conn
 
 def init_db(conn):
+    # Drop tables neu schema cu (co cot data_json) de recreate normalized
+    for table in ['financials_ratio', 'financials_income', 'financials_balance', 'financials_cashflow']:
+        try:
+            cols = [r[1] for r in conn.execute('PRAGMA table_info(' + table + ')').fetchall()]
+            if 'data_json' in cols:
+                conn.execute('DROP TABLE ' + table)
+                conn.commit()
+        except Exception:
+            pass
     conn.executescript('''
         CREATE TABLE IF NOT EXISTS financials_ratio (
             symbol TEXT, year INTEGER, quarter INTEGER,
