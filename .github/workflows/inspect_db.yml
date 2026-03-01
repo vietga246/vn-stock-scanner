@@ -1,0 +1,29 @@
+name: Inspect DB
+
+on:
+  workflow_dispatch:   # Chi chay thu cong
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install vnstock==3.4.2 pandas
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: data/stock.db
+          key: stock-db-never-matches
+          restore-keys: stock-db-
+
+      - name: Inspect DB
+        env:
+          DB_PATH: data/stock.db
+        run: python scripts/inspect_db.py
