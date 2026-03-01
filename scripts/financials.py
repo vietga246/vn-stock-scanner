@@ -17,6 +17,8 @@ API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
 MAX_RPM              = 55
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
+TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
+TEST_SYMBOLS         = ['VCB', 'FPT', 'VIC']   # chi dung khi TEST_MODE=true
 
 logging.basicConfig(
     level=logging.INFO,
@@ -247,6 +249,9 @@ def upsert_report(conn, table, field_map, symbol, df):
 # ===== TICKERS =====
 
 def get_tickers():
+    if TEST_MODE:
+        log.info('[TEST MODE] Chi lay %d ma: %s', len(TEST_SYMBOLS), TEST_SYMBOLS)
+        return TEST_SYMBOLS
     from vnstock import Listing
     listing = Listing()
     try:
