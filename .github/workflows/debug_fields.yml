@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install vnstock==3.4.2 pandas
+      - run: pip install vnstock==3.4.2 pandas pytz
       - name: Debug field names
         env:
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
