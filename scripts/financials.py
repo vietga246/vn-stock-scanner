@@ -1,10 +1,21 @@
-# financials.py - normalized schema, no JSON, 5 years only
+# financials.py - normalized schema, multi-worker, batch commit
 # 706 symbols x 20 quarters x 4 tables x ~150 bytes = ~8MB DB
+#
+# ARCHITECTURE:
+#   - 6 fetch workers (network I/O parallel) + 1 write thread (DB serial)
+#   - Shared SmartRateLimiter giữ tổng <= 55 RPM
+#   - Batch commit mỗi COMMIT_BATCH symbols (giảm fsync ~20x)
+#   - to_dict('records') thay iterrows() (~30-40% nhanh hơn)
+#   - VACUUM chỉ chạy production + DB > 10MB
+#   - Index trên pe/roe/revenue_growth cho scan
+
 from vnstock import Listing, Finance
 from datetime import datetime, timedelta
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import sqlite3
 import pandas as pd
+import queue
 import logging
 import sys
 import os
@@ -17,6 +28,9 @@ API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
 MAX_RPM              = 55
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
+MAX_WORKERS          = 6      # fetch workers (network parallel)
+COMMIT_BATCH         = 25     # commit sau bao nhieu symbol
+VACUUM_THRESHOLD_MB  = 10     # chi VACUUM neu DB > threshold
 TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
 TEST_SYMBOLS         = ['VCB', 'FPT', 'VIC']   # chi dung khi TEST_MODE=true
 
@@ -29,53 +43,49 @@ log = logging.getLogger(__name__)
 
 # ===== FIELD MAPPINGS (vnstock -> normalized) =====
 
+# Ratio: MultiIndex columns -> flatten: ('Chỉ tiêu định giá', 'P/E') -> 'Chỉ tiêu định giá_P/E'
 RATIO_MAP = {
-    'priceToEarning':    'pe',
-    'priceToBook':       'pb',
-    'priceToSale':       'ps',
-    'ValueBeforeEbitda': 'ev_ebitda',
-    'roa':               'roa',
-    'roe':               'roe',
-    'roic':              'roic',
-    'grossProfitMargin': 'gross_margin',
-    'netProfitMargin':   'net_margin',
-    'ebitdaOnRevenue':   'ebitda_margin',
-    'debtOnEquity':      'debt_equity',
-    'debtOnAsset':       'debt_asset',
-    'currentPayment':    'current_ratio',
-    'quickPayment':      'quick_ratio',
-    'revenueGrowth':     'revenue_growth',
-    'earningGrowth':     'earnings_growth',
+    'Chỉ tiêu định giá_P/E':                              'pe',
+    'Chỉ tiêu định giá_P/B':                              'pb',
+    'Chỉ tiêu định giá_P/S':                              'ps',
+    'Chỉ tiêu định giá_EV/EBITDA':                        'ev_ebitda',
+    'Chỉ tiêu khả năng sinh lợi_ROA (%)':                 'roa',
+    'Chỉ tiêu khả năng sinh lợi_ROE (%)':                 'roe',
+    'Chỉ tiêu khả năng sinh lợi_ROIC (%)':                'roic',
+    'Chỉ tiêu khả năng sinh lợi_Gross Profit Margin (%)': 'gross_margin',
+    'Chỉ tiêu khả năng sinh lợi_Net Profit Margin (%)':   'net_margin',
+    'Chỉ tiêu cơ cấu nguồn vốn_Debt/Equity':              'debt_equity',
+    'Chỉ tiêu thanh khoản_Current Ratio':                  'current_ratio',
+    'Chỉ tiêu thanh khoản_Quick Ratio':                    'quick_ratio',
 }
 
 INCOME_MAP = {
-    'revenue':           'revenue',
-    'grossProfit':       'gross_profit',
-    'operationProfit':   'operating_profit',
-    'ebit':              'ebit',
-    'ebitda':            'ebitda',
-    'shareHolderIncome': 'net_profit',
+    'Revenue (Bn. VND)':              'revenue',
+    'Gross Profit':                   'gross_profit',
+    'Operating Profit/Loss':          'operating_profit',
+    'Profit before tax':              'ebit',
+    'Net Profit For the Year':        'net_profit',
+    'Attributable to parent company': 'net_profit_parent',
+    'Revenue YoY (%)':                'revenue_growth',
 }
 
 BALANCE_MAP = {
-    'asset':             'total_assets',
-    'equity':            'total_equity',
-    'debt':              'total_debt',
-    'cash':              'cash',
-    'shortDebt':         'short_term_debt',
-    'longDebt':          'long_term_debt',
-    'bookValuePerShare': 'book_value_per_share',
+    'TOTAL ASSETS (Bn. VND)':                'total_assets',
+    "OWNER'S EQUITY(Bn.VND)":               'total_equity',
+    'LIABILITIES (Bn. VND)':                'total_debt',
+    'Cash and cash equivalents (Bn. VND)':  'cash',
+    'Short-term borrowings (Bn. VND)':      'short_term_debt',
+    'Long-term borrowings (Bn. VND)':       'long_term_debt',
 }
 
 CASHFLOW_MAP = {
-    'fromSale':          'cfo',
-    'fromInvesting':     'cfi',
-    'fromFinancial':     'cff',
-    'investCost':        'capex',
-    'freeCashFlow':      'fcf',
+    'Net cash inflows/outflows from operating activities': 'cfo',
+    'Net Cash Flows from Investing Activities':            'cfi',
+    'Cash flows from financial activities':                'cff',
+    'Purchase of fixed assets':                            'capex',
 }
 
-# ===== RATE LIMITER =====
+# ===== RATE LIMITER (thread-safe, shared across workers) =====
 
 class SmartRateLimiter:
     def __init__(self, rpm):
@@ -108,34 +118,37 @@ def create_connection():
     conn.execute('PRAGMA journal_mode=WAL;')
     conn.execute('PRAGMA synchronous=NORMAL;')
     conn.execute('PRAGMA busy_timeout=60000;')
+    conn.execute('PRAGMA cache_size=-32000;')   # 32MB cache
     return conn
 
 def init_db(conn):
-    # Drop tables neu schema cu (co cot data_json) de recreate normalized
+    # Drop tables neu schema thay doi (kiem tra cot cu)
     for table in ['financials_ratio', 'financials_income', 'financials_balance', 'financials_cashflow']:
         try:
             cols = [r[1] for r in conn.execute('PRAGMA table_info(' + table + ')').fetchall()]
-            if 'data_json' in cols:
+            if any(c in cols for c in ('data_json', 'ebitda_margin', 'fcf', 'book_value_per_share')):
                 conn.execute('DROP TABLE ' + table)
                 conn.commit()
+                log.info('Dropped old schema table: %s', table)
         except Exception:
             pass
+
     conn.executescript('''
         CREATE TABLE IF NOT EXISTS financials_ratio (
             symbol TEXT, year INTEGER, quarter INTEGER,
             pe REAL, pb REAL, ps REAL, ev_ebitda REAL,
             roe REAL, roa REAL, roic REAL,
-            gross_margin REAL, net_margin REAL, ebitda_margin REAL,
-            debt_equity REAL, debt_asset REAL,
+            gross_margin REAL, net_margin REAL,
+            debt_equity REAL,
             current_ratio REAL, quick_ratio REAL,
-            revenue_growth REAL, earnings_growth REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
         CREATE TABLE IF NOT EXISTS financials_income (
             symbol TEXT, year INTEGER, quarter INTEGER,
             revenue REAL, gross_profit REAL, operating_profit REAL,
-            ebit REAL, ebitda REAL, net_profit REAL,
+            ebit REAL, net_profit REAL, net_profit_parent REAL,
+            revenue_growth REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
@@ -143,19 +156,25 @@ def init_db(conn):
             symbol TEXT, year INTEGER, quarter INTEGER,
             total_assets REAL, total_equity REAL, total_debt REAL,
             cash REAL, short_term_debt REAL, long_term_debt REAL,
-            book_value_per_share REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
         CREATE TABLE IF NOT EXISTS financials_cashflow (
             symbol TEXT, year INTEGER, quarter INTEGER,
-            cfo REAL, cfi REAL, cff REAL, capex REAL, fcf REAL,
+            cfo REAL, cfi REAL, cff REAL, capex REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
         CREATE TABLE IF NOT EXISTS financials_meta (
             symbol TEXT PRIMARY KEY, updated_at TEXT
         );
+
+        -- TỐI ƯU CẤP 5: index cho scan nhanh
+        CREATE INDEX IF NOT EXISTS idx_ratio_pe             ON financials_ratio(pe);
+        CREATE INDEX IF NOT EXISTS idx_ratio_roe            ON financials_ratio(roe);
+        CREATE INDEX IF NOT EXISTS idx_ratio_roa            ON financials_ratio(roa);
+        CREATE INDEX IF NOT EXISTS idx_income_revenue_growth ON financials_income(revenue_growth);
+        CREATE INDEX IF NOT EXISTS idx_ratio_year_quarter   ON financials_ratio(year, quarter);
     ''')
     conn.commit()
 
@@ -182,65 +201,61 @@ def extract_wait_time(msg, default=65):
 def min_year():
     return datetime.now().year - YEARS_HISTORY
 
-# ===== UPSERT FUNCTIONS =====
+# ===== UPSERT FUNCTIONS (dùng to_dict records thay iterrows) =====
 
 def upsert_ratio(conn, symbol, df):
-    now = datetime.now().isoformat()
+    now    = datetime.now().isoformat()
     cutoff = min_year()
-    df_T = df.T.copy()
+    # Flatten MultiIndex: ('Category', 'Name') -> 'Category_Name'
+    if isinstance(df.columns, pd.MultiIndex):
+        df = df.copy()
+        df.columns = ['_'.join(str(c) for c in col).strip('_') for col in df.columns]
     records = []
-    for idx, row in df_T.iterrows():
+    cols_sql      = ', '.join(RATIO_MAP.values())
+    placeholders  = ', '.join(['?'] * (3 + len(RATIO_MAP) + 1))
+    # TỐI ƯU CẤP 3: to_dict('records') nhanh hơn iterrows ~35%
+    for d in df.to_dict('records'):
         try:
-            if isinstance(idx, tuple):
-                year    = int(idx[0]) if idx[0] else 0
-                quarter = int(idx[1]) if len(idx) > 1 and idx[1] else 0
-            else:
-                m = re.match(r'(\d{4})(?:Q(\d))?', str(idx))
-                year    = int(m.group(1)) if m else 0
-                quarter = int(m.group(2)) if m and m.group(2) else 0
+            year    = int(d.get('Meta_yearReport',   0) or 0)
+            length  = int(d.get('Meta_lengthReport', 0) or 0)
         except (ValueError, TypeError):
-            year = quarter = 0
+            year = length = 0
+        quarter = 0 if length == 5 else length
         if year < cutoff:
             continue
-        d = {str(k): v for k, v in row.to_dict().items()}
-        rec = [symbol, year, quarter]
-        for src, _ in RATIO_MAP.items():
-            rec.append(safe_float(d.get(src)))
-        rec.append(now)
+        rec = [symbol, year, quarter] + [safe_float(d.get(src)) for src in RATIO_MAP] + [now]
         records.append(tuple(rec))
     if records:
-        cols = ', '.join(RATIO_MAP.values())
-        placeholders = ', '.join(['?'] * (3 + len(RATIO_MAP) + 1))
         conn.executemany(
             'INSERT OR REPLACE INTO financials_ratio '
-            '(symbol, year, quarter, ' + cols + ', updated_at) '
+            '(symbol, year, quarter, ' + cols_sql + ', updated_at) '
             'VALUES (' + placeholders + ')',
             records
         )
     return len(records)
 
 def upsert_report(conn, table, field_map, symbol, df):
-    now = datetime.now().isoformat()
+    now    = datetime.now().isoformat()
     cutoff = min_year()
     records = []
-    for _, row in df.iterrows():
-        d      = {str(k): v for k, v in row.to_dict().items()}
-        year   = int(d.get('yearReport',   d.get('year',    0)) or 0)
-        length = int(d.get('lengthReport', d.get('quarter', 0)) or 0)
+    cols_sql     = ', '.join(field_map.values())
+    placeholders = ', '.join(['?'] * (3 + len(field_map) + 1))
+    # TỐI ƯU CẤP 3: to_dict('records')
+    for d in df.to_dict('records'):
+        try:
+            year   = int(d.get('yearReport',   d.get('year',    0)) or 0)
+            length = int(d.get('lengthReport', d.get('quarter', 0)) or 0)
+        except (ValueError, TypeError):
+            year = length = 0
         quarter = 0 if length == 5 else length
         if year < cutoff:
             continue
-        rec = [symbol, year, quarter]
-        for src, _ in field_map.items():
-            rec.append(safe_float(d.get(src)))
-        rec.append(now)
+        rec = [symbol, year, quarter] + [safe_float(d.get(src)) for src in field_map] + [now]
         records.append(tuple(rec))
     if records:
-        cols = ', '.join(field_map.values())
-        placeholders = ', '.join(['?'] * (3 + len(field_map) + 1))
         conn.executemany(
             'INSERT OR REPLACE INTO ' + table +
-            ' (symbol, year, quarter, ' + cols + ', updated_at) '
+            ' (symbol, year, quarter, ' + cols_sql + ', updated_at) '
             'VALUES (' + placeholders + ')',
             records
         )
@@ -252,7 +267,6 @@ def get_tickers():
     if TEST_MODE:
         log.info('[TEST MODE] Chi lay %d ma: %s', len(TEST_SYMBOLS), TEST_SYMBOLS)
         return TEST_SYMBOLS
-    from vnstock import Listing
     listing = Listing()
     try:
         warrants = set(listing.all_covered_warrant().tolist())
@@ -272,9 +286,10 @@ def get_tickers():
     df = listing.all_symbols()
     return [t for t in df['symbol'].tolist() if t not in warrants]
 
-# ===== FETCH + SAVE =====
+# ===== FETCH (chạy trong worker thread) =====
 
 def fetch_symbol(symbol):
+    """Fetch data từ API - chạy song song trong ThreadPoolExecutor."""
     retry = 0
     while retry < 4:
         try:
@@ -307,7 +322,7 @@ def fetch_symbol(symbol):
             retry += 1
         except Exception as e:
             err = str(e).lower()
-            if any(x in err for x in ['429', 'rate limit', 'exceeded', 'gi\u1edbi h\u1ea1n']):
+            if any(x in err for x in ['429', 'rate limit', 'exceeded', 'giới hạn']):
                 wait = extract_wait_time(str(e))
                 log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
                 time.sleep(wait)
@@ -319,21 +334,23 @@ def fetch_symbol(symbol):
             retry += 1
     return None
 
+# ===== SAVE (chạy trong write thread duy nhất) =====
+
 def save_symbol(conn, symbol, data):
+    """Write vào DB - chỉ gọi từ write thread để tránh locked."""
     try:
         if 'ratio' in data:
             upsert_ratio(conn, symbol, data['ratio'])
         if 'income' in data:
-            upsert_report(conn, 'financials_income', INCOME_MAP, symbol, data['income'])
+            upsert_report(conn, 'financials_income',   INCOME_MAP,   symbol, data['income'])
         if 'balance' in data:
-            upsert_report(conn, 'financials_balance', BALANCE_MAP, symbol, data['balance'])
+            upsert_report(conn, 'financials_balance',  BALANCE_MAP,  symbol, data['balance'])
         if 'cashflow' in data:
             upsert_report(conn, 'financials_cashflow', CASHFLOW_MAP, symbol, data['cashflow'])
         conn.execute(
             'INSERT OR REPLACE INTO financials_meta (symbol, updated_at) VALUES (?, ?)',
             (symbol, datetime.now().isoformat())
         )
-        conn.commit()
         return True
     except Exception as e:
         log.warning('[%s] Save loi: %s', symbol, e)
@@ -351,17 +368,15 @@ def fetch_financials():
         log.info('Using API key')
     else:
         log.warning('Guest mode')
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(DB_PATH) if os.path.dirname(DB_PATH) else '.', exist_ok=True)
 
     conn = create_connection()
     init_db(conn)
-    cursor = conn.cursor()
-    cursor.execute('SELECT symbol, updated_at FROM financials_meta')
-    updated_at_map = dict(cursor.fetchall())
+    updated_at_map = dict(conn.execute('SELECT symbol, updated_at FROM financials_meta').fetchall())
 
     tickers = get_tickers()
     if TEST_MODE:
-        todo    = tickers  # TEST MODE: luon fetch lai, khong skip
+        todo    = tickers
         skipped = 0
         log.info('[TEST MODE] Buoc qua kiem tra skip, luon fetch lai')
     else:
@@ -369,22 +384,63 @@ def fetch_financials():
         skipped = len(tickers) - len(todo)
     log.info('Todo: %d | Skip: %d | Cutoff: %d nam tro lai', len(todo), skipped, YEARS_HISTORY)
 
-    ok = fail = 0
-    for i, symbol in enumerate(todo):
-        data = fetch_symbol(symbol)
-        if data is None:
-            fail += 1
-            log.warning('FAIL %s (%d/%d)', symbol, i+1, len(todo))
-        else:
-            if save_symbol(conn, symbol, data):
-                ok += 1
-                log.info('OK %s (%d/%d)', symbol, i+1, len(todo))
-            else:
-                fail += 1
+    if not todo:
+        log.info('Khong co gi can update.')
+        conn.close()
+        return
 
-    # VACUUM de compact DB sau khi write
-    log.info('VACUUM DB...')
-    conn.execute('VACUUM;')
+    ok = fail = 0
+    total = len(todo)
+
+    # TỐI ƯU CẤP 1: fetch parallel (network I/O), write serial (DB)
+    # TỐI ƯU CẤP 2: batch commit mỗi COMMIT_BATCH symbols
+    workers = min(MAX_WORKERS, total) if not TEST_MODE else 1
+    log.info('Workers: %d | Batch commit: %d', workers, COMMIT_BATCH)
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        # Submit tất cả jobs
+        future_to_symbol = {executor.submit(fetch_symbol, s): s for s in todo}
+        done_count = 0
+
+        for future in as_completed(future_to_symbol):
+            symbol = future_to_symbol[future]
+            done_count += 1
+            try:
+                data = future.result()
+            except Exception as e:
+                log.warning('FAIL %s (%d/%d) exception: %s', symbol, done_count, total, e)
+                fail += 1
+                continue
+
+            if data is None:
+                fail += 1
+                log.warning('FAIL %s (%d/%d)', symbol, done_count, total)
+            else:
+                if save_symbol(conn, symbol, data):
+                    ok += 1
+                    log.info('OK %s (%d/%d)', symbol, done_count, total)
+                else:
+                    fail += 1
+
+            # TỐI ƯU CẤP 2: batch commit
+            if done_count % COMMIT_BATCH == 0:
+                conn.commit()
+                log.info('--- Commit batch (%d/%d) ---', done_count, total)
+
+    # Final commit
+    conn.commit()
+
+    # TỐI ƯU CẤP 4: VACUUM chỉ khi production + DB đủ lớn
+    if not TEST_MODE:
+        db_size_mb = os.path.getsize(DB_PATH) / 1024 / 1024
+        if db_size_mb > VACUUM_THRESHOLD_MB:
+            log.info('VACUUM DB (%.1f MB > %d MB threshold)...', db_size_mb, VACUUM_THRESHOLD_MB)
+            conn.execute('VACUUM;')
+        else:
+            log.info('Skip VACUUM (DB %.1f MB < %d MB threshold)', db_size_mb, VACUUM_THRESHOLD_MB)
+    else:
+        log.info('[TEST MODE] Skip VACUUM')
+
     conn.close()
     log.info('Done -- OK: %d | Skipped: %d | Failed: %d', ok, skipped, fail)
 
