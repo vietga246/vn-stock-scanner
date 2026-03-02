@@ -25,7 +25,7 @@ import threading
 
 DB_PATH              = os.getenv('DB_PATH', 'data/stock.db')
 API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
-MAX_RPM              = 45  # buffer 25% duoi limit 60 de tranh burst
+MAX_RPM              = 40  # interval throttle: 60/40 = 1.5s/req, khong bao gio burst
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
 MAX_WORKERS          = 3      # 3 workers: 45RPM / 4req/symbol = ~11 symbols/phut
@@ -109,23 +109,30 @@ CASHFLOW_MAP = {
 
 # ===== RATE LIMITER (thread-safe, shared across workers) =====
 
-class SmartRateLimiter:
+class GlobalRateController:
+    """
+    Interval-based throttle: 1 request moi min_interval giay.
+    Khong bao gio burst. Co global cooldown khi server bao rate limit.
+    """
     def __init__(self, rpm):
-        self.rpm      = rpm
-        self.requests = deque()
-        self.lock     = threading.Lock()
+        self.min_interval = 60.0 / rpm   # 40 RPM = 1.5s/req
+        self.lock         = threading.Lock()
+        self.last_call    = 0.0
+        self.pause_until  = 0.0
 
     def acquire(self):
         while True:
             with self.lock:
                 now = time.time()
-                while self.requests and now - self.requests[0] > 60:
-                    self.requests.popleft()
-                if len(self.requests) < self.rpm:
-                    self.requests.append(time.time())
-                    return
-                sleep_time = 60 - (now - self.requests[0]) + 0.1
-            # Chunked sleep: log moi 10s de GitHub Actions khong kill process
+                if now < self.pause_until:
+                    sleep_time = self.pause_until - now
+                else:
+                    elapsed = now - self.last_call
+                    if elapsed >= self.min_interval:
+                        self.last_call = now
+                        return
+                    sleep_time = self.min_interval - elapsed
+            # Chunked sleep de GitHub Actions khong kill process
             _slept = 0
             while _slept < sleep_time:
                 chunk = min(10, sleep_time - _slept)
@@ -135,11 +142,20 @@ class SmartRateLimiter:
                     log.info('Rate limiter: cho them %.0fs...', sleep_time - _slept)
                     sys.stdout.flush()
 
+    def trigger_cooldown(self, seconds):
+        """Tat ca worker deu phai cho sau khi server bao rate limit."""
+        with self.lock:
+            self.pause_until = max(self.pause_until, time.time() + seconds)
+            self.last_call   = self.pause_until  # reset interval sau cooldown
+        log.info('Global cooldown: %ds (tat ca worker dung lai)', seconds)
+        sys.stdout.flush()
+
     def reset(self):
         with self.lock:
-            self.requests.clear()
+            self.pause_until = 0.0
+            self.last_call   = 0.0
 
-limiter = SmartRateLimiter(MAX_RPM)
+limiter = GlobalRateController(MAX_RPM)
 
 # ===== DATABASE =====
 
@@ -370,17 +386,17 @@ def fetch_symbol(symbol):
             # Lay wait time tu _stdout_capture neu co, fallback = 65s
             wait = _last_wait_capture[0] if _last_wait_capture[0] else 65
             _last_wait_capture[0] = None  # reset
-            log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
+            log.warning('[%s] Rate limit -> global cooldown %ds (retry %d/4)', symbol, wait, retry+1)
+            limiter.trigger_cooldown(wait)
             _chunked_sleep(wait)
-            limiter.reset()
             retry += 1
         except Exception as e:
             err = str(e).lower()
             if any(x in err for x in ['429', 'rate limit', 'exceeded', 'giới hạn']):
                 wait = extract_wait_time(str(e))
-                log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
+                log.warning('[%s] Rate limit -> global cooldown %ds (retry %d/4)', symbol, wait, retry+1)
+                limiter.trigger_cooldown(wait)
                 _chunked_sleep(wait)
-                limiter.reset()
             else:
                 t = 2 ** retry
                 log.warning('[%s] Loi: %s -> retry %d/4 sau %ds', symbol, e, retry+1, t)
