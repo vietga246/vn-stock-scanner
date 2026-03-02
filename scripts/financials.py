@@ -25,10 +25,10 @@ import threading
 
 DB_PATH              = os.getenv('DB_PATH', 'data/stock.db')
 API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
-MAX_RPM              = 40  # interval throttle: 60/40 = 1.5s/req, khong bao gio burst
+MAX_RPM              = 60  # interval throttle: 60/40 = 1.5s/req, khong bao gio burst
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
-MAX_WORKERS          = 2      # 3 workers: 45RPM / 4req/symbol = ~11 symbols/phut
+MAX_WORKERS          = 1      # 3 workers: 45RPM / 4req/symbol = ~11 symbols/phut
 COMMIT_BATCH         = 25     # commit sau bao nhieu symbol
 VACUUM_THRESHOLD_MB  = 10     # chi VACUUM neu DB > threshold
 TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
