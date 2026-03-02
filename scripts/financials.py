@@ -55,7 +55,7 @@ class _WaitCapture:
         # Match "Cho 4 giay" hoac "Chờ 56 giây"
         m = re.search(r'Ch[oờ]\s*(\d+)\s*gi[aâ]y', s)
         if m:
-            wait = int(m.group(1)) + 2  # +2 buffer
+            wait = int(m.group(1)) + 5  # +2 buffer
             # limiter chua ton tai o thoi diem import, dung try
             try:
                 limiter.set_server_wait(wait)
