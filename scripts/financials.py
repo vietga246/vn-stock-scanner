@@ -25,10 +25,10 @@ import threading
 
 DB_PATH              = os.getenv('DB_PATH', 'data/stock.db')
 API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
-MAX_RPM              = 55
+MAX_RPM              = 45  # buffer 25% duoi limit 60 de tranh burst
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
-MAX_WORKERS          = 3      # fetch workers (3 la sweet spot: 60RPM / 4req / worker)
+MAX_WORKERS          = 1      # single worker: tranh burst, de SmartRateLimiter hoat dong chinh xac
 COMMIT_BATCH         = 25     # commit sau bao nhieu symbol
 VACUUM_THRESHOLD_MB  = 10     # chi VACUUM neu DB > threshold
 TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
@@ -40,6 +40,28 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 log = logging.getLogger(__name__)
+
+
+# ===== STDOUT CAPTURE - parse wait time tu vnstock rate limit message =====
+
+_last_wait_capture = [None]  # [0] = so giay can cho, None neu chua co
+
+class _WaitCapture:
+    """Wrap sys.stdout, bat wait time tu message rate limit cua vnstock."""
+    def __init__(self, real):
+        self._real = real
+    def write(self, s):
+        self._real.write(s)
+        # Match "Cho 4 giay" hoac "Chờ 56 giây"
+        m = re.search(r'Ch[oờ]\s*(\d+)\s*gi[aâ]y', s)
+        if m:
+            _last_wait_capture[0] = int(m.group(1)) + 2  # +2 buffer
+    def flush(self):
+        self._real.flush()
+    def __getattr__(self, name):
+        return getattr(self._real, name)
+
+sys.stdout = _WaitCapture(sys.stdout)
 
 # ===== FIELD MAPPINGS (vnstock -> normalized) =====
 
@@ -344,7 +366,10 @@ def fetch_symbol(symbol):
                     log.warning('[%s] %s loi: %s', symbol, key, e)
             return result
         except SystemExit:
-            wait = 65
+            # vnstock in message truoc khi raise SystemExit.
+            # Lay wait time tu _stdout_capture neu co, fallback = 65s
+            wait = _last_wait_capture[0] if _last_wait_capture[0] else 65
+            _last_wait_capture[0] = None  # reset
             log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
             _chunked_sleep(wait)
             limiter.reset()
