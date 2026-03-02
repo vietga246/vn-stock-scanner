@@ -144,6 +144,9 @@ class GlobalRateController:
                         # Slot trong: cap phat ngay, update last_call de worker
                         # ke tiep phai doi min_interval (tranh burst dong thoi)
                         self.last_call = now
+                        # Reset server_wait khi cooldown da qua (tranh dung lai cho lan sau)
+                        if self._server_wait and now > self.pause_until:
+                            self._server_wait = None
                         return
                     sleep_time = next_allowed - now
             # Chunked sleep de GitHub Actions khong kill process
@@ -164,18 +167,24 @@ class GlobalRateController:
     def trigger_cooldown(self, fallback=65):
         """
         Dung wait time thuc tu server (neu co), fallback neu khong parse duoc.
-        Tat ca worker deu cho dung thoi gian nay, stagger sau do.
+        - Worker dau tien: set pause_until, KHONG reset _server_wait
+        - Worker sau: doc lai _server_wait de sleep dung thoi gian, khong fallback 65s
+        - Chi reset _server_wait khi no da cu (qua thoi diem pause_until)
         """
         with self.lock:
-            # Lay server_wait thread-safe, reset sau khi dung
+            now = time.time()
+            # Lay server_wait: uu tien gia tri server, fallback neu chua co
             seconds = self._server_wait if self._server_wait else fallback
-            self._server_wait = None
-            new_pause = max(self.pause_until, time.time() + seconds)
+            new_pause = now + seconds
             if new_pause > self.pause_until:
+                # Worker dau tien set cooldown, giu _server_wait cho cac worker sau
                 self.pause_until = new_pause
                 self.last_call   = new_pause  # stagger sau cooldown
                 log.info('Global cooldown: %ds (server wait)', seconds)
                 sys.stdout.flush()
+            else:
+                # Worker sau: pause_until da duoc set, dung thoi gian con lai
+                seconds = max(1, int(self.pause_until - now))
             return seconds  # tra ve de caller sleep dung thoi gian nay
 
     def reset(self):
