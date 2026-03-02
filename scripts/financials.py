@@ -28,7 +28,7 @@ API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
 MAX_RPM              = 55
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
-MAX_WORKERS          = 6      # fetch workers (network parallel)
+MAX_WORKERS          = 3      # fetch workers (3 la sweet spot: 60RPM / 4req / worker)
 COMMIT_BATCH         = 25     # commit sau bao nhieu symbol
 VACUUM_THRESHOLD_MB  = 10     # chi VACUUM neu DB > threshold
 TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
@@ -103,7 +103,15 @@ class SmartRateLimiter:
                     self.requests.append(time.time())
                     return
                 sleep_time = 60 - (now - self.requests[0]) + 0.1
-            time.sleep(sleep_time)
+            # Chunked sleep: log moi 10s de GitHub Actions khong kill process
+            _slept = 0
+            while _slept < sleep_time:
+                chunk = min(10, sleep_time - _slept)
+                time.sleep(chunk)
+                _slept += chunk
+                if _slept < sleep_time:
+                    log.info('Rate limiter: cho them %.0fs...', sleep_time - _slept)
+                    sys.stdout.flush()
 
     def reset(self):
         with self.lock:
@@ -119,6 +127,8 @@ def create_connection():
     conn.execute('PRAGMA synchronous=NORMAL;')
     conn.execute('PRAGMA busy_timeout=60000;')
     conn.execute('PRAGMA cache_size=-32000;')   # 32MB cache
+    conn.execute('PRAGMA temp_store=MEMORY;')   # sort/index dung RAM
+    conn.execute('PRAGMA mmap_size=268435456;') # 256MB mmap (phu hop GitHub runner ~7GB RAM)
     return conn
 
 def init_db(conn):
@@ -296,6 +306,17 @@ def get_tickers():
 
 # ===== FETCH (chạy trong worker thread) =====
 
+def _chunked_sleep(seconds, chunk=10):
+    """Sleep theo chunk de GitHub Actions khong kill process vi khong co output."""
+    remaining = seconds
+    while remaining > 0:
+        t = min(chunk, remaining)
+        time.sleep(t)
+        remaining -= t
+        if remaining > 0:
+            log.info('  ... cho them %.0fs', remaining)
+            sys.stdout.flush()
+
 def fetch_symbol(symbol):
     """Fetch data từ API - chạy song song trong ThreadPoolExecutor."""
     retry = 0
@@ -325,7 +346,7 @@ def fetch_symbol(symbol):
         except SystemExit:
             wait = 65
             log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
-            time.sleep(wait)
+            _chunked_sleep(wait)
             limiter.reset()
             retry += 1
         except Exception as e:
@@ -333,7 +354,7 @@ def fetch_symbol(symbol):
             if any(x in err for x in ['429', 'rate limit', 'exceeded', 'giới hạn']):
                 wait = extract_wait_time(str(e))
                 log.warning('[%s] Rate limit -> sleep %ds (retry %d/4)', symbol, wait, retry+1)
-                time.sleep(wait)
+                _chunked_sleep(wait)
                 limiter.reset()
             else:
                 t = 2 ** retry
