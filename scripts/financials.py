@@ -122,14 +122,22 @@ def create_connection():
     return conn
 
 def init_db(conn):
-    # Drop tables neu schema thay doi (kiem tra cot cu)
-    for table in ['financials_ratio', 'financials_income', 'financials_balance', 'financials_cashflow']:
+    # Drop tables neu schema thay doi: kiem tra cac cot bat buoc cua schema moi
+    # Neu thieu bat ky cot nao -> drop va recreate
+    REQUIRED = {
+        'financials_ratio':    {'pe', 'pb', 'roe', 'roa', 'net_margin', 'debt_equity'},
+        'financials_income':   {'revenue', 'gross_profit', 'net_profit', 'revenue_growth'},
+        'financials_balance':  {'total_assets', 'total_equity', 'total_debt', 'cash'},
+        'financials_cashflow': {'cfo', 'cfi', 'cff', 'capex'},
+    }
+    for table, required_cols in REQUIRED.items():
         try:
-            cols = [r[1] for r in conn.execute('PRAGMA table_info(' + table + ')').fetchall()]
-            if any(c in cols for c in ('data_json', 'ebitda_margin', 'fcf', 'book_value_per_share')):
+            cols = {r[1] for r in conn.execute('PRAGMA table_info(' + table + ')').fetchall()}
+            if cols and not required_cols.issubset(cols):
+                missing = required_cols - cols
                 conn.execute('DROP TABLE ' + table)
                 conn.commit()
-                log.info('Dropped old schema table: %s', table)
+                log.info('Schema moi: dropped %s (thieu: %s)', table, missing)
         except Exception:
             pass
 
