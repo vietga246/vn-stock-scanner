@@ -44,10 +44,10 @@ log = logging.getLogger(__name__)
 
 # ===== STDOUT CAPTURE - parse wait time tu vnstock rate limit message =====
 
-_last_wait_capture = [None]  # [0] = so giay can cho, None neu chua co
-
 class _WaitCapture:
-    """Wrap sys.stdout, bat wait time tu message rate limit cua vnstock."""
+    """Wrap sys.stdout, bat wait time tu message rate limit cua vnstock.
+    Ghi truc tiep vao limiter.server_wait (thread-safe qua lock cua limiter).
+    """
     def __init__(self, real):
         self._real = real
     def write(self, s):
@@ -55,7 +55,12 @@ class _WaitCapture:
         # Match "Cho 4 giay" hoac "Chờ 56 giây"
         m = re.search(r'Ch[oờ]\s*(\d+)\s*gi[aâ]y', s)
         if m:
-            _last_wait_capture[0] = int(m.group(1)) + 2  # +2 buffer
+            wait = int(m.group(1)) + 2  # +2 buffer
+            # limiter chua ton tai o thoi diem import, dung try
+            try:
+                limiter.set_server_wait(wait)
+            except NameError:
+                pass
     def flush(self):
         self._real.flush()
     def __getattr__(self, name):
@@ -123,6 +128,7 @@ class GlobalRateController:
         self.lock         = threading.Lock()
         self.last_call    = 0.0
         self.pause_until  = 0.0
+        self._server_wait = None          # wait time thuc tu server, thread-safe
 
     def acquire(self):
         while True:
@@ -150,26 +156,33 @@ class GlobalRateController:
                     log.info('Rate limiter: cho them %.0fs...', sleep_time - _slept)
                     sys.stdout.flush()
 
-    def trigger_cooldown(self, seconds):
+    def set_server_wait(self, seconds):
+        """_WaitCapture goi khi detect wait time tu stdout cua vnstock."""
+        with self.lock:
+            self._server_wait = seconds
+
+    def trigger_cooldown(self, fallback=65):
         """
-        Tat ca worker deu phai cho. Sau cooldown, last_call = pause_until
-        de worker dau tien phai doi them min_interval, tranh burst ngay.
+        Dung wait time thuc tu server (neu co), fallback neu khong parse duoc.
+        Tat ca worker deu cho dung thoi gian nay, stagger sau do.
         """
         with self.lock:
+            # Lay server_wait thread-safe, reset sau khi dung
+            seconds = self._server_wait if self._server_wait else fallback
+            self._server_wait = None
             new_pause = max(self.pause_until, time.time() + seconds)
-            if new_pause > self.pause_until:  # chi log khi thay doi
+            if new_pause > self.pause_until:
                 self.pause_until = new_pause
-                # Dat last_call = pause_until: worker dau tien wake up phai
-                # doi them 1.5s, worker thu 2 doi 3s, thu 3 doi 4.5s -> stagger
-                self.last_call = new_pause
-                log.info('Global cooldown: %ds (tat ca worker dung lai, stagger sau do)',
-                         seconds)
+                self.last_call   = new_pause  # stagger sau cooldown
+                log.info('Global cooldown: %ds (server wait)', seconds)
                 sys.stdout.flush()
+            return seconds  # tra ve de caller sleep dung thoi gian nay
 
     def reset(self):
         with self.lock:
-            self.pause_until = 0.0
-            self.last_call   = 0.0
+            self.pause_until  = 0.0
+            self.last_call    = 0.0
+            self._server_wait = None
 
 limiter = GlobalRateController(MAX_RPM)
 
@@ -399,19 +412,16 @@ def fetch_symbol(symbol):
             return result
         except SystemExit:
             # vnstock in message truoc khi raise SystemExit.
-            # Lay wait time tu _stdout_capture neu co, fallback = 65s
-            wait = _last_wait_capture[0] if _last_wait_capture[0] else 65
-            _last_wait_capture[0] = None  # reset
+            # _WaitCapture da parse wait time vao limiter.server_wait
+            wait = limiter.trigger_cooldown(fallback=65)
             log.warning('[%s] Rate limit -> global cooldown %ds (retry %d/4)', symbol, wait, retry+1)
-            limiter.trigger_cooldown(wait)
             _chunked_sleep(wait)
             retry += 1
         except Exception as e:
             err = str(e).lower()
             if any(x in err for x in ['429', 'rate limit', 'exceeded', 'giới hạn']):
-                wait = extract_wait_time(str(e))
+                wait = limiter.trigger_cooldown(fallback=extract_wait_time(str(e)))
                 log.warning('[%s] Rate limit -> global cooldown %ds (retry %d/4)', symbol, wait, retry+1)
-                limiter.trigger_cooldown(wait)
                 _chunked_sleep(wait)
             else:
                 t = 2 ** retry
