@@ -113,6 +113,10 @@ class GlobalRateController:
     """
     Interval-based throttle: 1 request moi min_interval giay.
     Khong bao gio burst. Co global cooldown khi server bao rate limit.
+
+    Fix burst-after-cooldown: acquire() luon update last_call truoc khi return,
+    dam bao worker ke tiep phai doi du min_interval, ke ca sau cooldown.
+    3 workers wake up dong thoi nhung chi 1 worker pass gate moi 1.5s.
     """
     def __init__(self, rpm):
         self.min_interval = 60.0 / rpm   # 40 RPM = 1.5s/req
@@ -124,14 +128,18 @@ class GlobalRateController:
         while True:
             with self.lock:
                 now = time.time()
+                # Dang trong global cooldown
                 if now < self.pause_until:
                     sleep_time = self.pause_until - now
                 else:
-                    elapsed = now - self.last_call
-                    if elapsed >= self.min_interval:
+                    # Tinh thoi diem som nhat co the gui request tiep theo
+                    next_allowed = self.last_call + self.min_interval
+                    if now >= next_allowed:
+                        # Slot trong: cap phat ngay, update last_call de worker
+                        # ke tiep phai doi min_interval (tranh burst dong thoi)
                         self.last_call = now
                         return
-                    sleep_time = self.min_interval - elapsed
+                    sleep_time = next_allowed - now
             # Chunked sleep de GitHub Actions khong kill process
             _slept = 0
             while _slept < sleep_time:
@@ -143,12 +151,20 @@ class GlobalRateController:
                     sys.stdout.flush()
 
     def trigger_cooldown(self, seconds):
-        """Tat ca worker deu phai cho sau khi server bao rate limit."""
+        """
+        Tat ca worker deu phai cho. Sau cooldown, last_call = pause_until
+        de worker dau tien phai doi them min_interval, tranh burst ngay.
+        """
         with self.lock:
-            self.pause_until = max(self.pause_until, time.time() + seconds)
-            self.last_call   = self.pause_until  # reset interval sau cooldown
-        log.info('Global cooldown: %ds (tat ca worker dung lai)', seconds)
-        sys.stdout.flush()
+            new_pause = max(self.pause_until, time.time() + seconds)
+            if new_pause > self.pause_until:  # chi log khi thay doi
+                self.pause_until = new_pause
+                # Dat last_call = pause_until: worker dau tien wake up phai
+                # doi them 1.5s, worker thu 2 doi 3s, thu 3 doi 4.5s -> stagger
+                self.last_call = new_pause
+                log.info('Global cooldown: %ds (tat ca worker dung lai, stagger sau do)',
+                         seconds)
+                sys.stdout.flush()
 
     def reset(self):
         with self.lock:
