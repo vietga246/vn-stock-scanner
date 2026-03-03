@@ -1,9 +1,9 @@
-# quarterly_financials.py - normalized schema, multi-worker, batch commit
-# 728 symbols x 20 quarters x 4 tables x ~150 bytes = ~8MB DB
+# financials.py - normalized schema, multi-worker, batch commit
+# 706 symbols x 20 quarters x 4 tables x ~150 bytes = ~8MB DB
 #
 # ARCHITECTURE:
-#   - 2 fetch workers (network I/O parallel) + staggered start 6s
-#   - Shared GlobalRateController giữ tổng <= 60 RPM
+#   - 6 fetch workers (network I/O parallel) + 1 write thread (DB serial)
+#   - Shared SmartRateLimiter giữ tổng <= 55 RPM
 #   - Batch commit mỗi COMMIT_BATCH symbols (giảm fsync ~20x)
 #   - to_dict('records') thay iterrows() (~30-40% nhanh hơn)
 #   - VACUUM chỉ chạy production + DB > 10MB
@@ -25,11 +25,10 @@ import threading
 
 DB_PATH              = os.getenv('DB_PATH', 'data/db/stock.db')
 API_KEY              = os.getenv('VNSTOCK_API_KEY', '')
-MAX_RPM              = 60  # interval throttle: 60 RPM = 1s/req
+MAX_RPM              = 60  # interval throttle: 60/40 = 1.5s/req, khong bao gio burst
 SKIP_IF_UPDATED_DAYS = 80
 YEARS_HISTORY        = 5
-MAX_WORKERS          = 2      # 2 workers with staggered start
-WORKER_STAGGER_SEC   = 6      # 6 giây giữa mỗi worker start
+MAX_WORKERS          = 1      # 3 workers: 45RPM / 4req/symbol = ~11 symbols/phut
 COMMIT_BATCH         = 25     # commit sau bao nhieu symbol
 VACUUM_THRESHOLD_MB  = 10     # chi VACUUM neu DB > threshold
 TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
@@ -46,16 +45,18 @@ log = logging.getLogger(__name__)
 # ===== STDOUT CAPTURE - parse wait time tu vnstock rate limit message =====
 
 class _WaitCapture:
-    """Wrap sys.stdout, bat wait time tu message rate limit cua vnstock."""
+    """Wrap sys.stdout, bat wait time tu message rate limit cua vnstock.
+    Ghi truc tiep vao limiter.server_wait (thread-safe qua lock cua limiter).
+    """
     def __init__(self, real):
         self._real = real
     def write(self, s):
         self._real.write(s)
+        # Match "Cho 4 giay" hoac "Chờ 56 giây"
         m = re.search(r'Ch[oờ]\s*(\d+)\s*gi[aâ]y', s)
-        if not m:
-            m = re.search(r'wait\s+(?:for\s+)?(\d+)\s*s', s, re.I)
         if m:
-            wait = int(m.group(1)) + 5
+            wait = int(m.group(1)) + 5  # +2 buffer
+            # limiter chua ton tai o thoi diem import, dung try
             try:
                 limiter.set_server_wait(wait)
             except NameError:
@@ -69,6 +70,7 @@ sys.stdout = _WaitCapture(sys.stdout)
 
 # ===== FIELD MAPPINGS (vnstock -> normalized) =====
 
+# Ratio: MultiIndex columns -> flatten: ('Chỉ tiêu định giá', 'P/E') -> 'Chỉ tiêu định giá_P/E'
 RATIO_MAP = {
     'Chỉ tiêu định giá_P/E':                              'pe',
     'Chỉ tiêu định giá_P/B':                              'pb',
@@ -116,55 +118,74 @@ class GlobalRateController:
     """
     Interval-based throttle: 1 request moi min_interval giay.
     Khong bao gio burst. Co global cooldown khi server bao rate limit.
+
+    Fix burst-after-cooldown: acquire() luon update last_call truoc khi return,
+    dam bao worker ke tiep phai doi du min_interval, ke ca sau cooldown.
+    3 workers wake up dong thoi nhung chi 1 worker pass gate moi 1.5s.
     """
     def __init__(self, rpm):
-        self.min_interval = 60.0 / rpm
+        self.min_interval = 60.0 / rpm   # 40 RPM = 1.5s/req
         self.lock         = threading.Lock()
         self.last_call    = 0.0
         self.pause_until  = 0.0
-        self._server_wait = None
+        self._server_wait = None          # wait time thuc tu server, thread-safe
 
-    def acquire(self, worker_id=None):
+    def acquire(self):
         while True:
             with self.lock:
                 now = time.time()
+                # Dang trong global cooldown
                 if now < self.pause_until:
                     sleep_time = self.pause_until - now
                 else:
+                    # Tinh thoi diem som nhat co the gui request tiep theo
                     next_allowed = self.last_call + self.min_interval
                     if now >= next_allowed:
+                        # Slot trong: cap phat ngay, update last_call de worker
+                        # ke tiep phai doi min_interval (tranh burst dong thoi)
                         self.last_call = now
+                        # Reset server_wait khi cooldown da qua (tranh dung lai cho lan sau)
                         if self._server_wait and now > self.pause_until:
                             self._server_wait = None
                         return
                     sleep_time = next_allowed - now
+            # Chunked sleep de GitHub Actions khong kill process
             _slept = 0
             while _slept < sleep_time:
                 chunk = min(10, sleep_time - _slept)
                 time.sleep(chunk)
                 _slept += chunk
                 if _slept < sleep_time:
-                    prefix = f'[W{worker_id}] ' if worker_id is not None else ''
-                    log.info('%sRate limiter: cho them %.0fs...', prefix, sleep_time - _slept)
+                    log.info('Rate limiter: cho them %.0fs...', sleep_time - _slept)
                     sys.stdout.flush()
 
     def set_server_wait(self, seconds):
+        """_WaitCapture goi khi detect wait time tu stdout cua vnstock."""
         with self.lock:
             self._server_wait = seconds
 
     def trigger_cooldown(self, fallback=65):
+        """
+        Dung wait time thuc tu server (neu co), fallback neu khong parse duoc.
+        - Worker dau tien: set pause_until, KHONG reset _server_wait
+        - Worker sau: doc lai _server_wait de sleep dung thoi gian, khong fallback 65s
+        - Chi reset _server_wait khi no da cu (qua thoi diem pause_until)
+        """
         with self.lock:
             now = time.time()
+            # Lay server_wait: uu tien gia tri server, fallback neu chua co
             seconds = self._server_wait if self._server_wait else fallback
             new_pause = now + seconds
             if new_pause > self.pause_until:
+                # Worker dau tien set cooldown, giu _server_wait cho cac worker sau
                 self.pause_until = new_pause
-                self.last_call   = new_pause
+                self.last_call   = new_pause  # stagger sau cooldown
                 log.info('Global cooldown: %ds (server wait)', seconds)
                 sys.stdout.flush()
             else:
+                # Worker sau: pause_until da duoc set, dung thoi gian con lai
                 seconds = max(1, int(self.pause_until - now))
-            return seconds
+            return seconds  # tra ve de caller sleep dung thoi gian nay
 
     def reset(self):
         with self.lock:
@@ -181,25 +202,44 @@ def create_connection():
     conn.execute('PRAGMA journal_mode=WAL;')
     conn.execute('PRAGMA synchronous=NORMAL;')
     conn.execute('PRAGMA busy_timeout=60000;')
+    conn.execute('PRAGMA cache_size=-32000;')   # 32MB cache
+    conn.execute('PRAGMA temp_store=MEMORY;')   # sort/index dung RAM
+    conn.execute('PRAGMA mmap_size=268435456;') # 256MB mmap (phu hop GitHub runner ~7GB RAM)
     return conn
 
 def init_db(conn):
+    # Drop tables neu schema thay doi: kiem tra cac cot bat buoc cua schema moi
+    # Neu thieu bat ky cot nao -> drop va recreate
+    REQUIRED = {
+        'financials_ratio':    {'pe', 'pb', 'roe', 'roa', 'net_margin', 'debt_equity'},
+        'financials_income':   {'revenue', 'gross_profit', 'net_profit', 'revenue_growth'},
+        'financials_balance':  {'total_assets', 'total_equity', 'total_debt', 'cash'},
+        'financials_cashflow': {'cfo', 'cfi', 'cff', 'capex'},
+    }
+    for table, required_cols in REQUIRED.items():
+        try:
+            cols = {r[1] for r in conn.execute('PRAGMA table_info(' + table + ')').fetchall()}
+            if cols and not required_cols.issubset(cols):
+                missing = required_cols - cols
+                conn.execute('DROP TABLE ' + table)
+                conn.commit()
+                log.info('Schema moi: dropped %s (thieu: %s)', table, missing)
+        except Exception:
+            pass
+
     conn.executescript('''
-        CREATE TABLE IF NOT EXISTS financials_meta (
-            symbol TEXT PRIMARY KEY,
-            updated_at TEXT
-        );
         CREATE TABLE IF NOT EXISTS financials_ratio (
-            symbol TEXT, year INT, quarter INT,
+            symbol TEXT, year INTEGER, quarter INTEGER,
             pe REAL, pb REAL, ps REAL, ev_ebitda REAL,
-            roa REAL, roe REAL, roic REAL,
+            roe REAL, roa REAL, roic REAL,
             gross_margin REAL, net_margin REAL,
-            debt_equity REAL, current_ratio REAL, quick_ratio REAL,
+            debt_equity REAL,
+            current_ratio REAL, quick_ratio REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
         CREATE TABLE IF NOT EXISTS financials_income (
-            symbol TEXT, year INT, quarter INT,
+            symbol TEXT, year INTEGER, quarter INTEGER,
             revenue REAL, gross_profit REAL, operating_profit REAL,
             ebit REAL, net_profit REAL, net_profit_parent REAL,
             revenue_growth REAL,
@@ -207,127 +247,112 @@ def init_db(conn):
             PRIMARY KEY (symbol, year, quarter)
         );
         CREATE TABLE IF NOT EXISTS financials_balance (
-            symbol TEXT, year INT, quarter INT,
+            symbol TEXT, year INTEGER, quarter INTEGER,
             total_assets REAL, total_equity REAL, total_debt REAL,
             cash REAL, short_term_debt REAL, long_term_debt REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
         CREATE TABLE IF NOT EXISTS financials_cashflow (
-            symbol TEXT, year INT, quarter INT,
+            symbol TEXT, year INTEGER, quarter INTEGER,
             cfo REAL, cfi REAL, cff REAL, capex REAL,
             updated_at TEXT,
             PRIMARY KEY (symbol, year, quarter)
         );
-        CREATE INDEX IF NOT EXISTS idx_ratio_pe ON financials_ratio(pe);
-        CREATE INDEX IF NOT EXISTS idx_ratio_roe ON financials_ratio(roe);
-        CREATE INDEX IF NOT EXISTS idx_income_growth ON financials_income(revenue_growth);
+        CREATE TABLE IF NOT EXISTS financials_meta (
+            symbol TEXT PRIMARY KEY, updated_at TEXT
+        );
+
+        -- TỐI ƯU CẤP 5: index cho scan nhanh
+        CREATE INDEX IF NOT EXISTS idx_ratio_pe             ON financials_ratio(pe);
+        CREATE INDEX IF NOT EXISTS idx_ratio_roe            ON financials_ratio(roe);
+        CREATE INDEX IF NOT EXISTS idx_ratio_roa            ON financials_ratio(roa);
+        CREATE INDEX IF NOT EXISTS idx_income_revenue_growth ON financials_income(revenue_growth);
+        CREATE INDEX IF NOT EXISTS idx_ratio_year_quarter   ON financials_ratio(year, quarter);
     ''')
     conn.commit()
 
+# ===== HELPERS =====
+
 def should_skip(updated_at_map, symbol):
-    if symbol not in updated_at_map:
+    updated_at = updated_at_map.get(symbol)
+    if not updated_at:
         return False
+    cutoff = (datetime.now() - timedelta(days=SKIP_IF_UPDATED_DAYS)).isoformat()
+    return updated_at >= cutoff
+
+def safe_float(val):
     try:
-        dt = datetime.fromisoformat(updated_at_map[symbol])
-        return (datetime.now() - dt).days < SKIP_IF_UPDATED_DAYS
-    except Exception:
-        return False
+        v = float(val)
+        return None if (v != v) else v  # NaN check
+    except (TypeError, ValueError):
+        return None
 
-def extract_wait_time(msg):
-    m = re.search(r'(\d+)\s*gi[aâ]y', msg, re.I)
-    if m:
-        return int(m.group(1)) + 5
-    m = re.search(r'(\d+)\s*s', msg, re.I)
-    if m:
-        return int(m.group(1)) + 5
-    return 65
+def extract_wait_time(msg, default=65):
+    m = re.search(r'(\d+)\s*(?:giay|second|s\b)', msg.lower())
+    return int(m.group(1)) + 2 if m else default
 
-# ===== UPSERT FUNCTIONS =====
+def min_year():
+    return datetime.now().year - YEARS_HISTORY
 
-def parse_quarter(col_name):
-    m = re.search(r'Q(\d)\s*(\d{4})', col_name)
-    if m:
-        return int(m.group(2)), int(m.group(1))
-    m = re.search(r'(\d{4})\s*Q(\d)', col_name)
-    if m:
-        return int(m.group(1)), int(m.group(2))
-    m = re.search(r'(\d{4})', col_name)
-    if m:
-        return int(m.group(1)), 0
-    return None, None
+# ===== UPSERT FUNCTIONS (dùng to_dict records thay iterrows) =====
 
 def upsert_ratio(conn, symbol, df):
-    if df is None or df.empty:
-        return 0
+    now    = datetime.now().isoformat()
+    cutoff = min_year()
+    # Flatten MultiIndex: ('Category', 'Name') -> 'Category_Name'
     if isinstance(df.columns, pd.MultiIndex):
-        df.columns = ['_'.join(str(c) for c in col).strip() for col in df.columns.values]
-    df = df.T
-    df.index.name = 'quarter_col'
-    df = df.reset_index()
-
-    cutoff = datetime.now().year - YEARS_HISTORY
+        df = df.copy()
+        df.columns = ['_'.join(str(c) for c in col).strip('_') for col in df.columns]
     records = []
-    now = datetime.now().isoformat()
-
-    for rec in df.to_dict('records'):
-        qcol = rec.get('quarter_col', '')
-        year, qtr = parse_quarter(str(qcol))
-        if year is None or year < cutoff:
+    cols_sql      = ', '.join(RATIO_MAP.values())
+    placeholders  = ', '.join(['?'] * (3 + len(RATIO_MAP) + 1))
+    # TỐI ƯU CẤP 3: to_dict('records') nhanh hơn iterrows ~35%
+    for d in df.to_dict('records'):
+        try:
+            year    = int(d.get('Meta_yearReport',   0) or 0)
+            length  = int(d.get('Meta_lengthReport', 0) or 0)
+        except (ValueError, TypeError):
+            year = length = 0
+        quarter = 0 if length == 5 else length
+        if year < cutoff:
             continue
-        row = {'symbol': symbol, 'year': year, 'quarter': qtr, 'updated_at': now}
-        for src, dst in RATIO_MAP.items():
-            val = rec.get(src)
-            row[dst] = None if val is None or (isinstance(val, float) and val != val) else val
-        records.append(tuple(row.values()))
-
+        rec = [symbol, year, quarter] + [safe_float(d.get(src)) for src in RATIO_MAP] + [now]
+        records.append(tuple(rec))
     if records:
         conn.executemany(
-            '''INSERT OR REPLACE INTO financials_ratio
-               (symbol, year, quarter, pe, pb, ps, ev_ebitda,
-                roa, roe, roic, gross_margin, net_margin,
-                debt_equity, current_ratio, quick_ratio, updated_at)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+            'INSERT OR REPLACE INTO financials_ratio '
+            '(symbol, year, quarter, ' + cols_sql + ', updated_at) '
+            'VALUES (' + placeholders + ')',
             records
         )
     return len(records)
 
 def upsert_report(conn, table, field_map, symbol, df):
-    if df is None or df.empty:
-        return 0
-    cutoff = datetime.now().year - YEARS_HISTORY
-    now = datetime.now().isoformat()
+    now    = datetime.now().isoformat()
+    cutoff = min_year()
     records = []
-
-    quarter_cols = [c for c in df.columns if re.search(r'Q\d|20\d\d', str(c))]
-
-    for qcol in quarter_cols:
-        year, qtr = parse_quarter(str(qcol))
-        if year is None or year < cutoff:
+    cols_sql     = ', '.join(field_map.values())
+    placeholders = ', '.join(['?'] * (3 + len(field_map) + 1))
+    # TỐI ƯU CẤP 3: to_dict('records')
+    for d in df.to_dict('records'):
+        try:
+            year   = int(d.get('yearReport',   d.get('year',    0)) or 0)
+            length = int(d.get('lengthReport', d.get('quarter', 0)) or 0)
+        except (ValueError, TypeError):
+            year = length = 0
+        quarter = 0 if length == 5 else length
+        if year < cutoff:
             continue
-        row_dict = {'symbol': symbol, 'year': year, 'quarter': qtr}
-        for src, dst in field_map.items():
-            matches = df[df.index.astype(str).str.contains(src, case=False, na=False)]
-            if not matches.empty:
-                val = matches[qcol].iloc[0]
-                row_dict[dst] = None if val is None or (isinstance(val, float) and val != val) else val
-            else:
-                row_dict[dst] = None
-        row_dict['updated_at'] = now
-        records.append(row_dict)
-
+        rec = [symbol, year, quarter] + [safe_float(d.get(src)) for src in field_map] + [now]
+        records.append(tuple(rec))
     if records:
-        cols = [k for k in records[0].keys() if k not in ('symbol', 'year', 'quarter', 'updated_at')]
-        cols_sql = ', '.join(cols)
-        placeholders = ', '.join(['?'] * (4 + len(cols)))
-        for rec in records:
-            vals = [rec['symbol'], rec['year'], rec['quarter']]
-            vals.extend(rec[c] for c in cols)
-            vals.append(rec['updated_at'])
-            conn.execute(
-                f'INSERT OR REPLACE INTO {table} (symbol, year, quarter, {cols_sql}, updated_at) VALUES ({placeholders})',
-                vals
-            )
+        conn.executemany(
+            'INSERT OR REPLACE INTO ' + table +
+            ' (symbol, year, quarter, ' + cols_sql + ', updated_at) '
+            'VALUES (' + placeholders + ')',
+            records
+        )
     return len(records)
 
 # ===== TICKERS =====
@@ -357,35 +382,31 @@ def get_tickers():
 
 # ===== FETCH (chạy trong worker thread) =====
 
-def _chunked_sleep(seconds, chunk=10, worker_id=None):
+def _chunked_sleep(seconds, chunk=10):
+    """Sleep theo chunk de GitHub Actions khong kill process vi khong co output."""
     remaining = seconds
-    prefix = f'[W{worker_id}] ' if worker_id is not None else ''
     while remaining > 0:
         t = min(chunk, remaining)
         time.sleep(t)
         remaining -= t
         if remaining > 0:
-            log.info('%s... cho them %.0fs', prefix, remaining)
+            log.info('  ... cho them %.0fs', remaining)
             sys.stdout.flush()
 
-def fetch_symbol(symbol, worker_id=None):
-    prefix = f'[W{worker_id}] ' if worker_id is not None else ''
+def fetch_symbol(symbol):
+    """Fetch data từ API - chạy song song trong ThreadPoolExecutor."""
     retry = 0
     while retry < 4:
         try:
-            limiter.acquire(worker_id)
-            log.info('%sFETCH %s - Dang goi API...', prefix, symbol)
+            limiter.acquire()
             f = Finance(symbol=symbol, source='VCI', period='quarter', get_all=True)
             result = {}
-            
             try:
                 df = f.ratio()
                 if df is not None and not df.empty:
                     result['ratio'] = df
-                    log.info('%s  %s ratio: %d records', prefix, symbol, len(df))
             except Exception as e:
-                log.warning('%s  %s ratio loi: %s', prefix, symbol, e)
-            
+                log.warning('[%s] ratio loi: %s', symbol, e)
             for key, method in [
                 ('income',   f.income_statement),
                 ('balance',  f.balance_sheet),
@@ -395,89 +416,63 @@ def fetch_symbol(symbol, worker_id=None):
                     df = method()
                     if df is not None and not df.empty:
                         result[key] = df
-                        log.info('%s  %s %s: %d records', prefix, symbol, key, len(df))
                 except Exception as e:
-                    log.warning('%s  %s %s loi: %s', prefix, symbol, key, e)
-            
-            tables_ok = len(result)
-            log.info('%sFETCH %s DONE - %d/4 tables', prefix, symbol, tables_ok)
+                    log.warning('[%s] %s loi: %s', symbol, key, e)
             return result
-            
         except SystemExit:
+            # vnstock in message truoc khi raise SystemExit.
+            # _WaitCapture da parse wait time vao limiter.server_wait
             wait = limiter.trigger_cooldown(fallback=65)
-            log.warning('%s%s Rate limit -> global cooldown %ds (retry %d/4)', prefix, symbol, wait, retry+1)
-            _chunked_sleep(wait, worker_id=worker_id)
+            log.warning('[%s] Rate limit -> global cooldown %ds (retry %d/4)', symbol, wait, retry+1)
+            _chunked_sleep(wait)
             retry += 1
         except Exception as e:
             err = str(e).lower()
             if any(x in err for x in ['429', 'rate limit', 'exceeded', 'giới hạn']):
                 wait = limiter.trigger_cooldown(fallback=extract_wait_time(str(e)))
-                log.warning('%s%s Rate limit -> global cooldown %ds (retry %d/4)', prefix, symbol, wait, retry+1)
-                _chunked_sleep(wait, worker_id=worker_id)
+                log.warning('[%s] Rate limit -> global cooldown %ds (retry %d/4)', symbol, wait, retry+1)
+                _chunked_sleep(wait)
             else:
                 t = 2 ** retry
-                log.warning('%s%s Loi: %s -> retry %d/4 sau %ds', prefix, symbol, e, retry+1, t)
+                log.warning('[%s] Loi: %s -> retry %d/4 sau %ds', symbol, e, retry+1, t)
                 time.sleep(t)
             retry += 1
-    
-    log.error('%sFETCH %s FAILED sau 4 retries', prefix, symbol)
     return None
 
-# ===== SAVE =====
+# ===== SAVE (chạy trong write thread duy nhất) =====
 
-def save_symbol(conn, symbol, data, worker_id=None):
-    prefix = f'[W{worker_id}] ' if worker_id is not None else ''
+def save_symbol(conn, symbol, data):
+    """Write vào DB - chỉ gọi từ write thread để tránh locked."""
     try:
-        saved = 0
         if 'ratio' in data:
-            n = upsert_ratio(conn, symbol, data['ratio'])
-            saved += n
+            upsert_ratio(conn, symbol, data['ratio'])
         if 'income' in data:
-            n = upsert_report(conn, 'financials_income', INCOME_MAP, symbol, data['income'])
-            saved += n
+            upsert_report(conn, 'financials_income',   INCOME_MAP,   symbol, data['income'])
         if 'balance' in data:
-            n = upsert_report(conn, 'financials_balance', BALANCE_MAP, symbol, data['balance'])
-            saved += n
+            upsert_report(conn, 'financials_balance',  BALANCE_MAP,  symbol, data['balance'])
         if 'cashflow' in data:
-            n = upsert_report(conn, 'financials_cashflow', CASHFLOW_MAP, symbol, data['cashflow'])
-            saved += n
+            upsert_report(conn, 'financials_cashflow', CASHFLOW_MAP, symbol, data['cashflow'])
         conn.execute(
             'INSERT OR REPLACE INTO financials_meta (symbol, updated_at) VALUES (?, ?)',
             (symbol, datetime.now().isoformat())
         )
-        log.info('%sSAVE %s - %d quarters saved to DB', prefix, symbol, saved)
         return True
     except Exception as e:
-        log.warning('%sSAVE %s loi: %s', prefix, symbol, e)
+        log.warning('[%s] Save loi: %s', symbol, e)
         try:
             conn.rollback()
         except Exception:
             pass
         return False
 
-# ===== WORKER WRAPPER với Staggered Start =====
-
-def worker_fetch(symbol, worker_id, start_delay):
-    if start_delay > 0:
-        log.info('[W%d] Staggered start: doi %ds truoc khi bat dau...', worker_id, start_delay)
-        time.sleep(start_delay)
-        log.info('[W%d] Bat dau lam viec!', worker_id)
-    
-    return fetch_symbol(symbol, worker_id)
-
 # ===== MAIN =====
 
 def fetch_financials():
-    log.info('=' * 60)
-    log.info('QUARTERLY FINANCIALS COLLECTOR')
-    log.info('=' * 60)
-    
     if API_KEY:
         os.environ['VNSTOCK_API_KEY'] = API_KEY
         log.info('Using API key')
     else:
-        log.warning('Guest mode (no API key)')
-    
+        log.warning('Guest mode')
     os.makedirs(os.path.dirname(DB_PATH) if os.path.dirname(DB_PATH) else '.', exist_ok=True)
 
     conn = create_connection()
@@ -492,10 +487,7 @@ def fetch_financials():
     else:
         todo    = [s for s in tickers if not should_skip(updated_at_map, s)]
         skipped = len(tickers) - len(todo)
-    
-    log.info('-' * 40)
-    log.info('Todo: %d | Skip: %d | Cutoff: %d nam', len(todo), skipped, YEARS_HISTORY)
-    log.info('-' * 40)
+    log.info('Todo: %d | Skip: %d | Cutoff: %d nam tro lai', len(todo), skipped, YEARS_HISTORY)
 
     if not todo:
         log.info('Khong co gi can update.')
@@ -505,65 +497,45 @@ def fetch_financials():
     ok = fail = 0
     total = len(todo)
 
+    # TỐI ƯU CẤP 1: fetch parallel (network I/O), write serial (DB)
+    # TỐI ƯU CẤP 2: batch commit mỗi COMMIT_BATCH symbols
     workers = min(MAX_WORKERS, total) if not TEST_MODE else 1
-    log.info('Config: %d workers | Stagger: %ds | Batch commit: %d', workers, WORKER_STAGGER_SEC, COMMIT_BATCH)
-    log.info('Rate limit: %d RPM (%.1fs/request)', MAX_RPM, 60.0/MAX_RPM)
-    log.info('=' * 60)
-
-    worker_counter = [0]
-    worker_lock = threading.Lock()
-    worker_start_times = {}
-
-    def get_worker_id_and_delay():
-        with worker_lock:
-            wid = worker_counter[0] % workers
-            if wid not in worker_start_times:
-                delay = wid * WORKER_STAGGER_SEC
-                worker_start_times[wid] = True
-            else:
-                delay = 0
-            worker_counter[0] += 1
-            return wid, delay
+    log.info('Workers: %d | Batch commit: %d', workers, COMMIT_BATCH)
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = {}
-        for symbol in todo:
-            wid, delay = get_worker_id_and_delay()
-            future = executor.submit(worker_fetch, symbol, wid, delay)
-            futures[future] = (symbol, wid)
-        
+        # Submit tất cả jobs
+        future_to_symbol = {executor.submit(fetch_symbol, s): s for s in todo}
         done_count = 0
-        
-        for future in as_completed(futures):
-            symbol, wid = futures[future]
+
+        for future in as_completed(future_to_symbol):
+            symbol = future_to_symbol[future]
             done_count += 1
-            prefix = f'[W{wid}] '
-            
             try:
                 data = future.result()
             except Exception as e:
-                log.error('%sFAIL %s (%d/%d) exception: %s', prefix, symbol, done_count, total, e)
+                log.warning('FAIL %s (%d/%d) exception: %s', symbol, done_count, total, e)
                 fail += 1
                 continue
 
             if data is None:
                 fail += 1
-                log.warning('%sFAIL %s (%d/%d)', prefix, symbol, done_count, total)
+                log.warning('FAIL %s (%d/%d)', symbol, done_count, total)
             else:
-                if save_symbol(conn, symbol, data, wid):
+                if save_symbol(conn, symbol, data):
                     ok += 1
-                    log.info('%sOK %s (%d/%d)', prefix, symbol, done_count, total)
+                    log.info('OK %s (%d/%d)', symbol, done_count, total)
                 else:
                     fail += 1
 
+            # TỐI ƯU CẤP 2: batch commit
             if done_count % COMMIT_BATCH == 0:
                 conn.commit()
-                log.info('--- COMMIT batch (%d/%d) ---', done_count, total)
-                sys.stdout.flush()
+                log.info('--- Commit batch (%d/%d) ---', done_count, total)
 
+    # Final commit
     conn.commit()
-    log.info('--- FINAL COMMIT ---')
 
+    # TỐI ƯU CẤP 4: VACUUM chỉ khi production + DB đủ lớn
     if not TEST_MODE:
         db_size_mb = os.path.getsize(DB_PATH) / 1024 / 1024
         if db_size_mb > VACUUM_THRESHOLD_MB:
@@ -575,10 +547,7 @@ def fetch_financials():
         log.info('[TEST MODE] Skip VACUUM')
 
     conn.close()
-    
-    log.info('=' * 60)
-    log.info('SUMMARY: OK=%d | Skipped=%d | Failed=%d', ok, skipped, fail)
-    log.info('=' * 60)
+    log.info('Done -- OK: %d | Skipped: %d | Failed: %d', ok, skipped, fail)
 
 if __name__ == '__main__':
     fetch_financials()
