@@ -10,6 +10,7 @@ Features:
 - Auto-detect server wait time
 - Batch commit for performance
 - WAL mode enabled
+- TEST_MODE: chỉ chạy VN30 để test nhanh
 """
 
 from vnstock import Listing, Quote
@@ -41,6 +42,14 @@ DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
 MAX_REQUEST_PER_MIN = 60
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
+TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
+
+# VN30 symbols for testing
+VN30_SYMBOLS = [
+    "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
+    "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
+    "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE"
+]
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
 
@@ -99,7 +108,15 @@ def upsert_df(cursor, ticker: str, df: pd.DataFrame):
 # ─── TICKERS ───────────────────────────────────────────────────────────────
 
 def get_tickers() -> list:
-    """Get HOSE + HNX symbols, excluding bonds and UPCOM."""
+    """Get HOSE + HNX symbols, excluding bonds and UPCOM.
+    
+    In TEST_MODE, returns only VN30 symbols.
+    """
+    # TEST MODE: Only VN30
+    if TEST_MODE:
+        log.info("[TEST MODE] Using VN30: %d symbols", len(VN30_SYMBOLS))
+        return VN30_SYMBOLS.copy()
+    
     listing = Listing()
     
     try:
@@ -148,6 +165,9 @@ def update_daily():
     end_str = end_date.strftime("%Y-%m-%d")
     
     log.info("Period: %s → %s", start_str, end_str)
+    
+    mode_str = "[TEST MODE] " if TEST_MODE else ""
+    log.info("%sTotal symbols: %d", mode_str, len(tickers))
     
     # Database connection
     conn = create_db_connection(DB_PATH)
