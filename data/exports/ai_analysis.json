@@ -1,72 +1,53 @@
 {
-  "generated_at": "2026-03-03T23:20:02.164073Z",
+  "generated_at": "2026-03-03T23:25:38.894453Z",
   "ai_provider": "",
   "analysis": {
     "market_overview": {
       "sentiment": "bullish",
-      "summary": "Thị trường hiện đang có xu hướng tích cực với nhiều cổ phiếu ghi nhận điểm số cao và xu hướng tăng. Tuy nhiên, một số ngành đang gặp khó khăn và cần theo dõi kỹ lưỡng.",
+      "summary": "Thị trường hiện tại có xu hướng tích cực với nhiều cổ phiếu ghi nhận xu hướng tăng trưởng ổn định. Tuy nhiên, cần lưu ý rằng một số ngành đang gặp khó khăn trong việc thu hút dòng vốn.",
       "key_themes": [
-        "Tăng trưởng bền vững",
-        "Đầu tư vào ngành vận tải"
+        "Tăng trưởng trong ngành vận tải",
+        "Đầu tư vào khai khoáng"
       ]
     },
     "top_picks": [
       {
-        "symbol": "VVS",
-        "recommendation": "strong_buy",
+        "symbol": "MDG",
+        "recommendation": "buy",
         "target_score": 75,
         "reasoning": {
-          "fundamental": "Công ty có ROE cao và tăng trưởng doanh thu ổn định, cùng với PE hấp dẫn.",
-          "technical": "RSI đang ở mức 76.8, gần vùng quá mua nhưng xu hướng vẫn tích cực.",
-          "smart_money": "Dòng tiền đang vào mạnh trong ngành bán buôn, có khả năng tiếp tục tăng trưởng."
+          "fundamental": "Công ty có ROE ổn định và PE hợp lý, cùng với tăng trưởng doanh thu 0.7%.",
+          "technical": "RSI gần mức 80 có thể chỉ ra rằng cổ phiếu đang bị định giá cao, nhưng vẫn có xu hướng tăng.",
+          "smart_money": "Dòng tiền vào ổn định cho thấy sự quan tâm từ các nhà đầu tư lớn."
         },
         "catalysts": [
-          "Tăng trưởng doanh thu từ sản phẩm mới",
-          "Mở rộng thị trường xuất khẩu"
+          "Tăng trưởng trong ngành khai khoáng",
+          "Dự báo doanh thu tích cực cho quý tới"
         ],
         "risks": [
-          "Rủi ro thị trường bất ổn",
-          "Cạnh tranh gia tăng trong ngành"
-        ],
-        "time_horizon": "medium"
-      },
-      {
-        "symbol": "KSF",
-        "recommendation": "buy",
-        "target_score": 70,
-        "reasoning": {
-          "fundamental": "Cổ phiếu có tăng trưởng 51% ấn tượng, tuy nhiên ROE vẫn còn thấp.",
-          "technical": "Xu hướng tăng hiện tại cho thấy khả năng tiếp tục tăng, RSI 52.3 an toàn.",
-          "smart_money": "Dòng tiền vào mạnh trong ngành bất động sản, hỗ trợ cho đà tăng."
-        },
-        "catalysts": [
-          "Dự án bất động sản mới",
-          "Tăng cường hợp tác với các đối tác lớn"
-        ],
-        "risks": [
-          "Rủi ro thị trường bất động sản",
-          "Khó khăn trong việc triển khai dự án"
+          "Biến động giá hàng hóa",
+          "Rủi ro từ chính sách ngành"
         ],
         "time_horizon": "medium"
       }
     ],
     "sector_rotation": {
       "accumulating": [
-        "Vận tải - kho bãi",
-        "Bất động sản"
+        "Khai khoáng",
+        "Vận tải - kho bãi"
       ],
       "avoiding": [
-        "Khai khoáng"
+        "Bất động sản"
       ],
-      "rationale": "Ngành vận tải có xu hướng phục hồi sau đại dịch, trong khi khai khoáng đang gặp khó khăn với giá nguyên liệu."
+      "rationale": "Ngành khai khoáng và vận tải đang có sự hồi phục và nhu cầu tăng cao, trong khi bất động sản đang gặp khó khăn trong việc thu hút đầu tư."
     },
     "watchlist": [
       {
-        "symbol": "PVB",
-        "reason": "Có dấu hiệu tăng trưởng tốt nhưng PE cao có thể gây rủi ro.",
-        "trigger": "Theo dõi nếu giá giảm xuống dưới 14.0x PE."
+        "symbol": "KSV",
+        "reason": "PE cao và tăng trưởng âm, cần theo dõi để đánh giá khả năng hồi phục.",
+        "trigger": "Theo dõi nếu ROE cải thiện hoặc có thông tin tích cực từ ngành."
       }
     ]
   },
-  "daily_report": "### Báo cáo Phân tích Thị trường Ngày 03/03/2026\n\n#### 1. Tổng quan thị trường\nThị trường chứng khoán ngày 03/03/2026 ghi nhận xu hướng tăng trưởng mạnh mẽ với sự dẫn dắt của nhiều cổ phiếu trong các ngành như khai khoáng và vận tải - kho bãi. Chỉ số RSI trung bình ở mức 48.7 cho thấy thị trường hiện tại đang trong trạng thái trung lập, với nhiều cơ hội đầu tư tiềm năng.\n\n#### 2. Top 3 cổ phiếu đáng chú ý\n- **NFC (CTCP Phân lân Ninh Bình)**: Với composite score 65.0, NFC hiện có tỷ suất sinh lời trên vốn chủ sở hữu (ROE) là 0.5% và PE chỉ 7.5x, cho thấy cổ phiếu này đang được định giá hợp lý. Ngành sản xuất nhựa - hóa chất đang có xu hướng phát triển tích cực, hỗ trợ cho sự tăng trưởng của NFC.\n\n- **FDC (CTCP Ngoại thương và Phát triển Đầu tư Thành phố Hồ Chí Minh)**: FDC có score 64.6, ROE 0.4% và PE chỉ 3.3x, cho thấy tiềm năng tăng trưởng cao trong lĩnh vực bất động sản. Mặc dù tăng trưởng doanh thu chỉ 0.4%, nhưng với xu hướng tích cực hiện tại, FDC có khả năng thu hút sự quan tâm của nhà đầu tư.\n\n- **VVS (CTCP Đầu tư phát triển máy Việt Nam)**: Đứng ở vị trí thứ ba với score 64.0, VVS có ROE 0.6% và PE 7.8x, cho thấy sự hấp dẫn về mặt định giá. Tăng trưởng doanh thu cao 1.2% và RSI lên tới 76.8 cho thấy cổ phiếu này đang thu hút một lượng lớn nhà đầu tư và có khả năng tiếp tục tăng giá.\n\n#### 3. Ngành nổi bật\nNgành khai khoáng hiện đang nổi bật với score trung bình đạt 51.5, cho thấy sức hấp dẫn ngày càng tăng trong mắt nhà đầu tư. Các cổ phiếu trong ngành này như PVB và MDG cũng ghi nhận nhiều dấu hiệu tích cực, cho thấy xu hướng chuyển dịch vốn đang diễn ra mạnh mẽ từ các ngành khác sang khai khoáng.\n\n#### 4. Cảnh báo rủi ro\n- **Rủi ro về định giá**: Mặc dù nhiều cổ phiếu đang có xu hướng tăng, nhưng giá cổ phiếu của một số công ty như PVB với PE cao lên tới 14.4x có thể bị áp lực điều chỉnh nếu kết quả kinh doanh không đạt kỳ vọng.\n- **Biến động thị trường**: Với RSI đang ở mức 48.7, có thể thấy thị trường đang trong trạng thái chờ đợi thông tin mới. Bất kỳ thông tin không thuận lợi nào cũng có thể làm thay đổi tâm lý nhà đầu tư.\n- **Tình hình kinh tế vĩ mô**: Các yếu tố như lạm phát, lãi suất và chính sách tiền tệ có thể ảnh hưởng đến hoạt động của các ngành khác nhau, đặc biệt là ngành bất động sản và ngân hàng.\n\n#### 5. Kết luận\nThị trường chứng khoán hiện tại đang trên đà phục hồi với nhiều cổ phiếu trong các ngành khác nhau có tiềm năng tăng trưởng. Tuy nhiên, nhà đầu tư cần thận trọng trước những rủi ro tiềm ẩn liên quan đến định giá và biến động kinh tế vĩ mô."
+  "daily_report": "### Báo cáo phân tích thị trường ngày 03 tháng 03 năm 2026\n\n#### 1. Tổng quan thị trường\nThị trường chứng khoán Việt Nam hiện đang cho thấy dấu hiệu tích cực với nhiều cổ phiếu dẫn đầu có xu hướng tăng giá. Cụ thể, chỉ số RSI trung bình là 48.7, cho thấy thị trường vẫn đang trong trạng thái trung lập, nhưng với xu hướng tăng chiếm ưu thế (375 mã tăng so với 328 mã giảm).\n\n#### 2. Top 3 cổ phiếu đáng chú ý\n- **NFC (CTCP Phân lân Ninh Bình)**: Cổ phiếu này có Composite Score cao nhất trong danh sách, đạt 65.0. Với PE chỉ 7.5x và ROE 0.5%, NFC cho thấy tiềm năng tăng trưởng ổn định dù tốc độ tăng trưởng chỉ đạt 0.4%. Xu hướng giá của cổ phiếu này đang đi lên, tạo niềm tin cho nhà đầu tư trong ngành sản xuất nhựa - hóa chất.\n\n- **FDC (CTCP Ngoại thương và Phát triển Đầu tư Thành phố Hồ Chí Minh)**: Với Composite Score 64.6, FDC có PE rất thấp (3.3x), cho thấy cổ phiếu này có giá trị hấp dẫn. ROE của FDC là 0.4% và tốc độ tăng trưởng 0.4% cho thấy sự ổn định trong ngành bất động sản, mặc dù có dấu hiệu tăng trưởng chậm.\n\n- **VVS (CTCP Đầu tư phát triển máy Việt Nam)**: VVS đạt Composite Score 64.0 và có ROE 0.6% với PE 7.8x. Tốc độ tăng trưởng tương đối tốt (1.2%) và RSI cao (76.8) cho thấy cổ phiếu này đang thu hút sự chú ý của nhà đầu tư trong lĩnh vực bán buôn.\n\n#### 3. Ngành nổi bật\nNgành khai khoáng hiện đang nổi bật trong bối cảnh tổng thể của thị trường với điểm số trung bình 51.5, cho thấy tiềm năng tăng trưởng và khả năng thu hút vốn đầu tư. Các cổ phiếu trong lĩnh vực này như PVB và MDG cũng có xu hướng tăng trưởng ổn định, điều này có thể tạo ra một làn sóng đầu tư mới trong thời gian tới.\n\n#### 4. Cảnh báo rủi ro\n- **Biến động thị trường**: Mặc dù xu hướng chung là tích cực, nhưng việc chỉ số RSI đang ở mức gần ngưỡng quá mua (64.0) cảnh báo về khả năng điều chỉnh có thể xảy ra.\n- **Tình hình kinh tế vĩ mô**: Các yếu tố bên ngoài như lạm phát, lãi suất có thể ảnh hưởng đến khả năng phát triển bền vững của các ngành, đặc biệt là ngành bất động sản và khai khoáng.\n- **Rủi ro ngành**: Các ngành có điểm số thấp như ngân hàng và chứng khoán đang cho thấy dấu hiệu yếu kém, điều này có thể kéo theo ảnh hưởng tới tâm lý nhà đầu tư.\n\n#### 5. Kết luận\nTổng quan thị trường hiện tại cho thấy sự tích cực với nhiều cổ phiếu có tiềm năng tăng trưởng. Tuy nhiên, nhà đầu tư cần thận trọng trước những rủi ro tiềm ẩn và theo dõi sát sao diễn biến của các yếu tố vĩ mô."
 }
