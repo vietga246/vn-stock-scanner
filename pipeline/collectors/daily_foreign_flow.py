@@ -5,11 +5,11 @@ Lấy dữ liệu giao dịch khối ngoại & tự doanh hàng ngày.
 Chạy cùng daily_prices.py lúc 17:00 ICT.
 
 Features:
-- HOSE + HNX only, loại bỏ chứng quyền
-- Multi-threaded với 2 workers
+- HOSE + HNX only, loại bỏ chứng quyền + trái phiếu
+- Multi-threaded với 2 workers (staggered 60s)
 - Thread-safe adaptive rate limiter
 - Queue-based DB writes (tránh SQLite lock)
-- Batch commit for performance
+- TEST_MODE: chỉ chạy VN30 để test nhanh
 """
 
 from vnstock import Listing, Trading
@@ -47,6 +47,15 @@ MAX_REQUEST_PER_MIN = 60
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
 NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "2"))
+TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
+WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "60"))
+
+# VN30 symbols for testing
+VN30_SYMBOLS = [
+    "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
+    "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
+    "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE"
+]
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
 
@@ -178,7 +187,15 @@ def batch_insert(cursor, table: str, rows: list):
 # ─── TICKERS ───────────────────────────────────────────────────────────────
 
 def get_tickers() -> list:
-    """Get HOSE + HNX symbols, excluding warrants and bonds."""
+    """Get HOSE + HNX symbols, excluding warrants and bonds.
+    
+    In TEST_MODE, returns only VN30 symbols.
+    """
+    # TEST MODE: Only VN30
+    if TEST_MODE:
+        log.info("[TEST MODE] Using VN30: %d symbols", len(VN30_SYMBOLS))
+        return VN30_SYMBOLS.copy()
+    
     listing = Listing()
     
     # Get warrant list
@@ -303,8 +320,10 @@ def fetch_foreign_trading():
     end_str = end_date.strftime("%Y-%m-%d")
     
     log.info("Period: %s → %s", start_str, end_str)
-    log.info("Workers: %d | Rate limit: %d RPM | Stagger: 60s between workers", 
-             NUM_WORKERS, MAX_REQUEST_PER_MIN)
+    
+    mode_str = "[TEST MODE] " if TEST_MODE else ""
+    log.info("%sWorkers: %d | Rate limit: %d RPM | Stagger: %ds", 
+             mode_str, NUM_WORKERS, MAX_REQUEST_PER_MIN, WORKER_STAGGER_SEC)
     
     # Database connection (main thread only)
     conn = create_db_connection(DB_PATH)
@@ -320,13 +339,12 @@ def fetch_foreign_trading():
     # Stats
     ok = fail = 0
     batch_counter = 0
-    results_queue = Queue()
     
     def worker_task(worker_id: int, symbols: list):
         """Worker task with staggered start."""
         # Stagger start: worker 0 starts immediately, worker 1 waits 60s, etc.
         if worker_id > 0:
-            wait_time = worker_id * 60
+            wait_time = worker_id * WORKER_STAGGER_SEC
             log.info("Worker %d: waiting %ds before start...", worker_id, wait_time)
             time.sleep(wait_time)
         
