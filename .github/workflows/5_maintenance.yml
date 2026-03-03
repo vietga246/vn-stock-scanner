@@ -1,4 +1,4 @@
-name: "⑤ Maintenance — Debug & Kiểm tra DB (Manual)"
+name: "⑤ Maintenance — Debug & Bảo trì DB (Manual)"
 
 on:
   workflow_dispatch:
@@ -8,16 +8,17 @@ on:
         type: choice
         required: true
         options:
-          - inspect_db        # Xem schema, số dòng, sample data
-          - debug_fields      # Debug field names từ vnstock API
-          - reset_financials  # Xóa financials_meta (force re-fetch)
-          - vacuum_db         # Compact DB, giải phóng không gian
-          - export_json       # Re-export JSON từ DB hiện tại
+          - inspect_db          # Xem schema, số dòng, sample data
+          - debug_fields        # Debug field names từ vnstock API
+          - reset_financials    # Xóa financials_meta → force re-fetch toàn bộ
+          - vacuum_db           # Compact DB, giải phóng không gian
+          - export_json         # Re-export tất cả JSON từ DB hiện tại
+          - fix_symbols         # Force re-fetch thông tin công ty (khi có symbol mới)
 
 jobs:
   maintenance:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -36,29 +37,58 @@ jobs:
           key: stock-db-${{ github.run_id }}
           restore-keys: stock-db-
 
-      - name: Chạy tác vụ được chọn
+      - name: Tạo thư mục nếu chưa có
+        run: mkdir -p data/db data/exports
+
+      - name: Chạy tác vụ — ${{ github.event.inputs.action }}
         env:
           DB_PATH: data/db/stock.db
           EXPORT_DIR: data/exports
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: |
           ACTION="${{ github.event.inputs.action }}"
           case "$ACTION" in
-            inspect_db)       python pipeline/utils/inspect_db.py ;;
-            debug_fields)     python pipeline/utils/debug_fields.py ;;
-            reset_financials) python pipeline/utils/reset_financials_meta.py ;;
-            vacuum_db)        python pipeline/utils/vacuum_db.py ;;
-            export_json)
-              python pipeline/exporters/export_financials.py
-              python pipeline/processors/sector_analysis.py
+            inspect_db)
+              python pipeline/utils/inspect_db.py
               ;;
-            *) echo "Unknown action: $ACTION" && exit 1 ;;
+            debug_fields)
+              python pipeline/utils/debug_fields.py
+              ;;
+            reset_financials)
+              python pipeline/utils/reset_financials_meta.py
+              echo "✅ Reset xong — chạy ④b Quarterly Financials với force_run=true để re-fetch"
+              ;;
+            vacuum_db)
+              python pipeline/utils/vacuum_db.py
+              ;;
+            export_json)
+              python pipeline/processors/technical_indicators.py
+              python pipeline/processors/scoring_engine.py
+              python pipeline/processors/sector_analysis.py
+              python pipeline/exporters/export_financials.py
+              ;;
+            fix_symbols)
+              python pipeline/collectors/weekly_symbols.py
+              python pipeline/exporters/export_financials.py
+              ;;
+            *)
+              echo "Unknown action: $ACTION" && exit 1
+              ;;
           esac
 
-      - name: Commit nếu có thay đổi (export_json)
-        if: github.event.inputs.action == 'export_json'
+      - name: Lưu DB vào cache
+        uses: actions/cache/save@v4
+        with:
+          path: data/db/stock.db
+          key: stock-db-${{ github.run_id }}
+
+      - name: Commit JSON nếu có thay đổi (export_json / fix_symbols)
+        if: >
+          github.event.inputs.action == 'export_json' ||
+          github.event.inputs.action == 'fix_symbols'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/exports/
-          git diff --cached --quiet || git commit -m "chore: manual export $(date +'%Y-%m-%d')"
+          git diff --cached --quiet || git commit -m "chore: manual ${{ github.event.inputs.action }} $(date +'%Y-%m-%d')"
           git push
