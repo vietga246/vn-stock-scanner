@@ -153,31 +153,56 @@ def create_connection():
     return conn
 
 
+def get_available_columns(conn, table: str) -> set:
+    """Get available columns in a table."""
+    try:
+        cursor = conn.execute(f"PRAGMA table_info({table})")
+        return {row[1] for row in cursor.fetchall()}
+    except Exception as e:
+        log.warning("Could not get columns for %s: %s", table, e)
+        return set()
+
+
 def load_top_stocks(conn, limit: int = 10) -> pd.DataFrame:
-    """Load top N stocks by composite score."""
-    query = """
+    """Load top N stocks by composite score - dynamically adapt to available columns."""
+    
+    # Get available columns in stock_scores
+    available = get_available_columns(conn, "stock_scores")
+    log.info("Available columns in stock_scores: %d", len(available))
+    
+    # Core columns (must exist)
+    core_cols = [
+        "symbol", "composite_score", "fundamental_score", 
+        "smart_money_score", "momentum_score", "technical_score",
+        "tier", "rank_total"
+    ]
+    
+    # Optional columns (may or may not exist)
+    optional_cols = [
+        "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
+        "rsi14", "price_change_5d", "price_change_20d", "trend_short",
+        "foreign_net_7d", "foreign_net_30d", "vol_ratio"
+    ]
+    
+    # Build SELECT clause with only available columns
+    select_cols = []
+    for col in core_cols:
+        if col in available:
+            select_cols.append(f"s.{col}")
+        else:
+            log.warning("Missing core column: %s", col)
+    
+    for col in optional_cols:
+        if col in available:
+            select_cols.append(f"s.{col}")
+    
+    if not select_cols:
+        log.error("No columns available in stock_scores!")
+        return pd.DataFrame()
+    
+    query = f"""
         SELECT 
-            s.symbol,
-            s.composite_score,
-            s.fundamental_score,
-            s.smart_money_score,
-            s.momentum_score,
-            s.technical_score,
-            s.tier,
-            s.rank_total,
-            s.roe,
-            s.roa,
-            s.pe,
-            s.revenue_growth,
-            s.net_margin,
-            s.debt_equity,
-            s.rsi14,
-            s.price_change_5d,
-            s.price_change_20d,
-            s.trend_short,
-            s.foreign_net_7d,
-            s.foreign_net_30d,
-            s.vol_ratio,
+            {', '.join(select_cols)},
             sym.organ_name,
             sym.industry_name
         FROM stock_scores s
@@ -186,6 +211,7 @@ def load_top_stocks(conn, limit: int = 10) -> pd.DataFrame:
         ORDER BY s.composite_score DESC
         LIMIT ?
     """
+    
     df = pd.read_sql(query, conn, params=(limit,))
     log.info("Loaded %d top stocks", len(df))
     return df
@@ -206,129 +232,162 @@ def load_sector_data(conn) -> pd.DataFrame:
 
 def load_technical_signals(conn) -> Dict[str, Any]:
     """Load aggregate technical signals."""
+    available = get_available_columns(conn, "stock_scores")
+    
+    result = {}
+    
     try:
-        # RSI distribution
-        rsi_query = """
-            SELECT 
-                SUM(CASE WHEN rsi14 > 70 THEN 1 ELSE 0 END) as overbought,
-                SUM(CASE WHEN rsi14 < 30 THEN 1 ELSE 0 END) as oversold,
-                SUM(CASE WHEN rsi14 BETWEEN 30 AND 70 THEN 1 ELSE 0 END) as neutral,
-                AVG(rsi14) as avg_rsi
-            FROM stock_scores
-            WHERE rsi14 IS NOT NULL
-        """
-        rsi = pd.read_sql(rsi_query, conn).iloc[0].to_dict()
+        # RSI distribution (if rsi14 exists)
+        if "rsi14" in available:
+            rsi_query = """
+                SELECT 
+                    SUM(CASE WHEN rsi14 > 70 THEN 1 ELSE 0 END) as overbought,
+                    SUM(CASE WHEN rsi14 < 30 THEN 1 ELSE 0 END) as oversold,
+                    SUM(CASE WHEN rsi14 BETWEEN 30 AND 70 THEN 1 ELSE 0 END) as neutral,
+                    AVG(rsi14) as avg_rsi
+                FROM stock_scores
+                WHERE rsi14 IS NOT NULL
+            """
+            result["rsi"] = pd.read_sql(rsi_query, conn).iloc[0].to_dict()
         
-        # Trend distribution
-        trend_query = """
-            SELECT 
-                SUM(CASE WHEN trend_short = 1 THEN 1 ELSE 0 END) as uptrend,
-                SUM(CASE WHEN trend_short = -1 THEN 1 ELSE 0 END) as downtrend,
-                SUM(CASE WHEN trend_short = 0 THEN 1 ELSE 0 END) as sideways
-            FROM stock_scores
-            WHERE trend_short IS NOT NULL
-        """
-        trend = pd.read_sql(trend_query, conn).iloc[0].to_dict()
+        # Trend distribution (if trend_short exists)
+        if "trend_short" in available:
+            trend_query = """
+                SELECT 
+                    SUM(CASE WHEN trend_short = 1 THEN 1 ELSE 0 END) as uptrend,
+                    SUM(CASE WHEN trend_short = -1 THEN 1 ELSE 0 END) as downtrend,
+                    SUM(CASE WHEN trend_short = 0 THEN 1 ELSE 0 END) as sideways
+                FROM stock_scores
+                WHERE trend_short IS NOT NULL
+            """
+            result["trend"] = pd.read_sql(trend_query, conn).iloc[0].to_dict()
         
-        # Top movers
-        movers_query = """
-            SELECT symbol, price_change_5d, price_change_20d
-            FROM stock_scores
-            WHERE price_change_5d IS NOT NULL
-            ORDER BY price_change_5d DESC
-            LIMIT 5
-        """
-        top_gainers = pd.read_sql(movers_query, conn).to_dict('records')
+        # Top movers (if price_change_5d exists)
+        if "price_change_5d" in available:
+            movers_query = """
+                SELECT symbol, price_change_5d, price_change_20d
+                FROM stock_scores
+                WHERE price_change_5d IS NOT NULL
+                ORDER BY price_change_5d DESC
+                LIMIT 5
+            """
+            result["top_gainers"] = pd.read_sql(movers_query, conn).to_dict('records')
         
-        return {
-            "rsi": rsi,
-            "trend": trend,
-            "top_gainers": top_gainers,
-        }
+        return result
+        
     except Exception as e:
         log.warning("Could not load technical signals: %s", e)
         return {}
 
 
-# ─── DATA FORMATTERS ───────────────────────────────────────────────────────
-
-def format_stock_for_prompt(row: pd.Series) -> str:
-    """Format a single stock row for prompt."""
-    return f"""
-### {row['symbol']} - {row.get('organ_name', 'N/A')} ({row.get('industry_name', 'N/A')})
-- **Composite Score**: {row['composite_score']:.1f} (Tier {row['tier']}, Rank #{row['rank_total']})
-- **Sub-scores**: Fundamental {row['fundamental_score']:.1f} | Smart Money {row['smart_money_score']:.1f} | Momentum {row['momentum_score']:.1f} | Technical {row['technical_score']:.1f}
-- **Fundamentals**: ROE {row['roe']:.1f}% | ROA {row['roa']:.1f}% | PE {row['pe']:.1f}x | Revenue Growth {row['revenue_growth']:.1f}%
-- **Technical**: RSI {row['rsi14']:.1f} | 5D Change {row['price_change_5d']:.1f}% | 20D Change {row['price_change_20d']:.1f}% | Trend {'↑' if row['trend_short'] == 1 else '↓' if row['trend_short'] == -1 else '→'}
-- **Smart Money**: Foreign Net 7D {row['foreign_net_7d']:.1f}B | Foreign Net 30D {row['foreign_net_30d']:.1f}B | Vol Ratio {row['vol_ratio']:.2f}x
-"""
-
+# ─── FORMATTERS ────────────────────────────────────────────────────────────
 
 def format_stocks_for_prompt(df: pd.DataFrame) -> str:
-    """Format all stocks for prompt."""
-    formatted = []
+    """Format stock data for AI prompt."""
+    if df.empty:
+        return "Không có dữ liệu"
+    
+    lines = []
     for _, row in df.iterrows():
-        # Handle NaN values
-        row_filled = row.fillna(0)
-        formatted.append(format_stock_for_prompt(row_filled))
-    return "\n".join(formatted)
+        parts = [f"**{row['symbol']}**"]
+        
+        # Add available metrics
+        if 'organ_name' in row and pd.notna(row['organ_name']):
+            parts.append(f"({row['organ_name']})")
+        
+        metrics = []
+        if 'composite_score' in row and pd.notna(row['composite_score']):
+            metrics.append(f"Score: {row['composite_score']:.1f}")
+        if 'tier' in row and pd.notna(row['tier']):
+            metrics.append(f"Tier: {row['tier']}")
+        if 'roe' in row and pd.notna(row['roe']):
+            metrics.append(f"ROE: {row['roe']:.1f}%")
+        if 'pe' in row and pd.notna(row['pe']):
+            metrics.append(f"PE: {row['pe']:.1f}x")
+        if 'revenue_growth' in row and pd.notna(row['revenue_growth']):
+            metrics.append(f"Growth: {row['revenue_growth']:.1f}%")
+        if 'rsi14' in row and pd.notna(row['rsi14']):
+            metrics.append(f"RSI: {row['rsi14']:.1f}")
+        if 'trend_short' in row and pd.notna(row['trend_short']):
+            trend = '↑' if row['trend_short'] == 1 else '↓' if row['trend_short'] == -1 else '→'
+            metrics.append(f"Trend: {trend}")
+        if 'foreign_net_7d' in row and pd.notna(row['foreign_net_7d']):
+            metrics.append(f"Foreign 7D: {row['foreign_net_7d']:.1f}B")
+        if 'industry_name' in row and pd.notna(row['industry_name']):
+            metrics.append(f"Ngành: {row['industry_name']}")
+        
+        if metrics:
+            parts.append(" | ".join(metrics))
+        
+        lines.append(" ".join(parts))
+    
+    return "\n".join(lines)
 
 
 def format_sectors_for_prompt(df: pd.DataFrame) -> str:
-    """Format sector data for prompt."""
+    """Format sector data for AI prompt."""
     if df.empty:
-        return "Không có dữ liệu ngành."
+        return "Không có dữ liệu ngành"
     
-    lines = ["| Ngành | Score | Foreign 7D | Momentum Rank |"]
-    lines.append("|-------|-------|------------|---------------|")
-    
-    for _, row in df.head(10).iterrows():
+    lines = []
+    for _, row in df.iterrows():
         name = row.get('industry_name', row.get('name', 'N/A'))
-        score = row.get('avg_composite', row.get('avg_composite_score', 0))
-        foreign = row.get('total_foreign_7d', row.get('foreign_net_7d', 0)) or 0
-        momentum = row.get('momentum_rank', 'N/A')
-        lines.append(f"| {name} | {score:.1f} | {foreign:.1f}B | {momentum} |")
+        parts = [f"**{name}**"]
+        
+        metrics = []
+        if 'avg_composite' in row and pd.notna(row['avg_composite']):
+            metrics.append(f"Avg Score: {row['avg_composite']:.1f}")
+        if 'stock_count' in row and pd.notna(row['stock_count']):
+            metrics.append(f"Stocks: {int(row['stock_count'])}")
+        if 'total_foreign_7d' in row and pd.notna(row['total_foreign_7d']):
+            metrics.append(f"Foreign 7D: {row['total_foreign_7d']:.1f}B")
+        
+        if metrics:
+            parts.append(" | ".join(metrics))
+        
+        lines.append(" ".join(parts))
     
     return "\n".join(lines)
 
 
 def format_technical_for_prompt(signals: Dict) -> str:
-    """Format technical signals for prompt."""
+    """Format technical signals for AI prompt."""
     if not signals:
-        return "Không có dữ liệu kỹ thuật."
+        return "Không có dữ liệu kỹ thuật"
     
-    rsi = signals.get('rsi', {})
-    trend = signals.get('trend', {})
+    lines = []
     
-    lines = [
-        f"**RSI Distribution**: Overbought (>70): {rsi.get('overbought', 0)} | Oversold (<30): {rsi.get('oversold', 0)} | Neutral: {rsi.get('neutral', 0)}",
-        f"**Average RSI**: {rsi.get('avg_rsi', 50):.1f}",
-        f"**Trend Distribution**: Uptrend: {trend.get('uptrend', 0)} | Downtrend: {trend.get('downtrend', 0)} | Sideways: {trend.get('sideways', 0)}",
-    ]
+    if "rsi" in signals:
+        rsi = signals["rsi"]
+        lines.append(f"RSI: Overbought={rsi.get('overbought', 0)}, Oversold={rsi.get('oversold', 0)}, Neutral={rsi.get('neutral', 0)}")
+        lines.append(f"RSI trung bình: {rsi.get('avg_rsi', 0):.1f}")
     
-    gainers = signals.get('top_gainers', [])
-    if gainers:
-        lines.append("\n**Top 5 Gainers (5D)**:")
-        for g in gainers:
-            lines.append(f"  - {g['symbol']}: +{g['price_change_5d']:.1f}%")
+    if "trend" in signals:
+        trend = signals["trend"]
+        lines.append(f"Xu hướng: Tăng={trend.get('uptrend', 0)}, Giảm={trend.get('downtrend', 0)}, Sideway={trend.get('sideways', 0)}")
     
-    return "\n".join(lines)
+    if "top_gainers" in signals:
+        gainers = signals["top_gainers"][:3]
+        gainer_str = ", ".join([f"{g['symbol']}(+{g['price_change_5d']:.1f}%)" for g in gainers if 'symbol' in g and 'price_change_5d' in g])
+        if gainer_str:
+            lines.append(f"Top gainers 5D: {gainer_str}")
+    
+    return "\n".join(lines) if lines else "Không có dữ liệu"
 
 
-# ─── AI API CLIENTS ────────────────────────────────────────────────────────
+# ─── AI CALLERS ────────────────────────────────────────────────────────────
 
 def call_openai(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str]:
     """Call OpenAI API."""
     try:
-        import openai
-        
-        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
         
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": prompt},
             ],
             max_tokens=MAX_TOKENS,
             temperature=0.7,
@@ -337,7 +396,7 @@ def call_openai(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str
         return response.choices[0].message.content
         
     except ImportError:
-        log.error("openai package not installed. Run: pip install openai")
+        log.error("OpenAI package not installed. Run: pip install openai")
         return None
     except Exception as e:
         log.error("OpenAI API error: %s", e)
@@ -347,23 +406,22 @@ def call_openai(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str
 def call_anthropic(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str]:
     """Call Anthropic Claude API."""
     try:
-        import anthropic
-        
-        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        from anthropic import Anthropic
+        client = Anthropic(api_key=ANTHROPIC_API_KEY)
         
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-haiku-20240307",
             max_tokens=MAX_TOKENS,
             system=system_prompt,
             messages=[
-                {"role": "user", "content": prompt}
-            ]
+                {"role": "user", "content": prompt},
+            ],
         )
         
         return response.content[0].text
         
     except ImportError:
-        log.error("anthropic package not installed. Run: pip install anthropic")
+        log.error("Anthropic package not installed. Run: pip install anthropic")
         return None
     except Exception as e:
         log.error("Anthropic API error: %s", e)
@@ -481,10 +539,13 @@ def create_fallback_analysis(stocks_df: pd.DataFrame, sectors_df: pd.DataFrame) 
     
     top_picks = []
     for _, row in stocks_df.head(5).iterrows():
-        row = row.fillna(0)
+        # Safe get with defaults
+        def safe_get(col, default=0):
+            val = row.get(col, default)
+            return default if pd.isna(val) else val
         
         # Determine recommendation based on scores
-        score = row['composite_score']
+        score = safe_get('composite_score', 0)
         if score >= 70:
             rec = "strong_buy"
         elif score >= 60:
@@ -498,37 +559,52 @@ def create_fallback_analysis(stocks_df: pd.DataFrame, sectors_df: pd.DataFrame) 
         
         # Identify risks
         risks = []
-        if row['rsi14'] > 70:
+        rsi = safe_get('rsi14', 50)
+        pe = safe_get('pe', 0)
+        de = safe_get('debt_equity', 0)
+        foreign_7d = safe_get('foreign_net_7d', 0)
+        
+        if rsi > 70:
             risks.append("RSI cao (>70) - có thể điều chỉnh ngắn hạn")
-        if row['pe'] > 20:
-            risks.append(f"PE cao ({row['pe']:.1f}x) - định giá đắt")
-        if row['debt_equity'] > 1.5:
-            risks.append(f"Nợ cao (D/E: {row['debt_equity']:.1f})")
-        if row['foreign_net_7d'] < 0:
+        if pe > 20:
+            risks.append(f"PE cao ({pe:.1f}x) - định giá đắt")
+        if de > 1.5:
+            risks.append(f"Nợ cao (D/E: {de:.1f})")
+        if foreign_7d < 0:
             risks.append("Khối ngoại đang bán ròng")
         
         # Identify catalysts
         catalysts = []
-        if row['revenue_growth'] > 20:
-            catalysts.append(f"Tăng trưởng doanh thu mạnh ({row['revenue_growth']:.1f}%)")
-        if row['roe'] > 15:
-            catalysts.append(f"ROE cao ({row['roe']:.1f}%)")
-        if row['foreign_net_7d'] > 0:
+        rev_growth = safe_get('revenue_growth', 0)
+        roe = safe_get('roe', 0)
+        trend = safe_get('trend_short', 0)
+        
+        if rev_growth > 20:
+            catalysts.append(f"Tăng trưởng doanh thu mạnh ({rev_growth:.1f}%)")
+        if roe > 15:
+            catalysts.append(f"ROE cao ({roe:.1f}%)")
+        if foreign_7d > 0:
             catalysts.append("Khối ngoại đang mua ròng")
-        if row['trend_short'] == 1:
+        if trend == 1:
             catalysts.append("Xu hướng ngắn hạn tăng")
+        
+        # Build reasoning
+        reasoning = {}
+        if 'roe' in row.index or 'pe' in row.index or 'revenue_growth' in row.index:
+            reasoning["fundamental"] = f"ROE {roe:.1f}%, PE {pe:.1f}x, Growth {rev_growth:.1f}%"
+        if 'rsi14' in row.index or 'trend_short' in row.index:
+            trend_str = '↑' if trend == 1 else '↓' if trend == -1 else '→'
+            reasoning["technical"] = f"RSI {rsi:.1f}, Trend {trend_str}"
+        if 'foreign_net_7d' in row.index:
+            reasoning["smart_money"] = f"Foreign 7D: {foreign_7d:.1f}B VND"
         
         top_picks.append({
             "symbol": row['symbol'],
-            "name": row.get('organ_name', ''),
-            "industry": row.get('industry_name', ''),
+            "name": safe_get('organ_name', ''),
+            "industry": safe_get('industry_name', ''),
             "recommendation": rec,
-            "composite_score": round(row['composite_score'], 1),
-            "reasoning": {
-                "fundamental": f"ROE {row['roe']:.1f}%, PE {row['pe']:.1f}x, Growth {row['revenue_growth']:.1f}%",
-                "technical": f"RSI {row['rsi14']:.1f}, Trend {'↑' if row['trend_short']==1 else '↓' if row['trend_short']==-1 else '→'}",
-                "smart_money": f"Foreign 7D: {row['foreign_net_7d']:.1f}B VND",
-            },
+            "composite_score": round(score, 1),
+            "reasoning": reasoning if reasoning else {"note": "Limited data available"},
             "catalysts": catalysts if catalysts else ["Đánh giá composite tốt"],
             "risks": risks if risks else ["Không có rủi ro đáng kể"],
         })
