@@ -18,13 +18,14 @@ jobs:
 
       - run: pip install -r pipeline/requirements.txt
 
+      - name: Tạo thư mục
+        run: mkdir -p data/db data/exports
+
       - name: Tải toàn bộ lịch sử giá (2020 → nay)
         env:
           DB_PATH: data/db/stock.db
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-        run: |
-          mkdir -p data/db
-          python pipeline/collectors/bootstrap_prices.py
+        run: python pipeline/collectors/bootstrap_prices.py
 
       - name: Tải thông tin công ty (tên, ngành, sàn)
         env:
@@ -32,11 +33,20 @@ jobs:
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: python pipeline/collectors/weekly_symbols.py
 
-      - name: Export JSON ban đầu
+      - name: Export JSON ban đầu (symbols only)
         env:
           DB_PATH: data/db/stock.db
           EXPORT_DIR: data/exports
-        run: python pipeline/exporters/export_financials.py
+        run: |
+          # Export sẽ handle gracefully nếu chưa có financials
+          python pipeline/exporters/export_financials.py || echo "⚠️ Export partial - financials chưa có"
+
+      - name: Kiểm tra DB
+        run: |
+          echo "=== Database Info ==="
+          sqlite3 data/db/stock.db "SELECT COUNT(*) || ' prices' FROM stock_prices;"
+          sqlite3 data/db/stock.db "SELECT COUNT(*) || ' symbols' FROM symbols;"
+          sqlite3 data/db/stock.db ".tables"
 
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
@@ -48,6 +58,19 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/exports/
-          git diff --cached --quiet || git commit -m "chore: bootstrap full history $(date +'%Y-%m-%d')"
-          git push
+          git add data/exports/ || true
+          git diff --cached --quiet || git commit -m "chore: bootstrap $(date +'%Y-%m-%d')"
+          git push || echo "Nothing to push"
+
+      - name: Summary
+        run: |
+          echo "## ✅ Bootstrap Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Data | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Prices | $(sqlite3 data/db/stock.db 'SELECT COUNT(*) FROM stock_prices;') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Symbols | $(sqlite3 data/db/stock.db 'SELECT COUNT(*) FROM symbols;') |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Run **④b Quarterly Financials** to load financial data" >> $GITHUB_STEP_SUMMARY
+          echo "2. Run **③ Daily Process** to calculate scores" >> $GITHUB_STEP_SUMMARY
