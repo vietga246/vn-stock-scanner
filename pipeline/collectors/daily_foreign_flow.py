@@ -6,20 +6,25 @@ Chạy cùng daily_prices.py lúc 17:00 ICT.
 
 Features:
 - HOSE + HNX only, loại bỏ chứng quyền
-- Adaptive rate limiter
-- Incremental update (chỉ lấy từ ngày chưa có)
+- Multi-threaded với 2 workers
+- Thread-safe adaptive rate limiter
+- Queue-based DB writes (tránh SQLite lock)
 - Batch commit for performance
 """
 
 from vnstock import Listing, Trading
 from datetime import datetime, timedelta
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+from queue import Queue
 import sqlite3
 import pandas as pd
 import json
 import logging
 import sys
 import os
+import time
 
 # Import shared utilities
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -40,10 +45,47 @@ DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
 MAX_REQUEST_PER_MIN = 60
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
+NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "2"))
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
 
 log = setup_logging()
+
+# ─── THREAD-SAFE RATE LIMITER ──────────────────────────────────────────────
+
+class ThreadSafeRateLimiter:
+    """Thread-safe rate limiter using sliding window."""
+    
+    def __init__(self, max_requests_per_min: int, safety_ratio: float = 0.85):
+        self.max_rpm = int(max_requests_per_min * safety_ratio)
+        self.window = 60.0  # 1 minute window
+        self.requests = []
+        self.lock = Lock()
+    
+    def acquire(self):
+        """Wait if necessary, then record a request."""
+        with self.lock:
+            now = time.time()
+            # Remove old requests outside window
+            self.requests = [t for t in self.requests if now - t < self.window]
+            
+            if len(self.requests) >= self.max_rpm:
+                # Need to wait
+                oldest = self.requests[0]
+                wait_time = self.window - (now - oldest) + 0.1
+                if wait_time > 0:
+                    log.debug("Rate limit: sleeping %.1fs", wait_time)
+                    time.sleep(wait_time)
+                    now = time.time()
+                    self.requests = [t for t in self.requests if now - t < self.window]
+            
+            self.requests.append(now)
+    
+    def reset(self):
+        """Reset after hitting rate limit error."""
+        with self.lock:
+            self.requests = []
+
 
 # ─── DATABASE ──────────────────────────────────────────────────────────────
 
@@ -83,14 +125,8 @@ def init_db(conn):
     conn.commit()
 
 
-def preload_last_dates(cursor, table: str) -> dict:
-    """Get last date for each symbol in table."""
-    cursor.execute(f"SELECT symbol, MAX(date) FROM {table} GROUP BY symbol")
-    return {row[0]: row[1] for row in cursor.fetchall()}
-
-
-def upsert_trading(cursor, table: str, symbol: str, df: pd.DataFrame):
-    """Insert or replace trading data with normalized dates."""
+def prepare_trading_rows(symbol: str, df: pd.DataFrame) -> list:
+    """Prepare rows for insertion (thread-safe, no DB access)."""
     rows = []
     
     for row in df.itertuples(index=False):
@@ -124,6 +160,11 @@ def upsert_trading(cursor, table: str, symbol: str, df: pd.DataFrame):
             data_json
         ))
     
+    return rows
+
+
+def batch_insert(cursor, table: str, rows: list):
+    """Insert rows into table."""
     if rows:
         cursor.executemany(f"""
             INSERT OR REPLACE INTO {table}
@@ -162,10 +203,79 @@ def get_tickers() -> list:
     return [t for t in df["symbol"].tolist() if t not in warrants]
 
 
+# ─── WORKER FUNCTION ───────────────────────────────────────────────────────
+
+def fetch_symbol_data(symbol: str, limiter: ThreadSafeRateLimiter) -> dict:
+    """
+    Fetch foreign and prop trading data for a single symbol.
+    Returns dict with results (thread-safe, no DB writes).
+    """
+    result = {
+        'symbol': symbol,
+        'status': 'ok',
+        'foreign_rows': [],
+        'prop_rows': [],
+        'error': None
+    }
+    
+    retry = 0
+    while retry < MAX_RETRY:
+        try:
+            limiter.acquire()
+            t = Trading(symbol=symbol, source="VCI")
+            
+            # Foreign trading
+            try:
+                df_f = t.foreign_trade()
+                if df_f is not None and not df_f.empty:
+                    result['foreign_rows'] = prepare_trading_rows(symbol, df_f)
+            except Exception as e:
+                log.debug("[%s] foreign_trade error: %s", symbol, e)
+            
+            # Proprietary trading
+            try:
+                df_p = t.prop_trade()
+                if df_p is not None and not df_p.empty:
+                    result['prop_rows'] = prepare_trading_rows(symbol, df_p)
+            except Exception as e:
+                log.debug("[%s] prop_trade error: %s", symbol, e)
+            
+            return result
+            
+        except SystemExit:
+            wait = 65
+            log.warning("[%s] SystemExit → sleep %ds (retry %d/%d)",
+                       symbol, wait, retry + 1, MAX_RETRY)
+            time.sleep(wait)
+            limiter.reset()
+            retry += 1
+            
+        except Exception as e:
+            err = str(e).lower()
+            if any(x in err for x in ["429", "rate limit", "exceeded", "giới hạn"]):
+                wait = extract_wait_time(str(e))
+                log.warning("[%s] Rate limit → sleep %ds (retry %d/%d)",
+                           symbol, wait, retry + 1, MAX_RETRY)
+                time.sleep(wait)
+                limiter.reset()
+                retry += 1
+            else:
+                log.warning("❌ %s — %s", symbol, e)
+                result['status'] = 'failed'
+                result['error'] = str(e)
+                return result
+    
+    # Max retries reached
+    log.warning("[%s] Max retries reached — skipping", symbol)
+    result['status'] = 'failed'
+    result['error'] = 'max_retries'
+    return result
+
+
 # ─── MAIN ──────────────────────────────────────────────────────────────────
 
 def fetch_foreign_trading():
-    """Main function to fetch foreign and prop trading data."""
+    """Main function to fetch foreign and prop trading data with multi-threading."""
     
     # Setup API key
     if API_KEY:
@@ -176,7 +286,7 @@ def fetch_foreign_trading():
     
     # Initialize
     tickers = get_tickers()
-    limiter = AdaptiveRateLimiter(MAX_REQUEST_PER_MIN, safety_ratio=0.9)
+    limiter = ThreadSafeRateLimiter(MAX_REQUEST_PER_MIN, safety_ratio=0.85)
     
     end_date = datetime.now()
     start_date = end_date - timedelta(days=DAYS_LOOKBACK)
@@ -184,88 +294,56 @@ def fetch_foreign_trading():
     end_str = end_date.strftime("%Y-%m-%d")
     
     log.info("Period: %s → %s", start_str, end_str)
+    log.info("Workers: %d | Rate limit: %d RPM", NUM_WORKERS, MAX_REQUEST_PER_MIN)
     
-    # Database connection
+    # Database connection (main thread only)
     conn = create_db_connection(DB_PATH)
     cursor = conn.cursor()
     init_db(conn)
     
-    # Preload existing dates for incremental update
-    last_foreign = preload_last_dates(cursor, "foreign_trading")
-    last_prop = preload_last_dates(cursor, "prop_trading")
-    
     # Stats
-    ok = fail = skipped = 0
+    ok = fail = 0
     batch_counter = 0
     
-    for symbol in tqdm(tickers, desc="Foreign trading"):
-        retry = 0
-        success = False
+    # Process with thread pool
+    with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+        # Submit all tasks
+        futures = {
+            executor.submit(fetch_symbol_data, symbol, limiter): symbol 
+            for symbol in tickers
+        }
         
-        while retry < MAX_RETRY:
+        # Process results as they complete
+        for future in tqdm(as_completed(futures), total=len(tickers), desc="Foreign trading"):
             try:
-                limiter.acquire()
-                t = Trading(symbol=symbol, source="VCI")
+                result = future.result()
                 
-                # Foreign trading
-                try:
-                    df_f = t.foreign_trade()
-                    if df_f is not None and not df_f.empty:
-                        upsert_trading(cursor, "foreign_trading", symbol, df_f)
-                except Exception as e:
-                    log.debug("[%s] foreign_trade error: %s", symbol, e)
-                
-                # Proprietary trading
-                try:
-                    df_p = t.prop_trade()
-                    if df_p is not None and not df_p.empty:
-                        upsert_trading(cursor, "prop_trading", symbol, df_p)
-                except Exception as e:
-                    log.debug("[%s] prop_trade error: %s", symbol, e)
-                
-                ok += 1
-                batch_counter += 1
-                success = True
-                break
-                
-            except SystemExit:
-                wait = 65
-                log.warning("[%s] SystemExit → sleep %ds (retry %d/%d)",
-                           symbol, wait, retry + 1, MAX_RETRY)
-                import time
-                time.sleep(wait)
-                limiter.reset()
-                retry += 1
-                
-            except Exception as e:
-                err = str(e).lower()
-                if any(x in err for x in ["429", "rate limit", "exceeded", "giới hạn"]):
-                    wait = extract_wait_time(str(e))
-                    log.warning("[%s] Rate limit → sleep %ds (retry %d/%d)",
-                               symbol, wait, retry + 1, MAX_RETRY)
-                    import time
-                    time.sleep(wait)
-                    limiter.reset()
-                    retry += 1
+                if result['status'] == 'ok':
+                    # Insert data (main thread - thread safe)
+                    if result['foreign_rows']:
+                        batch_insert(cursor, "foreign_trading", result['foreign_rows'])
+                    if result['prop_rows']:
+                        batch_insert(cursor, "prop_trading", result['prop_rows'])
+                    
+                    ok += 1
+                    batch_counter += 1
                 else:
-                    log.warning("❌ %s — %s", symbol, e)
                     fail += 1
-                    break
-        
-        if not success and retry >= MAX_RETRY:
-            log.warning("[%s] Max retries reached — skipping", symbol)
-            fail += 1
-        
-        # Batch commit
-        if batch_counter >= COMMIT_BATCH:
-            conn.commit()
-            batch_counter = 0
+                
+                # Batch commit
+                if batch_counter >= COMMIT_BATCH:
+                    conn.commit()
+                    batch_counter = 0
+                    
+            except Exception as e:
+                log.error("Future error: %s", e)
+                fail += 1
     
     # Final commit and close
     conn.commit()
     conn.close()
     
-    log.info("✅ Done — OK: %d, Skipped: %d, Failed: %d", ok, skipped, fail)
+    log.info("✅ Done — OK: %d, Failed: %d", ok, fail)
 
 
 if __name__ == "__main__":
