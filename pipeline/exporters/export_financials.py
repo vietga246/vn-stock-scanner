@@ -42,6 +42,47 @@ def export():
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
+    # ── Check if tables exist ────────────────────────────────────────────────
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    existing_tables = {r[0] for r in cur.fetchall()}
+    
+    has_financials = 'financials_ratio' in existing_tables
+    has_symbols = 'symbols' in existing_tables
+    has_prices = 'stock_prices' in existing_tables
+    
+    print(f"Tables found: {existing_tables}")
+    print(f"Has financials: {has_financials}, Has symbols: {has_symbols}, Has prices: {has_prices}")
+    
+    if not has_symbols and not has_prices:
+        print("⚠️ No data tables found. Run bootstrap first.")
+        conn.close()
+        return
+    
+    # ── If no financials yet, export symbols-only JSON ───────────────────────
+    if not has_financials:
+        print("⚠️ No financials data yet. Exporting symbols-only JSON...")
+        
+        # Export symbols list
+        if has_symbols:
+            cur.execute("SELECT * FROM symbols")
+            symbols_data = [dict(r) for r in cur.fetchall()]
+            
+            output = {
+                "generated_at": datetime.utcnow().isoformat() + "Z",
+                "note": "Financials not yet loaded. Run 4b_quarterly_financials workflow.",
+                "total": len(symbols_data),
+                "symbols": symbols_data,
+            }
+            
+            os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
+            with open(OUT_PATH, "w", encoding="utf-8") as f:
+                json.dump(output, f, ensure_ascii=False, indent=2)
+            
+            print(f"✅ Exported {len(symbols_data)} symbols to {OUT_PATH}")
+        
+        conn.close()
+        return
+
     # ── Latest quarter per symbol ─────────────────────────────────────────
     cur.execute("""
         SELECT symbol, MAX(year*10 + quarter) AS yq, year, quarter
