@@ -1,39 +1,41 @@
 name: "⑥ AI Analysis — Phân tích AI (Manual/Weekly)"
 
+# ============================================================
+# CHỈ CHẠY KHI:
+# 1. Manual trigger (workflow_dispatch) - click "Run workflow"
+# 2. Schedule (Chủ nhật 19:00 ICT)
+#
+# KHÔNG TỰ ĐỘNG TRIGGER TỪ PUSH HOẶC WORKFLOW KHÁC
+# ============================================================
+
 on:
   schedule:
-    - cron: "0 12 * * 0"    # 19:00 ICT Chủ nhật
-  workflow_run:
-    workflows: ["③ Daily Process — Scoring & Sector (17:30 ICT T2-T6)"]
-    types: [completed]
+    - cron: "0 12 * * 0"
+  
   workflow_dispatch:
     inputs:
-      use_ai:
-        description: 'Use AI API (requires API key)'
-        required: false
-        default: 'true'
+      run_mode:
+        description: 'Chế độ chạy'
+        required: true
+        default: 'fallback'
         type: choice
         options:
-          - 'true'
-          - 'false'
+          - 'fallback'
+          - 'ai'
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
-    # Only run if triggered manually, by schedule, or if process workflow succeeded
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'schedule' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
-    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
@@ -42,24 +44,28 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r pipeline/requirements.txt
-          pip install openai anthropic
+          if [ "${{ inputs.run_mode }}" = "ai" ]; then
+            pip install openai anthropic
+          fi
 
-      - name: Khôi phục DB từ cache
+      - name: Restore DB from cache
         uses: actions/cache@v4
         with:
           path: data/db/stock.db
           key: stock-db-${{ github.run_id }}
-          restore-keys: stock-db-
+          restore-keys: |
+            stock-db-
 
       - name: Check DB exists
         id: check_db
         run: |
+          mkdir -p data/db data/exports
           if [ -f "data/db/stock.db" ]; then
             echo "DB_EXISTS=true" >> $GITHUB_OUTPUT
             echo "✅ Database found"
           else
             echo "DB_EXISTS=false" >> $GITHUB_OUTPUT
-            echo "❌ Database not found"
+            echo "❌ Database not found - run Bootstrap first"
           fi
 
       - name: Run AI Analysis
@@ -69,11 +75,9 @@ jobs:
           EXPORT_DIR: data/exports
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
           TOP_N_STOCKS: "15"
-        run: |
-          mkdir -p data/exports
-          python pipeline/ai_analyst/ai_analyst.py
+        run: python pipeline/ai_analyst/ai_analyst.py
 
       - name: Generate Reports
         if: steps.check_db.outputs.DB_EXISTS == 'true'
@@ -83,49 +87,28 @@ jobs:
         run: python pipeline/ai_analyst/report_generator.py
 
       - name: List generated files
+        if: always()
         run: |
-          echo "Generated files:"
-          ls -la data/exports/
-          if [ -d "data/exports/stocks" ]; then
-            echo "Stock details:"
-            ls data/exports/stocks/ | head -10
-          fi
+          echo "=== Generated files ==="
+          ls -la data/exports/ 2>/dev/null || echo "No exports"
 
       - name: Commit reports
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add data/exports/ai_analysis.json || true
-          git add data/exports/daily_report.md || true
-          git add data/exports/daily_report.html || true
-          git add data/exports/stocks/ || true
-          
+          git add data/exports/ || true
           git diff --cached --quiet || git commit -m "chore: AI analysis $(date +'%Y-%m-%d')"
           git push || echo "Nothing to push"
 
       - name: Summary
+        if: always()
         run: |
-          echo "## AI Analysis Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
+          echo "## AI Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- Mode: ${{ inputs.run_mode || 'scheduled' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- DB: ${{ steps.check_db.outputs.DB_EXISTS }}" >> $GITHUB_STEP_SUMMARY
           if [ -f "data/exports/ai_analysis.json" ]; then
-            echo "✅ AI Analysis generated" >> $GITHUB_STEP_SUMMARY
-            # Extract top picks
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Top Picks" >> $GITHUB_STEP_SUMMARY
-            python3 -c "
-import json
-with open('data/exports/ai_analysis.json') as f:
-    data = json.load(f)
-picks = data.get('analysis', {}).get('top_picks', [])
-for p in picks[:5]:
-    print(f\"- **{p.get('symbol')}**: {p.get('recommendation', 'N/A')} (Score: {p.get('composite_score', 'N/A')})\")
-" >> $GITHUB_STEP_SUMMARY || true
+            echo "- Status: ✅ Success" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️ AI Analysis not generated" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ -f "data/exports/daily_report.md" ]; then
-            echo "✅ Daily report generated" >> $GITHUB_STEP_SUMMARY
+            echo "- Status: ⚠️ No output" >> $GITHUB_STEP_SUMMARY
           fi
