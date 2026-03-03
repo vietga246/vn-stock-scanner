@@ -303,50 +303,86 @@ def fetch_foreign_trading():
     end_str = end_date.strftime("%Y-%m-%d")
     
     log.info("Period: %s → %s", start_str, end_str)
-    log.info("Workers: %d | Rate limit: %d RPM", NUM_WORKERS, MAX_REQUEST_PER_MIN)
+    log.info("Workers: %d | Rate limit: %d RPM | Stagger: 60s between workers", 
+             NUM_WORKERS, MAX_REQUEST_PER_MIN)
     
     # Database connection (main thread only)
     conn = create_db_connection(DB_PATH)
     cursor = conn.cursor()
     init_db(conn)
     
+    # Split tickers into chunks for each worker
+    chunk_size = len(tickers) // NUM_WORKERS + 1
+    ticker_chunks = [tickers[i:i + chunk_size] for i in range(0, len(tickers), chunk_size)]
+    
+    log.info("Split %d symbols into %d chunks", len(tickers), len(ticker_chunks))
+    
     # Stats
     ok = fail = 0
     batch_counter = 0
+    results_queue = Queue()
+    
+    def worker_task(worker_id: int, symbols: list):
+        """Worker task with staggered start."""
+        # Stagger start: worker 0 starts immediately, worker 1 waits 60s, etc.
+        if worker_id > 0:
+            wait_time = worker_id * 60
+            log.info("Worker %d: waiting %ds before start...", worker_id, wait_time)
+            time.sleep(wait_time)
+        
+        log.info("Worker %d: starting with %d symbols", worker_id, len(symbols))
+        
+        results = []
+        for symbol in symbols:
+            result = fetch_symbol_data(symbol, limiter)
+            results.append(result)
+        
+        return results
     
     # Process with thread pool
     with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
-        # Submit all tasks
+        # Submit tasks with worker IDs
         futures = {
-            executor.submit(fetch_symbol_data, symbol, limiter): symbol 
-            for symbol in tickers
+            executor.submit(worker_task, i, chunk): i 
+            for i, chunk in enumerate(ticker_chunks)
         }
         
-        # Process results as they complete
-        for future in tqdm(as_completed(futures), total=len(tickers), desc="Foreign trading"):
+        # Progress bar for total symbols
+        pbar = tqdm(total=len(tickers), desc="Foreign trading")
+        
+        # Process results as workers complete
+        for future in as_completed(futures):
+            worker_id = futures[future]
             try:
-                result = future.result()
+                results = future.result()
                 
-                if result['status'] == 'ok':
-                    # Insert data (main thread - thread safe)
-                    if result['foreign_rows']:
-                        batch_insert(cursor, "foreign_trading", result['foreign_rows'])
-                    if result['prop_rows']:
-                        batch_insert(cursor, "prop_trading", result['prop_rows'])
+                for result in results:
+                    if result['status'] == 'ok':
+                        # Insert data (main thread - thread safe)
+                        if result['foreign_rows']:
+                            batch_insert(cursor, "foreign_trading", result['foreign_rows'])
+                        if result['prop_rows']:
+                            batch_insert(cursor, "prop_trading", result['prop_rows'])
+                        
+                        ok += 1
+                        batch_counter += 1
+                    else:
+                        fail += 1
                     
-                    ok += 1
-                    batch_counter += 1
-                else:
-                    fail += 1
+                    pbar.update(1)
+                    
+                    # Batch commit
+                    if batch_counter >= COMMIT_BATCH:
+                        conn.commit()
+                        batch_counter = 0
                 
-                # Batch commit
-                if batch_counter >= COMMIT_BATCH:
-                    conn.commit()
-                    batch_counter = 0
+                log.info("Worker %d: completed", worker_id)
                     
             except Exception as e:
-                log.error("Future error: %s", e)
-                fail += 1
+                log.error("Worker %d error: %s", worker_id, e)
+                fail += len(ticker_chunks[worker_id])
+        
+        pbar.close()
     
     # Final commit and close
     conn.commit()
