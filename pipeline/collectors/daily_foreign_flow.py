@@ -33,6 +33,7 @@ from utils import (
     normalize_date,
     safe_float,
     extract_wait_time,
+    is_bond,
     create_db_connection,
     setup_logging,
 )
@@ -177,7 +178,7 @@ def batch_insert(cursor, table: str, rows: list):
 # ─── TICKERS ───────────────────────────────────────────────────────────────
 
 def get_tickers() -> list:
-    """Get HOSE + HNX symbols, excluding warrants."""
+    """Get HOSE + HNX symbols, excluding warrants and bonds."""
     listing = Listing()
     
     # Get warrant list
@@ -191,16 +192,24 @@ def get_tickers() -> list:
         df = listing.symbols_by_exchange()
         if "exchange" in df.columns:
             df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
-            tickers = [t for t in df["symbol"].tolist() if t not in warrants]
-            log.info("HOSE+HNX: %d symbols (excluded %d warrants)", 
-                    len(tickers), len(warrants))
+            all_symbols = df["symbol"].tolist()
+            
+            # Filter out warrants AND bonds
+            before = len(all_symbols)
+            tickers = [t for t in all_symbols if t not in warrants and not is_bond(t)]
+            
+            excluded_warrants = len([t for t in all_symbols if t in warrants])
+            excluded_bonds = before - excluded_warrants - len(tickers)
+            
+            log.info("HOSE+HNX: %d symbols (excluded %d warrants + %d bonds)", 
+                    len(tickers), excluded_warrants, excluded_bonds)
             return tickers
     except Exception as e:
         log.warning("symbols_by_exchange() failed: %s", e)
     
     # Fallback
     df = listing.all_symbols()
-    return [t for t in df["symbol"].tolist() if t not in warrants]
+    return [t for t in df["symbol"].tolist() if t not in warrants and not is_bond(t)]
 
 
 # ─── WORKER FUNCTION ───────────────────────────────────────────────────────
