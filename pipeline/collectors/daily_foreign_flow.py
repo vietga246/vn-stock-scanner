@@ -351,9 +351,14 @@ def fetch_foreign_trading():
         log.info("Worker %d: starting with %d symbols", worker_id, len(symbols))
         
         results = []
-        for symbol in symbols:
+        for i, symbol in enumerate(symbols, 1):
             result = fetch_symbol_data(symbol, limiter)
             results.append(result)
+            
+            # Log progress every symbol
+            status = "✓" if result['status'] == 'ok' else "✗"
+            log.info("Worker %d: [%d/%d] %s %s", 
+                    worker_id, i, len(symbols), symbol, status)
         
         return results
     
