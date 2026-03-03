@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "0 10 * * 1-5"    # 17:00 ICT (UTC+7)
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "🧪 TEST MODE - Chỉ chạy VN30 (30 mã)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   collect:
@@ -37,8 +43,10 @@ jobs:
           DB_PATH: data/db/stock.db
           DAYS_LOOKBACK: "7"
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+          TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
         run: |
           mkdir -p data/db
+          echo "🔧 TEST_MODE=$TEST_MODE"
           python pipeline/collectors/daily_prices.py
         continue-on-error: true
 
@@ -54,7 +62,11 @@ jobs:
           DB_PATH: data/db/stock.db
           DAYS_LOOKBACK: "7"
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-        run: python pipeline/collectors/daily_foreign_flow.py
+          TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
+          NUM_WORKERS: "2"
+        run: |
+          echo "🔧 TEST_MODE=$TEST_MODE"
+          python pipeline/collectors/daily_foreign_flow.py
         continue-on-error: true
 
       - name: Check foreign result
@@ -73,6 +85,12 @@ jobs:
         run: |
           echo "## Daily Collect Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ inputs.test_mode }}" = "true" ]; then
+            echo "### 🧪 TEST MODE (VN30 only)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
           if [ "$PRICES_FAILED" = "true" ]; then
             echo "- ⚠️ Prices: **FAILED**" >> $GITHUB_STEP_SUMMARY
           else
