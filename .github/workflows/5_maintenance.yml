@@ -1,0 +1,64 @@
+name: "⑤ Maintenance — Debug & Kiểm tra DB (Manual)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Chọn tác vụ cần thực hiện"
+        type: choice
+        required: true
+        options:
+          - inspect_db        # Xem schema, số dòng, sample data
+          - debug_fields      # Debug field names từ vnstock API
+          - reset_financials  # Xóa financials_meta (force re-fetch)
+          - vacuum_db         # Compact DB, giải phóng không gian
+          - export_json       # Re-export JSON từ DB hiện tại
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: Khôi phục DB từ cache
+        uses: actions/cache@v4
+        with:
+          path: data/db/stock.db
+          key: stock-db-${{ github.run_id }}
+          restore-keys: stock-db-
+
+      - name: Chạy tác vụ được chọn
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: |
+          ACTION="${{ github.event.inputs.action }}"
+          case "$ACTION" in
+            inspect_db)       python pipeline/utils/inspect_db.py ;;
+            debug_fields)     python pipeline/utils/debug_fields.py ;;
+            reset_financials) python pipeline/utils/reset_financials_meta.py ;;
+            vacuum_db)        python pipeline/utils/vacuum_db.py ;;
+            export_json)
+              python pipeline/exporters/export_financials.py
+              python pipeline/processors/sector_analysis.py
+              ;;
+            *) echo "Unknown action: $ACTION" && exit 1 ;;
+          esac
+
+      - name: Commit nếu có thay đổi (export_json)
+        if: github.event.inputs.action == 'export_json'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/exports/
+          git diff --cached --quiet || git commit -m "chore: manual export $(date +'%Y-%m-%d')"
+          git push

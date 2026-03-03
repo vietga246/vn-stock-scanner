@@ -1,0 +1,131 @@
+name: "⑥ AI Analysis — Phân tích AI (Manual/Weekly)"
+
+on:
+  schedule:
+    - cron: "0 12 * * 0"    # 19:00 ICT Chủ nhật
+  workflow_run:
+    workflows: ["③ Daily Process — Scoring & Sector (17:30 ICT T2-T6)"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      use_ai:
+        description: 'Use AI API (requires API key)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    # Only run if triggered manually, by schedule, or if process workflow succeeded
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          pip install -r pipeline/requirements.txt
+          pip install openai anthropic
+
+      - name: Khôi phục DB từ cache
+        uses: actions/cache@v4
+        with:
+          path: data/db/stock.db
+          key: stock-db-${{ github.run_id }}
+          restore-keys: stock-db-
+
+      - name: Check DB exists
+        id: check_db
+        run: |
+          if [ -f "data/db/stock.db" ]; then
+            echo "DB_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "✅ Database found"
+          else
+            echo "DB_EXISTS=false" >> $GITHUB_OUTPUT
+            echo "❌ Database not found"
+          fi
+
+      - name: Run AI Analysis
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'openai' }}
+          TOP_N_STOCKS: "15"
+        run: |
+          mkdir -p data/exports
+          python pipeline/ai_analyst/ai_analyst.py
+
+      - name: Generate Reports
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: python pipeline/ai_analyst/report_generator.py
+
+      - name: List generated files
+        run: |
+          echo "Generated files:"
+          ls -la data/exports/
+          if [ -d "data/exports/stocks" ]; then
+            echo "Stock details:"
+            ls data/exports/stocks/ | head -10
+          fi
+
+      - name: Commit reports
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add data/exports/ai_analysis.json || true
+          git add data/exports/daily_report.md || true
+          git add data/exports/daily_report.html || true
+          git add data/exports/stocks/ || true
+          
+          git diff --cached --quiet || git commit -m "chore: AI analysis $(date +'%Y-%m-%d')"
+          git push || echo "Nothing to push"
+
+      - name: Summary
+        run: |
+          echo "## AI Analysis Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "data/exports/ai_analysis.json" ]; then
+            echo "✅ AI Analysis generated" >> $GITHUB_STEP_SUMMARY
+            # Extract top picks
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Top Picks" >> $GITHUB_STEP_SUMMARY
+            python3 -c "
+import json
+with open('data/exports/ai_analysis.json') as f:
+    data = json.load(f)
+picks = data.get('analysis', {}).get('top_picks', [])
+for p in picks[:5]:
+    print(f\"- **{p.get('symbol')}**: {p.get('recommendation', 'N/A')} (Score: {p.get('composite_score', 'N/A')})\")
+" >> $GITHUB_STEP_SUMMARY || true
+          else
+            echo "⚠️ AI Analysis not generated" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "data/exports/daily_report.md" ]; then
+            echo "✅ Daily report generated" >> $GITHUB_STEP_SUMMARY
+          fi
