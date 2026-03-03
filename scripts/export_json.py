@@ -19,9 +19,23 @@ def safe(v):
         return None
 
 def pct(v):
-    """Ratio column (0–1) → percent (0–100), rounded 2dp."""
+    """Ratio column (0-1) -> percent (0-100), rounded 2dp."""
     v = safe(v)
     return round(v * 100, 2) if v is not None else None
+
+def bil(v):
+    """Raw VND -> ty dong (chia 1e9), rounded 2dp."""
+    v = safe(v)
+    return round(v / 1e9, 2) if v is not None else None
+
+# Columns can convert theo tung table trong details
+INCOME_BIL  = {"revenue","gross_profit","operating_profit","ebit",
+                "net_profit","net_profit_parent"}
+INCOME_PCT  = {"revenue_growth"}
+BALANCE_BIL = {"total_assets","total_equity","total_debt","cash",
+                "short_term_debt","long_term_debt"}
+CASHFLOW_BIL= {"cfo","cfi","cff","capex"}
+RATIO_PCT   = {"roe","roa","roic","gross_margin","net_margin"}
 
 def export():
     conn = sqlite3.connect(DB_PATH)
@@ -91,8 +105,8 @@ def export():
             "roe":     pct(row["roe"]),
             "roa":     pct(row["roa"]),
             "net_margin": pct(row["net_margin"]),
-            "revenue":    safe(row["revenue"]),
-            "net_profit": safe(row["net_profit"]),
+            "revenue":    bil(row["revenue"]),
+            "net_profit": bil(row["net_profit"]),
             "revenue_growth": pct(row["revenue_growth"]),
         })
     # Keep last 8 quarters
@@ -200,36 +214,76 @@ def export():
             "debt_equity":   safe(r.get("debt_equity")),
             "current_ratio": safe(r.get("current_ratio")),
             # Income
-            "revenue":        safe(i.get("revenue")),
-            "net_profit":     safe(i.get("net_profit")),
+            "revenue":        bil(i.get("revenue")),
+            "net_profit":     bil(i.get("net_profit")),
             "revenue_growth": pct(i.get("revenue_growth")),
             # Balance snapshot
-            "total_assets":  safe(b.get("total_assets")),
-            "total_equity":  safe(b.get("total_equity")),
-            "cash":          safe(b.get("cash")),
+            "total_assets":  bil(b.get("total_assets")),
+            "total_equity":  bil(b.get("total_equity")),
+            "cash":          bil(b.get("cash")),
             # Cashflow
-            "cfo":   safe(cf.get("cfo")),
-            "capex": safe(cf.get("capex")),
+            "cfo":   bil(cf.get("cfo")),
+            "capex": bil(cf.get("capex")),
             # History sparkline
             "history": history.get(sym, []),
         }
         screener.append(row)
 
-        # Detail: full quarterly data
-        def clean_rows(rows):
+        # Detail: full quarterly data - apply dung converter tung table
+        def clean_income(rows):
             out = []
             for row in (rows or []):
-                cleaned = {k: (safe(v) if isinstance(v, float) else v)
-                           for k, v in row.items()
-                           if k != "updated_at"}
+                cleaned = {}
+                for k, v in row.items():
+                    if k == "updated_at": continue
+                    if k in INCOME_BIL:  cleaned[k] = bil(v)
+                    elif k in INCOME_PCT: cleaned[k] = pct(v)
+                    elif isinstance(v, float): cleaned[k] = safe(v)
+                    else: cleaned[k] = v
+                out.append(cleaned)
+            return out
+
+        def clean_balance(rows):
+            out = []
+            for row in (rows or []):
+                cleaned = {}
+                for k, v in row.items():
+                    if k == "updated_at": continue
+                    if k in BALANCE_BIL: cleaned[k] = bil(v)
+                    elif isinstance(v, float): cleaned[k] = safe(v)
+                    else: cleaned[k] = v
+                out.append(cleaned)
+            return out
+
+        def clean_cashflow(rows):
+            out = []
+            for row in (rows or []):
+                cleaned = {}
+                for k, v in row.items():
+                    if k == "updated_at": continue
+                    if k in CASHFLOW_BIL: cleaned[k] = bil(v)
+                    elif isinstance(v, float): cleaned[k] = safe(v)
+                    else: cleaned[k] = v
+                out.append(cleaned)
+            return out
+
+        def clean_ratio(rows):
+            out = []
+            for row in (rows or []):
+                cleaned = {}
+                for k, v in row.items():
+                    if k == "updated_at": continue
+                    if k in RATIO_PCT: cleaned[k] = pct(v)
+                    elif isinstance(v, float): cleaned[k] = safe(v)
+                    else: cleaned[k] = v
                 out.append(cleaned)
             return out
 
         details[sym] = {
-            "ratio":    clean_rows(all_ratios.get(sym)),
-            "income":   clean_rows(all_incomes.get(sym)),
-            "balance":  clean_rows(all_balances.get(sym)),
-            "cashflow": clean_rows(all_cashflows.get(sym)),
+            "ratio":    clean_ratio(all_ratios.get(sym)),
+            "income":   clean_income(all_incomes.get(sym)),
+            "balance":  clean_balance(all_balances.get(sym)),
+            "cashflow": clean_cashflow(all_cashflows.get(sym)),
         }
 
     # Sort screener by ROE desc (nulls last)
