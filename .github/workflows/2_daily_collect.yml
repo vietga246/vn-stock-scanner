@@ -63,7 +63,7 @@ jobs:
           DAYS_LOOKBACK: "7"
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
           TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
-          NUM_WORKERS: "5"
+          NUM_WORKERS: "6"
         run: |
           echo "🔧 TEST_MODE=$TEST_MODE"
           python pipeline/collectors/daily_foreign_flow.py
