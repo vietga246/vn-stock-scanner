@@ -22,7 +22,6 @@ export default function Sparkline({
     pt: { x: number; y: number; value: number; vol?: number; date?: string };
     idx: number;
   } | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
 
   if (!data || data.length < 2) return null;
@@ -49,18 +48,13 @@ export default function Sparkline({
     const rect = ref.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const idx = Math.max(0, Math.min(data.length - 1, Math.round((x / width) * (data.length - 1))));
-
-setTooltipPos({
-      x: e.clientX,
-      y: e.clientY - 15,
-    });
     setHover({ pt: pts[idx], idx });
   };
 
   return (
     <div
       ref={ref}
-      className="relative inline-block"
+      className="relative inline-flex items-center gap-2"
       onMouseMove={onMove}
       onMouseLeave={() => setHover(null)}
     >
@@ -108,25 +102,19 @@ setTooltipPos({
         )}
       </svg>
 
-      {/* Tooltip - Fixed position, always on top */}
+      {/* Tooltip - Inline beside chart */}
       {hover && (
         <div
           style={{
-            position: 'fixed',
-            left: tooltipPos.x,
-            top: tooltipPos.y,
-            transform: 'translate(-50%, -100%)',
             background: 'linear-gradient(180deg, #141b22 0%, #0a0f14 100%)',
             border: '1px solid rgba(0, 212, 255, 0.5)',
             borderRadius: '8px',
             boxShadow: '0 0 20px rgba(0,212,255,0.3), 0 8px 24px rgba(0,0,0,0.6)',
-            zIndex: 99999,
             pointerEvents: 'none',
             overflow: 'hidden',
             minWidth: '70px',
           }}
         >
-          {/* Date header */}
           {hover.pt.date && (
             <div
               style={{
@@ -141,7 +129,6 @@ setTooltipPos({
               </span>
             </div>
           )}
-          {/* Price */}
           <div style={{ padding: '6px 10px', textAlign: 'center' }}>
             <div style={{ fontSize: '9px', color: '#4a5a6a', marginBottom: '2px' }}>
               Price
@@ -157,7 +144,6 @@ setTooltipPos({
               {formatPrice(hover.pt.value)}
             </div>
           </div>
-          {/* Volume */}
           {hover.pt.vol !== undefined && (
             <div
               style={{
