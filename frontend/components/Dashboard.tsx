@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Star, BarChart3, X, TrendingUp, TrendingDown, ChevronUp } from 'lucide-react';
 import type { Stock, Sector, AIAnalysis } from '@/lib/types';
-import { getDashboardData, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
+import { getDashboardData, getSummary, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
 import IndustryFlow from './IndustryFlow';
 import StockModal from './StockModal';
 import Sparkline from './Sparkline';
@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generatedAt, setGeneratedAt] = useState<string>('');
+  const [vnindex, setVnindex] = useState<{ value: number; change: number } | null>(null);
 
   // UI state
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
@@ -34,11 +35,20 @@ export default function Dashboard() {
     async function fetchData() {
       try {
         setLoading(true);
-        const data = await getDashboardData();
+        const [data, summary] = await Promise.all([
+          getDashboardData(),
+          getSummary().catch(() => null),
+        ]);
         setStocks(data.stocks);
         setSectors(data.sectors);
         setAiAnalyses(data.aiAnalyses || {});
         setGeneratedAt(data.generatedAt);
+        if (summary?.market) {
+          setVnindex({
+            value: summary.market.vnindex,
+            change: summary.market.vnindex_change,
+          });
+        }
         setError(null);
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -349,8 +359,20 @@ export default function Dashboard() {
       <div className="p-2.5 flex gap-3 flex-wrap" style={{ background: '#0a0f14', borderBottom: '1px solid #1e2832' }}>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-md" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
           <span className="text-[10px]" style={{ color: '#4a5a6a' }}>VN-INDEX</span>
-          <span className="font-mono font-semibold">1,285.42</span>
-          <span className="font-mono text-xs" style={{ color: '#00ff88', textShadow: '0 0 6px rgba(0,255,136,0.3)' }}>+1.85%</span>
+          <span className="font-mono font-semibold">
+            {vnindex ? vnindex.value.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}
+          </span>
+          {vnindex && (
+            <span 
+              className="font-mono text-xs" 
+              style={{ 
+                color: vnindex.change >= 0 ? '#00ff88' : '#ff3366', 
+                textShadow: `0 0 6px ${vnindex.change >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}` 
+              }}
+            >
+              {vnindex.change >= 0 ? '+' : ''}{vnindex.change.toFixed(2)}%
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-md" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
           <span className="text-[10px]" style={{ color: '#4a5a6a' }}>STOCKS</span>

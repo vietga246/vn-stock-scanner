@@ -128,7 +128,7 @@ def load_scores(conn) -> pd.DataFrame:
             "symbol", "composite_score", "fundamental_score",
             "smart_money_score", "momentum_score", "technical_score",
             "tier", "roe", "pe", "revenue_growth", "net_margin",
-            "price_change_5d", "price_change_20d",
+            "price_change_1d", "price_change_5d", "price_change_20d",
             "rsi14", "trend_short", "rank_total", "rank_pct",
             "debt_equity", "vol_ratio",
         ]
