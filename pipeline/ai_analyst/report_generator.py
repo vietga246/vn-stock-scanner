@@ -1,5 +1,5 @@
 """
-report_generator.py — Multi-format Report Generator
+report_generator.py — Multi-format Report Generator (v2)
 
 Tạo báo cáo phân tích ở nhiều định dạng:
 - Markdown (cho GitHub, web)
@@ -56,8 +56,8 @@ DAILY_REPORT_MD = """# 📊 Báo cáo thị trường - ${date}
 
 ## 🏆 Top 10 Composite Score
 
-| # | Mã | Tên | Ngành | Score | Tier | ROE | PE | RSI |
-|---|-----|-----|-------|-------|------|-----|-----|-----|
+| # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
+|---|-----|-----|-------|-------|------|-------------|
 ${top_stocks_table}
 
 ---
@@ -95,93 +95,176 @@ ${warnings}
 *Báo cáo được tạo tự động bởi VN Stock Scanner. Không phải lời khuyên đầu tư.*
 """
 
-STOCK_DETAIL_MD = """# ${symbol} - ${name}
-
-> **Ngành**: ${industry} | **Sàn**: ${exchange}
-
----
-
-## 📊 Điểm số
-
-| Metric | Score | Percentile |
-|--------|-------|------------|
-| **Composite** | ${composite_score} | Top ${rank_pct}% |
-| Fundamental | ${fundamental_score} | - |
-| Smart Money | ${smart_money_score} | - |
-| Momentum | ${momentum_score} | - |
-| Technical | ${technical_score} | - |
-
-**Tier**: ${tier}
-
----
-
-## 💰 Chỉ số tài chính
-
-| Chỉ số | Giá trị | Đánh giá |
-|--------|---------|----------|
-| ROE | ${roe}% | ${roe_rating} |
-| ROA | ${roa}% | ${roa_rating} |
-| PE | ${pe}x | ${pe_rating} |
-| Revenue Growth | ${revenue_growth}% | ${growth_rating} |
-| Net Margin | ${net_margin}% | - |
-| D/E | ${debt_equity} | ${de_rating} |
-
----
-
-## 📈 Kỹ thuật
-
-| Chỉ số | Giá trị | Signal |
-|--------|---------|--------|
-| RSI(14) | ${rsi14} | ${rsi_signal} |
-| MACD | ${macd_hist} | ${macd_signal} |
-| Trend (Short) | ${trend_short} | ${trend_signal} |
-| Price 5D | ${price_5d}% | - |
-| Price 20D | ${price_20d}% | - |
-| Vol Ratio | ${vol_ratio}x | ${vol_signal} |
-
----
-
-## 💸 Dòng tiền thông minh
-
-| Metric | 7 ngày | 30 ngày |
-|--------|--------|---------|
-| Khối ngoại | ${foreign_7d}B | ${foreign_30d}B |
-| Tự doanh | ${prop_7d}B | - |
-
-**Nhận định**: ${smart_money_verdict}
-
----
-
-*Cập nhật: ${updated_at}*
-"""
-
-HTML_WRAPPER = """<!DOCTYPE html>
+HTML_REPORT = """<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
+    <title>VN Stock Scanner - Daily Report ${date}</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-               max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
-        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
-        th { background: #f5f5f5; }
-        tr:nth-child(even) { background: #fafafa; }
-        h1 { color: #1a73e8; }
-        h2 { color: #34a853; border-bottom: 2px solid #34a853; padding-bottom: 5px; }
-        .tier-a { color: #00c853; font-weight: bold; }
-        .tier-b { color: #2196f3; }
-        .tier-c { color: #ff9800; }
-        .tier-d { color: #f44336; }
-        .positive { color: #00c853; }
-        .negative { color: #f44336; }
-        .warning { background: #fff3e0; padding: 10px; border-left: 4px solid #ff9800; margin: 10px 0; }
-        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #05080a;
+            color: #e8edf2;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1 { color: #00d4ff; margin-bottom: 10px; font-size: 24px; }
+        h2 { color: #a855f7; margin: 25px 0 15px; font-size: 18px; border-bottom: 1px solid #1e2832; padding-bottom: 8px; }
+        h3 { color: #00ff88; margin: 15px 0 10px; font-size: 14px; }
+        .meta { color: #4a5a6a; font-size: 13px; margin-bottom: 20px; }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin: 15px 0;
+            background: #0a0f14;
+            border: 1px solid #1e2832;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #1e2832; }
+        th { background: #0f1519; color: #4a5a6a; font-size: 11px; text-transform: uppercase; }
+        td { font-size: 13px; }
+        tr:hover { background: rgba(0,212,255,0.05); }
+        .tier-A { color: #00ff88; font-weight: bold; }
+        .tier-B { color: #00d4ff; }
+        .tier-C { color: #8b99a8; }
+        .tier-D { color: #ffcc00; }
+        .tier-F { color: #ff3366; }
+        .rec-STRONG_BUY, .rec-BUY { color: #00ff88; }
+        .rec-HOLD { color: #ffcc00; }
+        .rec-SELL, .rec-STRONG_SELL { color: #ff3366; }
+        .positive { color: #00ff88; }
+        .negative { color: #ff3366; }
+        .warning { 
+            background: rgba(255,204,0,0.1); 
+            padding: 12px 15px; 
+            border-left: 3px solid #ffcc00; 
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+        .card {
+            background: #0a0f14;
+            border: 1px solid #1e2832;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            background: #0a0f14;
+            border: 1px solid #1e2832;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-value { font-size: 20px; font-weight: bold; color: #00d4ff; }
+        .stat-label { font-size: 11px; color: #4a5a6a; margin-top: 4px; }
+        ul { margin: 10px 0; padding-left: 20px; }
+        li { margin: 5px 0; font-size: 13px; }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #1e2832;
+            color: #4a5a6a;
+            font-size: 11px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-${content}
+    <h1>📊 VN Stock Scanner - Daily Report</h1>
+    <div class="meta">
+        <p>Ngày: ${date} | Cập nhật: ${time} ICT</p>
+    </div>
+    
+    <h2>📈 Tổng quan thị trường</h2>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-value">${total_stocks}</div>
+            <div class="stat-label">Tổng cổ phiếu</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: #00ff88">${tier_a}</div>
+            <div class="stat-label">Tier A (≥70)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: #00d4ff">${tier_b}</div>
+            <div class="stat-label">Tier B (55-69)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">${avg_score}</div>
+            <div class="stat-label">Score TB</div>
+        </div>
+    </div>
+    
+    <h2>🏆 Top 10 Composite Score</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Mã</th>
+                <th>Tên</th>
+                <th>Ngành</th>
+                <th>Score</th>
+                <th>Tier</th>
+                <th>Khuyến nghị</th>
+            </tr>
+        </thead>
+        <tbody>
+${top_stocks_html}
+        </tbody>
+    </table>
+    
+    <h2>🔥 Phân tích ngành</h2>
+    <div class="card">
+        <h3>📈 Đang tích lũy</h3>
+        <ul class="positive">
+${accumulating_html}
+        </ul>
+        
+        <h3 style="margin-top: 15px;">📉 Đang phân phối</h3>
+        <ul class="negative">
+${distributing_html}
+        </ul>
+    </div>
+    
+    <h2>📊 Tín hiệu kỹ thuật</h2>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-value negative">${overbought_count}</div>
+            <div class="stat-label">RSI > 70 (Quá mua)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value positive">${oversold_count}</div>
+            <div class="stat-label">RSI < 30 (Quá bán)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value positive">${uptrend_count}</div>
+            <div class="stat-label">Uptrend</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value negative">${downtrend_count}</div>
+            <div class="stat-label">Downtrend</div>
+        </div>
+    </div>
+    
+    <h2>⚠️ Cảnh báo</h2>
+${warnings_html}
+    
+    <div class="footer">
+        <p>Báo cáo được tạo tự động bởi VN Stock Scanner</p>
+        <p>⚠️ Không phải lời khuyên đầu tư. Chỉ mang tính tham khảo.</p>
+    </div>
 </body>
 </html>
 """
@@ -189,6 +272,9 @@ ${content}
 # ─── DATA LOADERS ──────────────────────────────────────────────────────────
 
 def create_connection():
+    if not os.path.exists(DB_PATH):
+        log.error("Database not found: %s", DB_PATH)
+        return None
     conn = sqlite3.connect(DB_PATH, timeout=60)
     conn.row_factory = sqlite3.Row
     return conn
@@ -217,6 +303,15 @@ def load_sector_scores(conn) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def load_ai_analysis() -> Dict:
+    """Load AI analysis from JSON."""
+    path = os.path.join(EXPORT_DIR, "ai_analysis.json")
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+
 # ─── HELPER FUNCTIONS ──────────────────────────────────────────────────────
 
 def safe_val(val, default="N/A", fmt=None):
@@ -228,118 +323,142 @@ def safe_val(val, default="N/A", fmt=None):
     return val
 
 
-def get_rating(val, thresholds: Dict[str, tuple], default="Trung bình") -> str:
-    """Get rating based on thresholds."""
-    if val is None or (isinstance(val, float) and val != val):
-        return default
-    for rating, (low, high) in thresholds.items():
-        if low <= val < high:
-            return rating
-    return default
-
-
-def get_tier_class(tier: str) -> str:
-    """Get CSS class for tier."""
-    return f"tier-{tier.lower()}" if tier else ""
-
-
-def get_rsi_signal(rsi: float) -> str:
-    """Get RSI signal."""
-    if rsi is None or rsi != rsi:
-        return "N/A"
-    if rsi > 70:
-        return "🔴 Overbought"
-    elif rsi < 30:
-        return "🟢 Oversold"
-    elif 40 <= rsi <= 60:
-        return "⚪ Neutral"
-    elif rsi > 60:
-        return "🟡 Bullish"
+def get_recommendation(score: float) -> str:
+    """Get recommendation from score."""
+    if score >= 75:
+        return "STRONG_BUY"
+    elif score >= 65:
+        return "BUY"
+    elif score >= 55:
+        return "HOLD"
+    elif score >= 45:
+        return "SELL"
     else:
-        return "🟡 Bearish"
+        return "STRONG_SELL"
 
 
-def get_trend_signal(trend: int) -> str:
-    """Get trend signal."""
-    if trend == 1:
-        return "🟢 Uptrend"
-    elif trend == -1:
-        return "🔴 Downtrend"
-    else:
-        return "⚪ Sideways"
+def get_recommendation_text(rec: str) -> str:
+    """Get Vietnamese recommendation text."""
+    mapping = {
+        "STRONG_BUY": "Mua mạnh",
+        "BUY": "Mua",
+        "HOLD": "Giữ",
+        "SELL": "Bán",
+        "STRONG_SELL": "Bán mạnh",
+    }
+    return mapping.get(rec, rec)
 
 
 # ─── REPORT GENERATORS ─────────────────────────────────────────────────────
 
-def generate_daily_report(scores_df: pd.DataFrame, sectors_df: pd.DataFrame) -> str:
-    """Generate daily market report in Markdown."""
+def generate_daily_report(scores_df: pd.DataFrame, sectors_df: pd.DataFrame, ai_analysis: Dict) -> tuple:
+    """Generate daily report in both MD and HTML formats."""
     
     now = datetime.now()
     
-    # Stats
+    # Basic stats
     total = len(scores_df)
     tier_counts = scores_df['tier'].value_counts().to_dict()
     avg_score = scores_df['composite_score'].mean()
     
     # Top stocks table
-    top_rows = []
-    for i, (_, row) in enumerate(scores_df.head(10).iterrows(), 1):
-        top_rows.append(
-            f"| {i} | {row['symbol']} | {safe_val(row.get('organ_name'), '')[:20]} | "
-            f"{safe_val(row.get('industry_name'), '')[:15]} | "
-            f"**{safe_val(row['composite_score'], fmt='{:.1f}')}** | {row['tier']} | "
-            f"{safe_val(row['roe'], fmt='{:.1f}')}% | "
-            f"{safe_val(row['pe'], fmt='{:.1f}')}x | "
-            f"{safe_val(row['rsi14'], fmt='{:.0f}')} |"
-        )
+    top_rows_md = []
+    top_rows_html = []
+    analyses = ai_analysis.get('analyses', {})
     
-    # Sectors
-    acc_sectors = []
-    dist_sectors = []
+    for i, (_, row) in enumerate(scores_df.head(10).iterrows()):
+        symbol = row['symbol']
+        score = safe_val(row['composite_score'], 0, '{:.1f}')
+        tier = safe_val(row.get('tier'), 'N/A')
+        name = safe_val(row.get('organ_name'), symbol)[:20]
+        industry = safe_val(row.get('industry_name'), 'N/A')[:15]
+        
+        # Get recommendation from AI analysis or calculate
+        if symbol in analyses:
+            rec = analyses[symbol].get('recommendation', 'HOLD')
+        else:
+            rec = get_recommendation(row['composite_score'] or 0)
+        
+        rec_text = get_recommendation_text(rec)
+        
+        # Markdown row
+        top_rows_md.append(f"| {i+1} | {symbol} | {name} | {industry} | {score} | {tier} | {rec_text} |")
+        
+        # HTML row
+        top_rows_html.append(f"""            <tr>
+                <td>{i+1}</td>
+                <td><strong>{symbol}</strong></td>
+                <td>{name}</td>
+                <td>{industry}</td>
+                <td>{score}</td>
+                <td class="tier-{tier}">{tier}</td>
+                <td class="rec-{rec}">{rec_text}</td>
+            </tr>""")
+    
+    # Sector analysis
+    acc_sectors_md = []
+    acc_sectors_html = []
+    dist_sectors_md = []
+    dist_sectors_html = []
+    
     if not sectors_df.empty:
         for _, row in sectors_df.iterrows():
             name = row.get('industry_name', row.get('name', ''))
             foreign = row.get('total_foreign_7d', row.get('foreign_net_7d', 0)) or 0
+            score = row.get('avg_composite', row.get('avg_composite_score', 0)) or 0
+            
             if foreign > 0:
-                acc_sectors.append(f"- **{name}**: +{foreign:.1f}B VND")
+                acc_sectors_md.append(f"- **{name}**: +{foreign:.1f}B VND (Score: {score:.1f})")
+                acc_sectors_html.append(f"<li><strong>{name}</strong>: +{foreign:.1f}B VND (Score: {score:.1f})</li>")
             elif foreign < 0:
-                dist_sectors.append(f"- **{name}**: {foreign:.1f}B VND")
+                dist_sectors_md.append(f"- **{name}**: {foreign:.1f}B VND (Score: {score:.1f})")
+                dist_sectors_html.append(f"<li><strong>{name}</strong>: {foreign:.1f}B VND (Score: {score:.1f})</li>")
     
     # Technical signals
-    rsi_vals = scores_df['rsi14'].dropna()
+    rsi_vals = scores_df['rsi14'].dropna() if 'rsi14' in scores_df.columns else pd.Series([50])
     overbought = (rsi_vals > 70).sum()
     oversold = (rsi_vals < 30).sum()
     
-    trend_vals = scores_df['trend_short'].dropna()
+    trend_vals = scores_df['trend_short'].dropna() if 'trend_short' in scores_df.columns else pd.Series([0])
     uptrend = (trend_vals == 1).sum()
     downtrend = (trend_vals == -1).sum()
     
     # Top movers
-    gainers_df = scores_df.nlargest(5, 'price_change_5d')
-    losers_df = scores_df.nsmallest(5, 'price_change_5d')
+    gainers_md = []
+    losers_md = []
     
-    gainers_list = []
-    for _, row in gainers_df.iterrows():
-        gainers_list.append(f"- {row['symbol']}: +{safe_val(row['price_change_5d'], fmt='{:.1f}')}%")
-    
-    losers_list = []
-    for _, row in losers_df.iterrows():
-        losers_list.append(f"- {row['symbol']}: {safe_val(row['price_change_5d'], fmt='{:.1f}')}%")
+    if 'price_change_5d' in scores_df.columns:
+        gainers_df = scores_df.nlargest(5, 'price_change_5d')
+        losers_df = scores_df.nsmallest(5, 'price_change_5d')
+        
+        for _, row in gainers_df.iterrows():
+            gainers_md.append(f"- {row['symbol']}: +{safe_val(row['price_change_5d'], 0, '{:.1f}')}%")
+        
+        for _, row in losers_df.iterrows():
+            losers_md.append(f"- {row['symbol']}: {safe_val(row['price_change_5d'], 0, '{:.1f}')}%")
     
     # Warnings
-    warnings = []
-    if overbought > 10:
-        warnings.append(f"⚠️ {overbought} cổ phiếu RSI > 70 - thị trường có thể điều chỉnh")
-    if oversold > 10:
-        warnings.append(f"📢 {oversold} cổ phiếu RSI < 30 - có thể là cơ hội mua")
-    if downtrend > uptrend * 1.5:
-        warnings.append("⚠️ Số cổ phiếu downtrend nhiều hơn uptrend - cẩn trọng")
-    if not warnings:
-        warnings.append("✅ Không có cảnh báo đặc biệt")
+    warnings_md = []
+    warnings_html = []
     
-    # Fill template
-    template = Template(DAILY_REPORT_MD)
-    report = template.substitute(
+    if overbought > 10:
+        msg = f"⚠️ {overbought} cổ phiếu RSI > 70 - thị trường có thể điều chỉnh"
+        warnings_md.append(msg)
+        warnings_html.append(f'<div class="warning">{msg}</div>')
+    if oversold > 10:
+        msg = f"📢 {oversold} cổ phiếu RSI < 30 - có thể là cơ hội mua"
+        warnings_md.append(msg)
+        warnings_html.append(f'<div class="warning">{msg}</div>')
+    if downtrend > uptrend * 1.5:
+        msg = "⚠️ Số cổ phiếu downtrend nhiều hơn uptrend - cẩn trọng"
+        warnings_md.append(msg)
+        warnings_html.append(f'<div class="warning">{msg}</div>')
+    if not warnings_md:
+        warnings_md.append("✅ Không có cảnh báo đặc biệt")
+        warnings_html.append('<div class="warning" style="border-color: #00ff88; background: rgba(0,255,136,0.1);">✅ Không có cảnh báo đặc biệt</div>')
+    
+    # Generate Markdown
+    md_report = Template(DAILY_REPORT_MD).substitute(
         date=now.strftime("%d/%m/%Y"),
         time=now.strftime("%H:%M"),
         total_stocks=total,
@@ -347,169 +466,38 @@ def generate_daily_report(scores_df: pd.DataFrame, sectors_df: pd.DataFrame) -> 
         tier_b=tier_counts.get('B', 0),
         tier_c=tier_counts.get('C', 0),
         avg_score=f"{avg_score:.1f}",
-        top_stocks_table="\n".join(top_rows),
-        accumulating_sectors="\n".join(acc_sectors[:5]) if acc_sectors else "- Không có",
-        distributing_sectors="\n".join(dist_sectors[:5]) if dist_sectors else "- Không có",
+        top_stocks_table="\n".join(top_rows_md),
+        accumulating_sectors="\n".join(acc_sectors_md[:5]) if acc_sectors_md else "- Không có",
+        distributing_sectors="\n".join(dist_sectors_md[:5]) if dist_sectors_md else "- Không có",
         overbought_count=overbought,
         oversold_count=oversold,
         uptrend_count=uptrend,
         downtrend_count=downtrend,
-        top_gainers="\n".join(gainers_list),
-        top_losers="\n".join(losers_list),
-        warnings="\n".join(warnings),
+        top_gainers="\n".join(gainers_md) if gainers_md else "- Không có dữ liệu",
+        top_losers="\n".join(losers_md) if losers_md else "- Không có dữ liệu",
+        warnings="\n".join(warnings_md),
     )
     
-    return report
-
-
-def generate_stock_detail(row: pd.Series) -> str:
-    """Generate detailed report for a single stock."""
-    
-    # Ratings
-    roe_rating = get_rating(row.get('roe'), {
-        "Xuất sắc": (20, 100),
-        "Tốt": (15, 20),
-        "Khá": (10, 15),
-        "Yếu": (0, 10),
-    })
-    
-    roa_rating = get_rating(row.get('roa'), {
-        "Xuất sắc": (15, 100),
-        "Tốt": (10, 15),
-        "Khá": (5, 10),
-        "Yếu": (0, 5),
-    })
-    
-    pe_val = row.get('pe', 0) or 0
-    pe_rating = "Rẻ" if pe_val < 10 else "Hợp lý" if pe_val < 15 else "Cao" if pe_val < 25 else "Đắt"
-    
-    growth_rating = get_rating(row.get('revenue_growth'), {
-        "Tăng mạnh": (20, 200),
-        "Tăng": (10, 20),
-        "Ổn định": (0, 10),
-        "Giảm": (-100, 0),
-    })
-    
-    de_val = row.get('debt_equity', 0) or 0
-    de_rating = "Thấp" if de_val < 0.5 else "Trung bình" if de_val < 1.5 else "Cao"
-    
-    # Smart money verdict
-    foreign_7d = row.get('foreign_net_7d', 0) or 0
-    foreign_30d = row.get('foreign_net_30d', 0) or 0
-    
-    if foreign_7d > 0 and foreign_30d > 0:
-        sm_verdict = "🟢 Khối ngoại đang tích cực mua ròng"
-    elif foreign_7d < 0 and foreign_30d < 0:
-        sm_verdict = "🔴 Khối ngoại đang bán ròng"
-    elif foreign_7d > 0:
-        sm_verdict = "🟡 Khối ngoại bắt đầu mua lại"
-    elif foreign_7d < 0:
-        sm_verdict = "🟡 Khối ngoại đang giảm mua"
-    else:
-        sm_verdict = "⚪ Khối ngoại trung lập"
-    
-    # Volume signal
-    vol_ratio = row.get('vol_ratio', 1) or 1
-    vol_signal = "🔥 Đột biến" if vol_ratio > 2 else "📈 Tăng" if vol_ratio > 1.3 else "📉 Giảm" if vol_ratio < 0.7 else "⚪ Bình thường"
-    
-    template = Template(STOCK_DETAIL_MD)
-    return template.substitute(
-        symbol=row['symbol'],
-        name=safe_val(row.get('organ_name'), row['symbol']),
-        industry=safe_val(row.get('industry_name'), 'N/A'),
-        exchange=safe_val(row.get('exchange'), 'N/A'),
-        composite_score=f"{safe_val(row['composite_score'], 0):.1f}",
-        rank_pct=f"{safe_val(row.get('rank_pct'), 50):.0f}",
-        fundamental_score=f"{safe_val(row.get('fundamental_score'), 50):.1f}",
-        smart_money_score=f"{safe_val(row.get('smart_money_score'), 50):.1f}",
-        momentum_score=f"{safe_val(row.get('momentum_score'), 50):.1f}",
-        technical_score=f"{safe_val(row.get('technical_score'), 50):.1f}",
-        tier=row.get('tier', 'N/A'),
-        roe=f"{safe_val(row.get('roe'), 0):.1f}",
-        roe_rating=roe_rating,
-        roa=f"{safe_val(row.get('roa'), 0):.1f}",
-        roa_rating=roa_rating,
-        pe=f"{safe_val(row.get('pe'), 0):.1f}",
-        pe_rating=pe_rating,
-        revenue_growth=f"{safe_val(row.get('revenue_growth'), 0):.1f}",
-        growth_rating=growth_rating,
-        net_margin=f"{safe_val(row.get('net_margin'), 0):.1f}",
-        debt_equity=f"{safe_val(row.get('debt_equity'), 0):.2f}",
-        de_rating=de_rating,
-        rsi14=f"{safe_val(row.get('rsi14'), 50):.0f}",
-        rsi_signal=get_rsi_signal(row.get('rsi14')),
-        macd_hist=f"{safe_val(row.get('macd_hist'), 0):.4f}",
-        macd_signal="🟢 Bullish" if (row.get('macd_hist') or 0) > 0 else "🔴 Bearish",
-        trend_short="↑ Up" if row.get('trend_short') == 1 else "↓ Down" if row.get('trend_short') == -1 else "→ Side",
-        trend_signal=get_trend_signal(row.get('trend_short')),
-        price_5d=f"{safe_val(row.get('price_change_5d'), 0):.1f}",
-        price_20d=f"{safe_val(row.get('price_change_20d'), 0):.1f}",
-        vol_ratio=f"{vol_ratio:.2f}",
-        vol_signal=vol_signal,
-        foreign_7d=f"{foreign_7d:.1f}",
-        foreign_30d=f"{foreign_30d:.1f}",
-        prop_7d=f"{safe_val(row.get('prop_net_7d'), 0):.1f}",
-        smart_money_verdict=sm_verdict,
-        updated_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+    # Generate HTML
+    html_report = Template(HTML_REPORT).substitute(
+        date=now.strftime("%d/%m/%Y"),
+        time=now.strftime("%H:%M"),
+        total_stocks=total,
+        tier_a=tier_counts.get('A', 0),
+        tier_b=tier_counts.get('B', 0),
+        tier_c=tier_counts.get('C', 0),
+        avg_score=f"{avg_score:.1f}",
+        top_stocks_html="\n".join(top_rows_html),
+        accumulating_html="\n".join(acc_sectors_html[:5]) if acc_sectors_html else "<li>Không có</li>",
+        distributing_html="\n".join(dist_sectors_html[:5]) if dist_sectors_html else "<li>Không có</li>",
+        overbought_count=overbought,
+        oversold_count=oversold,
+        uptrend_count=uptrend,
+        downtrend_count=downtrend,
+        warnings_html="\n".join(warnings_html),
     )
-
-
-def markdown_to_html(md_content: str, title: str = "Report") -> str:
-    """Convert markdown to HTML (basic conversion)."""
-    import re
     
-    html = md_content
-    
-    # Headers
-    html = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
-    html = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
-    html = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
-    
-    # Bold
-    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html)
-    
-    # Tables (basic)
-    lines = html.split('\n')
-    in_table = False
-    new_lines = []
-    
-    for line in lines:
-        if line.strip().startswith('|'):
-            if not in_table:
-                new_lines.append('<table>')
-                in_table = True
-            
-            if '---' in line:
-                continue
-            
-            cells = [c.strip() for c in line.split('|')[1:-1]]
-            tag = 'th' if new_lines[-1] == '<table>' else 'td'
-            row = '<tr>' + ''.join(f'<{tag}>{c}</{tag}>' for c in cells) + '</tr>'
-            new_lines.append(row)
-        else:
-            if in_table:
-                new_lines.append('</table>')
-                in_table = False
-            new_lines.append(line)
-    
-    if in_table:
-        new_lines.append('</table>')
-    
-    html = '\n'.join(new_lines)
-    
-    # Lists
-    html = re.sub(r'^- (.+)$', r'<li>\1</li>', html, flags=re.MULTILINE)
-    
-    # Blockquotes
-    html = re.sub(r'^> (.+)$', r'<blockquote>\1</blockquote>', html, flags=re.MULTILINE)
-    
-    # Paragraphs
-    html = re.sub(r'\n\n', '</p><p>', html)
-    html = f'<p>{html}</p>'
-    
-    # Wrap in HTML template
-    template = Template(HTML_WRAPPER)
-    return template.substitute(title=title, content=html)
+    return md_report, html_report
 
 
 # ─── EXPORT FUNCTIONS ──────────────────────────────────────────────────────
@@ -518,42 +506,38 @@ def export_reports(scores_df: pd.DataFrame, sectors_df: pd.DataFrame):
     """Export all reports."""
     os.makedirs(EXPORT_DIR, exist_ok=True)
     
-    # Daily report
-    daily_md = generate_daily_report(scores_df, sectors_df)
+    # Load AI analysis
+    ai_analysis = load_ai_analysis()
     
+    # Generate daily reports
+    md_report, html_report = generate_daily_report(scores_df, sectors_df, ai_analysis)
+    
+    # Save Markdown
     md_path = os.path.join(EXPORT_DIR, "daily_report.md")
     with open(md_path, "w", encoding="utf-8") as f:
-        f.write(daily_md)
+        f.write(md_report)
     log.info("✅ Exported %s", md_path)
     
+    # Save HTML
     html_path = os.path.join(EXPORT_DIR, "daily_report.html")
-    daily_html = markdown_to_html(daily_md, "Báo cáo thị trường")
     with open(html_path, "w", encoding="utf-8") as f:
-        f.write(daily_html)
+        f.write(html_report)
     log.info("✅ Exported %s", html_path)
-    
-    # Top stock details
-    details_dir = os.path.join(EXPORT_DIR, "stocks")
-    os.makedirs(details_dir, exist_ok=True)
-    
-    for _, row in scores_df.head(20).iterrows():
-        symbol = row['symbol']
-        detail_md = generate_stock_detail(row)
-        
-        detail_path = os.path.join(details_dir, f"{symbol}.md")
-        with open(detail_path, "w", encoding="utf-8") as f:
-            f.write(detail_md)
-    
-    log.info("✅ Exported %d stock details", min(20, len(scores_df)))
 
 
 # ─── MAIN ──────────────────────────────────────────────────────────────────
 
 def run():
     """Main function to generate reports."""
-    log.info("=== Report Generator ===")
+    log.info("=" * 60)
+    log.info("📝 REPORT GENERATOR — VN Stock Scanner")
+    log.info("=" * 60)
     
     conn = create_connection()
+    if conn is None:
+        log.error("Cannot connect to database")
+        return
+    
     scores_df = load_all_scores(conn)
     sectors_df = load_sector_scores(conn)
     conn.close()
@@ -562,10 +546,11 @@ def run():
         log.error("No data available. Run scoring_engine.py first.")
         return
     
-    log.info("Loaded %d stocks", len(scores_df))
+    log.info("📊 Loaded %d stocks", len(scores_df))
     
     export_reports(scores_df, sectors_df)
     
+    log.info("")
     log.info("✅ Report generation completed")
 
 
