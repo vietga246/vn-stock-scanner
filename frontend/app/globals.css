@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #05080a;
+  --foreground: #e8edf2;
+  --primary: #00d4ff;
+  --secondary: #a855f7;
+  --success: #00ff88;
+  --danger: #ff3366;
+  --warning: #ffcc00;
+  --muted: #4a5a6a;
+  --border: #1e2832;
+  --card: #0a0f14;
+  --card-hover: #0f1519;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 212, 255, 0.3);
+  color: var(--foreground);
+}
+
+/* Focus styles */
+input:focus,
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+}
+
+/* Table hover transition */
+tr {
+  transition: background-color 0.15s ease;
+}
+
+/* Glow effects */
+.glow-primary {
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.glow-success {
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.glow-danger {
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
+}
+
+/* Animation keyframes */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px currentColor;
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 15px currentColor;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Dark mode gradient backgrounds */
+.bg-gradient-dark {
+  background: linear-gradient(180deg, var(--card-hover) 0%, var(--card) 100%);
+}
+
+.bg-gradient-dark-reverse {
+  background: linear-gradient(180deg, var(--card) 0%, var(--card-hover) 100%);
+}
+
+/* Cyber grid background (optional) */
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Number formatting */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
