@@ -3,62 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Báo cáo thị trường</title>
+    <title>VN Stock Scanner - Daily Report 04/03/2026</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-               max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
-        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
-        th { background: #f5f5f5; }
-        tr:nth-child(even) { background: #fafafa; }
-        h1 { color: #1a73e8; }
-        h2 { color: #34a853; border-bottom: 2px solid #34a853; padding-bottom: 5px; }
-        .tier-a { color: #00c853; font-weight: bold; }
-        .tier-b { color: #2196f3; }
-        .tier-c { color: #ff9800; }
-        .tier-d { color: #f44336; }
-        .positive { color: #00c853; }
-        .negative { color: #f44336; }
-        .warning { background: #fff3e0; padding: 10px; border-left: 4px solid #ff9800; margin: 10px 0; }
-        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #05080a;
+            color: #e8edf2;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1 { color: #00d4ff; margin-bottom: 10px; font-size: 24px; }
+        h2 { color: #a855f7; margin: 25px 0 15px; font-size: 18px; border-bottom: 1px solid #1e2832; padding-bottom: 8px; }
+        h3 { color: #00ff88; margin: 15px 0 10px; font-size: 14px; }
+        .meta { color: #4a5a6a; font-size: 13px; margin-bottom: 20px; }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin: 15px 0;
+            background: #0a0f14;
+            border: 1px solid #1e2832;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #1e2832; }
+        th { background: #0f1519; color: #4a5a6a; font-size: 11px; text-transform: uppercase; }
+        td { font-size: 13px; }
+        tr:hover { background: rgba(0,212,255,0.05); }
+        .tier-A { color: #00ff88; font-weight: bold; }
+        .tier-B { color: #00d4ff; }
+        .tier-C { color: #8b99a8; }
+        .tier-D { color: #ffcc00; }
+        .tier-F { color: #ff3366; }
+        .rec-STRONG_BUY, .rec-BUY { color: #00ff88; }
+        .rec-HOLD { color: #ffcc00; }
+        .rec-SELL, .rec-STRONG_SELL { color: #ff3366; }
+        .positive { color: #00ff88; }
+        .negative { color: #ff3366; }
+        .warning { 
+            background: rgba(255,204,0,0.1); 
+            padding: 12px 15px; 
+            border-left: 3px solid #ffcc00; 
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+        .card {
+            background: #0a0f14;
+            border: 1px solid #1e2832;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            background: #0a0f14;
+            border: 1px solid #1e2832;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-value { font-size: 20px; font-weight: bold; color: #00d4ff; }
+        .stat-label { font-size: 11px; color: #4a5a6a; margin-top: 4px; }
+        ul { margin: 10px 0; padding-left: 20px; }
+        li { margin: 5px 0; font-size: 13px; }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #1e2832;
+            color: #4a5a6a;
+            font-size: 11px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-<p><h1>📊 Báo cáo thị trường - 03/03/2026</h1></p><p><blockquote>Cập nhật lúc 23:25 ICT</blockquote></p><p>---</p><p><h2>📈 Tổng quan thị trường</h2></p><p><table>
-<tr><th>Chỉ số</th><th>Giá trị</th></tr>
-<tr><td>Tổng số cổ phiếu</td><td>706</td></tr>
-<tr><td>Tier A (≥70 điểm)</td><td>0</td></tr>
-<tr><td>Tier B (55-69)</td><td>56</td></tr>
-<tr><td>Tier C (40-54)</td><td>545</td></tr>
-<tr><td>Score TB</td><td>46.5</td></tr>
-</table></p><p>---</p><p><h2>🏆 Top 10 Composite Score</h2></p><p><table>
-<tr><th>#</th><th>Mã</th><th>Tên</th><th>Ngành</th><th>Score</th><th>Tier</th><th>ROE</th><th>PE</th><th>RSI</th></tr>
-<tr><td>1</td><td>NFC</td><td>CTCP Phân lân Ninh B</td><td>SX Nhựa - Hóa c</td><td><strong>65.0</strong></td><td>B</td><td>0.5%</td><td>7.5x</td><td>54</td></tr>
-<tr><td>2</td><td>FDC</td><td>CTCP Ngoại thương và</td><td>Bất động sản</td><td><strong>64.6</strong></td><td>B</td><td>0.4%</td><td>3.3x</td><td>52</td></tr>
-<tr><td>3</td><td>VVS</td><td>CTCP Đầu tư phát tri</td><td>Bán buôn</td><td><strong>64.0</strong></td><td>B</td><td>0.6%</td><td>7.8x</td><td>77</td></tr>
-<tr><td>4</td><td>PVB</td><td>CTCP Bọc ống Dầu khí</td><td>Khai khoáng</td><td><strong>62.3</strong></td><td>B</td><td>0.2%</td><td>14.4x</td><td>71</td></tr>
-<tr><td>5</td><td>HAH</td><td>CTCP Vận tải và Xếp</td><td>Vận tải - kho b</td><td><strong>62.0</strong></td><td>B</td><td>0.3%</td><td>9.3x</td><td>79</td></tr>
-<tr><td>6</td><td>AST</td><td>CTCP Dịch vụ Hàng kh</td><td>Vận tải - kho b</td><td><strong>61.1</strong></td><td>B</td><td>0.4%</td><td>13.4x</td><td>55</td></tr>
-<tr><td>7</td><td>SCS</td><td>CTCP Dịch vụ Hàng hó</td><td>Vận tải - kho b</td><td><strong>61.1</strong></td><td>B</td><td>0.5%</td><td>7.7x</td><td>59</td></tr>
-<tr><td>8</td><td>SVT</td><td>CTCP Công nghệ Sài G</td><td>SX Phụ trợ</td><td><strong>60.7</strong></td><td>B</td><td>0.1%</td><td>7.3x</td><td>50</td></tr>
-<tr><td>9</td><td>MDG</td><td>CTCP Miền Đông</td><td>Khai khoáng</td><td><strong>60.5</strong></td><td>B</td><td>0.3%</td><td>10.7x</td><td>79</td></tr>
-<tr><td>10</td><td>PJC</td><td>CTCP Thương mại và V</td><td>Vận tải - kho b</td><td><strong>60.2</strong></td><td>B</td><td>0.2%</td><td>6.4x</td><td>66</td></tr>
-</table></p><p>---</p><p><h2>🔥 Ngành nổi bật</h2></p><p><h3>Dòng tiền vào mạnh nhất</h3>
-<li>Không có</li></p><p><h3>Dòng tiền ra</h3>
-<li>Không có</li></p><p>---</p><p><h2>📊 Tín hiệu kỹ thuật</h2></p><p><li><strong>RSI Overbought (>70)</strong>: 64 cổ phiếu</li>
-<li><strong>RSI Oversold (<30)</strong>: 43 cổ phiếu</li>
-<li><strong>Uptrend</strong>: 375 | <strong>Downtrend</strong>: 328</li></p><p><h3>Top Gainers (5D)</h3>
-<li>GMA: +50.0%</li>
-<li>HKT: +45.3%</li>
-<li>HRC: +39.9%</li>
-<li>PVC: +39.5%</li>
-<li>SGH: +36.5%</li></p><p><h3>Top Losers (5D)</h3>
-<li>VNT: -32.1%</li>
-<li>CJC: -30.2%</li>
-<li>THS: -27.7%</li>
-<li>VE3: -24.4%</li>
-<li>BCG: -21.7%</li></p><p>---</p><p><h2>⚠️ Cảnh báo</h2></p><p>⚠️ 64 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
-📢 43 cổ phiếu RSI < 30 - có thể là cơ hội mua</p><p>---</p><p>*Báo cáo được tạo tự động bởi VN Stock Scanner. Không phải lời khuyên đầu tư.*
-</p>
+    <h1>📊 VN Stock Scanner - Daily Report</h1>
+    <div class="meta">
+        <p>Ngày: 04/03/2026 | Cập nhật: 03:45 ICT</p>
+    </div>
+    
+    <h2>📈 Tổng quan thị trường</h2>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-value">706</div>
+            <div class="stat-label">Tổng cổ phiếu</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: #00ff88">0</div>
+            <div class="stat-label">Tier A (≥70)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: #00d4ff">56</div>
+            <div class="stat-label">Tier B (55-69)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">46.5</div>
+            <div class="stat-label">Score TB</div>
+        </div>
+    </div>
+    
+    <h2>🏆 Top 10 Composite Score</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Mã</th>
+                <th>Tên</th>
+                <th>Ngành</th>
+                <th>Score</th>
+                <th>Tier</th>
+                <th>Khuyến nghị</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><strong>NFC</strong></td>
+                <td>CTCP Phân lân Ninh B</td>
+                <td>SX Nhựa - Hóa c</td>
+                <td>65.0</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>FDC</strong></td>
+                <td>CTCP Ngoại thương và</td>
+                <td>Bất động sản</td>
+                <td>64.6</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>VVS</strong></td>
+                <td>CTCP Đầu tư phát tri</td>
+                <td>Bán buôn</td>
+                <td>64.0</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>PVB</strong></td>
+                <td>CTCP Bọc ống Dầu khí</td>
+                <td>Khai khoáng</td>
+                <td>62.3</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><strong>HAH</strong></td>
+                <td>CTCP Vận tải và Xếp </td>
+                <td>Vận tải - kho b</td>
+                <td>62.0</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><strong>AST</strong></td>
+                <td>CTCP Dịch vụ Hàng kh</td>
+                <td>Vận tải - kho b</td>
+                <td>61.1</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><strong>SCS</strong></td>
+                <td>CTCP Dịch vụ Hàng hó</td>
+                <td>Vận tải - kho b</td>
+                <td>61.1</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><strong>SVT</strong></td>
+                <td>CTCP Công nghệ Sài G</td>
+                <td>SX Phụ trợ</td>
+                <td>60.7</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td><strong>MDG</strong></td>
+                <td>CTCP Miền Đông</td>
+                <td>Khai khoáng</td>
+                <td>60.5</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td><strong>PJC</strong></td>
+                <td>CTCP Thương mại và V</td>
+                <td>Vận tải - kho b</td>
+                <td>60.2</td>
+                <td class="tier-B">B</td>
+                <td class="rec-HOLD">Giữ</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h2>🔥 Phân tích ngành</h2>
+    <div class="card">
+        <h3>📈 Đang tích lũy</h3>
+        <ul class="positive">
+<li>Không có</li>
+        </ul>
+        
+        <h3 style="margin-top: 15px;">📉 Đang phân phối</h3>
+        <ul class="negative">
+<li>Không có</li>
+        </ul>
+    </div>
+    
+    <h2>📊 Tín hiệu kỹ thuật</h2>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-value negative">64</div>
+            <div class="stat-label">RSI > 70 (Quá mua)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value positive">43</div>
+            <div class="stat-label">RSI < 30 (Quá bán)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value positive">375</div>
+            <div class="stat-label">Uptrend</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value negative">328</div>
+            <div class="stat-label">Downtrend</div>
+        </div>
+    </div>
+    
+    <h2>⚠️ Cảnh báo</h2>
+<div class="warning">⚠️ 64 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh</div>
+<div class="warning">📢 43 cổ phiếu RSI < 30 - có thể là cơ hội mua</div>
+    
+    <div class="footer">
+        <p>Báo cáo được tạo tự động bởi VN Stock Scanner</p>
+        <p>⚠️ Không phải lời khuyên đầu tư. Chỉ mang tính tham khảo.</p>
+    </div>
 </body>
 </html>

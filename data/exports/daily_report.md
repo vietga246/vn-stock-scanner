@@ -1,6 +1,6 @@
-# 📊 Báo cáo thị trường - 03/03/2026
+# 📊 Báo cáo thị trường - 04/03/2026
 
-> Cập nhật lúc 23:25 ICT
+> Cập nhật lúc 03:45 ICT
 
 ---
 
@@ -18,18 +18,18 @@
 
 ## 🏆 Top 10 Composite Score
 
-| # | Mã | Tên | Ngành | Score | Tier | ROE | PE | RSI |
-|---|-----|-----|-------|-------|------|-----|-----|-----|
-| 1 | NFC | CTCP Phân lân Ninh B | SX Nhựa - Hóa c | **65.0** | B | 0.5% | 7.5x | 54 |
-| 2 | FDC | CTCP Ngoại thương và | Bất động sản | **64.6** | B | 0.4% | 3.3x | 52 |
-| 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | **64.0** | B | 0.6% | 7.8x | 77 |
-| 4 | PVB | CTCP Bọc ống Dầu khí | Khai khoáng | **62.3** | B | 0.2% | 14.4x | 71 |
-| 5 | HAH | CTCP Vận tải và Xếp  | Vận tải - kho b | **62.0** | B | 0.3% | 9.3x | 79 |
-| 6 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | **61.1** | B | 0.4% | 13.4x | 55 |
-| 7 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | **61.1** | B | 0.5% | 7.7x | 59 |
-| 8 | SVT | CTCP Công nghệ Sài G | SX Phụ trợ | **60.7** | B | 0.1% | 7.3x | 50 |
-| 9 | MDG | CTCP Miền Đông | Khai khoáng | **60.5** | B | 0.3% | 10.7x | 79 |
-| 10 | PJC | CTCP Thương mại và V | Vận tải - kho b | **60.2** | B | 0.2% | 6.4x | 66 |
+| # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
+|---|-----|-----|-------|-------|------|-------------|
+| 1 | NFC | CTCP Phân lân Ninh B | SX Nhựa - Hóa c | 65.0 | B | Giữ |
+| 2 | FDC | CTCP Ngoại thương và | Bất động sản | 64.6 | B | Giữ |
+| 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 64.0 | B | Giữ |
+| 4 | PVB | CTCP Bọc ống Dầu khí | Khai khoáng | 62.3 | B | Giữ |
+| 5 | HAH | CTCP Vận tải và Xếp  | Vận tải - kho b | 62.0 | B | Giữ |
+| 6 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | 61.1 | B | Giữ |
+| 7 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 61.1 | B | Giữ |
+| 8 | SVT | CTCP Công nghệ Sài G | SX Phụ trợ | 60.7 | B | Giữ |
+| 9 | MDG | CTCP Miền Đông | Khai khoáng | 60.5 | B | Giữ |
+| 10 | PJC | CTCP Thương mại và V | Vận tải - kho b | 60.2 | B | Giữ |
 
 ---
 
