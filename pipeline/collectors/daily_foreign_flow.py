@@ -46,7 +46,7 @@ DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
 MAX_REQUEST_PER_MIN = 60
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
-NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "5"))        # 4 workers parallel
+NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "6"))        # 4 workers parallel
 TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
 WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "1")) # 1s giữa các worker
 
