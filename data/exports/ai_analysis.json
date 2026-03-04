@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-04T03:45:32.509256Z",
+  "generated_at": "2026-03-04T06:58:31.139853Z",
   "model": "ai-",
   "total_analyzed": 15,
   "summary": {
@@ -12,288 +12,288 @@
   "analyses": {
     "NFC": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu NFC cho thấy tiềm năng tăng trưởng ổn định nhưng đối mặt với một số hạn chế về tăng trưởng và lợi nhuận. Đánh giá tổng thể ở mức trung bình với điểm cơ bản và kỹ thuật khá.",
+      "summary": "NFC hiện thể hiện sức mạnh vừa phải trong bối cảnh ngành SX Nhựa - Hóa chất trung lập, với các chỉ số kỹ thuật và cơ bản cho thấy một số khả năng tăng trưởng nhưng vẫn còn hạn chế.",
       "highlights": [
         {
-          "text": "Fundamental Score cao, phản ánh tiềm năng tăng trưởng",
+          "text": "Composite Score và Fundamental Score cao, phản ánh tiềm năng vững chắc từ cơ bản.",
           "type": "positive"
         },
         {
-          "text": "Debt/Equity thấp, chỉ ra tình hình tài chính ổn định",
+          "text": "Technical Score tốt cùng với xu hướng tăng giá ngắn hạn.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROA và ROE thấp, làm dấy lên lo ngại về hiệu quả hoạt động",
+          "text": "ROE và ROA thấp, phản ánh hiệu quả vốn kém.",
           "type": "negative"
         },
         {
-          "text": "Không có dòng tiền đầu tư nước ngoài trong ngắn hạn, cần theo dõi",
+          "text": "Dòng tiền từ khối ngoại không thay đổi, thiếu sự tham gia của nhà đầu tư lớn.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản của NFC cho thấy vài điểm mạnh nhưng cần cải thiện hiệu quả hoạt động.",
-      "technical_view": "Kỹ thuật cho thấy xu hướng tăng gần đây nhưng có biến động.",
-      "flow_view": "Dòng tiền không thể hiện sự quan tâm rõ ràng từ khối ngoại.",
+      "fundamental_view": "NFC có nền tảng cơ bản tốt nhưng cần cải thiện hiệu quả sử dụng vốn.",
+      "technical_view": "Dấu hiệu kỹ thuật tích cực với xu hướng tăng ngắn hạn và RSI ổn định.",
+      "flow_view": "Dòng tiền yếu từ khối ngoại cho thấy sự thiếu hấp dẫn đối với nhà đầu tư lớn.",
       "symbol": "NFC"
     },
     "FDC": {
       "recommendation": "HOLD",
-      "summary": "FDC hiện tại có một số yếu tố tích cực về mặt cơ bản và kỹ thuật, nhưng các chỉ số về dòng tiền không hỗ trợ mạnh mẽ.",
+      "summary": "FDC, với tiềm năng trung bình trong ngành Bất động sản, cho thấy dấu hiệu ổn định nhưng không nổi bật. P/E thấp hứa hẹn về một định giá hợp lý.",
       "highlights": [
         {
-          "text": "Fundamental Score cao cho thấy cơ bản tốt.",
+          "text": "Fundamental Score ấn tượng 80.8/100, thể hiện cơ bản vững mạnh.",
           "type": "positive"
         },
         {
-          "text": "P/E thấp so với mặt bằng chung cho thấy tiềm năng tăng giá.",
+          "text": "Technical Score khả quan 74.0/100, phản ánh xu hướng tăng gần đây.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Momentum Score và Smart Money Score thấp, dấu hiệu của sự không chắc chắn.",
+          "text": "ROE và ROA thấp, cho thấy hiệu quả sử dụng vốn không cao.",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền từ khối ngoại thấp, giảm khả năng hấp thụ lượng bán ra lớn.",
+          "text": "Dòng tiền từ khối ngoại không thay đổi trong 30 ngày qua, cảnh báo về dòng tiền yếu.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản mạnh với Fundamental Score cao và P/E thấp.",
-      "technical_view": "Xu hướng tăng ngắn hạn, nhưng cần thận trọng với RSI trung bình.",
-      "flow_view": "Dòng tiền yếu có thể hạn chế sự tăng giá.",
+      "fundamental_view": "Với P/E thấp, FDC có vẻ là định giá hợp lý so với lợi nhuận, nhưng các chỉ số hiệu quả sử dụng vốn đang đặt ra câu hỏi.",
+      "technical_view": "Xu hướng tăng ngắn hạn và chỉ số RSI ở mức 52 cho thấy cổ phiếu này có thể chưa quá mua hoặc bán.",
+      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, cho thấy sự thận trọng của nhà đầu tư nước ngoài.",
       "symbol": "FDC"
     },
     "VVS": {
       "recommendation": "HOLD",
-      "summary": "VVS thể hiện sự tăng trưởng mạnh mẽ về giá cổ phiếu với sự tăng trưởng vượt bậc trong ngắn hạn, tuy nhiên các chỉ số cơ bản không đủ mạnh mẽ.",
+      "summary": "Cổ phiếu VVS có một số điểm sáng từ góc độ kỹ thuật, nhưng yếu tố cơ bản và dòng tiền không mạnh mẽ.",
       "highlights": [
         {
-          "text": "Momentum Score ấn tượng với 80.0/100, phản ánh đà tăng trưởng mạnh của cổ phiếu trong ngắn hạn.",
+          "text": "Momentum Score và Technical Score cao, phản ánh xu hướng tăng trong ngắn hạn và sức mạnh kỹ thuật.",
           "type": "positive"
         },
         {
-          "text": "Technical Score cao ở mức 75.2/100, cho thấy xu hướng kỹ thuật tích cực.",
+          "text": "P/E thấp cho thấy cổ phiếu có thể đang ở mức định giá hợp lý.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Tỷ lệ Debt/Equity cao tới 6.78, cho thấy rủi ro tài chính tiềm ẩn.",
+          "text": "ROE và ROA thấp cho thấy hiệu quả sử dụng vốn không cao.",
           "type": "negative"
         },
         {
-          "text": "ROE và ROA thấp, chỉ ở mức 0.6% và 0.1% tương ứng, phản ánh hiệu quả sử dụng vốn kém.",
+          "text": "Debt/Equity cao báo hiệu rủi ro tài chính có thể gia tăng.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Với Fundamental Score ở mức 62.0/100, VVS có bức tranh cơ bản khá ổn nhưng không quá nổi bật.",
-      "technical_view": "Mạnh mẽ về mặt kỹ thuật, RSI(14) ở mức 77 cho thấy có thể đang trong tình trạng mua quá mức.",
-      "flow_view": "Dòng tiền từ khối ngoại không đổi trong 7 và 30 ngày qua, cho thấy sự thờ ơ từ nhà đầu tư nước ngoài.",
+      "fundamental_view": "Yếu tố cơ bản không mạnh, phản ánh qua ROE và ROA thấp.",
+      "technical_view": "Xu hướng tăng trong ngắn hạn, được hỗ trợ bởi điểm RSI cao và giá tăng mạnh gần đây.",
+      "flow_view": "Dòng tiền từ khối ngoại không thể hiện sự quan tâm đáng kể.",
       "symbol": "VVS"
     },
     "PVB": {
       "recommendation": "HOLD",
-      "summary": "PVB có dấu hiệu tích cực về mặt kỹ thuật nhưng yếu kém về mặt cơ bản và dòng tiền trung lập.",
+      "summary": "Cổ phiếu PVB thể hiện tín hiệu mạnh về mặt kỹ thuật, nhưng cơ bản tài chính và sự quan tâm từ khối ngoại lại không mạnh.",
       "highlights": [
         {
-          "text": "Momentum và kỹ thuật rất mạnh với chỉ số RSI cao và tăng giá mạnh trong ngắn hạn.",
+          "text": "Momentum Score và Technical Score cao, cho thấy động lực tăng giá tốt.",
           "type": "positive"
         },
         {
-          "text": "Tăng trưởng doanh thu ổn định 2.9% cho thấy sự vững chắc ngành.",
+          "text": "Trend ngắn hạn đang đi lên, với mức tăng giá đáng kể trong 5 và 20 ngày qua.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Chỉ số ROE và ROA thấp, phản ánh hiệu quả sử dụng vốn yếu.",
+          "text": "Debt/Equity cao 1.54, ám chỉ rủi ro về tài chính.",
           "type": "negative"
         },
         {
-          "text": "Debt/Equity cao 1.54, nâng cao rủi ro về tài chính.",
+          "text": "ROE và ROA thấp, cho thấy hiệu suất sinh lời kém.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản yếu với ROE và net margin thấp.",
-      "technical_view": "Mạnh về kỹ thuật với RSI cao và xu hướng tăng giá.",
-      "flow_view": "Dòng tiền trung lập với khối ngoại không có giao dịch đáng chú ý.",
+      "fundamental_view": "Dựa trên chỉ số cơ bản, cổ phiếu không quá lôi cuốn.",
+      "technical_view": "Biểu đồ kỹ thuật mạnh, hỗ trợ quan điểm nắm giữ.",
+      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, thiếu sự nhập cuộc của nhà đầu tư lớn.",
       "symbol": "PVB"
     },
     "HAH": {
       "recommendation": "HOLD",
-      "summary": "HAH hiện có đà tăng trưởng nhẹ nhưng cần thận trọng do chỉ số kỹ thuật cao và dòng tiền ổn định.",
+      "summary": "HAH cho thấy sự vững vàng về mặt kỹ thuật cùng với mức tăng trưởng giá gần đây, nhưng mảng cơ bản và dòng tiền không hỗ trợ mạnh mẽ.",
       "highlights": [
         {
-          "text": "Chỉ số kỹ thuật mạnh với RSI(14) cao và xu hướng tăng ngắn hạn",
+          "text": "Momentum và Technical Score cao, cho thấy xu hướng tăng giá ổn định",
           "type": "positive"
         },
         {
-          "text": "P/E thấp cho thấy cổ phiếu được định giá hợp lý so với lợi nhuận",
+          "text": "PE thấp so với mức trung bình ngành, có thể là cơ hội đầu tư đối với nhà đầu tư giá trị",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA thấp cho thấy hiệu quả sử dụng vốn kém",
+          "text": "ROE và ROA thấp, phản ánh hiệu suất sử dụng vốn không cao",
           "type": "negative"
         },
         {
-          "text": "RSI cao có thể báo hiệu về việc cổ phiếu đang trong tình trạng quá mua",
+          "text": "RSI cao cho thấy có thể đang ở trạng thái mua quá mức, cảnh báo nguy cơ điều chỉnh giá",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản đang ở mức trung bình với Fundamental Score ở mức 60.",
-      "technical_view": "Kỹ thuật mạnh nhờ vào Momentum và Technical Scores cao.",
-      "flow_view": "Dòng tiền từ khối ngoại không biến động cho thấy sự trung tính của nhà đầu tư nước ngoài.",
+      "fundamental_view": "Với Fundamental Score ở mức trung bình và chỉ số tài chính không ấn tượng, cơ bản của HAH còn nhiều thách thức.",
+      "technical_view": "Sức mạnh kỹ thuật cùng với xu hướng giá tăng ổn định cho thấy tín hiệu lạc quan trong ngắn hạn.",
+      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, cho thấy sự thờ ơ của nhà đầu tư ngoại.",
       "symbol": "HAH"
     },
     "AST": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu AST có sự cân bằng giữa tiềm năng và rủi ro dựa trên các chỉ số hiện tại. Mặc dù có yếu tố tích cực từ góc độ kỹ thuật, nhưng yếu tố cơ bản và dòng tiền cho thấy sự thận trọng.",
+      "summary": "AST cho thấy một số tiềm năng nhưng cũng có những rủi ro không thể bỏ qua. Composite Score và Fundamental Score ở mức khá, nhưng Momentum và Smart Money Score cho thấy sự thiếu vắng của động lực tăng trưởng mạnh mẽ.",
       "highlights": [
         {
-          "text": "Fundamental Score đạt 73.1/100 cho thấy tiềm năng tăng trưởng.",
+          "text": "Composite Score và Fundamental Score trên mức trung bình, cho thấy cơ bản vững vàng.",
           "type": "positive"
         },
         {
-          "text": "Technical Score tốt với 78.5/100, phản ánh xu hướng tích cực.",
+          "text": "Technical Score cao, báo hiệu về tiềm năng kỹ thuật.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA rất thấp, chỉ số hiệu suất tài chính kém.",
+          "text": "Momentum Score thấp, thiếu sự hỗ trợ từ động lực tăng giá.",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền từ khối ngoại không có sự biến động, thiếu sự quan tâm.",
+          "text": "Smart Money Score ở mức trung bình, chỉ ra sự thiếu hụt của sự quan tâm từ những nhà đầu tư thông thái.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Mặc dù điểm số cơ bản khả quan, hiệu suất tài chính kém làm giảm sức hấp dẫn.",
-      "technical_view": "Chỉ số kỹ thuật và xu hướng ngắn hạn tích cực hỗ trợ giá cổ phiếu.",
-      "flow_view": "Sự thiếu vắng dòng tiền khối ngoại cho thấy ít sự quan tâm đầu tư.",
+      "fundamental_view": "Cơ bản vững chắc với Fundamental Score cao.",
+      "technical_view": "Báo hiệu tiềm năng từ Technical Score cao.",
+      "flow_view": "Dòng tiền từ khối ngoại không đáng kể, khiến cho việc đầu tư thiếu đi sự hỗ trợ.",
       "symbol": "AST"
     },
     "SCS": {
       "recommendation": "HOLD",
-      "summary": "SCS có hiệu suất cơ bản ổn định nhưng đang thiếu sức mạnh dòng tiền và động lực tăng giá.",
+      "summary": "CTCP Dịch vụ Hàng hóa Sài Gòn (SCS) sở hữu cơ bản kỹ thuật tốt nhưng đang trải qua sự chững lại về tăng trưởng. Tín hiệu hỗn hợp từ các chỉ số sàng lọc.",
       "highlights": [
         {
-          "text": "Fundaemntal Score khá cao ở 75.7/100, chỉ ra tiềm năng tăng trưởng mạnh mẽ.",
+          "text": "ROE và ROA thấp nhưng ổn định, phản ánh quản lý hiệu quả tài sản và vốn chủ sở hữu tương đối tốt.",
           "type": "positive"
         },
         {
-          "text": "Technical Score ổn định với 77.2/100, hỗ trợ tín hiệu mua từ góc độ kỹ thuật.",
+          "text": "P/E thấp Điểm mua hấp dẫn với định giá 7.7x, hứa hẹn về khả năng sinh lời.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA thấp, chỉ ở mức 0.5% và 0.4%, phản ánh hiệu quả sử dụng vốn kém.",
+          "text": "Momentum Score thấp chỉ ra ít động lực tăng giá trong ngắn hạn.",
           "type": "negative"
         },
         {
-          "text": "Momentum Score thấp ở mức 40.0/100, có thể cản trở đà tăng giá.",
+          "text": "Tốc độ tăng trưởng doanh thu cực kỳ hạn chế chỉ 0.1%, cảnh báo về sự suy giảm tăng trưởng.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Với Fundamental Score cao, SCS có nền tảng tài chính vững.",
-      "technical_view": "Xu hướng ngắn hạn tăng, nhưng cần thêm động lực để duy trì.",
-      "flow_view": "Dòng tiền từ khối ngoại không đổi trong thời gian gần đây, cần theo dõi sát.",
+      "fundamental_view": "Với Fundamental Score 75.7/100, SCS có bức tranh tài chính tốt, dù tăng trưởng chậm.",
+      "technical_view": "Kỹ thuật mạnh với Technical Score 78.1/100 và xu hướng tăng ngắn hạn.",
+      "flow_view": "Dòng tiền từ khối ngoại không thay đổi trong 30 ngày, phản ánh sự không chắc chắn từ nhà đầu tư.",
       "symbol": "SCS"
     },
     "SVT": {
       "recommendation": "HOLD",
-      "summary": "SVT là một cổ phiếu của CTCP Công nghệ Sài Gòn Viễn Đông, với các chỉ số cơ bản khá ổn nhưng không quá nổi bật. Mặc dù Fundamental Score cao, kỹ thuật và dòng tiền không đủ mạnh để đảm bảo tăng trưởng giá mạnh mẽ.",
+      "summary": "Cổ phiếu SVT có một số điểm mạnh về cơ bản nhưng lại thiếu sức hút từ dòng tiền và momentum.",
       "highlights": [
         {
-          "text": "Fundamental Score cao (74.5/100)",
+          "text": "P/E thấp 7.3x cho thấy cổ phiếu có thể đang được định giá thấp.",
           "type": "positive"
         },
         {
-          "text": "Thấp về nợ với tỷ lệ Debt/Equity là 0.07",
+          "text": "Debt/Equity rất thấp 0.07, cho thấy tình hình tài chính ổn định.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Momentum Score chỉ ở mức 46.3, phản ánh sự thận trọng từ phía nhà đầu tư",
+          "text": "ROE và ROA cực thấp cho thấy hiệu quả sử dụng vốn kém.",
           "type": "negative"
         },
         {
-          "text": "ROE và ROA thấp cho thấy hiệu quả sử dụng vốn không cao",
+          "text": "Momentum thấp với chỉ số 46.3/100, cảnh báo về sự thiếu hấp dẫn lâu dài của cổ phiếu.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Với một Fundamental Score tốt nhưng không xuất sắc, SVT có thể được xem xét cho danh mục đầu tư dài hạn.",
-      "technical_view": "Mặc dù có dấu hiệu tăng trong ngắn hạn, nhưng momentum không đủ mạnh.",
-      "flow_view": "Dòng tiền từ khối ngoại không biến động, cho thấy sự thận trọng.",
+      "fundamental_view": "Cơ bản tốt với Fundamental Score 74.5/100, nhưng ROE và ROA thấp cần được cải thiện.",
+      "technical_view": "Kỹ thuật tương đối ổn với Technical Score 69.8/100 và RSI(14) ở mức cân bằng.",
+      "flow_view": "Dòng tiền yếu với Khối ngoại không mua ròng trong 7 và 30 ngày qua.",
       "symbol": "SVT"
     },
     "MDG": {
       "recommendation": "HOLD",
-      "summary": "MDG là một lựa chọn cân nhắc với sự cải thiện trong Momentum, nhưng rủi ro từ chỉ số tài chính yếu và RSI cao.",
+      "summary": "MDG cho thấy một số điểm mạnh trong đà tăng giá và các chỉ số kỹ thuật, nhưng yếu kém về cơ bản và dòng tiền khối ngoại không đáng kể.",
       "highlights": [
         {
-          "text": "Momentum Score cao (78.9), phản ánh sức mạnh giá tăng gần đây.",
+          "text": "Momentum Score cao với 78.9, phản ánh xu hướng tăng giá mạnh mẽ",
           "type": "positive"
         },
         {
-          "text": "Price Change 20D tăng ấn tượng (45.5%)",
+          "text": "Đà tăng giá gần đây mạnh mẽ với 45.5% trong 20 ngày",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Chỉ số ROE và ROA thấp, phản ánh hiệu quả sử dụng vốn kém.",
+          "text": "P/E so với ngành khá cao, chỉ ra giá có thể đã phản ánh quá mức lợi nhuận hiện tại",
           "type": "negative"
         },
         {
-          "text": "RSI(14) cao ở 79, báo hiệu về khả năng quá mua.",
+          "text": "RSI cao ở mức 79, cảnh báo về khả năng quá mua",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Fundamental Score ở mức trung bình (60.1), tạo nên cơ sở cho nhận định thận trọng.",
-      "technical_view": "Chỉ số kỹ thuật và xu hướng ngắn hạn tích cực, nhưng RSI cao cảnh báo về sự quá mua.",
-      "flow_view": "Dòng tiền khối ngoại không thay đổi, ít hỗ trợ cho cơn sốt giá.",
+      "fundamental_view": "Cơ bản yếu kém với ROE và ROA thấp, thách thức trong việc tạo lợi nhuận.",
+      "technical_view": "Biểu đồ kỹ thuật mạnh mẽ với xu hướng tăng ngắn hạn và RSI cao.",
+      "flow_view": "Dòng tiền khối ngoại không đáng kể, cho thấy thiếu hỗ trợ từ nhà đầu tư nước ngoài.",
       "symbol": "MDG"
     },
     "PJC": {
       "recommendation": "HOLD",
-      "summary": "PJC hiện đang cho thấy dấu hiệu tăng trưởng nhẹ trên thị trường, với một số chỉ số kỹ thuật ủng hộ, nhưng được cân nhắc bởi hiệu suất cơ bản kém.",
+      "summary": "PJC hiện thế mạnh về mặt kỹ thuật và đang chứng kiến đà tăng giá, tuy nhiên chỉ số cơ bản và dòng tiền cho thấy sự ổn định chưa cao.",
       "highlights": [
         {
-          "text": "Momentum Score cao (77.3/100) cho thấy động lượng tích cực của cổ phiếu trên thị trường.",
+          "text": "Momentum và Technical Score cao, chỉ ra xu hướng tăng giá trong ngắn hạn",
           "type": "positive"
         },
         {
-          "text": "P/E thấp (6.4x) so với mặt bằng chung, đề xuất cổ phiếu được định giá tốt.",
+          "text": "Has a low P/E ratio, indicating potential undervaluation",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA cực thấp (0.2% và 0.1%), cho thấy hiệu suất tài chính kém.",
+          "text": "Chỉ số ROE và ROA thấp, phản ánh hiệu quả sử dụng vốn không cao",
           "type": "negative"
         },
         {
-          "text": "Tăng trưởng doanh thu rất thấp (0.2%), cảnh báo về khả năng tăng trưởng kém.",
+          "text": "Chỉ số dòng tiền khối ngoại không thay đổi, cảnh báo về sự thiếu hấp dẫn dài hạn",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản kém với chỉ số ROE và ROA thấp, cùng tăng trưởng doanh thu không đáng kể.",
-      "technical_view": "Kỹ thuật ổn với RSI dưới 70 và xu hướng tăng ngắn hạn.",
-      "flow_view": "Dòng tiền từ khối ngoại không đổi, cho thấy sự thiếu hứng thú từ nhà đầu tư nước ngoài.",
+      "fundamental_view": "Cơ bản yếu với chỉ số hiệu quả thấp và tốc độ tăng trưởng doanh thu khiêm tốn.",
+      "technical_view": "Tín hiệu kỹ thuật mạnh với xu hướng tăng giá rõ ràng trong ngắn hạn.",
+      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, cho thấy sự thờ ơ của nhà đầu tư nước ngoài.",
       "symbol": "PJC"
     },
     "QST": {
       "symbol": "QST",
       "recommendation": "HOLD",
-      "summary": "QST đang trong vùng trung tính (59.6). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+      "summary": "QST đang trong vùng trung tính (59.7). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
       "highlights": [
         {
           "text": "Tín hiệu kỹ thuật tích cực",
@@ -317,7 +317,7 @@
     "KSV": {
       "symbol": "KSV",
       "recommendation": "HOLD",
-      "summary": "KSV đang trong vùng trung tính (59.2). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+      "summary": "KSV đang trong vùng trung tính (59.4). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
       "highlights": [
         {
           "text": "Điểm cơ bản 68/100 - Tài chính ổn định",
@@ -332,7 +332,7 @@
     "VPX": {
       "symbol": "VPX",
       "recommendation": "HOLD",
-      "summary": "VPX đang trong vùng trung tính (59.1). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+      "summary": "VPX đang trong vùng trung tính (59.2). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
       "highlights": [
         {
           "text": "Điểm cơ bản 60/100 - Tài chính ổn định",
@@ -352,38 +352,10 @@
       "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
       "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
     },
-    "KSF": {
-      "symbol": "KSF",
-      "recommendation": "HOLD",
-      "summary": "KSF đang trong vùng trung tính (59.0). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
-      "highlights": [
-        {
-          "text": "Điểm cơ bản 78/100 - Tài chính lành mạnh",
-          "type": "positive"
-        },
-        {
-          "text": "P/E 11.1 - Định giá hấp dẫn",
-          "type": "positive"
-        },
-        {
-          "text": "Tăng trưởng doanh thu 51.0% - Tăng mạnh",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Momentum yếu - Đà tăng suy giảm",
-          "type": "negative"
-        }
-      ],
-      "fundamental_view": "Nền tảng tài chính vững chắc với các chỉ số cơ bản ấn tượng.",
-      "technical_view": "Kỹ thuật trung tính, đang tích lũy trong biên độ hẹp.",
-      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
-    },
     "DCM": {
       "symbol": "DCM",
       "recommendation": "HOLD",
-      "summary": "DCM đang trong vùng trung tính (59.0). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+      "summary": "DCM đang trong vùng trung tính (59.2). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
       "highlights": [
         {
           "text": "Momentum mạnh - Đà tăng tích cực",
@@ -405,6 +377,34 @@
         }
       ],
       "fundamental_view": "Nền tảng tài chính cần được cải thiện, theo dõi khả năng trả nợ.",
+      "technical_view": "Kỹ thuật trung tính, đang tích lũy trong biên độ hẹp.",
+      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
+    },
+    "KSF": {
+      "symbol": "KSF",
+      "recommendation": "HOLD",
+      "summary": "KSF đang trong vùng trung tính (59.2). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+      "highlights": [
+        {
+          "text": "Điểm cơ bản 78/100 - Tài chính lành mạnh",
+          "type": "positive"
+        },
+        {
+          "text": "P/E 11.1 - Định giá hấp dẫn",
+          "type": "positive"
+        },
+        {
+          "text": "Tăng trưởng doanh thu 51.0% - Tăng mạnh",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Momentum yếu - Đà tăng suy giảm",
+          "type": "negative"
+        }
+      ],
+      "fundamental_view": "Nền tảng tài chính vững chắc với các chỉ số cơ bản ấn tượng.",
       "technical_view": "Kỹ thuật trung tính, đang tích lũy trong biên độ hẹp.",
       "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
     }

@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 04/03/2026
 
-> Cập nhật lúc 03:45 ICT
+> Cập nhật lúc 06:58 ICT
 
 ---
 
@@ -10,9 +10,9 @@
 |--------|---------|
 | Tổng số cổ phiếu | 706 |
 | Tier A (≥70 điểm) | 0 |
-| Tier B (55-69) | 56 |
-| Tier C (40-54) | 545 |
-| Score TB | 46.5 |
+| Tier B (55-69) | 58 |
+| Tier C (40-54) | 542 |
+| Score TB | 46.6 |
 
 ---
 
@@ -20,16 +20,16 @@
 
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
-| 1 | NFC | CTCP Phân lân Ninh B | SX Nhựa - Hóa c | 65.0 | B | Giữ |
-| 2 | FDC | CTCP Ngoại thương và | Bất động sản | 64.6 | B | Giữ |
+| 1 | NFC | CTCP Phân lân Ninh B | SX Nhựa - Hóa c | 65.1 | B | Giữ |
+| 2 | FDC | CTCP Ngoại thương và | Bất động sản | 64.7 | B | Giữ |
 | 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 64.0 | B | Giữ |
-| 4 | PVB | CTCP Bọc ống Dầu khí | Khai khoáng | 62.3 | B | Giữ |
+| 4 | PVB | CTCP Bọc ống Dầu khí | Khai khoáng | 62.4 | B | Giữ |
 | 5 | HAH | CTCP Vận tải và Xếp  | Vận tải - kho b | 62.0 | B | Giữ |
-| 6 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | 61.1 | B | Giữ |
-| 7 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 61.1 | B | Giữ |
-| 8 | SVT | CTCP Công nghệ Sài G | SX Phụ trợ | 60.7 | B | Giữ |
-| 9 | MDG | CTCP Miền Đông | Khai khoáng | 60.5 | B | Giữ |
-| 10 | PJC | CTCP Thương mại và V | Vận tải - kho b | 60.2 | B | Giữ |
+| 6 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | 61.2 | B | Giữ |
+| 7 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 61.2 | B | Giữ |
+| 8 | SVT | CTCP Công nghệ Sài G | SX Phụ trợ | 60.8 | B | Giữ |
+| 9 | MDG | CTCP Miền Đông | Khai khoáng | 60.6 | B | Giữ |
+| 10 | PJC | CTCP Thương mại và V | Vận tải - kho b | 60.4 | B | Giữ |
 
 ---
 
@@ -46,8 +46,8 @@
 ## 📊 Tín hiệu kỹ thuật
 
 - **RSI Overbought (>70)**: 64 cổ phiếu
-- **RSI Oversold (<30)**: 43 cổ phiếu
-- **Uptrend**: 375 | **Downtrend**: 328
+- **RSI Oversold (<30)**: 45 cổ phiếu
+- **Uptrend**: 371 | **Downtrend**: 332
 
 ### Top Gainers (5D)
 - GMA: +50.0%
@@ -68,7 +68,7 @@
 ## ⚠️ Cảnh báo
 
 ⚠️ 64 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
-📢 43 cổ phiếu RSI < 30 - có thể là cơ hội mua
+📢 45 cổ phiếu RSI < 30 - có thể là cơ hội mua
 
 ---
 
