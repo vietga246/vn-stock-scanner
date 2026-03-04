@@ -6,7 +6,7 @@ Chạy cùng daily_prices.py lúc 17:00 ICT.
 
 Features:
 - HOSE + HNX only, loại bỏ chứng quyền + trái phiếu
-- Multi-threaded với 2 workers (staggered 60s)
+- Multi-threaded với 4 workers (staggered 1s)
 - Thread-safe adaptive rate limiter
 - Queue-based DB writes (tránh SQLite lock)
 - TEST_MODE: chỉ chạy VN30 để test nhanh
@@ -46,9 +46,9 @@ DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
 MAX_REQUEST_PER_MIN = 60
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
-NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "4"))        # 3 workers parallel
+NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "4"))        # 4 workers parallel
 TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
-WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "1")) # 2s giữa các request
+WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "1")) # 1s giữa các worker
 
 # VN30 symbols for testing
 VN30_SYMBOLS = [
@@ -331,7 +331,7 @@ def fetch_foreign_trading():
     init_db(conn)
     
     # Split tickers into chunks for each worker
-    num_workers = min(MAX_WORKERS, len(tickers))
+    num_workers = min(NUM_WORKERS, len(tickers))
     chunk_size = len(tickers) // num_workers + 1
     ticker_chunks = [tickers[i:i + chunk_size] for i in range(0, len(tickers), chunk_size)]
     
@@ -343,7 +343,7 @@ def fetch_foreign_trading():
     
     def worker_task(worker_id: int, symbols: list):
         """Worker task with staggered start."""
-        # Stagger start: worker 0 starts immediately, worker 1 waits 60s, etc.
+        # Stagger start
         if worker_id > 0:
             wait_time = worker_id * WORKER_STAGGER_SEC
             log.info("Worker %d: waiting %ds before start...", worker_id, wait_time)
@@ -361,52 +361,45 @@ def fetch_foreign_trading():
             log.info("Worker %d: [%d/%d] %s %s", 
                     worker_id, i, len(symbols), symbol, status)
         
+        log.info("Worker %d: completed", worker_id)
         return results
     
     # Process with thread pool
-    with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+    all_results = []
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         # Submit tasks with worker IDs
         futures = {
             executor.submit(worker_task, i, chunk): i 
             for i, chunk in enumerate(ticker_chunks)
         }
         
-        # Progress bar for total symbols
-        pbar = tqdm(total=len(tickers), desc="Foreign trading")
-        
         # Process results as workers complete
         for future in as_completed(futures):
             worker_id = futures[future]
             try:
                 results = future.result()
-                
-                for result in results:
-                    if result['status'] == 'ok':
-                        # Insert data (main thread - thread safe)
-                        if result['foreign_rows']:
-                            batch_insert(cursor, "foreign_trading", result['foreign_rows'])
-                        if result['prop_rows']:
-                            batch_insert(cursor, "prop_trading", result['prop_rows'])
-                        
-                        ok += 1
-                        batch_counter += 1
-                    else:
-                        fail += 1
-                    
-                    pbar.update(1)
-                    
-                    # Batch commit
-                    if batch_counter >= COMMIT_BATCH:
-                        conn.commit()
-                        batch_counter = 0
-                
-                log.info("Worker %d: completed", worker_id)
-                    
+                all_results.extend(results)
             except Exception as e:
                 log.error("Worker %d error: %s", worker_id, e)
-                fail += len(ticker_chunks[worker_id])
+    
+    # Write all results to DB (single thread)
+    log.info("Writing %d results to database...", len(all_results))
+    
+    for result in all_results:
+        if result['status'] == 'ok':
+            if result['foreign_rows']:
+                batch_insert(cursor, "foreign_trading", result['foreign_rows'])
+            if result['prop_rows']:
+                batch_insert(cursor, "prop_trading", result['prop_rows'])
+            ok += 1
+            batch_counter += 1
+        else:
+            fail += 1
         
-        pbar.close()
+        # Batch commit
+        if batch_counter >= COMMIT_BATCH:
+            conn.commit()
+            batch_counter = 0
     
     # Final commit and close
     conn.commit()
