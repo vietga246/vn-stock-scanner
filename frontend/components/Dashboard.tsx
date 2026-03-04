@@ -103,7 +103,7 @@ export default function Dashboard() {
   // Persist watchlist changes
   useEffect(() => {
     try {
-      localStorage.setItem('vns-watchlist', JSON.stringify([...watchlist]));
+      localStorage.setItem('vns-watchlist', JSON.stringify(Array.from(watchlist)));
     } catch { /* ignore */ }
   }, [watchlist]);
 
