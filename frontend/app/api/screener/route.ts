@@ -1,50 +1,9 @@
-import { NextResponse } from 'next/server';
-
-const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/vietga246/vn-stock-scanner/main/data/exports/screener.json';
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import { fetchGithubData } from '../_lib/github';
 
 export async function GET() {
-  try {
-    const response = await fetch(GITHUB_RAW_URL, {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'VN-Stock-Scanner/1.0',
-      },
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      console.error('GitHub fetch failed:', response.status, response.statusText);
-      return NextResponse.json(
-        { error: `Failed to fetch data: ${response.status}` },
-        { status: response.status }
-      );
-    }
-
-    // Get raw text first to handle potential NaN values
-    const text = await response.text();
-    
-    // Replace NaN/Infinity with null (these are not valid JSON)
-    const cleanedText = text
-      .replace(/:\s*NaN\s*([,\}])/g, ':null$1')
-      .replace(/:\s*Infinity\s*([,\}])/g, ':null$1')
-      .replace(/:\s*-Infinity\s*([,\}])/g, ':null$1');
-    
-    // Parse the cleaned JSON
-    const data = JSON.parse(cleanedText);
-    
-    return NextResponse.json(data, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching screener:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch screener data', details: String(error) },
-      { status: 500 }
-    );
-  }
+  return fetchGithubData('screener.json', {
+    generated_at: new Date().toISOString(),
+    total: 0,
+    screener: [],
+  });
 }

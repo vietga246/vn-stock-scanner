@@ -10,15 +10,15 @@ interface IndustryFlowProps {
   activeIndustry?: string | null;
 }
 
-export default function IndustryFlow({ 
-  sectors, 
-  onIndustryClick, 
-  activeIndustry 
+export default function IndustryFlow({
+  sectors,
+  onIndustryClick,
+  activeIndustry
 }: IndustryFlowProps) {
   const [expanded, setExpanded] = useState(true);
 
   const maxFlow = Math.max(...sectors.map(s => Math.abs(s.foreign_net_7d || 0)), 1);
-  
+
   const accumulating = sectors.filter(s => s.status === 'accumulating');
   const distributing = sectors.filter(s => s.status === 'distributing');
 
@@ -64,30 +64,13 @@ export default function IndustryFlow({
   const SectorItem = ({ sector }: { sector: Sector }) => {
     const isActive = activeIndustry === sector.name;
     const isAccumulating = sector.status === 'accumulating';
-    const hoverBg = isAccumulating
-      ? 'linear-gradient(90deg, rgba(0,255,136,0.08) 0%, transparent 100%)'
-      : 'linear-gradient(90deg, rgba(255,51,102,0.08) 0%, transparent 100%)';
 
     return (
       <div
         onClick={() => onIndustryClick?.(sector.name)}
-        className="flex items-center gap-2 p-2 rounded-md mb-1.5 cursor-pointer transition-all"
-        style={{
-          background: isActive ? hoverBg : '#0a0f14',
-          border: `1px solid ${isActive ? (isAccumulating ? '#00ff8840' : '#ff336640') : '#1e2832'}`,
-        }}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = hoverBg;
-            e.currentTarget.style.borderColor = isAccumulating ? '#00ff8840' : '#ff336640';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = '#0a0f14';
-            e.currentTarget.style.borderColor = '#1e2832';
-          }
-        }}
+        className="sector-item flex items-center gap-2 p-2 rounded-md mb-1.5 cursor-pointer transition-all"
+        data-status={isAccumulating ? 'accumulating' : 'distributing'}
+        data-active={isActive ? '' : undefined}
       >
         <span className="text-[11px] font-medium min-w-[80px] truncate">
           {sector.name}

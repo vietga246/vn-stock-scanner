@@ -153,3 +153,106 @@ tr {
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* ============ Component CSS (P4: CSS hover instead of DOM mutation) ============ */
+
+/* Stock table row hover */
+.stock-row:hover {
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.06) 0%, transparent 100%);
+}
+
+/* Sector item (IndustryFlow) */
+.sector-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.sector-item:hover,
+.sector-item[data-active] {
+  border-color: #1e283280;
+}
+
+.sector-item[data-status="accumulating"]:hover,
+.sector-item[data-status="accumulating"][data-active] {
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.08) 0%, transparent 100%);
+  border-color: rgba(0, 255, 136, 0.25);
+}
+
+.sector-item[data-status="distributing"]:hover,
+.sector-item[data-status="distributing"][data-active] {
+  background: linear-gradient(90deg, rgba(255, 51, 102, 0.08) 0%, transparent 100%);
+  border-color: rgba(255, 51, 102, 0.25);
+}
+
+/* Search input */
+.search-input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+}
+
+/* Pagination buttons */
+.pagination-btn {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  background: var(--card);
+  color: #8b99a8;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.pagination-btn:disabled {
+  background: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.pagination-btn[data-current] {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.19) 0%, rgba(0, 212, 255, 0.08) 100%);
+  color: var(--primary);
+  border-color: rgba(0, 212, 255, 0.31);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+/* Tier filter buttons */
+.tier-filter-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease;
+  background: var(--card);
+  color: #8b99a8;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.tier-filter-btn[data-active] {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.13) 0%, rgba(0, 212, 255, 0.06) 100%);
+  color: var(--primary);
+  border-color: rgba(0, 212, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+/* Industry tag in table */
+.industry-tag {
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid transparent;
+}
+
+.industry-tag[data-active] {
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--primary);
+  border-color: rgba(0, 212, 255, 0.25);
+}

@@ -1,14 +1,74 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Search, Star, BarChart3, X, TrendingUp, TrendingDown, ChevronUp } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Search, Star, BarChart3, X } from 'lucide-react';
 import type { Stock, Sector, AIAnalysis } from '@/lib/types';
-import { getDashboardData, getSummary, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
+import { getDashboardData, getSummary, loadPrices, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
 import IndustryFlow from './IndustryFlow';
 import StockModal from './StockModal';
 import Sparkline from './Sparkline';
 
 const ITEMS_PER_PAGE = 20;
+
+// ============ Module-level sub-components (P3 fix) ============
+
+function ScoreBadge({ value }: { value: number }) {
+  const color = getScoreColor(value);
+  return (
+    <span
+      className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold"
+      style={{
+        background: `${color}15`,
+        color,
+        border: `1px solid ${color}40`,
+        boxShadow: `0 0 8px ${color}30`,
+      }}
+    >
+      {value.toFixed(1)}
+    </span>
+  );
+}
+
+function TierBadge({ tier }: { tier: string }) {
+  const color = getTierColor(tier);
+  return (
+    <span
+      className="ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold"
+      style={{ background: `${color}20`, color, border: `1px solid ${color}30` }}
+    >
+      {tier}
+    </span>
+  );
+}
+
+function PriceChange({ value }: { value?: number }) {
+  if (value === undefined || Math.abs(value) < 0.01) {
+    return (
+      <span className="font-mono text-[10px]" style={{ color: '#4a5a6a' }}>
+        0.00%
+      </span>
+    );
+  }
+  const up = value >= 0;
+  return (
+    <span
+      className="font-mono text-[10px] font-medium"
+      style={{
+        color: up ? '#00ff88' : '#ff3366',
+        textShadow: `0 0 6px ${up ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`,
+      }}
+    >
+      {formatPercent(value)}
+    </span>
+  );
+}
+
+// Type-safe sort keys (Q4 fix)
+type SortableKey = 'rank' | 'close' | 'change_1d' | 'change_5d' | 'change_20d' | 'composite_score' | 'foreign_net_7d';
+
+function getSortValue(stock: Stock, key: SortableKey): number {
+  return stock[key] ?? 0;
+}
 
 export default function Dashboard() {
   // Data state
@@ -25,12 +85,29 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [industryFilter, setIndustryFilter] = useState<string | null>(null);
-  const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
-  const [sortBy, setSortBy] = useState<string>('rank');
+  const [sortBy, setSortBy] = useState<SortableKey>('rank');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
 
-  // Fetch data
+  // P5: Watchlist persisted to localStorage
+  const [watchlist, setWatchlist] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('vns-watchlist');
+        if (saved) return new Set(JSON.parse(saved));
+      } catch { /* ignore */ }
+    }
+    return new Set();
+  });
+
+  // Persist watchlist changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('vns-watchlist', JSON.stringify([...watchlist]));
+    } catch { /* ignore */ }
+  }, [watchlist]);
+
+  // Fetch data (P6: lazy-load prices separately)
   useEffect(() => {
     async function fetchData() {
       try {
@@ -50,6 +127,11 @@ export default function Dashboard() {
           });
         }
         setError(null);
+
+        // P6: Lazy-load prices after initial render
+        loadPrices(data.stocks).then((stocksWithPrices) => {
+          setStocks(stocksWithPrices);
+        });
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
@@ -60,7 +142,7 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  // Filter and sort stocks
+  // Filter and sort stocks (Q4: type-safe sort)
   const filteredStocks = useMemo(() => {
     let result = [...stocks];
 
@@ -85,10 +167,10 @@ export default function Dashboard() {
       result = result.filter((s) => s.industry === industryFilter);
     }
 
-    // Sort
+    // Sort (type-safe)
     result.sort((a, b) => {
-      const aVal = (a as any)[sortBy] || 0;
-      const bVal = (b as any)[sortBy] || 0;
+      const aVal = getSortValue(a, sortBy);
+      const bVal = getSortValue(b, sortBy);
       return sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
     });
 
@@ -105,17 +187,19 @@ export default function Dashboard() {
   const paginatedStocks = filteredStocks.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   // Sort handler
-  const handleSort = (field: string) => {
-    if (sortBy === field) {
-      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortBy(field);
+  const handleSort = useCallback((field: SortableKey) => {
+    setSortBy((prev) => {
+      if (prev === field) {
+        setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'));
+        return field;
+      }
       setSortOrder(field === 'rank' ? 'asc' : 'desc');
-    }
-  };
+      return field;
+    });
+  }, []);
 
   // Toggle watchlist
-  const toggleWatchlist = (symbol: string, e: React.MouseEvent) => {
+  const toggleWatchlist = useCallback((symbol: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setWatchlist((prev) => {
       const next = new Set(prev);
@@ -126,7 +210,7 @@ export default function Dashboard() {
       }
       return next;
     });
-  };
+  }, []);
 
   // Get sector status for selected stock
   const getStockSectorStatus = (stock: Stock) => {
@@ -134,105 +218,39 @@ export default function Dashboard() {
     return sector?.status;
   };
 
-  // Components
-  const ScoreBadge = ({ value }: { value: number }) => {
-    const color = getScoreColor(value);
-    return (
-      <span
-        className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold"
-        style={{
-          background: `${color}15`,
-          color,
-          border: `1px solid ${color}40`,
-          boxShadow: `0 0 8px ${color}30`,
-        }}
-      >
-        {value.toFixed(1)}
-      </span>
-    );
-  };
-
-  const TierBadge = ({ tier }: { tier: string }) => {
-    const color = getTierColor(tier);
-    return (
-      <span
-        className="ml-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold"
-        style={{ background: `${color}20`, color, border: `1px solid ${color}30` }}
-      >
-        {tier}
-      </span>
-    );
-  };
-
-  const PriceChange = ({ value }: { value?: number }) => {
-    if (value === undefined || Math.abs(value) < 0.01) {
-      return (
-        <span className="font-mono text-[10px]" style={{ color: '#4a5a6a' }}>
-          0.00%
-        </span>
-      );
-    }
-    const up = value >= 0;
-    return (
-      <span
-        className="font-mono text-[10px] font-medium"
-        style={{
-          color: up ? '#00ff88' : '#ff3366',
-          textShadow: `0 0 6px ${up ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`,
-        }}
-      >
-        {formatPercent(value)}
-      </span>
-    );
-  };
-
-  const Pagination = () => {
+  // Pagination component (moved out of render, now uses closure)
+  const renderPagination = () => {
     if (totalPages <= 1) return null;
 
     const getPageNumbers = () => {
       const pages: number[] = [];
       const maxVisible = 5;
       let start = Math.max(1, page - Math.floor(maxVisible / 2));
-      let end = Math.min(totalPages, start + maxVisible - 1);
+      const end = Math.min(totalPages, start + maxVisible - 1);
       if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
       for (let i = start; i <= end; i++) pages.push(i);
       return pages;
     };
 
-    const PageButton = ({
-      p,
-      children,
-      disabled,
-    }: {
-      p?: number;
-      children: React.ReactNode;
-      disabled?: boolean;
-    }) => (
-      <button
-        onClick={() => p && setPage(p)}
-        disabled={disabled}
-        className="px-2 py-1 rounded text-[10px] font-medium transition-all"
-        style={{
-          background: p === page ? 'linear-gradient(135deg, #00d4ff30 0%, #00d4ff15 100%)' : disabled ? '#1e2832' : '#0a0f14',
-          color: p === page ? '#00d4ff' : disabled ? '#4a5a6a' : '#8b99a8',
-          border: `1px solid ${p === page ? '#00d4ff50' : '#1e2832'}`,
-          boxShadow: p === page ? '0 0 10px rgba(0,212,255,0.2)' : 'none',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-        }}
-      >
-        {children}
-      </button>
-    );
-
     return (
       <div className="flex items-center justify-center gap-1 mt-3">
-        <PageButton p={1} disabled={page === 1}>««</PageButton>
-        <PageButton p={Math.max(1, page - 1)} disabled={page === 1}>«</PageButton>
+        <button onClick={() => setPage(1)} disabled={page === 1} className="pagination-btn" data-active={page === 1 ? undefined : 'false'}>
+          ««
+        </button>
+        <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="pagination-btn">
+          «
+        </button>
         {getPageNumbers().map((p) => (
-          <PageButton key={p} p={p}>{p}</PageButton>
+          <button key={p} onClick={() => setPage(p)} className="pagination-btn" data-current={p === page ? '' : undefined}>
+            {p}
+          </button>
         ))}
-        <PageButton p={Math.min(totalPages, page + 1)} disabled={page === totalPages}>»</PageButton>
-        <PageButton p={totalPages} disabled={page === totalPages}>»»</PageButton>
+        <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="pagination-btn">
+          »
+        </button>
+        <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="pagination-btn">
+          »»
+        </button>
       </div>
     );
   };
@@ -317,15 +335,7 @@ export default function Dashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm mã CK, tên công ty, ngành..."
-                className="w-full rounded-lg py-2.5 pl-10 pr-8 text-xs transition-all"
-                style={{
-                  background: '#0a0f14',
-                  border: '1px solid #1e2832',
-                  color: '#e8edf2',
-                  outline: 'none',
-                }}
-                onFocus={(e) => (e.target.style.borderColor = '#00d4ff40')}
-                onBlur={(e) => (e.target.style.borderColor = '#1e2832')}
+                className="search-input w-full rounded-lg py-2.5 pl-10 pr-8 text-xs transition-all"
               />
               {searchQuery && (
                 <button
@@ -363,11 +373,11 @@ export default function Dashboard() {
             {vnindex?.value != null ? vnindex.value.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}
           </span>
           {vnindex?.value != null && vnindex?.change != null && (
-            <span 
-              className="font-mono text-xs" 
-              style={{ 
-                color: vnindex.change >= 0 ? '#00ff88' : '#ff3366', 
-                textShadow: `0 0 6px ${vnindex.change >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}` 
+            <span
+              className="font-mono text-xs"
+              style={{
+                color: vnindex.change >= 0 ? '#00ff88' : '#ff3366',
+                textShadow: `0 0 6px ${vnindex.change >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`
               }}
             >
               {vnindex.change >= 0 ? '+' : ''}{vnindex.change.toFixed(2)}%
@@ -394,13 +404,8 @@ export default function Dashboard() {
           <button
             key={t}
             onClick={() => setTierFilter(t)}
-            className="px-3 py-1.5 rounded-md text-[10px] font-semibold tracking-wide transition-all"
-            style={{
-              background: tierFilter === t ? 'linear-gradient(135deg, #00d4ff20 0%, #00d4ff10 100%)' : '#0a0f14',
-              color: tierFilter === t ? '#00d4ff' : '#8b99a8',
-              border: `1px solid ${tierFilter === t ? '#00d4ff40' : '#1e2832'}`,
-              boxShadow: tierFilter === t ? '0 0 10px rgba(0,212,255,0.2)' : 'none',
-            }}
+            className="tier-filter-btn"
+            data-active={tierFilter === t ? '' : undefined}
           >
             {t === 'all' ? 'ALL' : `TIER ${t}`}
           </button>
@@ -480,10 +485,8 @@ export default function Dashboard() {
                     <tr
                       key={s.symbol}
                       onClick={() => setSelectedStock(s)}
-                      className="cursor-pointer transition-all"
+                      className="stock-row cursor-pointer transition-all"
                       style={{ borderBottom: '1px solid #1e2832' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(90deg, rgba(0,212,255,0.06) 0%, transparent 100%)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
                       <td className="p-2 text-center">
                         <Star
@@ -510,12 +513,8 @@ export default function Dashboard() {
                               e.stopPropagation();
                               setIndustryFilter(industryFilter === s.industry ? null : s.industry);
                             }}
-                            className="text-[8px] px-1.5 py-0.5 rounded cursor-pointer"
-                            style={{
-                              background: industryFilter === s.industry ? '#00d4ff15' : '#0a0f14',
-                              color: industryFilter === s.industry ? '#00d4ff' : '#4a5a6a',
-                              border: `1px solid ${industryFilter === s.industry ? '#00d4ff40' : 'transparent'}`,
-                            }}
+                            className="industry-tag text-[8px] px-1.5 py-0.5 rounded cursor-pointer"
+                            data-active={industryFilter === s.industry ? '' : undefined}
                           >
                             {s.industry}
                           </span>
@@ -547,7 +546,7 @@ export default function Dashboard() {
           </div>
 
           {/* Pagination */}
-          <Pagination />
+          {renderPagination()}
 
           {/* Footer */}
           <div className="mt-3 flex justify-between px-1 text-[10px]" style={{ color: '#4a5a6a' }}>

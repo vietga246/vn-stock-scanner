@@ -30,6 +30,86 @@ interface StockModalProps {
   onClose: () => void;
 }
 
+// ============ Module-level sub-components (Q5 fix) ============
+
+function ScoreCircle({
+  value,
+  label,
+  Icon,
+}: {
+  value: number;
+  label: string;
+  Icon: any;
+}) {
+  const r = 20,
+    sw = 3,
+    circ = 2 * Math.PI * r;
+  const prog = ((value || 0) / 100) * circ;
+  const color = getScoreColor(value);
+
+  return (
+    <div className="text-center">
+      <div className="relative mx-auto" style={{ width: (r + sw) * 2, height: (r + sw) * 2 }}>
+        <svg width={(r + sw) * 2} height={(r + sw) * 2} style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx={r + sw} cy={r + sw} r={r} fill="none" stroke="#1e2832" strokeWidth={sw} />
+          <circle
+            cx={r + sw}
+            cy={r + sw}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={sw}
+            strokeDasharray={circ}
+            strokeDashoffset={circ - prog}
+            strokeLinecap="round"
+            style={{
+              filter: `drop-shadow(0 0 4px ${color}50)`,
+              transition: 'stroke-dashoffset 0.6s ease',
+            }}
+          />
+        </svg>
+        <div
+          className="absolute inset-0 flex items-center justify-center font-mono font-bold text-[10px]"
+          style={{ color, textShadow: `0 0 6px ${color}50` }}
+        >
+          {value?.toFixed(0)}
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-1 mt-1.5">
+        <Icon size={9} color="#4a5a6a" />
+        <span className="text-[9px]" style={{ color: '#4a5a6a' }}>
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function HighlightItem({ item }: { item: { text: string; type: string } }) {
+  const colors: Record<string, { bg: string; border: string; text: string; icon: any }> = {
+    positive: { bg: '#00ff8815', border: '#00ff8840', text: '#00ff88', icon: CheckCircle },
+    negative: { bg: '#ff336615', border: '#ff336640', text: '#ff3366', icon: AlertTriangle },
+    neutral: { bg: '#ffcc0015', border: '#ffcc0040', text: '#ffcc00', icon: MinusCircle },
+    warning: { bg: '#ff990015', border: '#ff990040', text: '#ff9900', icon: AlertTriangle },
+  };
+  const style = colors[item.type] || colors.neutral;
+  const IconComp = style.icon;
+
+  return (
+    <div
+      className="flex items-start gap-2 p-2 rounded-md mb-1.5"
+      style={{ background: style.bg, border: `1px solid ${style.border}` }}
+    >
+      <IconComp size={12} color={style.text} className="mt-0.5 flex-shrink-0" />
+      <span className="text-[11px]" style={{ color: style.text }}>
+        {item.text}
+      </span>
+    </div>
+  );
+}
+
+// ============ Main Component ============
+
 export default function StockModal({
   stock,
   sectorStatus,
@@ -55,85 +135,6 @@ export default function StockModal({
   // Use preloaded AI analysis or generate on-the-fly
   const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus);
   const recDisplay = getRecommendationDisplay(analysis.recommendation);
-
-  // Score circle component
-  const ScoreCircle = ({
-    value,
-    label,
-    Icon,
-  }: {
-    value: number;
-    label: string;
-    Icon: any;
-  }) => {
-    const r = 20,
-      sw = 3,
-      circ = 2 * Math.PI * r;
-    const prog = ((value || 0) / 100) * circ;
-    const color = getScoreColor(value);
-
-    return (
-      <div className="text-center">
-        <div className="relative mx-auto" style={{ width: (r + sw) * 2, height: (r + sw) * 2 }}>
-          <svg width={(r + sw) * 2} height={(r + sw) * 2} style={{ transform: 'rotate(-90deg)' }}>
-            <circle cx={r + sw} cy={r + sw} r={r} fill="none" stroke="#1e2832" strokeWidth={sw} />
-            <circle
-              cx={r + sw}
-              cy={r + sw}
-              r={r}
-              fill="none"
-              stroke={color}
-              strokeWidth={sw}
-              strokeDasharray={circ}
-              strokeDashoffset={circ - prog}
-              strokeLinecap="round"
-              style={{
-                filter: `drop-shadow(0 0 4px ${color}50)`,
-                transition: 'stroke-dashoffset 0.6s ease',
-              }}
-            />
-          </svg>
-          <div
-            className="absolute inset-0 flex items-center justify-center font-mono font-bold text-[10px]"
-            style={{ color, textShadow: `0 0 6px ${color}50` }}
-          >
-            {value?.toFixed(0)}
-          </div>
-        </div>
-        <div className="flex items-center justify-center gap-1 mt-1.5">
-          <Icon size={9} color="#4a5a6a" />
-          <span className="text-[9px]" style={{ color: '#4a5a6a' }}>
-            {label}
-          </span>
-        </div>
-      </div>
-    );
-  };
-
-  // Highlight item component
-  const HighlightItem = ({ item }: { item: { text: string; type: string } }) => {
-    const colors: Record<string, { bg: string; border: string; text: string; icon: any }> = {
-      positive: { bg: '#00ff8815', border: '#00ff8840', text: '#00ff88', icon: CheckCircle },
-      negative: { bg: '#ff336615', border: '#ff336640', text: '#ff3366', icon: AlertTriangle },
-      neutral: { bg: '#ffcc0015', border: '#ffcc0040', text: '#ffcc00', icon: MinusCircle },
-      warning: { bg: '#ff990015', border: '#ff990040', text: '#ff9900', icon: AlertTriangle },
-    };
-    const style = colors[item.type] || colors.neutral;
-    const IconComp = style.icon;
-
-    return (
-      <div
-        className="flex items-start gap-2 p-2 rounded-md mb-1.5"
-        style={{ background: style.bg, border: `1px solid ${style.border}` }}
-      >
-        <IconComp size={12} color={style.text} className="mt-0.5 flex-shrink-0" />
-        <span className="text-[11px]" style={{ color: style.text }}>
-          {item.text}
-        </span>
-      </div>
-    );
-  };
-
   const tierColor = getTierColor(stock.tier);
   const price = stock.close || stock.price || 0;
   const change = stock.change_20d || stock.change_5d || 0;

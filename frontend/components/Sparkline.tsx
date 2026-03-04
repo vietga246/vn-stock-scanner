@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useId } from 'react';
 import { formatPrice, formatNumber } from '@/lib/api';
 
 interface SparklineProps {
@@ -11,13 +11,14 @@ interface SparklineProps {
   height?: number;
 }
 
-export default function Sparkline({ 
-  data, 
-  volume, 
+export default function Sparkline({
+  data,
+  volume,
   dates,
-  width = 90, 
-  height = 28 
+  width = 90,
+  height = 28
 }: SparklineProps) {
+  const reactId = useId();
   const [hover, setHover] = useState<{
     pt: { x: number; y: number; value: number; vol?: number; date?: string };
     idx: number;
@@ -41,7 +42,7 @@ export default function Sparkline({
   const ptsStr = pts.map(p => p.x + ',' + p.y).join(' ');
   const isUp = data[data.length - 1] >= data[0];
   const color = isUp ? '#00ff88' : '#ff3366';
-  const gradientId = `spark-${isUp ? 'up' : 'down'}-${Math.random().toString(36).substr(2, 9)}`;
+  const gradientId = `spark-${isUp ? 'up' : 'down'}-${reactId}`;
 
   const onMove = (e: React.MouseEvent) => {
     if (!ref.current) return;

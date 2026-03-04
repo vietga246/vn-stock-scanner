@@ -1,13 +1,14 @@
 // API client - sử dụng API routes của Next.js để proxy data từ GitHub
 // Giải quyết vấn đề CORS khi fetch từ client-side
 
-import type { 
-  ScreenerResponse, 
-  SectorsResponse, 
-  PricesResponse, 
+import type {
+  ScreenerResponse,
+  SectorsResponse,
+  PricesResponse,
   SummaryResponse,
   AIAnalysisResponse,
-  Stock 
+  AIAnalysis,
+  Stock
 } from './types';
 
 // Cache config - client-side only
@@ -16,7 +17,7 @@ const cache: Map<string, { data: unknown; timestamp: number }> = new Map();
 
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
   const now = Date.now();
-  
+
   // Check cache (client-side only)
   if (typeof window !== 'undefined') {
     const cached = cache.get(endpoint);
@@ -24,7 +25,7 @@ async function fetchFromAPI<T>(endpoint: string): Promise<T> {
       return cached.data as T;
     }
   }
-  
+
   try {
     // Fetch từ API route của chính app (proxy qua server)
     const response = await fetch(`/api/${endpoint}`, {
@@ -33,22 +34,22 @@ async function fetchFromAPI<T>(endpoint: string): Promise<T> {
         'Accept': 'application/json',
       },
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Update cache
     if (typeof window !== 'undefined') {
       cache.set(endpoint, { data, timestamp: now });
     }
-    
+
     return data as T;
   } catch (error) {
     console.error(`Error fetching ${endpoint}:`, error);
-    
+
     // Return cached data if available
     if (typeof window !== 'undefined') {
       const cached = cache.get(endpoint);
@@ -56,7 +57,7 @@ async function fetchFromAPI<T>(endpoint: string): Promise<T> {
         return cached.data as T;
       }
     }
-    
+
     throw error;
   }
 }
@@ -94,47 +95,31 @@ export interface DashboardData {
   sectors: SectorsResponse['sectors'];
   rotationSignal?: SectorsResponse['rotation_signal'];
   summary?: SummaryResponse;
-  aiAnalyses?: Record<string, any>;
+  aiAnalyses?: Record<string, AIAnalysis>;
   generatedAt: string;
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const [screenerData, sectorsData, pricesData, aiData] = await Promise.all([
+  // Load only essential data first (screener + sectors + summary)
+  // Prices are loaded lazily via loadPrices() to speed up initial render
+  const [screenerData, sectorsData, aiData] = await Promise.all([
     getScreener(),
     getSectors().catch(() => null),
-    getPrices().catch(() => null),
     getAIAnalysis().catch(() => null),
   ]);
-  
-// Merge price history into stocks
-  const stocks = screenerData.screener.map(stock => {
-    const priceData = pricesData?.prices?.[stock.symbol];
-    
-    // Map price_change_* to change_* for frontend compatibility
-    const mappedStock = {
-      ...stock,
-      change_1d: stock.price_change_1d ?? stock.change_1d,
-      change_5d: stock.price_change_5d ?? stock.change_5d,
-      change_20d: stock.price_change_20d ?? stock.change_20d,
-    };
-    
-    if (priceData) {
-      return {
-        ...mappedStock,
-        price_history: priceData.close?.slice(-30),
-        volume_history: priceData.volume?.slice(-30),
-        dates: priceData.dates?.slice(-30),
-        close: priceData.close?.[priceData.close.length - 1] || stock.close,
-      };
-    }
-    
-    return mappedStock;
-  });
-  
+
+  // Map price_change_* to change_* for frontend compatibility (no prices yet)
+  const stocks = screenerData.screener.map(stock => ({
+    ...stock,
+    change_1d: stock.price_change_1d ?? stock.change_1d,
+    change_5d: stock.price_change_5d ?? stock.change_5d,
+    change_20d: stock.price_change_20d ?? stock.change_20d,
+  }));
+
   // Determine sector status from rotation signal
   const sectors = sectorsData?.sectors?.map(sector => {
     let status: 'accumulating' | 'distributing' | 'neutral' = 'neutral';
-    
+
     if (sectorsData.rotation_signal) {
       if (sectorsData.rotation_signal.accumulating.includes(sector.name)) {
         status = 'accumulating';
@@ -142,13 +127,13 @@ export async function getDashboardData(): Promise<DashboardData> {
         status = 'distributing';
       }
     } else {
-      status = sector.foreign_net_7d > 0 ? 'accumulating' : 
-               sector.foreign_net_7d < 0 ? 'distributing' : 'neutral';
+      status = sector.foreign_net_7d > 0 ? 'accumulating' :
+        sector.foreign_net_7d < 0 ? 'distributing' : 'neutral';
     }
-    
+
     return { ...sector, status };
   }) || [];
-  
+
   return {
     stocks,
     sectors,
@@ -158,10 +143,36 @@ export async function getDashboardData(): Promise<DashboardData> {
   };
 }
 
+/**
+ * Lazy-load prices data and merge into existing stocks.
+ * Call this after the initial dashboard render for faster perceived load time.
+ */
+export async function loadPrices(stocks: Stock[]): Promise<Stock[]> {
+  try {
+    const pricesData = await getPrices();
+    if (!pricesData?.prices) return stocks;
+
+    return stocks.map(stock => {
+      const priceData = pricesData.prices[stock.symbol];
+      if (!priceData) return stock;
+
+      return {
+        ...stock,
+        price_history: priceData.close?.slice(-30),
+        volume_history: priceData.volume?.slice(-30),
+        dates: priceData.dates?.slice(-30),
+        close: priceData.close?.[priceData.close.length - 1] || stock.close,
+      };
+    });
+  } catch {
+    return stocks;
+  }
+}
+
 // ============ Utility Functions ============
 
-export function formatPrice(price: number | undefined): string {
-  if (!price) return '-';
+export function formatPrice(price: number | undefined | null): string {
+  if (price === undefined || price === null) return '-';
   return new Intl.NumberFormat('vi-VN').format(price);
 }
 
@@ -182,7 +193,7 @@ export function formatPercent(value: number | undefined): string {
 export function getTierColor(tier: string): string {
   const colors: Record<string, string> = {
     A: '#00ff88',
-    B: '#00d4ff', 
+    B: '#00d4ff',
     C: '#8b99a8',
     D: '#ffcc00',
     F: '#ff3366',
@@ -202,7 +213,7 @@ export function getRecommendation(stock: Stock): {
   color: string;
 } {
   const score = stock.composite_score;
-  
+
   if (score >= 75) return { text: 'STRONG BUY', color: '#00ff88' };
   if (score >= 65) return { text: 'BUY', color: '#00ff88' };
   if (score >= 55) return { text: 'HOLD', color: '#ffcc00' };
