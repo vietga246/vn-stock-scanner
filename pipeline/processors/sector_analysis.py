@@ -459,6 +459,7 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
             "debt_equity":        safe_float(row.get("debt_equity")),
             # Technical
             "rsi14":              safe_float(row.get("rsi14")),
+            "price_change_1d":    safe_float(row.get("price_change_1d")),
             "price_change_5d":    safe_float(row.get("price_change_5d")),
             "price_change_20d":   safe_float(row.get("price_change_20d")),
             "trend_short":        safe_int(row.get("trend_short")),
