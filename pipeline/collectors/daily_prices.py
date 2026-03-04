@@ -1,12 +1,13 @@
 """
-daily_prices.py — Daily OHLCV Price Updater
+daily_prices.py — Daily OHLCV Price Updater (Multi-Worker)
 
 Cập nhật giá OHLCV hàng ngày cho HOSE + HNX.
 Chạy mỗi ngày lúc 17:00 ICT qua GitHub Actions.
 
 Features:
 - HOSE + HNX only, loại bỏ trái phiếu
-- Adaptive rate limiter (sliding window)
+- 3 workers chạy parallel, cách nhau 2s
+- Global rate limiter (thread-safe)
 - Auto-detect server wait time
 - Batch commit for performance
 - WAL mode enabled
@@ -15,17 +16,19 @@ Features:
 
 from vnstock import Listing, Quote
 from datetime import datetime, timedelta
-from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import sqlite3
 import pandas as pd
+import threading
 import logging
+import time
 import sys
 import os
+import re
 
 # Import shared utilities
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from utils import (
-    AdaptiveRateLimiter,
     normalize_date,
     safe_float,
     extract_wait_time,
@@ -39,7 +42,8 @@ from utils import (
 DB_PATH             = os.getenv("DB_PATH", "data/db/stock.db")
 API_KEY             = os.getenv("VNSTOCK_API_KEY", "")
 DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
-MAX_REQUEST_PER_MIN = 60
+MAX_WORKERS         = int(os.getenv("MAX_WORKERS", "3"))      # 3 workers parallel
+WORKER_STAGGER_SEC  = float(os.getenv("WORKER_STAGGER", "2")) # 2s giữa các request
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
 TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
@@ -54,6 +58,108 @@ VN30_SYMBOLS = [
 # ─── LOGGING ───────────────────────────────────────────────────────────────
 
 log = setup_logging()
+
+
+# ─── RATE LIMITER (Thread-Safe) ────────────────────────────────────────────
+
+class StaggeredRateLimiter:
+    """
+    Thread-safe rate limiter với khoảng cách cố định giữa các request.
+    3 workers chạy parallel nhưng mỗi request cách nhau ít nhất STAGGER seconds.
+    """
+    
+    def __init__(self, stagger_seconds: float = 2.0):
+        self.stagger = stagger_seconds
+        self.lock = threading.Lock()
+        self.last_request = 0.0
+        self.pause_until = 0.0
+        self._server_wait = None
+    
+    def acquire(self):
+        """Chờ đến khi có thể gửi request tiếp theo."""
+        while True:
+            with self.lock:
+                now = time.time()
+                
+                # Đang trong cooldown period (rate limit từ server)
+                if now < self.pause_until:
+                    sleep_time = self.pause_until - now
+                else:
+                    # Tính thời điểm được phép request tiếp
+                    next_allowed = self.last_request + self.stagger
+                    if now >= next_allowed:
+                        self.last_request = now
+                        return
+                    sleep_time = next_allowed - now
+            
+            # Sleep bên ngoài lock
+            self._chunked_sleep(sleep_time)
+    
+    def _chunked_sleep(self, seconds: float, chunk: float = 10.0):
+        """Sleep theo chunk để GitHub Actions không kill process."""
+        remaining = seconds
+        while remaining > 0:
+            t = min(chunk, remaining)
+            time.sleep(t)
+            remaining -= t
+    
+    def set_server_wait(self, seconds: int):
+        """Gọi khi detect wait time từ server."""
+        with self.lock:
+            self._server_wait = seconds
+    
+    def trigger_cooldown(self, fallback: int = 65) -> int:
+        """Trigger global cooldown khi bị rate limit."""
+        with self.lock:
+            now = time.time()
+            seconds = self._server_wait if self._server_wait else fallback
+            new_pause = now + seconds
+            
+            if new_pause > self.pause_until:
+                self.pause_until = new_pause
+                self.last_request = new_pause
+                log.info("Global cooldown: %ds", seconds)
+            
+            self._server_wait = None
+            return seconds
+    
+    def reset(self):
+        """Reset limiter state."""
+        with self.lock:
+            self.pause_until = 0.0
+            self.last_request = 0.0
+            self._server_wait = None
+
+
+# Global limiter instance
+limiter = StaggeredRateLimiter(WORKER_STAGGER_SEC)
+
+
+# ─── STDOUT CAPTURE (detect server wait time) ──────────────────────────────
+
+class WaitTimeCapture:
+    """Capture stdout để detect wait time từ vnstock rate limit message."""
+    
+    def __init__(self, real_stdout):
+        self._real = real_stdout
+    
+    def write(self, s):
+        self._real.write(s)
+        # Match "Chờ 56 giây" hoặc "Cho 4 giay"
+        m = re.search(r'Ch[oờ]\s*(\d+)\s*gi[aâ]y', s)
+        if m:
+            wait = int(m.group(1)) + 5  # +5 buffer
+            limiter.set_server_wait(wait)
+    
+    def flush(self):
+        self._real.flush()
+    
+    def __getattr__(self, name):
+        return getattr(self._real, name)
+
+
+sys.stdout = WaitTimeCapture(sys.stdout)
+
 
 # ─── DATABASE ──────────────────────────────────────────────────────────────
 
@@ -76,43 +182,10 @@ def init_db(conn):
     conn.commit()
 
 
-def upsert_df(cursor, ticker: str, df: pd.DataFrame):
-    """Insert or replace price data with normalized dates."""
-    rows = []
-    for row in df.itertuples(index=False):
-        # Get date from 'time' or 'date' column
-        raw_date = getattr(row, "time", None) or getattr(row, "date", None)
-        date_str = normalize_date(raw_date)
-        
-        if not date_str:
-            continue
-            
-        rows.append((
-            ticker,
-            date_str,
-            safe_float(getattr(row, "open", 0)),
-            safe_float(getattr(row, "high", 0)),
-            safe_float(getattr(row, "low", 0)),
-            safe_float(getattr(row, "close", 0)),
-            safe_float(getattr(row, "volume", 0)),
-        ))
-    
-    if rows:
-        cursor.executemany("""
-            INSERT OR REPLACE INTO stock_prices
-            (symbol, date, open, high, low, close, volume)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, rows)
-
-
 # ─── TICKERS ───────────────────────────────────────────────────────────────
 
 def get_tickers() -> list:
-    """Get HOSE + HNX symbols, excluding bonds and UPCOM.
-    
-    In TEST_MODE, returns only VN30 symbols.
-    """
-    # TEST MODE: Only VN30
+    """Get HOSE + HNX symbols, excluding bonds and UPCOM."""
     if TEST_MODE:
         log.info("[TEST MODE] Using VN30: %d symbols", len(VN30_SYMBOLS))
         return VN30_SYMBOLS.copy()
@@ -143,22 +216,83 @@ def get_tickers() -> list:
     return tickers
 
 
+# ─── FETCH WORKER ──────────────────────────────────────────────────────────
+
+def fetch_ticker(ticker: str, start_str: str, end_str: str) -> dict:
+    """
+    Fetch price data cho 1 ticker.
+    Chạy trong worker thread, trả về dict với data hoặc error.
+    """
+    retry = 0
+    
+    while retry < MAX_RETRY:
+        try:
+            limiter.acquire()
+            
+            quote = Quote(symbol=ticker, source="VCI")
+            df = quote.history(start=start_str, end=end_str)
+            
+            if df is not None and not df.empty:
+                # Convert DataFrame to list of tuples
+                rows = []
+                for row in df.itertuples(index=False):
+                    raw_date = getattr(row, "time", None) or getattr(row, "date", None)
+                    date_str = normalize_date(raw_date)
+                    
+                    if date_str:
+                        rows.append((
+                            ticker,
+                            date_str,
+                            safe_float(getattr(row, "open", 0)),
+                            safe_float(getattr(row, "high", 0)),
+                            safe_float(getattr(row, "low", 0)),
+                            safe_float(getattr(row, "close", 0)),
+                            safe_float(getattr(row, "volume", 0)),
+                        ))
+                
+                return {"symbol": ticker, "status": "ok", "rows": rows}
+            else:
+                return {"symbol": ticker, "status": "empty", "rows": []}
+                
+        except SystemExit:
+            # vnstock calls sys.exit() on rate limit
+            wait = limiter.trigger_cooldown(65)
+            log.warning("[%s] SystemExit (rate limit) → cooldown %ds (retry %d/%d)",
+                       ticker, wait, retry + 1, MAX_RETRY)
+            time.sleep(wait)
+            retry += 1
+            
+        except Exception as e:
+            err = str(e).lower()
+            if any(x in err for x in ["429", "rate limit", "giới hạn", "exceeded"]):
+                wait = limiter.trigger_cooldown(extract_wait_time(str(e), default=65))
+                log.warning("[%s] Rate limit → cooldown %ds (retry %d/%d)",
+                           ticker, wait, retry + 1, MAX_RETRY)
+                time.sleep(wait)
+                retry += 1
+            else:
+                log.warning("[%s] Error: %s", ticker, e)
+                return {"symbol": ticker, "status": "error", "error": str(e), "rows": []}
+    
+    return {"symbol": ticker, "status": "max_retry", "rows": []}
+
+
 # ─── MAIN ──────────────────────────────────────────────────────────────────
 
 def update_daily():
-    """Main function to update daily prices."""
+    """Main function to update daily prices with multi-worker."""
     
     # Setup API key
     if API_KEY:
         os.environ["VNSTOCK_API_KEY"] = API_KEY
         log.info("✅ Using API key")
     else:
-        log.warning("⚠️  Guest mode (20 req/min)")
+        log.warning("⚠️  Guest mode (rate limited)")
     
-    # Initialize
-    limiter = AdaptiveRateLimiter(MAX_REQUEST_PER_MIN, safety_ratio=0.9)
+    # Get tickers
     tickers = get_tickers()
     
+    # Date range
     end_date = datetime.now()
     start_date = end_date - timedelta(days=DAYS_LOOKBACK)
     start_str = start_date.strftime("%Y-%m-%d")
@@ -168,8 +302,10 @@ def update_daily():
     
     mode_str = "[TEST MODE] " if TEST_MODE else ""
     log.info("%sTotal symbols: %d", mode_str, len(tickers))
+    log.info("Workers: %d | Stagger: %.1fs | Batch commit: %d", 
+             MAX_WORKERS, WORKER_STAGGER_SEC, COMMIT_BATCH)
     
-    # Database connection
+    # Database connection (main thread only for writes)
     conn = create_db_connection(DB_PATH)
     cursor = conn.cursor()
     init_db(conn)
@@ -177,61 +313,56 @@ def update_daily():
     # Stats
     ok = fail = skipped = 0
     batch_counter = 0
+    total = len(tickers)
     
-    for ticker in tqdm(tickers, desc="Daily update"):
-        retry = 0
-        success = False
+    # Multi-threaded fetch, single-threaded write
+    workers = min(MAX_WORKERS, total) if not TEST_MODE else 1
+    
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        # Submit all fetch jobs
+        futures = {
+            executor.submit(fetch_ticker, ticker, start_str, end_str): ticker 
+            for ticker in tickers
+        }
         
-        while retry < MAX_RETRY:
+        done_count = 0
+        for future in as_completed(futures):
+            ticker = futures[future]
+            done_count += 1
+            
             try:
-                limiter.acquire()
-                
-                quote = Quote(symbol=ticker, source="VCI")
-                df = quote.history(start=start_str, end=end_str)
-                
-                if df is not None and not df.empty:
-                    upsert_df(cursor, ticker, df)
-                    batch_counter += 1
-                    ok += 1
-                else:
-                    skipped += 1
-                
-                success = True
-                break
-                
-            except SystemExit:
-                # vnstock calls sys.exit() on rate limit
-                wait = 65
-                log.warning("[%s] SystemExit (rate limit) → sleep %ds (retry %d/%d)",
-                           ticker, wait, retry + 1, MAX_RETRY)
-                import time
-                time.sleep(wait)
-                limiter.reset()
-                retry += 1
-                
+                result = future.result()
             except Exception as e:
-                err = str(e).lower()
-                if any(x in err for x in ["429", "rate limit", "giới hạn", "exceeded"]):
-                    wait = extract_wait_time(str(e), default=65)
-                    log.warning("[%s] Rate limit → sleep %ds (retry %d/%d)",
-                               ticker, wait, retry + 1, MAX_RETRY)
-                    import time
-                    time.sleep(wait)
-                    limiter.reset()
-                    retry += 1
-                else:
-                    log.warning("[%s] Error: %s", ticker, e)
-                    fail += 1
-                    break
-        
-        if not success and retry >= MAX_RETRY:
-            log.warning("[%s] Max retries reached — skipping", ticker)
-            fail += 1
-        
-        # Batch commit
-        if batch_counter >= COMMIT_BATCH:
-            conn.commit()
-            batch_counter = 0
+                log.warning("[%s] Exception: %s", ticker, e)
+                fail += 1
+                continue
+            
+            status = result.get("status")
+            rows = result.get("rows", [])
+            
+            if status == "ok" and rows:
+                # Write to DB (main thread)
+                cursor.executemany("""
+                    INSERT OR REPLACE INTO stock_prices
+                    (symbol, date, open, high, low, close, volume)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, rows)
+                ok += 1
+                batch_counter += 1
+                
+                if done_count % 50 == 0:
+                    log.info("Progress: %d/%d (OK: %d)", done_count, total, ok)
+                    
+            elif status == "empty":
+                skipped += 1
+            else:
+                fail += 1
+                log.warning("[%s] %s", ticker, status)
+            
+            # Batch commit
+            if batch_counter >= COMMIT_BATCH:
+                conn.commit()
+                batch_counter = 0
     
     # Final commit and close
     conn.commit()

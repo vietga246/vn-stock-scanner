@@ -32,7 +32,14 @@ MAX_WORKERS          = 1      # 3 workers: 45RPM / 4req/symbol = ~11 symbols/phu
 COMMIT_BATCH         = 25     # commit sau bao nhieu symbol
 VACUUM_THRESHOLD_MB  = 10     # chi VACUUM neu DB > threshold
 TEST_MODE            = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
-TEST_SYMBOLS         = ['VCB', 'FPT', 'VIC']   # chi dung khi TEST_MODE=true
+
+# VN30 symbols for testing
+VN30_SYMBOLS = [
+    "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
+    "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
+    "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE"
+]
+TEST_SYMBOLS = VN30_SYMBOLS  # Dùng VN30 khi TEST_MODE=true
 
 logging.basicConfig(
     level=logging.INFO,
