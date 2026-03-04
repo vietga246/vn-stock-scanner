@@ -59,18 +59,57 @@ log = logging.getLogger(__name__)
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 def safe_float(v, decimals=2):
+    """Convert to float, replacing NaN/Infinity with None for valid JSON."""
     if v is None:
         return None
     try:
+        # Handle pandas NA
+        import pandas as pd
+        if pd.isna(v):
+            return None
+    except (ImportError, TypeError):
+        pass
+    try:
+        # Handle numpy types
+        import numpy as np
+        if isinstance(v, (np.floating, np.integer)):
+            if np.isnan(v) or np.isinf(v):
+                return None
+            v = float(v)
+    except (ImportError, TypeError):
+        pass
+    try:
         f = float(v)
-        return None if (f != f) else round(f, decimals)
+        # Check for NaN and Infinity (NaN != NaN is True)
+        if f != f or f == float('inf') or f == float('-inf'):
+            return None
+        return round(f, decimals)
     except (TypeError, ValueError):
         return None
 
 
 def safe_int(v):
+    """Convert to int, handling NaN/None properly for valid JSON."""
+    if v is None:
+        return None
     try:
-        return int(v) if v is not None else None
+        import pandas as pd
+        if pd.isna(v):
+            return None
+    except (ImportError, TypeError):
+        pass
+    try:
+        import numpy as np
+        if isinstance(v, (np.floating, np.integer)):
+            if np.isnan(v) or np.isinf(v):
+                return None
+    except (ImportError, TypeError):
+        pass
+    try:
+        f = float(v)
+        if f != f:  # NaN check
+            return None
+        return int(f)
     except (TypeError, ValueError):
         return None
 
