@@ -46,9 +46,9 @@ DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
 MAX_REQUEST_PER_MIN = 60
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
-NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "2"))
+NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "3"))
 TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
-WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "60"))
+WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "2"))
 
 # VN30 symbols for testing
 VN30_SYMBOLS = [
