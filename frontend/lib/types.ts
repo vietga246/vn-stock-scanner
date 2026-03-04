@@ -42,6 +42,9 @@ export interface Stock {
   change_1d?: number;
   change_5d?: number;
   change_20d?: number;
+  price_change_1d?: number;
+  price_change_5d?: number;
+  price_change_20d?: number;
   volume?: number;
   avg_volume_20d?: number;
   
