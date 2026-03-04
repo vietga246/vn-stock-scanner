@@ -48,7 +48,7 @@ MAX_RETRY           = 3
 COMMIT_BATCH        = 20
 NUM_WORKERS         = int(os.getenv("NUM_WORKERS", "3"))        # 3 workers parallel
 TEST_MODE           = os.getenv("TEST_MODE", "false").lower() == "true"
-WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "2")) # 2s giữa các request
+WORKER_STAGGER_SEC  = int(os.getenv("WORKER_STAGGER_SEC", "1")) # 2s giữa các request
 
 # VN30 symbols for testing
 VN30_SYMBOLS = [
