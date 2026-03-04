@@ -1,10 +1,8 @@
-name: "③ Daily Process — Scoring & Sector (17:30 ICT T2-T6)"
+name: "③ Daily Process — Scoring & Sector (sau Daily Collect)"
 
 on:
-  schedule:
-    - cron: "30 10 * * 1-5"   # 17:30 ICT — chạy sau daily_collect 30 phút
   workflow_run:
-    workflows: ["② Daily Collect — Giá & Dòng tiền (17:00 ICT T2-T6)"]
+    workflows: ["② Daily Collect — Giá & Dòng tiền (03:30 ICT T2-T6)"]
     types: [completed]
   workflow_dispatch:
 
@@ -13,10 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
-    # Only run if triggered manually, by schedule, or if collect workflow succeeded
+    # Only run if triggered manually or if collect workflow succeeded
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'schedule' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     
     steps:
