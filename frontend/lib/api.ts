@@ -12,43 +12,52 @@ import type {
 
 const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vietga246/vn-stock-scanner/main/data/exports';
 
-// Cache config
+// Cache config - only for client-side
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const cache: Record<string, { data: any; timestamp: number }> = {};
+const cache: Map<string, { data: unknown; timestamp: number }> = new Map();
 
 async function fetchWithCache<T>(endpoint: string): Promise<T> {
   const url = `${GITHUB_RAW_BASE}/${endpoint}`;
   const now = Date.now();
   
-  // Check cache
-  if (cache[endpoint] && (now - cache[endpoint].timestamp) < CACHE_DURATION) {
-    return cache[endpoint].data as T;
+  // Check cache (client-side only)
+  if (typeof window !== 'undefined') {
+    const cached = cache.get(endpoint);
+    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+      return cached.data as T;
+    }
   }
   
   try {
     const response = await fetch(url, {
-      next: { revalidate: 300 }, // ISR: revalidate every 5 minutes
+      method: 'GET',
       headers: {
         'Accept': 'application/json',
-      }
+      },
+      cache: 'no-store',
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
+      throw new Error(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
     
-    // Update cache
-    cache[endpoint] = { data, timestamp: now };
+    // Update cache (client-side only)
+    if (typeof window !== 'undefined') {
+      cache.set(endpoint, { data, timestamp: now });
+    }
     
     return data as T;
   } catch (error) {
     console.error(`Error fetching ${endpoint}:`, error);
     
     // Return cached data if available (stale-while-revalidate)
-    if (cache[endpoint]) {
-      return cache[endpoint].data as T;
+    if (typeof window !== 'undefined') {
+      const cached = cache.get(endpoint);
+      if (cached) {
+        return cached.data as T;
+      }
     }
     
     throw error;
@@ -77,7 +86,6 @@ export async function getAIAnalysis(): Promise<AIAnalysisResponse | null> {
   try {
     return await fetchWithCache<AIAnalysisResponse>('ai_analysis.json');
   } catch {
-    // AI analysis might not exist
     return null;
   }
 }
@@ -108,7 +116,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     if (priceData) {
       return {
         ...stock,
-        price_history: priceData.close?.slice(-30), // Last 30 days
+        price_history: priceData.close?.slice(-30),
         volume_history: priceData.volume?.slice(-30),
         dates: priceData.dates?.slice(-30),
         close: priceData.close?.[priceData.close.length - 1] || stock.close,
@@ -129,7 +137,6 @@ export async function getDashboardData(): Promise<DashboardData> {
         status = 'distributing';
       }
     } else {
-      // Fallback: determine by foreign flow
       status = sector.foreign_net_7d > 0 ? 'accumulating' : 
                sector.foreign_net_7d < 0 ? 'distributing' : 'neutral';
     }
