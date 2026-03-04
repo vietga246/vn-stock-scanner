@@ -1,5 +1,5 @@
-// API client để fetch data từ GitHub repo
-// Data được cập nhật tự động bởi GitHub Actions
+// API client - sử dụng API routes của Next.js để proxy data từ GitHub
+// Giải quyết vấn đề CORS khi fetch từ client-side
 
 import type { 
   ScreenerResponse, 
@@ -10,14 +10,11 @@ import type {
   Stock 
 } from './types';
 
-const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/vietga246/vn-stock-scanner/main/data/exports';
-
-// Cache config - only for client-side
+// Cache config - client-side only
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const cache: Map<string, { data: unknown; timestamp: number }> = new Map();
 
-async function fetchWithCache<T>(endpoint: string): Promise<T> {
-  const url = `${GITHUB_RAW_BASE}/${endpoint}`;
+async function fetchFromAPI<T>(endpoint: string): Promise<T> {
   const now = Date.now();
   
   // Check cache (client-side only)
@@ -29,21 +26,21 @@ async function fetchWithCache<T>(endpoint: string): Promise<T> {
   }
   
   try {
-    const response = await fetch(url, {
+    // Fetch từ API route của chính app (proxy qua server)
+    const response = await fetch(`/api/${endpoint}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
       },
-      cache: 'no-store',
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch ${endpoint}: ${response.status}`);
     }
     
     const data = await response.json();
     
-    // Update cache (client-side only)
+    // Update cache
     if (typeof window !== 'undefined') {
       cache.set(endpoint, { data, timestamp: now });
     }
@@ -52,7 +49,7 @@ async function fetchWithCache<T>(endpoint: string): Promise<T> {
   } catch (error) {
     console.error(`Error fetching ${endpoint}:`, error);
     
-    // Return cached data if available (stale-while-revalidate)
+    // Return cached data if available
     if (typeof window !== 'undefined') {
       const cached = cache.get(endpoint);
       if (cached) {
@@ -67,24 +64,24 @@ async function fetchWithCache<T>(endpoint: string): Promise<T> {
 // ============ API Functions ============
 
 export async function getScreener(): Promise<ScreenerResponse> {
-  return fetchWithCache<ScreenerResponse>('screener.json');
+  return fetchFromAPI<ScreenerResponse>('screener');
 }
 
 export async function getSectors(): Promise<SectorsResponse> {
-  return fetchWithCache<SectorsResponse>('sectors.json');
+  return fetchFromAPI<SectorsResponse>('sectors');
 }
 
 export async function getPrices(): Promise<PricesResponse> {
-  return fetchWithCache<PricesResponse>('prices.json');
+  return fetchFromAPI<PricesResponse>('prices');
 }
 
 export async function getSummary(): Promise<SummaryResponse> {
-  return fetchWithCache<SummaryResponse>('summary.json');
+  return fetchFromAPI<SummaryResponse>('summary');
 }
 
 export async function getAIAnalysis(): Promise<AIAnalysisResponse | null> {
   try {
-    return await fetchWithCache<AIAnalysisResponse>('ai_analysis.json');
+    return await fetchFromAPI<AIAnalysisResponse>('ai-analysis');
   } catch {
     return null;
   }
