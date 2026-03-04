@@ -42,7 +42,7 @@ from utils import (
 DB_PATH             = os.getenv("DB_PATH", "data/db/stock.db")
 API_KEY             = os.getenv("VNSTOCK_API_KEY", "")
 DAYS_LOOKBACK       = int(os.getenv("DAYS_LOOKBACK", "7"))
-MAX_WORKERS         = int(os.getenv("MAX_WORKERS", "5"))      # 3 workers parallel
+MAX_WORKERS         = int(os.getenv("MAX_WORKERS", "6"))      # 3 workers parallel
 WORKER_STAGGER_SEC  = float(os.getenv("WORKER_STAGGER", "1")) # 2s giữa các request
 MAX_RETRY           = 3
 COMMIT_BATCH        = 20
