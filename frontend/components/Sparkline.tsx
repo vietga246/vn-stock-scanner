@@ -50,9 +50,9 @@ export default function Sparkline({
     const x = e.clientX - rect.left;
     const idx = Math.max(0, Math.min(data.length - 1, Math.round((x / width) * (data.length - 1))));
 
-    setTooltipPos({
+setTooltipPos({
       x: e.clientX,
-      y: rect.top - 10,
+      y: e.clientY - 15,
     });
     setHover({ pt: pts[idx], idx });
   };
