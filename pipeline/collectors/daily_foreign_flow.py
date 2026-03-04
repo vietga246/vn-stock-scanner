@@ -331,7 +331,8 @@ def fetch_foreign_trading():
     init_db(conn)
     
     # Split tickers into chunks for each worker
-    chunk_size = len(tickers) // NUM_WORKERS + 1
+    num_workers = min(MAX_WORKERS, len(tickers))
+    chunk_size = len(tickers) // num_workers + 1
     ticker_chunks = [tickers[i:i + chunk_size] for i in range(0, len(tickers), chunk_size)]
     
     log.info("Split %d symbols into %d chunks", len(tickers), len(ticker_chunks))
