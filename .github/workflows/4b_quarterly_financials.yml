@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       test_mode:
-        description: "Test mode (chỉ lấy VCB, FPT, VIC)"
+        description: "Test mode (chỉ lấy VN30 - 30 mã)"
         type: choice
         options: ["false", "true"]
         default: "false"

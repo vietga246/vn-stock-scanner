@@ -80,6 +80,16 @@ jobs:
         run: python pipeline/processors/sector_analysis.py
         continue-on-error: true
 
+      - name: Export price history cho biểu đồ
+        id: prices
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+          PRICE_DAYS_LIMIT: "30"
+        run: python pipeline/exporters/export_prices.py
+        continue-on-error: true
+
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
         with:
@@ -98,6 +108,9 @@ jobs:
           fi
           if [ -f "data/exports/sectors.json" ]; then
             git add data/exports/sectors.json
+          fi
+          if [ -f "data/exports/prices.json" ]; then
+            git add data/exports/prices.json
           fi
           
           # Commit if there are changes
