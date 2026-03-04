@@ -1,14 +1,14 @@
 """
-ai_analyst.py — AI-Powered Stock Analysis Module
+ai_analyst.py — AI-Powered Stock Analysis Module (v2)
 
-Tự động phân tích top picks bằng OpenAI/Claude API.
-Tạo báo cáo phân tích chuyên sâu với reasoning.
+Output format phù hợp với frontend design:
+- ai_analysis.json với cấu trúc analyses[symbol] chứa recommendation, summary, highlights, risks
 
 Features:
 - Load top stocks từ stock_scores
 - Tạo prompt với context đầy đủ (Technical + Fundamental + Smart Money)
-- Gọi AI API để phân tích
-- Export analysis.json cho frontend
+- Gọi AI API để phân tích (hoặc fallback rule-based)
+- Export ai_analysis.json cho frontend
 
 Chạy sau scoring_engine.py và sector_analysis.py.
 """
@@ -29,7 +29,7 @@ EXPORT_DIR = os.getenv("EXPORT_DIR", "data/exports")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 AI_PROVIDER = os.getenv("AI_PROVIDER", "openai")  # "openai" or "anthropic"
-TOP_N_STOCKS = int(os.getenv("TOP_N_STOCKS", "10"))
+TOP_N_STOCKS = int(os.getenv("TOP_N_STOCKS", "50"))  # Increased for frontend
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "2000"))
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
@@ -56,98 +56,68 @@ Phong cách phân tích:
 Format output: JSON với cấu trúc được chỉ định."""
 
 ANALYSIS_PROMPT_TEMPLATE = """
-Phân tích {n_stocks} cổ phiếu sau đây và đưa ra nhận định:
+Phân tích cổ phiếu {symbol} với dữ liệu sau:
 
 ## DỮ LIỆU CỔ PHIẾU
 
-{stock_data}
+- Symbol: {symbol}
+- Tên: {name}
+- Ngành: {industry}
+- Composite Score: {composite_score}/100 (Tier {tier})
+- Fundamental Score: {fundamental_score}/100
+- Smart Money Score: {smart_money_score}/100
+- Momentum Score: {momentum_score}/100
+- Technical Score: {technical_score}/100
 
-## DỮ LIỆU NGÀNH
+Chỉ số tài chính:
+- ROE: {roe}%
+- ROA: {roa}%
+- P/E: {pe}x
+- Revenue Growth: {revenue_growth}%
+- Net Margin: {net_margin}%
+- Debt/Equity: {debt_equity}
 
-{sector_data}
+Kỹ thuật:
+- RSI(14): {rsi14}
+- Trend Short: {trend_short}
+- Price Change 5D: {price_change_5d}%
+- Price Change 20D: {price_change_20d}%
 
-## YÊU CẦU PHÂN TÍCH
+Dòng tiền:
+- Khối ngoại 7D: {foreign_net_7d}B VND
+- Khối ngoại 30D: {foreign_net_30d}B VND
 
-Trả về JSON với cấu trúc sau:
+Ngành {industry}: {sector_status}
 
-```json
+## YÊU CẦU
+
+Trả về JSON với cấu trúc:
 {{
-  "market_overview": {{
-    "sentiment": "bullish|bearish|neutral",
-    "summary": "Tóm tắt 2-3 câu về thị trường",
-    "key_themes": ["Theme 1", "Theme 2"]
-  }},
-  "top_picks": [
-    {{
-      "symbol": "XXX",
-      "recommendation": "strong_buy|buy|hold|sell|strong_sell",
-      "target_score": 75,
-      "reasoning": {{
-        "fundamental": "Nhận định về cơ bản",
-        "technical": "Nhận định về kỹ thuật",
-        "smart_money": "Nhận định về dòng tiền"
-      }},
-      "catalysts": ["Catalyst 1", "Catalyst 2"],
-      "risks": ["Risk 1", "Risk 2"],
-      "time_horizon": "short|medium|long"
-    }}
+  "recommendation": "STRONG_BUY|BUY|HOLD|SELL|STRONG_SELL",
+  "summary": "Tóm tắt 2-3 câu về cổ phiếu",
+  "highlights": [
+    {{"text": "Điểm tích cực 1", "type": "positive"}},
+    {{"text": "Điểm tích cực 2", "type": "positive"}}
   ],
-  "sector_rotation": {{
-    "accumulating": ["Ngành 1", "Ngành 2"],
-    "avoiding": ["Ngành 3"],
-    "rationale": "Lý do cho rotation"
-  }},
-  "watchlist": [
-    {{
-      "symbol": "YYY",
-      "reason": "Lý do theo dõi",
-      "trigger": "Điều kiện để action"
-    }}
-  ]
+  "risks": [
+    {{"text": "Rủi ro 1", "type": "negative"}},
+    {{"text": "Cảnh báo 1", "type": "warning"}}
+  ],
+  "fundamental_view": "Nhận định về cơ bản (1 câu)",
+  "technical_view": "Nhận định về kỹ thuật (1 câu)",
+  "flow_view": "Nhận định về dòng tiền (1 câu)"
 }}
-```
-
-Lưu ý:
-- Chỉ phân tích dựa trên data được cung cấp
-- Ưu tiên cổ phiếu có composite_score cao + smart_money_score tốt
-- Cảnh báo nếu RSI > 70 (overbought) hoặc < 30 (oversold)
-- Xem xét xu hướng ngành trước khi đề xuất
 
 Trả về CHÍNH XÁC JSON, không có text khác.
-"""
-
-DAILY_REPORT_PROMPT = """
-Tạo báo cáo phân tích thị trường ngày {date} dựa trên data sau:
-
-## TOP 10 CỔ PHIẾU THEO COMPOSITE SCORE
-
-{top_stocks}
-
-## PHÂN TÍCH NGÀNH
-
-{sector_analysis}
-
-## TÍN HIỆU KỸ THUẬT
-
-{technical_signals}
-
----
-
-Tạo báo cáo ngắn gọn (500-800 từ) theo format:
-
-1. **Tổng quan thị trường** (2-3 câu)
-2. **Top 3 cổ phiếu đáng chú ý** - mỗi cổ phiếu 3-4 câu giải thích
-3. **Ngành nổi bật** - 2-3 câu về sector rotation
-4. **Cảnh báo rủi ro** - 2-3 điểm cần lưu ý
-5. **Kết luận** - 1-2 câu
-
-Viết bằng tiếng Việt, chuyên nghiệp, dễ hiểu.
 """
 
 # ─── DATA LOADERS ──────────────────────────────────────────────────────────
 
 def create_connection():
     """Create database connection."""
+    if not os.path.exists(DB_PATH):
+        log.error("Database not found: %s", DB_PATH)
+        return None
     conn = sqlite3.connect(DB_PATH, timeout=60)
     conn.row_factory = sqlite3.Row
     return conn
@@ -163,34 +133,31 @@ def get_available_columns(conn, table: str) -> set:
         return set()
 
 
-def load_top_stocks(conn, limit: int = 10) -> pd.DataFrame:
+def load_top_stocks(conn, limit: int = 50) -> pd.DataFrame:
     """Load top N stocks by composite score - dynamically adapt to available columns."""
     
-    # Get available columns in stock_scores
     available = get_available_columns(conn, "stock_scores")
     log.info("Available columns in stock_scores: %d", len(available))
     
-    # Core columns (must exist)
+    # Core columns
     core_cols = [
         "symbol", "composite_score", "fundamental_score", 
         "smart_money_score", "momentum_score", "technical_score",
         "tier", "rank_total"
     ]
     
-    # Optional columns (may or may not exist)
+    # Optional columns
     optional_cols = [
         "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
         "rsi14", "price_change_5d", "price_change_20d", "trend_short",
         "foreign_net_7d", "foreign_net_30d", "vol_ratio"
     ]
     
-    # Build SELECT clause with only available columns
+    # Build SELECT clause
     select_cols = []
     for col in core_cols:
         if col in available:
             select_cols.append(f"s.{col}")
-        else:
-            log.warning("Missing core column: %s", col)
     
     for col in optional_cols:
         if col in available:
@@ -204,7 +171,8 @@ def load_top_stocks(conn, limit: int = 10) -> pd.DataFrame:
         SELECT 
             {', '.join(select_cols)},
             sym.organ_name,
-            sym.industry_name
+            sym.industry_name,
+            sym.exchange
         FROM stock_scores s
         LEFT JOIN symbols sym ON s.symbol = sym.symbol
         WHERE s.composite_score IS NOT NULL
@@ -217,255 +185,80 @@ def load_top_stocks(conn, limit: int = 10) -> pd.DataFrame:
     return df
 
 
-def load_sector_data(conn) -> pd.DataFrame:
-    """Load sector analysis data."""
+def load_sector_status(conn) -> Dict[str, str]:
+    """Load sector accumulating/distributing status."""
     try:
         df = pd.read_sql("""
-            SELECT * FROM sector_scores
-            ORDER BY avg_composite DESC
+            SELECT 
+                industry_name,
+                total_foreign_7d,
+                avg_composite
+            FROM sector_scores
         """, conn)
-        return df
-    except Exception as e:
-        log.warning("Could not load sector_scores: %s", e)
-        return pd.DataFrame()
-
-
-def load_technical_signals(conn) -> Dict[str, Any]:
-    """Load aggregate technical signals."""
-    available = get_available_columns(conn, "stock_scores")
-    
-    result = {}
-    
-    try:
-        # RSI distribution (if rsi14 exists)
-        if "rsi14" in available:
-            rsi_query = """
-                SELECT 
-                    SUM(CASE WHEN rsi14 > 70 THEN 1 ELSE 0 END) as overbought,
-                    SUM(CASE WHEN rsi14 < 30 THEN 1 ELSE 0 END) as oversold,
-                    SUM(CASE WHEN rsi14 BETWEEN 30 AND 70 THEN 1 ELSE 0 END) as neutral,
-                    AVG(rsi14) as avg_rsi
-                FROM stock_scores
-                WHERE rsi14 IS NOT NULL
-            """
-            result["rsi"] = pd.read_sql(rsi_query, conn).iloc[0].to_dict()
         
-        # Trend distribution (if trend_short exists)
-        if "trend_short" in available:
-            trend_query = """
-                SELECT 
-                    SUM(CASE WHEN trend_short = 1 THEN 1 ELSE 0 END) as uptrend,
-                    SUM(CASE WHEN trend_short = -1 THEN 1 ELSE 0 END) as downtrend,
-                    SUM(CASE WHEN trend_short = 0 THEN 1 ELSE 0 END) as sideways
-                FROM stock_scores
-                WHERE trend_short IS NOT NULL
-            """
-            result["trend"] = pd.read_sql(trend_query, conn).iloc[0].to_dict()
-        
-        # Top movers (if price_change_5d exists)
-        if "price_change_5d" in available:
-            movers_query = """
-                SELECT symbol, price_change_5d, price_change_20d
-                FROM stock_scores
-                WHERE price_change_5d IS NOT NULL
-                ORDER BY price_change_5d DESC
-                LIMIT 5
-            """
-            result["top_gainers"] = pd.read_sql(movers_query, conn).to_dict('records')
+        result = {}
+        for _, row in df.iterrows():
+            industry = row['industry_name']
+            foreign = row.get('total_foreign_7d', 0) or 0
+            score = row.get('avg_composite', 50) or 50
+            
+            if foreign > 10 and score > 55:
+                result[industry] = 'accumulating'
+            elif foreign < -10 and score < 50:
+                result[industry] = 'distributing'
+            else:
+                result[industry] = 'neutral'
         
         return result
-        
     except Exception as e:
-        log.warning("Could not load technical signals: %s", e)
+        log.warning("Could not load sector status: %s", e)
         return {}
 
 
-# ─── FORMATTERS ────────────────────────────────────────────────────────────
-
-def format_stocks_for_prompt(df: pd.DataFrame) -> str:
-    """Format stock data for AI prompt."""
-    if df.empty:
-        return "Không có dữ liệu"
-    
-    lines = []
-    for _, row in df.iterrows():
-        parts = [f"**{row['symbol']}**"]
-        
-        # Add available metrics
-        if 'organ_name' in row and pd.notna(row['organ_name']):
-            parts.append(f"({row['organ_name']})")
-        
-        metrics = []
-        if 'composite_score' in row and pd.notna(row['composite_score']):
-            metrics.append(f"Score: {row['composite_score']:.1f}")
-        if 'tier' in row and pd.notna(row['tier']):
-            metrics.append(f"Tier: {row['tier']}")
-        if 'roe' in row and pd.notna(row['roe']):
-            metrics.append(f"ROE: {row['roe']:.1f}%")
-        if 'pe' in row and pd.notna(row['pe']):
-            metrics.append(f"PE: {row['pe']:.1f}x")
-        if 'revenue_growth' in row and pd.notna(row['revenue_growth']):
-            metrics.append(f"Growth: {row['revenue_growth']:.1f}%")
-        if 'rsi14' in row and pd.notna(row['rsi14']):
-            metrics.append(f"RSI: {row['rsi14']:.1f}")
-        if 'trend_short' in row and pd.notna(row['trend_short']):
-            trend = '↑' if row['trend_short'] == 1 else '↓' if row['trend_short'] == -1 else '→'
-            metrics.append(f"Trend: {trend}")
-        if 'foreign_net_7d' in row and pd.notna(row['foreign_net_7d']):
-            metrics.append(f"Foreign 7D: {row['foreign_net_7d']:.1f}B")
-        if 'industry_name' in row and pd.notna(row['industry_name']):
-            metrics.append(f"Ngành: {row['industry_name']}")
-        
-        if metrics:
-            parts.append(" | ".join(metrics))
-        
-        lines.append(" ".join(parts))
-    
-    return "\n".join(lines)
-
-
-def format_sectors_for_prompt(df: pd.DataFrame) -> str:
-    """Format sector data for AI prompt."""
-    if df.empty:
-        return "Không có dữ liệu ngành"
-    
-    lines = []
-    for _, row in df.iterrows():
-        name = row.get('industry_name', row.get('name', 'N/A'))
-        parts = [f"**{name}**"]
-        
-        metrics = []
-        if 'avg_composite' in row and pd.notna(row['avg_composite']):
-            metrics.append(f"Avg Score: {row['avg_composite']:.1f}")
-        if 'stock_count' in row and pd.notna(row['stock_count']):
-            metrics.append(f"Stocks: {int(row['stock_count'])}")
-        if 'total_foreign_7d' in row and pd.notna(row['total_foreign_7d']):
-            metrics.append(f"Foreign 7D: {row['total_foreign_7d']:.1f}B")
-        
-        if metrics:
-            parts.append(" | ".join(metrics))
-        
-        lines.append(" ".join(parts))
-    
-    return "\n".join(lines)
-
-
-def format_technical_for_prompt(signals: Dict) -> str:
-    """Format technical signals for AI prompt."""
-    if not signals:
-        return "Không có dữ liệu kỹ thuật"
-    
-    lines = []
-    
-    if "rsi" in signals:
-        rsi = signals["rsi"]
-        lines.append(f"RSI: Overbought={rsi.get('overbought', 0)}, Oversold={rsi.get('oversold', 0)}, Neutral={rsi.get('neutral', 0)}")
-        lines.append(f"RSI trung bình: {rsi.get('avg_rsi', 0):.1f}")
-    
-    if "trend" in signals:
-        trend = signals["trend"]
-        lines.append(f"Xu hướng: Tăng={trend.get('uptrend', 0)}, Giảm={trend.get('downtrend', 0)}, Sideway={trend.get('sideways', 0)}")
-    
-    if "top_gainers" in signals:
-        gainers = signals["top_gainers"][:3]
-        gainer_str = ", ".join([f"{g['symbol']}(+{g['price_change_5d']:.1f}%)" for g in gainers if 'symbol' in g and 'price_change_5d' in g])
-        if gainer_str:
-            lines.append(f"Top gainers 5D: {gainer_str}")
-    
-    return "\n".join(lines) if lines else "Không có dữ liệu"
-
-
-# ─── AI CALLERS ────────────────────────────────────────────────────────────
-
-def call_openai(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str]:
-    """Call OpenAI API."""
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=MAX_TOKENS,
-            temperature=0.7,
-        )
-        
-        return response.choices[0].message.content
-        
-    except ImportError:
-        log.error("OpenAI package not installed. Run: pip install openai")
-        return None
-    except Exception as e:
-        log.error("OpenAI API error: %s", e)
-        return None
-
-
-def call_anthropic(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str]:
-    """Call Anthropic Claude API."""
-    try:
-        from anthropic import Anthropic
-        client = Anthropic(api_key=ANTHROPIC_API_KEY)
-        
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
-            max_tokens=MAX_TOKENS,
-            system=system_prompt,
-            messages=[
-                {"role": "user", "content": prompt},
-            ],
-        )
-        
-        return response.content[0].text
-        
-    except ImportError:
-        log.error("Anthropic package not installed. Run: pip install anthropic")
-        return None
-    except Exception as e:
-        log.error("Anthropic API error: %s", e)
-        return None
-
+# ─── AI FUNCTIONS ──────────────────────────────────────────────────────────
 
 def call_ai(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str]:
-    """Call AI API based on provider setting."""
+    """Call AI API (OpenAI or Anthropic)."""
+    
     if AI_PROVIDER == "anthropic" and ANTHROPIC_API_KEY:
-        log.info("Using Anthropic Claude API")
-        return call_anthropic(prompt, system_prompt)
+        try:
+            import anthropic
+            client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+            response = client.messages.create(
+                model="claude-3-sonnet-20240229",
+                max_tokens=MAX_TOKENS,
+                system=system_prompt,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return response.content[0].text
+        except Exception as e:
+            log.error("Anthropic API error: %s", e)
+            return None
+    
     elif OPENAI_API_KEY:
-        log.info("Using OpenAI API")
-        return call_openai(prompt, system_prompt)
-    else:
-        log.error("No API key configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY")
-        return None
+        try:
+            import openai
+            client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            response = client.chat.completions.create(
+                model="gpt-4-turbo-preview",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=MAX_TOKENS,
+                response_format={"type": "json_object"},
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            log.error("OpenAI API error: %s", e)
+            return None
+    
+    return None
 
 
-# ─── ANALYSIS FUNCTIONS ────────────────────────────────────────────────────
-
-def analyze_stocks(stocks_df: pd.DataFrame, sectors_df: pd.DataFrame) -> Optional[Dict]:
-    """Run AI analysis on top stocks."""
-    
-    # Format data for prompt
-    stock_data = format_stocks_for_prompt(stocks_df)
-    sector_data = format_sectors_for_prompt(sectors_df)
-    
-    # Build prompt
-    prompt = ANALYSIS_PROMPT_TEMPLATE.format(
-        n_stocks=len(stocks_df),
-        stock_data=stock_data,
-        sector_data=sector_data,
-    )
-    
-    log.info("Calling AI for stock analysis...")
-    response = call_ai(prompt)
-    
-    if not response:
-        return None
-    
-    # Parse JSON response
+def parse_ai_response(response: str) -> Optional[Dict]:
+    """Parse JSON from AI response."""
     try:
-        # Clean response (remove markdown code blocks if present)
         cleaned = response.strip()
         if cleaned.startswith("```json"):
             cleaned = cleaned[7:]
@@ -474,219 +267,298 @@ def analyze_stocks(stocks_df: pd.DataFrame, sectors_df: pd.DataFrame) -> Optiona
         if cleaned.endswith("```"):
             cleaned = cleaned[:-3]
         
-        analysis = json.loads(cleaned.strip())
-        return analysis
-        
+        return json.loads(cleaned.strip())
     except json.JSONDecodeError as e:
-        log.error("Failed to parse AI response as JSON: %s", e)
-        log.debug("Raw response: %s", response[:500])
-        return {"raw_response": response, "parse_error": str(e)}
+        log.warning("Failed to parse AI response: %s", e)
+        return None
 
 
-def generate_daily_report(
-    stocks_df: pd.DataFrame,
-    sectors_df: pd.DataFrame,
-    signals: Dict,
-) -> Optional[str]:
-    """Generate daily market report."""
+# ─── RULE-BASED ANALYSIS ───────────────────────────────────────────────────
+
+def generate_rule_based_analysis(row: pd.Series, sector_status: Dict[str, str]) -> Dict:
+    """Generate analysis using rule-based logic (fallback when no AI)."""
     
-    prompt = DAILY_REPORT_PROMPT.format(
-        date=datetime.now().strftime("%Y-%m-%d"),
-        top_stocks=format_stocks_for_prompt(stocks_df.head(10)),
-        sector_analysis=format_sectors_for_prompt(sectors_df),
-        technical_signals=format_technical_for_prompt(signals),
+    def safe_get(col, default=0):
+        val = row.get(col, default)
+        return default if pd.isna(val) else val
+    
+    symbol = row['symbol']
+    score = safe_get('composite_score', 50)
+    f_score = safe_get('fundamental_score', 50)
+    s_score = safe_get('smart_money_score', 50)
+    m_score = safe_get('momentum_score', 50)
+    t_score = safe_get('technical_score', 50)
+    tier = safe_get('tier', 'C')
+    industry = safe_get('industry_name', '')
+    
+    # ─── Recommendation ───
+    if score >= 75:
+        recommendation = "STRONG_BUY"
+        summary = f"{symbol} đang có điểm số xuất sắc ({score:.1f}) với tất cả các chỉ báo đều tích cực. Cổ phiếu thuộc nhóm chất lượng cao, đây là thời điểm tốt để tích lũy."
+    elif score >= 65:
+        recommendation = "BUY"
+        summary = f"{symbol} có điểm số tốt ({score:.1f}) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ."
+    elif score >= 55:
+        recommendation = "HOLD"
+        summary = f"{symbol} đang trong vùng trung tính ({score:.1f}). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động."
+    elif score >= 45:
+        recommendation = "SELL"
+        summary = f"{symbol} có nhiều chỉ báo tiêu cực ({score:.1f}). Nên cân nhắc chốt lời hoặc cắt lỗ để bảo toàn vốn."
+    else:
+        recommendation = "STRONG_SELL"
+        summary = f"{symbol} đang trong xu hướng giảm mạnh ({score:.1f}) với nhiều rủi ro. Khuyến nghị thoát hàng và chờ cơ hội tốt hơn."
+    
+    highlights = []
+    risks = []
+    
+    # ─── Fundamental Analysis ───
+    roe = safe_get('roe', 0)
+    roa = safe_get('roa', 0)
+    pe = safe_get('pe', 0)
+    revenue_growth = safe_get('revenue_growth', 0)
+    debt_equity = safe_get('debt_equity', 0)
+    
+    if f_score >= 75:
+        fundamental_view = "Nền tảng tài chính vững chắc với các chỉ số cơ bản ấn tượng."
+        highlights.append({"text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính lành mạnh", "type": "positive"})
+        if roe > 15:
+            highlights.append({"text": f"ROE {roe:.1f}% - Sinh lời trên vốn cao", "type": "positive"})
+        if 0 < pe < 15:
+            highlights.append({"text": f"P/E {pe:.1f} - Định giá hấp dẫn", "type": "positive"})
+        if revenue_growth > 20:
+            highlights.append({"text": f"Tăng trưởng doanh thu {revenue_growth:.1f}% - Tăng mạnh", "type": "positive"})
+    elif f_score >= 55:
+        fundamental_view = "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được."
+        highlights.append({"text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính ổn định", "type": "neutral"})
+    else:
+        fundamental_view = "Nền tảng tài chính cần được cải thiện, theo dõi khả năng trả nợ."
+        risks.append({"text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính cần cải thiện", "type": "negative"})
+        if debt_equity > 2:
+            risks.append({"text": f"D/E {debt_equity:.1f} - Đòn bẩy tài chính cao", "type": "negative"})
+        if pe > 25 and pe > 0:
+            risks.append({"text": f"P/E {pe:.1f} - Định giá cao", "type": "warning"})
+    
+    # ─── Smart Money Analysis ───
+    nn7d = safe_get('foreign_net_7d', 0)
+    nn30d = safe_get('foreign_net_30d', 0)
+    
+    if s_score >= 70 and nn7d > 0:
+        flow_view = "Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục."
+        highlights.append({"text": f"Khối ngoại mua ròng +{nn7d:.1f}B trong 7 ngày", "type": "positive"})
+        if nn30d > nn7d * 3:
+            highlights.append({"text": f"Tích lũy bền vững: +{nn30d:.1f}B trong 30 ngày", "type": "positive"})
+    elif s_score >= 55:
+        flow_view = "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
+    else:
+        flow_view = "Dòng tiền đang rút ra, khối ngoại bán ròng."
+        if nn7d < -5:
+            risks.append({"text": f"Khối ngoại bán ròng {nn7d:.1f}B trong 7 ngày", "type": "negative"})
+    
+    # ─── Momentum Analysis ───
+    change_5d = safe_get('price_change_5d', 0)
+    change_20d = safe_get('price_change_20d', 0)
+    
+    if m_score >= 70:
+        highlights.append({"text": "Momentum mạnh - Đà tăng tích cực", "type": "positive"})
+        if change_20d > 10:
+            highlights.append({"text": f"Tăng {change_20d:.1f}% trong 20 phiên - Uptrend mạnh", "type": "positive"})
+    elif m_score < 45:
+        risks.append({"text": "Momentum yếu - Đà tăng suy giảm", "type": "negative"})
+        if change_20d < -10:
+            risks.append({"text": f"Giảm {abs(change_20d):.1f}% trong 20 phiên - Downtrend", "type": "negative"})
+    
+    # ─── Technical Analysis ───
+    rsi = safe_get('rsi14', 50)
+    trend = safe_get('trend_short', 0)
+    
+    if t_score >= 70:
+        technical_view = "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng."
+        highlights.append({"text": "Tín hiệu kỹ thuật tích cực", "type": "positive"})
+        if 50 <= rsi <= 70:
+            highlights.append({"text": f"RSI {rsi:.0f} - Vùng tăng bền vững", "type": "positive"})
+    elif t_score >= 55:
+        technical_view = "Kỹ thuật trung tính, đang tích lũy trong biên độ hẹp."
+        if rsi > 70:
+            risks.append({"text": f"RSI {rsi:.0f} - Vùng quá mua, cẩn thận điều chỉnh", "type": "warning"})
+    else:
+        technical_view = "Kỹ thuật tiêu cực, giá dưới MA, momentum giảm."
+        risks.append({"text": "Tín hiệu kỹ thuật tiêu cực", "type": "negative"})
+        if rsi < 30:
+            highlights.append({"text": f"RSI {rsi:.0f} - Quá bán, có thể rebound", "type": "neutral"})
+    
+    # ─── Sector Analysis ───
+    status = sector_status.get(industry, 'neutral')
+    if status == 'accumulating':
+        highlights.append({"text": f"Ngành {industry} đang được tích lũy", "type": "positive"})
+    elif status == 'distributing':
+        risks.append({"text": f"Ngành {industry} đang bị phân phối", "type": "negative"})
+    
+    # ─── Tier Analysis ───
+    if tier == 'A':
+        highlights.append({"text": "Tier A - Cổ phiếu chất lượng cao, thanh khoản tốt", "type": "positive"})
+    elif tier in ['D', 'F']:
+        risks.append({"text": f"Tier {tier} - Cần theo dõi chặt chẽ, rủi ro cao", "type": "warning"})
+    
+    return {
+        "symbol": symbol,
+        "recommendation": recommendation,
+        "summary": summary,
+        "highlights": highlights[:5],  # Limit to 5
+        "risks": risks[:4],  # Limit to 4
+        "fundamental_view": fundamental_view,
+        "technical_view": technical_view,
+        "flow_view": flow_view,
+    }
+
+
+def analyze_single_stock_with_ai(row: pd.Series, sector_status: Dict[str, str]) -> Optional[Dict]:
+    """Analyze single stock with AI API."""
+    
+    def safe_get(col, default=0):
+        val = row.get(col, default)
+        return default if pd.isna(val) else val
+    
+    industry = safe_get('industry_name', '')
+    status = sector_status.get(industry, 'neutral')
+    status_text = "đang được tích lũy" if status == 'accumulating' else "đang bị phân phối" if status == 'distributing' else "trung lập"
+    
+    prompt = ANALYSIS_PROMPT_TEMPLATE.format(
+        symbol=row['symbol'],
+        name=safe_get('organ_name', row['symbol']),
+        industry=industry,
+        composite_score=f"{safe_get('composite_score', 50):.1f}",
+        tier=safe_get('tier', 'C'),
+        fundamental_score=f"{safe_get('fundamental_score', 50):.1f}",
+        smart_money_score=f"{safe_get('smart_money_score', 50):.1f}",
+        momentum_score=f"{safe_get('momentum_score', 50):.1f}",
+        technical_score=f"{safe_get('technical_score', 50):.1f}",
+        roe=f"{safe_get('roe', 0):.1f}",
+        roa=f"{safe_get('roa', 0):.1f}",
+        pe=f"{safe_get('pe', 0):.1f}",
+        revenue_growth=f"{safe_get('revenue_growth', 0):.1f}",
+        net_margin=f"{safe_get('net_margin', 0):.1f}",
+        debt_equity=f"{safe_get('debt_equity', 0):.2f}",
+        rsi14=f"{safe_get('rsi14', 50):.0f}",
+        trend_short="↑ Up" if safe_get('trend_short', 0) == 1 else "↓ Down" if safe_get('trend_short', 0) == -1 else "→ Side",
+        price_change_5d=f"{safe_get('price_change_5d', 0):.1f}",
+        price_change_20d=f"{safe_get('price_change_20d', 0):.1f}",
+        foreign_net_7d=f"{safe_get('foreign_net_7d', 0):.1f}",
+        foreign_net_30d=f"{safe_get('foreign_net_30d', 0):.1f}",
+        sector_status=status_text,
     )
     
-    log.info("Generating daily report...")
-    report = call_ai(prompt, system_prompt="Bạn là chuyên gia phân tích chứng khoán. Viết báo cáo chuyên nghiệp, ngắn gọn.")
+    response = call_ai(prompt)
+    if response:
+        result = parse_ai_response(response)
+        if result:
+            result['symbol'] = row['symbol']
+            return result
     
-    return report
+    return None
 
 
 # ─── EXPORT FUNCTIONS ──────────────────────────────────────────────────────
 
-def export_analysis(analysis: Dict, report: Optional[str] = None):
-    """Export analysis to JSON file."""
+def export_analysis(analyses: Dict[str, Dict], model: str):
+    """Export analysis to ai_analysis.json for frontend."""
     os.makedirs(EXPORT_DIR, exist_ok=True)
+    
+    # Summary statistics
+    rec_counts = {}
+    for a in analyses.values():
+        rec = a.get('recommendation', 'HOLD')
+        rec_counts[rec] = rec_counts.get(rec, 0) + 1
     
     output = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
-        "ai_provider": AI_PROVIDER if (OPENAI_API_KEY or ANTHROPIC_API_KEY) else "none",
-        "analysis": analysis,
+        "model": model,
+        "total_analyzed": len(analyses),
+        "summary": {
+            "STRONG_BUY": rec_counts.get('STRONG_BUY', 0),
+            "BUY": rec_counts.get('BUY', 0),
+            "HOLD": rec_counts.get('HOLD', 0),
+            "SELL": rec_counts.get('SELL', 0),
+            "STRONG_SELL": rec_counts.get('STRONG_SELL', 0),
+        },
+        "analyses": analyses,
     }
-    
-    if report:
-        output["daily_report"] = report
     
     out_path = os.path.join(EXPORT_DIR, "ai_analysis.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
     
-    log.info("✅ Exported analysis → %s", out_path)
-    
-    # Also export markdown report if available
-    if report:
-        report_path = os.path.join(EXPORT_DIR, "daily_report.md")
-        with open(report_path, "w", encoding="utf-8") as f:
-            f.write(f"# Báo cáo thị trường - {datetime.now().strftime('%Y-%m-%d')}\n\n")
-            f.write(report)
-        log.info("✅ Exported report → %s", report_path)
-
-
-def create_fallback_analysis(stocks_df: pd.DataFrame, sectors_df: pd.DataFrame) -> Dict:
-    """Create rule-based analysis when AI is not available."""
-    log.info("Creating fallback analysis (no AI API)")
-    
-    top_picks = []
-    for _, row in stocks_df.head(5).iterrows():
-        # Safe get with defaults
-        def safe_get(col, default=0):
-            val = row.get(col, default)
-            return default if pd.isna(val) else val
-        
-        # Determine recommendation based on scores
-        score = safe_get('composite_score', 0)
-        if score >= 70:
-            rec = "strong_buy"
-        elif score >= 60:
-            rec = "buy"
-        elif score >= 50:
-            rec = "hold"
-        elif score >= 40:
-            rec = "sell"
-        else:
-            rec = "strong_sell"
-        
-        # Identify risks
-        risks = []
-        rsi = safe_get('rsi14', 50)
-        pe = safe_get('pe', 0)
-        de = safe_get('debt_equity', 0)
-        foreign_7d = safe_get('foreign_net_7d', 0)
-        
-        if rsi > 70:
-            risks.append("RSI cao (>70) - có thể điều chỉnh ngắn hạn")
-        if pe > 20:
-            risks.append(f"PE cao ({pe:.1f}x) - định giá đắt")
-        if de > 1.5:
-            risks.append(f"Nợ cao (D/E: {de:.1f})")
-        if foreign_7d < 0:
-            risks.append("Khối ngoại đang bán ròng")
-        
-        # Identify catalysts
-        catalysts = []
-        rev_growth = safe_get('revenue_growth', 0)
-        roe = safe_get('roe', 0)
-        trend = safe_get('trend_short', 0)
-        
-        if rev_growth > 20:
-            catalysts.append(f"Tăng trưởng doanh thu mạnh ({rev_growth:.1f}%)")
-        if roe > 15:
-            catalysts.append(f"ROE cao ({roe:.1f}%)")
-        if foreign_7d > 0:
-            catalysts.append("Khối ngoại đang mua ròng")
-        if trend == 1:
-            catalysts.append("Xu hướng ngắn hạn tăng")
-        
-        # Build reasoning
-        reasoning = {}
-        if 'roe' in row.index or 'pe' in row.index or 'revenue_growth' in row.index:
-            reasoning["fundamental"] = f"ROE {roe:.1f}%, PE {pe:.1f}x, Growth {rev_growth:.1f}%"
-        if 'rsi14' in row.index or 'trend_short' in row.index:
-            trend_str = '↑' if trend == 1 else '↓' if trend == -1 else '→'
-            reasoning["technical"] = f"RSI {rsi:.1f}, Trend {trend_str}"
-        if 'foreign_net_7d' in row.index:
-            reasoning["smart_money"] = f"Foreign 7D: {foreign_7d:.1f}B VND"
-        
-        top_picks.append({
-            "symbol": row['symbol'],
-            "name": safe_get('organ_name', ''),
-            "industry": safe_get('industry_name', ''),
-            "recommendation": rec,
-            "composite_score": round(score, 1),
-            "reasoning": reasoning if reasoning else {"note": "Limited data available"},
-            "catalysts": catalysts if catalysts else ["Đánh giá composite tốt"],
-            "risks": risks if risks else ["Không có rủi ro đáng kể"],
-        })
-    
-    # Sector analysis
-    accumulating = []
-    avoiding = []
-    
-    if not sectors_df.empty:
-        for _, row in sectors_df.iterrows():
-            name = row.get('industry_name', row.get('name', ''))
-            foreign = row.get('total_foreign_7d', row.get('foreign_net_7d', 0)) or 0
-            score = row.get('avg_composite', row.get('avg_composite_score', 0)) or 0
-            
-            if foreign > 0 and score > 55:
-                accumulating.append(name)
-            elif foreign < 0 and score < 45:
-                avoiding.append(name)
-    
-    return {
-        "market_overview": {
-            "sentiment": "neutral",
-            "summary": f"Phân tích dựa trên {len(stocks_df)} cổ phiếu hàng đầu theo composite score.",
-            "key_themes": ["Dựa trên scoring engine", "Không có AI analysis"],
-        },
-        "top_picks": top_picks,
-        "sector_rotation": {
-            "accumulating": accumulating[:3],
-            "avoiding": avoiding[:3],
-            "rationale": "Dựa trên dòng tiền khối ngoại và composite score ngành",
-        },
-        "watchlist": [],
-        "disclaimer": "Phân tích tự động bằng rule-based, không có AI. Chỉ mang tính tham khảo.",
-    }
+    log.info("✅ Exported → %s", out_path)
+    log.info("   Model: %s", model)
+    log.info("   Total: %d stocks", len(analyses))
+    log.info("   Summary: %s", rec_counts)
 
 
 # ─── MAIN ──────────────────────────────────────────────────────────────────
 
 def run():
     """Main function to run AI analysis."""
-    log.info("=== AI Analyst Module ===")
+    log.info("=" * 60)
+    log.info("🤖 AI ANALYST — VN Stock Scanner")
+    log.info("=" * 60)
     
     # Load data
     conn = create_connection()
+    if conn is None:
+        log.error("Cannot connect to database")
+        return
     
     stocks_df = load_top_stocks(conn, limit=TOP_N_STOCKS)
-    sectors_df = load_sector_data(conn)
-    signals = load_technical_signals(conn)
-    
+    sector_status = load_sector_status(conn)
     conn.close()
     
     if stocks_df.empty:
         log.error("No stock data available. Run scoring_engine.py first.")
         return
     
-    log.info("Loaded %d stocks, %d sectors", len(stocks_df), len(sectors_df))
+    log.info("📊 Loaded %d stocks", len(stocks_df))
+    log.info("📈 Sector status: %d accumulating, %d distributing",
+             sum(1 for v in sector_status.values() if v == 'accumulating'),
+             sum(1 for v in sector_status.values() if v == 'distributing'))
     
-    # Run analysis
-    if OPENAI_API_KEY or ANTHROPIC_API_KEY:
-        analysis = analyze_stocks(stocks_df, sectors_df)
-        report = generate_daily_report(stocks_df, sectors_df, signals)
+    # Generate analyses
+    analyses = {}
+    model_used = "rule-based"
+    use_ai = bool(OPENAI_API_KEY or ANTHROPIC_API_KEY)
+    
+    if use_ai:
+        model_used = f"ai-{AI_PROVIDER}"
+        log.info("🤖 Using AI provider: %s", AI_PROVIDER)
     else:
-        log.warning("No AI API key configured. Using fallback analysis.")
-        analysis = create_fallback_analysis(stocks_df, sectors_df)
-        report = None
+        log.info("📋 Using rule-based analysis (no AI API key)")
     
-    if analysis is None:
-        log.warning("AI analysis failed. Using fallback.")
-        analysis = create_fallback_analysis(stocks_df, sectors_df)
+    log.info("🔍 Generating analyses...")
+    
+    for i, (_, row) in enumerate(stocks_df.iterrows()):
+        symbol = row['symbol']
+        
+        # Try AI first if available (only for top 10 to save API calls)
+        if use_ai and i < 10:
+            ai_result = analyze_single_stock_with_ai(row, sector_status)
+            if ai_result:
+                analyses[symbol] = ai_result
+                continue
+        
+        # Fallback to rule-based
+        analyses[symbol] = generate_rule_based_analysis(row, sector_status)
+        
+        if (i + 1) % 10 == 0:
+            log.info("   Processed %d/%d stocks", i + 1, len(stocks_df))
     
     # Export
-    export_analysis(analysis, report)
+    export_analysis(analyses, model_used)
     
     # Summary
-    if "top_picks" in analysis:
-        log.info("Top picks:")
-        for pick in analysis["top_picks"][:3]:
-            log.info("  %s (%s): %s", 
-                    pick.get("symbol"),
-                    pick.get("recommendation", "N/A"),
-                    pick.get("reasoning", {}).get("fundamental", "")[:50])
+    log.info("")
+    log.info("📋 Top 5 recommendations:")
+    for symbol, analysis in list(analyses.items())[:5]:
+        log.info("   %s: %s", symbol, analysis.get('recommendation', 'N/A'))
     
+    log.info("")
     log.info("✅ AI Analyst completed")
 
 
