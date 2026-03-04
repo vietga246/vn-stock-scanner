@@ -360,9 +360,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-md" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
           <span className="text-[10px]" style={{ color: '#4a5a6a' }}>VN-INDEX</span>
           <span className="font-mono font-semibold">
-            {vnindex ? vnindex.value.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}
+            {vnindex?.value != null ? vnindex.value.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}
           </span>
-          {vnindex && (
+          {vnindex?.value != null && vnindex?.change != null && (
             <span 
               className="font-mono text-xs" 
               style={{ 
