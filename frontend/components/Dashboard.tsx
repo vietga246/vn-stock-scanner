@@ -59,9 +59,9 @@ export default function Dashboard() {
       const q = searchQuery.toLowerCase();
       result = result.filter(
         (s) =>
-          s.symbol.toLowerCase().includes(q) ||
-          s.name.toLowerCase().includes(q) ||
-          s.industry.toLowerCase().includes(q)
+          (s.symbol && s.symbol.toLowerCase().includes(q)) ||
+          (s.name && s.name.toLowerCase().includes(q)) ||
+          (s.industry && s.industry.toLowerCase().includes(q))
       );
     }
 
