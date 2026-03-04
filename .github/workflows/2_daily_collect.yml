@@ -1,8 +1,8 @@
-name: "② Daily Collect — Giá & Dòng tiền (17:00 ICT T2-T6)"
+name: "② Daily Collect — Giá & Dòng tiền (03:30 ICT T2-T6)"
 
 on:
   schedule:
-    - cron: "0 10 * * 1-5"    # 17:00 ICT (UTC+7)
+    - cron: "30 20 * * 0-4"    # 03:30 ICT (UTC+7) = 20:30 UTC ngày hôm trước
   workflow_dispatch:
     inputs:
       test_mode:
