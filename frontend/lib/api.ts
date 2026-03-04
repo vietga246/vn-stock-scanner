@@ -106,13 +106,21 @@ export async function getDashboardData(): Promise<DashboardData> {
     getAIAnalysis().catch(() => null),
   ]);
   
-  // Merge price history into stocks
+// Merge price history into stocks
   const stocks = screenerData.screener.map(stock => {
     const priceData = pricesData?.prices?.[stock.symbol];
     
+    // Map price_change_* to change_* for frontend compatibility
+    const mappedStock = {
+      ...stock,
+      change_1d: stock.price_change_1d ?? stock.change_1d,
+      change_5d: stock.price_change_5d ?? stock.change_5d,
+      change_20d: stock.price_change_20d ?? stock.change_20d,
+    };
+    
     if (priceData) {
       return {
-        ...stock,
+        ...mappedStock,
         price_history: priceData.close?.slice(-30),
         volume_history: priceData.volume?.slice(-30),
         dates: priceData.dates?.slice(-30),
@@ -120,7 +128,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       };
     }
     
-    return stock;
+    return mappedStock;
   });
   
   // Determine sector status from rotation signal
