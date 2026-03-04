@@ -23,7 +23,17 @@ export async function GET() {
       );
     }
 
-    const data = await response.json();
+    // Get raw text first to handle potential NaN values
+    const text = await response.text();
+    
+    // Replace NaN/Infinity with null (these are not valid JSON)
+    const cleanedText = text
+      .replace(/:\s*NaN\s*([,\}])/g, ':null$1')
+      .replace(/:\s*Infinity\s*([,\}])/g, ':null$1')
+      .replace(/:\s*-Infinity\s*([,\}])/g, ':null$1');
+    
+    // Parse the cleaned JSON
+    const data = JSON.parse(cleanedText);
     
     return NextResponse.json(data, {
       headers: {
@@ -33,7 +43,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching screener:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch screener data' },
+      { error: 'Failed to fetch screener data', details: String(error) },
       { status: 500 }
     );
   }

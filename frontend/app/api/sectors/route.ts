@@ -17,12 +17,20 @@ export async function GET() {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: `Failed to fetch data: ${response.status}` },
-        { status: response.status }
+        { sectors: [], rotation_signal: { accumulating: [], distributing: [] } }
       );
     }
 
-    const data = await response.json();
+    // Get raw text first to handle potential NaN values
+    const text = await response.text();
+    
+    // Replace NaN/Infinity with null
+    const cleanedText = text
+      .replace(/:\s*NaN\s*([,\}])/g, ':null$1')
+      .replace(/:\s*Infinity\s*([,\}])/g, ':null$1')
+      .replace(/:\s*-Infinity\s*([,\}])/g, ':null$1');
+    
+    const data = JSON.parse(cleanedText);
     
     return NextResponse.json(data, {
       headers: {
@@ -32,8 +40,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching sectors:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch sectors data' },
-      { status: 500 }
+      { sectors: [], rotation_signal: { accumulating: [], distributing: [] } }
     );
   }
 }
