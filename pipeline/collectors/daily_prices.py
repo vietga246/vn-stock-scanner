@@ -310,65 +310,89 @@ def update_daily():
     cursor = conn.cursor()
     init_db(conn)
     
-    # Stats
-    ok = fail = skipped = 0
-    batch_counter = 0
-    total = len(tickers)
+    # Split tickers into chunks for each worker
+    num_workers = min(MAX_WORKERS, len(tickers))
+    chunk_size = len(tickers) // num_workers + 1
+    ticker_chunks = [tickers[i:i + chunk_size] for i in range(0, len(tickers), chunk_size)]
     
-    # Multi-threaded fetch, single-threaded write
-    workers = min(MAX_WORKERS, total) if not TEST_MODE else 1
+    log.info("Split %d symbols into %d chunks", len(tickers), len(ticker_chunks))
     
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        # Submit all fetch jobs
+    # Stats (thread-safe)
+    stats_lock = threading.Lock()
+    stats = {"ok": 0, "fail": 0, "skipped": 0}
+    results_queue = []
+    
+    def worker_task(worker_id: int, symbols: list):
+        """Worker task with staggered start and detailed logging."""
+        # Stagger start
+        if worker_id > 0:
+            wait_time = worker_id * WORKER_STAGGER_SEC
+            log.info("Worker %d: waiting %.1fs before start...", worker_id, wait_time)
+            time.sleep(wait_time)
+        
+        log.info("Worker %d: starting with %d symbols", worker_id, len(symbols))
+        
+        worker_results = []
+        for i, symbol in enumerate(symbols, 1):
+            result = fetch_ticker(symbol, start_str, end_str)
+            worker_results.append(result)
+            
+            # Log progress for each symbol
+            status_icon = "✓" if result['status'] == 'ok' else ("○" if result['status'] == 'empty' else "✗")
+            log.info("Worker %d: [%d/%d] %s %s", worker_id, i, len(symbols), symbol, status_icon)
+        
+        log.info("Worker %d: completed", worker_id)
+        return worker_results
+    
+    # Process with thread pool
+    all_results = []
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         futures = {
-            executor.submit(fetch_ticker, ticker, start_str, end_str): ticker 
-            for ticker in tickers
+            executor.submit(worker_task, i, chunk): i 
+            for i, chunk in enumerate(ticker_chunks)
         }
         
-        done_count = 0
         for future in as_completed(futures):
-            ticker = futures[future]
-            done_count += 1
-            
+            worker_id = futures[future]
             try:
-                result = future.result()
+                results = future.result()
+                all_results.extend(results)
             except Exception as e:
-                log.warning("[%s] Exception: %s", ticker, e)
-                fail += 1
-                continue
-            
-            status = result.get("status")
-            rows = result.get("rows", [])
-            
-            if status == "ok" and rows:
-                # Write to DB (main thread)
-                cursor.executemany("""
-                    INSERT OR REPLACE INTO stock_prices
-                    (symbol, date, open, high, low, close, volume)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, rows)
-                ok += 1
-                batch_counter += 1
-                
-                if done_count % 50 == 0:
-                    log.info("Progress: %d/%d (OK: %d)", done_count, total, ok)
-                    
-            elif status == "empty":
-                skipped += 1
-            else:
-                fail += 1
-                log.warning("[%s] %s", ticker, status)
-            
-            # Batch commit
-            if batch_counter >= COMMIT_BATCH:
-                conn.commit()
-                batch_counter = 0
+                log.error("Worker %d error: %s", worker_id, e)
+    
+    # Write all results to DB (single thread)
+    log.info("Writing %d results to database...", len(all_results))
+    batch_counter = 0
+    
+    for result in all_results:
+        status = result.get("status")
+        rows = result.get("rows", [])
+        symbol = result.get("symbol")
+        
+        if status == "ok" and rows:
+            cursor.executemany("""
+                INSERT OR REPLACE INTO stock_prices
+                (symbol, date, open, high, low, close, volume)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, rows)
+            stats["ok"] += 1
+            batch_counter += 1
+        elif status == "empty":
+            stats["skipped"] += 1
+        else:
+            stats["fail"] += 1
+        
+        # Batch commit
+        if batch_counter >= COMMIT_BATCH:
+            conn.commit()
+            batch_counter = 0
     
     # Final commit and close
     conn.commit()
     conn.close()
     
-    log.info("✅ Done — OK: %d, Skipped: %d, Failed: %d", ok, skipped, fail)
+    log.info("✅ Done — OK: %d, Skipped: %d, Failed: %d", 
+             stats["ok"], stats["skipped"], stats["fail"])
 
 
 if __name__ == "__main__":
