@@ -38,6 +38,18 @@ WEIGHTS = {
     "technical":   0.15,
 }
 
+# ════════════════════════════════════════════════════════════════════════════
+# PENALTY CHO CỔ PHIẾU CẢNH BÁO/KIỂM SOÁT
+# Cổ phiếu trong diện cảnh báo/kiểm soát sẽ bị trừ điểm composite
+# ════════════════════════════════════════════════════════════════════════════
+WARNING_PENALTIES = {
+    "control":     0.50,  # Kiểm soát: trừ 50% điểm (điểm max = 50)
+    "warning":     0.30,  # Cảnh báo: trừ 30% điểm (điểm max = 70)
+    "restriction": 0.15,  # Hạn chế: trừ 15% điểm (điểm max = 85)
+    "delisting":   0.70,  # Sắp hủy niêm yết: trừ 70% (điểm max = 30)
+    "normal":      0.00,  # Bình thường: không trừ
+}
+
 # Trọng số các chỉ số trong từng trụ cột
 FUNDAMENTAL_WEIGHTS = {
     "roe_score":             0.25,
@@ -132,6 +144,11 @@ def init_db(conn):
             rsi14               REAL,
             macd_hist           REAL,
             trend_short         INTEGER,
+            
+            -- Smart money raw values (tỷ đồng)
+            foreign_net_7d      REAL,
+            foreign_net_30d     REAL,
+            prop_net_7d         REAL,
 
             -- Ranking
             rank_total          INTEGER,
@@ -397,16 +414,54 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
     return df
 
 
-def calc_composite(df: pd.DataFrame) -> pd.DataFrame:
-    """Tính composite score, rank, tier."""
+def calc_composite(df: pd.DataFrame, symbols_df: pd.DataFrame = None) -> pd.DataFrame:
+    """
+    Tính composite score, rank, tier.
+    Áp dụng penalty cho cổ phiếu trong diện cảnh báo/kiểm soát.
+    """
     df = df.copy()
 
-    df["composite_score"] = (
+    # Base composite score (chưa có penalty)
+    df["composite_score_raw"] = (
         df["fundamental_score"] * WEIGHTS["fundamental"] +
         df["smart_money_score"] * WEIGHTS["smart_money"] +
         df["momentum_score"]    * WEIGHTS["momentum"] +
         df["technical_score"]   * WEIGHTS["technical"]
     ).round(2)
+    
+    # Merge warning_status từ symbols_df
+    df["warning_status"] = "normal"
+    if symbols_df is not None and not symbols_df.empty and "warning_status" in symbols_df.columns:
+        warning_map = dict(zip(symbols_df["symbol"], symbols_df["warning_status"]))
+        df["warning_status"] = df["symbol"].map(warning_map).fillna("normal")
+    
+    # Áp dụng penalty cho cổ phiếu cảnh báo
+    def apply_penalty(row):
+        raw_score = row["composite_score_raw"]
+        status = row["warning_status"]
+        penalty = WARNING_PENALTIES.get(status, 0)
+        
+        if penalty > 0:
+            # Trừ % điểm theo penalty
+            penalized = raw_score * (1 - penalty)
+            return round(penalized, 2)
+        return raw_score
+    
+    df["composite_score"] = df.apply(apply_penalty, axis=1)
+    
+    # Log warning stocks
+    warning_stocks = df[df["warning_status"] != "normal"]
+    if len(warning_stocks) > 0:
+        log.info("Cổ phiếu có penalty:")
+        for status in ["control", "warning", "restriction", "delisting"]:
+            subset = warning_stocks[warning_stocks["warning_status"] == status]
+            if len(subset) > 0:
+                penalty_pct = WARNING_PENALTIES.get(status, 0) * 100
+                symbols_list = subset["symbol"].head(10).tolist()
+                log.info("  %s (-%d%%): %s%s", 
+                        status.upper(), int(penalty_pct),
+                        ", ".join(symbols_list),
+                        "..." if len(subset) > 10 else "")
 
     # Rank (1 = best)
     df = df.sort_values("composite_score", ascending=False).reset_index(drop=True)
@@ -508,6 +563,8 @@ OUTPUT_COLS = [
     "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
     "price_change_5d", "price_change_20d", "vol_ratio",
     "rsi14", "macd_hist", "trend_short",
+    # Smart money raw values (for export)
+    "foreign_net_7d", "foreign_net_30d", "prop_net_7d",
     "rank_total", "rank_pct", "tier",
     "data_completeness",
 ]
@@ -547,13 +604,15 @@ def save_scores(conn, df: pd.DataFrame):
 def load_symbols(conn) -> pd.DataFrame:
     """Load symbols table nếu có, hoặc từ JSON export."""
     try:
-        df = pd.read_sql("SELECT symbol, industry_name, exchange FROM symbols", conn)
+        df = pd.read_sql("SELECT symbol, industry_name, exchange, warning_status FROM symbols", conn)
         if not df.empty:
+            # Fill missing warning_status with 'normal'
+            df["warning_status"] = df["warning_status"].fillna("normal")
             return df
     except Exception:
         pass
 
-    # Fallback: đọc từ JSON export
+    # Fallback: đọc từ JSON export (không có warning_status)
     import json
     json_path = os.path.join(os.path.dirname(DB_PATH), "exports", "symbols.json")
     if os.path.exists(json_path):
@@ -567,8 +626,13 @@ def load_symbols(conn) -> pd.DataFrame:
                 rename["industryName"] = "industry_name"
             if rename:
                 df = df.rename(columns=rename)
+            # Add default warning_status
+            if "warning_status" not in df.columns:
+                df["warning_status"] = "normal"
             log.info("Symbols loaded from JSON: %d", len(df))
-            return df[["symbol", "industry_name", "exchange"]] if "industry_name" in df.columns else df[["symbol"]]
+            cols = ["symbol", "industry_name", "exchange", "warning_status"]
+            cols = [c for c in cols if c in df.columns]
+            return df[cols]
 
     log.warning("Không tìm thấy symbols data")
     return pd.DataFrame()
@@ -607,8 +671,8 @@ def run():
     df = score_momentum_technical(df, momentum_df)
     log.info("  Momentum + Technical: done")
 
-    # Composite
-    df = calc_composite(df)
+    # Composite (với warning penalty)
+    df = calc_composite(df, symbols_df)
     log.info("  Composite: done")
 
     # Save
@@ -622,12 +686,23 @@ def run():
     # Summary stats
     tiers = df["tier"].value_counts().to_dict()
     log.info("Tier distribution: %s", tiers)
+    
+    # Log warning stocks in top rankings
+    warning_in_top = df[df["warning_status"] != "normal"].head(20)
+    if len(warning_in_top) > 0:
+        log.info("⚠️  Cổ phiếu cảnh báo trong top 20:")
+        for _, r in warning_in_top.iterrows():
+            log.info("  #%d %s (%s) — Score: %.1f (raw: %.1f)",
+                     r["rank_total"], r["symbol"], r["warning_status"],
+                     r["composite_score"], r.get("composite_score_raw", r["composite_score"]))
+    
     log.info("Top 10 composite:")
     top10 = df[["symbol", "composite_score", "tier", "rank_total",
-                "roe", "pe", "revenue_growth"]].head(10)
+                "roe", "pe", "revenue_growth", "warning_status"]].head(10)
     for _, r in top10.iterrows():
-        log.info("  #%d %s — Score: %.1f (%s) | ROE: %s | PE: %s | RevGrowth: %s",
-                 r["rank_total"], r["symbol"], r["composite_score"], r["tier"],
+        warning_flag = f" ⚠️{r['warning_status']}" if r.get("warning_status", "normal") != "normal" else ""
+        log.info("  #%d %s%s — Score: %.1f (%s) | ROE: %s | PE: %s | RevGrowth: %s",
+                 r["rank_total"], r["symbol"], warning_flag, r["composite_score"], r["tier"],
                  f"{r['roe']:.1f}%" if r["roe"] else "N/A",
                  f"{r['pe']:.1f}x" if r["pe"] else "N/A",
                  f"{r['revenue_growth']:.1f}%" if r["revenue_growth"] else "N/A")
