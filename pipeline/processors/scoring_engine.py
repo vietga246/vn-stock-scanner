@@ -138,6 +138,7 @@ def init_db(conn):
             revenue_growth      REAL,
             net_margin          REAL,
             debt_equity         REAL,
+            price_change_1d     REAL,
             price_change_5d     REAL,
             price_change_20d    REAL,
             vol_ratio           REAL,
@@ -241,7 +242,7 @@ def load_smart_money(conn) -> pd.DataFrame:
 def load_momentum(conn) -> pd.DataFrame:
     """Lấy momentum từ technical_indicators (latest) + tính RS vs market."""
     tech = pd.read_sql("""
-        SELECT symbol, date, close, price_change_5d, price_change_20d,
+        SELECT symbol, date, close, price_change_1d, price_change_5d, price_change_20d,
                vol_ratio, rsi14, macd, macd_signal, macd_hist,
                trend_short, trend_medium, pct_from_ma20, pct_from_ma50
         FROM technical_indicators
@@ -357,12 +358,12 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
                     "price_5d_score", "price_20d_score", "vol_surge_score",
                     "rs_vs_market_score", "rsi_score", "macd_score", "trend_score"]:
             df[col] = 50.0  # neutral
-        for col in ["price_change_5d", "price_change_20d", "vol_ratio",
+        for col in ["price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
                     "rsi14", "macd_hist", "trend_short"]:
             df[col] = None
         return df
 
-    merge_cols = ["symbol", "price_change_5d", "price_change_20d", "vol_ratio",
+    merge_cols = ["symbol", "price_change_1d", "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
                   "rs_vs_market", "rsi14", "macd", "macd_signal", "macd_hist",
                   "trend_short", "trend_medium"]
     merge_cols = [c for c in merge_cols if c in tech_df.columns]
@@ -561,7 +562,7 @@ OUTPUT_COLS = [
     "price_5d_score", "price_20d_score", "vol_surge_score", "rs_vs_market_score",
     "rsi_score", "macd_score", "trend_score",
     "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
-    "price_change_5d", "price_change_20d", "vol_ratio",
+    "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
     "rsi14", "macd_hist", "trend_short",
     # Smart money raw values (for export)
     "foreign_net_7d", "foreign_net_30d", "prop_net_7d",
