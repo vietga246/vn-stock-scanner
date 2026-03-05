@@ -1,20 +1,20 @@
-name: "② Daily Collect — Giá & Dòng tiền (15:15 ICT T2-T6)"
+name: "③ Daily Process — Scoring & Sector (sau Daily Collect)"
 
 on:
-  schedule:
-    - cron: "15 8 * * 1-5"    # 15:15 ICT (UTC+7) = 08:15 UTC, Thứ 2-6
+  workflow_run:
+    workflows: ["② Daily Collect — Giá & Dòng tiền (15:15 ICT T2-T6)"]
+    types: [completed]
   workflow_dispatch:
-    inputs:
-      test_mode:
-        description: "🧪 TEST MODE - Chỉ chạy VN30 (30 mã)"
-        required: false
-        type: boolean
-        default: false
 
 jobs:
-  collect:
+  process:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 30
+    
+    # Only run if triggered manually or if collect workflow succeeded
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     
     steps:
       - uses: actions/checkout@v4
@@ -37,43 +37,64 @@ jobs:
           key: stock-db-${{ github.run_id }}
           restore-keys: stock-db-
 
-      - name: Cập nhật giá OHLCV hàng ngày
+      - name: Check DB exists
+        id: check_db
+        run: |
+          if [ -f "data/db/stock.db" ]; then
+            echo "DB_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "✅ Database found"
+            sqlite3 data/db/stock.db "SELECT COUNT(*) as rows FROM stock_prices;" || true
+          else
+            echo "DB_EXISTS=false" >> $GITHUB_OUTPUT
+            echo "❌ Database not found!"
+          fi
+
+      - name: Tính chỉ số kỹ thuật (MA, RSI, MACD, Bollinger)
+        id: technical
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+        run: python pipeline/processors/technical_indicators.py
+        continue-on-error: true
+
+      - name: Tính composite score toàn thị trường
+        id: scoring
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: |
+          mkdir -p data/exports
+          python pipeline/processors/scoring_engine.py
+        continue-on-error: true
+
+      - name: Phân tích ngành & tạo heatmap data
+        id: sector
+        if: steps.scoring.outcome == 'success'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: python pipeline/processors/sector_analysis.py
+        continue-on-error: true
+
+      - name: Export price history cho biểu đồ
         id: prices
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
         env:
           DB_PATH: data/db/stock.db
-          DAYS_LOOKBACK: "7"
-          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-          TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
-        run: |
-          mkdir -p data/db
-          echo "🔧 TEST_MODE=$TEST_MODE"
-          python pipeline/collectors/daily_prices.py
+          EXPORT_DIR: data/exports
+          PRICE_DAYS_LIMIT: "30"
+        run: python pipeline/exporters/export_prices.py
         continue-on-error: true
 
-      - name: Check prices result
-        if: steps.prices.outcome == 'failure'
-        run: |
-          echo "⚠️ daily_prices.py failed but continuing..."
-          echo "PRICES_FAILED=true" >> $GITHUB_ENV
-
-      - name: Cập nhật giao dịch khối ngoại & tự doanh
-        id: foreign
+      - name: Export summary (VN-Index + Top Movers)
+        id: summary_export
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
         env:
           DB_PATH: data/db/stock.db
-          DAYS_LOOKBACK: "7"
-          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-          TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
-          NUM_WORKERS: "6"
-        run: |
-          echo "🔧 TEST_MODE=$TEST_MODE"
-          python pipeline/collectors/daily_foreign_flow.py
+          EXPORT_DIR: data/exports
+        run: python pipeline/exporters/export_summary.py
         continue-on-error: true
-
-      - name: Check foreign result
-        if: steps.foreign.outcome == 'failure'
-        run: |
-          echo "⚠️ daily_foreign_flow.py failed"
-          echo "FOREIGN_FAILED=true" >> $GITHUB_ENV
 
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
@@ -81,29 +102,63 @@ jobs:
           path: data/db/stock.db
           key: stock-db-${{ github.run_id }}
 
+      - name: Commit JSON exports
+        if: steps.scoring.outcome == 'success'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add exports if they exist
+          if [ -f "data/exports/screener.json" ]; then
+            git add data/exports/screener.json
+          fi
+          if [ -f "data/exports/sectors.json" ]; then
+            git add data/exports/sectors.json
+          fi
+          if [ -f "data/exports/prices.json" ]; then
+            git add data/exports/prices.json
+          fi
+          if [ -f "data/exports/summary.json" ]; then
+            git add data/exports/summary.json
+          fi
+          
+          # Commit if there are changes
+          git diff --cached --quiet || git commit -m "chore: daily scoring $(date +'%Y-%m-%d')"
+          git push || echo "Nothing to push"
+
       - name: Summary
         run: |
-          echo "## Daily Collect Results" >> $GITHUB_STEP_SUMMARY
+          echo "## Daily Process Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
           
-          if [ "${{ inputs.test_mode }}" = "true" ]; then
-            echo "### 🧪 TEST MODE (VN30 only)" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_db.outputs.DB_EXISTS }}" = "true" ]; then
+            echo "| Database | ✅ Found |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Database | ❌ Missing |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [ "$PRICES_FAILED" = "true" ]; then
-            echo "- ⚠️ Prices: **FAILED**" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.technical.outcome }}" = "success" ]; then
+            echo "| Technical | ✅ OK |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- ✅ Prices: **OK**" >> $GITHUB_STEP_SUMMARY
+            echo "| Technical | ⚠️ Failed |" >> $GITHUB_STEP_SUMMARY
           fi
-          if [ "$FOREIGN_FAILED" = "true" ]; then
-            echo "- ⚠️ Foreign: **FAILED**" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.scoring.outcome }}" = "success" ]; then
+            echo "| Scoring | ✅ OK |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- ✅ Foreign: **OK**" >> $GITHUB_STEP_SUMMARY
+            echo "| Scoring | ⚠️ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.sector.outcome }}" = "success" ]; then
+            echo "| Sector | ✅ OK |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Sector | ⚠️ Failed |" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Fail if both failed
-        if: steps.prices.outcome == 'failure' && steps.foreign.outcome == 'failure'
+      - name: Fail if critical steps failed
+        if: steps.check_db.outputs.DB_EXISTS == 'false' || steps.scoring.outcome == 'failure'
         run: |
-          echo "❌ Both collectors failed!"
+          echo "❌ Critical step failed!"
           exit 1
