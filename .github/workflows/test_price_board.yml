@@ -1,0 +1,89 @@
+name: "🧪 Test — Price Board Collector"
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "🧪 TEST MODE - Chỉ chạy VN30 (30 mã) — bỏ check để chạy toàn thị trường"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  test-price-board:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r pipeline/requirements.txt
+
+      - name: Khôi phục DB từ cache (nếu có)
+        uses: actions/cache@v4
+        with:
+          path: data/db/stock.db
+          key: stock-db-${{ github.run_id }}
+          restore-keys: stock-db-
+
+      - name: "📡 Chạy Price Board Collector"
+        id: collector
+        env:
+          DB_PATH: data/db/stock.db
+          TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+        run: |
+          mkdir -p data/db
+          echo "🔧 TEST_MODE=$TEST_MODE"
+          echo ""
+          python pipeline/collectors/price_board_collector.py
+
+      - name: "🔍 Inspect dữ liệu vừa thu thập"
+        if: always()
+        env:
+          DB_PATH: data/db/stock.db
+        run: |
+          python pipeline/utils/inspect_price_board.py
+
+      - name: Lưu DB vào cache
+        if: steps.collector.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: data/db/stock.db
+          key: stock-db-${{ github.run_id }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🧪 Price Board Collector — Test Result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ inputs.test_mode }}" = "true" ]; then
+            echo "**Mode:** 🧪 TEST (VN30 only — 30 mã)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Mode:** 🌐 FULL (HOSE + HNX)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.collector.outcome }}" = "success" ]; then
+            echo "- ✅ Collector: **PASSED**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Collector: **FAILED**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "👉 Xem tab **Inspect** ở bước trên để kiểm tra dữ liệu chi tiết." >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail nếu collector lỗi
+        if: steps.collector.outcome == 'failure'
+        run: |
+          echo "❌ price_board_collector.py failed!"
+          exit 1
