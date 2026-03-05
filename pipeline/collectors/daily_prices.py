@@ -33,6 +33,8 @@ from utils import (
     safe_float,
     extract_wait_time,
     is_bond,
+    is_derivative,
+    is_stock,
     create_db_connection,
     setup_logging,
 )
@@ -185,7 +187,7 @@ def init_db(conn):
 # ─── TICKERS ───────────────────────────────────────────────────────────────
 
 def get_tickers() -> list:
-    """Get HOSE + HNX symbols, excluding bonds and UPCOM."""
+    """Get HOSE + HNX symbols, excluding bonds, futures, warrants, and UPCOM."""
     if TEST_MODE:
         log.info("[TEST MODE] Using VN30: %d symbols", len(VN30_SYMBOLS))
         return VN30_SYMBOLS.copy()
@@ -198,12 +200,13 @@ def get_tickers() -> list:
             df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
             tickers = df["symbol"].tolist()
             
-            # Filter out bonds
+            # Filter out bonds, futures, warrants - keep only 3-letter stock codes
             before = len(tickers)
-            tickers = [t for t in tickers if not is_bond(t)]
+            tickers = [t for t in tickers if is_stock(t)]
+            excluded = before - len(tickers)
             
-            log.info("HOSE+HNX: %d symbols (excluded UPCOM + %d bonds)", 
-                    len(tickers), before - len(tickers))
+            log.info("HOSE+HNX: %d stocks (excluded UPCOM + %d non-stocks: bonds/futures/warrants)", 
+                    len(tickers), excluded)
             return tickers
             
     except Exception as e:
@@ -211,7 +214,7 @@ def get_tickers() -> list:
     
     # Fallback to all_symbols
     df = listing.all_symbols()
-    tickers = [t for t in df["symbol"].tolist() if not is_bond(t)]
+    tickers = [t for t in df["symbol"].tolist() if is_stock(t)]
     log.warning("Fallback: %d symbols", len(tickers))
     return tickers
 
