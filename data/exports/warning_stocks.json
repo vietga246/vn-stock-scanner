@@ -1,0 +1,260 @@
+{
+  "generated_at": "2026-03-05T07:11:52Z",
+  "sources": [
+    "Fallback(38)"
+  ],
+  "total": 38,
+  "summary": {
+    "control": {
+      "count": 11,
+      "penalty": "-50%",
+      "description": "Kiểm soát - Giao dịch hạn chế nghiêm trọng, chỉ khớp lệnh định kỳ"
+    },
+    "warning": {
+      "count": 19,
+      "penalty": "-30%",
+      "description": "Cảnh báo - Nguy cơ bị kiểm soát, thua lỗ liên tục"
+    },
+    "restriction": {
+      "count": 8,
+      "penalty": "-15%",
+      "description": "Hạn chế - Điều kiện giao dịch đặc biệt"
+    }
+  },
+  "stocks": {
+    "control": [
+      {
+        "symbol": "AGM",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "AMD",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "CKG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "DRH",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "FLC",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HAI",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HNG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HVN",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "LGL",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "ROS",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "TNT",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      }
+    ],
+    "warning": [
+      {
+        "symbol": "C32",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "CEO",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "DAG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "DLG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "FIT",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "GAB",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HAG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HBC",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HHS",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "HQC",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "JVC",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "LDG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "NBB",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "OGC",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "PVX",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "QCG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "TGG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "TNI",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "TTF",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      }
+    ],
+    "restriction": [
+      {
+        "symbol": "CII",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "DIG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "DXG",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "KBC",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "NVL",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "PDR",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "SCR",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      },
+      {
+        "symbol": "VIX",
+        "name": "",
+        "exchange": "",
+        "source": "Fallback"
+      }
+    ]
+  }
+}
