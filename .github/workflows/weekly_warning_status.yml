@@ -27,7 +27,12 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml
+          pip install requests beautifulsoup4 lxml selenium webdriver-manager
+
+      - name: 🌐 Install Chrome & ChromeDriver
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
 
       - name: 🔍 Fetch warning stocks
         run: |
