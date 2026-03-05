@@ -59,6 +59,26 @@ export default function Sparkline({
     });
   };
 
+  // Tính vị trí tooltip - luôn nằm phía trên con trỏ
+  // Nếu gần mép trên màn hình, hiển thị phía dưới
+  const getTooltipStyle = () => {
+    if (!hover) return {};
+    
+    const tooltipHeight = 90; // Estimated tooltip height
+    const offset = 15; // Khoảng cách từ con trỏ
+    
+    // Nếu không đủ chỗ phía trên, hiển thị phía dưới
+    const showBelow = hover.mouseY < tooltipHeight + offset + 20;
+    
+    return {
+      position: 'fixed' as const,
+      left: hover.mouseX,
+      top: showBelow ? hover.mouseY + offset : hover.mouseY - tooltipHeight - offset,
+      transform: 'translateX(-50%)',
+      zIndex: 99999,
+    };
+  };
+
   return (
     <div
       ref={ref}
@@ -110,15 +130,11 @@ export default function Sparkline({
         )}
       </svg>
 
-      {/* Tooltip - Follow mouse cursor (above) */}
+      {/* Tooltip - Above cursor with smart positioning */}
       {hover && (
         <div
           style={{
-            position: 'fixed',
-            left: hover.mouseX,
-            top: hover.mouseY - 115,
-            transform: 'translateX(-50%)',
-            zIndex: 9999,
+            ...getTooltipStyle(),
             background: 'linear-gradient(180deg, #141b22 0%, #0a0f14 100%)',
             border: '1px solid rgba(0, 212, 255, 0.5)',
             borderRadius: '8px',
