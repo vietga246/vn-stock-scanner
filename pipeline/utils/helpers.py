@@ -234,6 +234,15 @@ def extract_wait_time(error_message: str, default: int = 65) -> int:
 # Examples: CACB2510, CVMM2520, VHM12345
 BOND_PATTERN = re.compile(r'^[A-Z]{2,4}\d{4,}$')
 
+# Pattern for futures: starts with FU (VN30 futures, etc.)
+# Examples: FUEMAVND, FUEKIV30, FUCTVGF4, FUEFCV50, FUETCC50
+FUTURES_PATTERN = re.compile(r'^FU[A-Z0-9]+$')
+
+# Pattern for covered warrants: ends with digits after stock code
+# Examples: CACB2401, CHPG2318, CFPT2401
+WARRANT_PATTERN = re.compile(r'^C[A-Z]{2,3}\d{4}$')
+
+
 def is_bond(symbol: str) -> bool:
     """
     Check if symbol is a bond (trái phiếu).
@@ -250,6 +259,58 @@ def is_bond(symbol: str) -> bool:
     if not symbol or len(symbol) <= 6:
         return False
     return bool(BOND_PATTERN.match(symbol))
+
+
+def is_derivative(symbol: str) -> bool:
+    """
+    Check if symbol is a derivative (futures, covered warrant).
+    
+    Futures patterns:
+    - FUE...: Futures VN30 (e.g., FUEMAVND, FUEKIV30)
+    - FUC...: Futures contracts (e.g., FUCTVGF4)
+    - FUE...: ETF futures (e.g., FUEFCV50, FUETCC50)
+    
+    Covered warrant patterns:
+    - C + stock code + 4 digits (e.g., CHPG2318)
+    
+    Args:
+        symbol: Stock symbol to check
+        
+    Returns:
+        True if symbol is a derivative (not a regular stock)
+    """
+    if not symbol:
+        return False
+    
+    # Check futures (starts with FU)
+    if FUTURES_PATTERN.match(symbol):
+        return True
+    
+    # Check covered warrants (C + code + digits)
+    if WARRANT_PATTERN.match(symbol):
+        return True
+    
+    return False
+
+
+def is_stock(symbol: str) -> bool:
+    """
+    Check if symbol is a regular stock (not bond, futures, or warrant).
+    
+    Args:
+        symbol: Stock symbol to check
+        
+    Returns:
+        True if symbol is a regular stock
+    """
+    if not symbol:
+        return False
+    
+    # Must be 3 letters (standard Vietnamese stock codes)
+    if not re.match(r'^[A-Z]{3}$', symbol):
+        return False
+    
+    return True
 
 
 def filter_stocks(symbols: list, warrants: set = None) -> list:
