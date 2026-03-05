@@ -2,7 +2,7 @@ name: "② Daily Collect — Giá & Dòng tiền (03:30 ICT T2-T6)"
 
 on:
   schedule:
-    - cron: "30 20 * * 0-4"    # 03:30 ICT (UTC+7) = 20:30 UTC ngày hôm trước
+    - cron: "15 8 * * 1-5"    # 15:15 ICT (UTC+7) = 08:15 UTC, Thứ 2-6
   workflow_dispatch:
     inputs:
       test_mode:
