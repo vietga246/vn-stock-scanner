@@ -1,6 +1,6 @@
-# 📊 Báo cáo thị trường - 04/03/2026
+# 📊 Báo cáo thị trường - 05/03/2026
 
-> Cập nhật lúc 06:58 ICT
+> Cập nhật lúc 12:13 ICT
 
 ---
 
@@ -10,9 +10,9 @@
 |--------|---------|
 | Tổng số cổ phiếu | 706 |
 | Tier A (≥70 điểm) | 0 |
-| Tier B (55-69) | 58 |
-| Tier C (40-54) | 542 |
-| Score TB | 46.6 |
+| Tier B (55-69) | 56 |
+| Tier C (40-54) | 536 |
+| Score TB | 46.2 |
 
 ---
 
@@ -20,16 +20,16 @@
 
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
-| 1 | NFC | CTCP Phân lân Ninh B | SX Nhựa - Hóa c | 65.1 | B | Giữ |
-| 2 | FDC | CTCP Ngoại thương và | Bất động sản | 64.7 | B | Giữ |
-| 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 64.0 | B | Giữ |
-| 4 | PVB | CTCP Bọc ống Dầu khí | Khai khoáng | 62.4 | B | Giữ |
-| 5 | HAH | CTCP Vận tải và Xếp  | Vận tải - kho b | 62.0 | B | Giữ |
-| 6 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | 61.2 | B | Giữ |
-| 7 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 61.2 | B | Giữ |
-| 8 | SVT | CTCP Công nghệ Sài G | SX Phụ trợ | 60.8 | B | Giữ |
-| 9 | MDG | CTCP Miền Đông | Khai khoáng | 60.6 | B | Giữ |
-| 10 | PJC | CTCP Thương mại và V | Vận tải - kho b | 60.4 | B | Giữ |
+| 1 | FDC | CTCP Ngoại thương và | Bất động sản | 65.3 | B | Mua |
+| 2 | HMH | CTCP Hải Minh | Vận tải - kho b | 61.7 | B | Giữ |
+| 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 61.4 | B | Giữ |
+| 4 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | 61.4 | B | Giữ |
+| 5 | PMC | CTCP Dược phẩm Dược  | Chăm sóc sức kh | 61.1 | B | Giữ |
+| 6 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 61.0 | B | Giữ |
+| 7 | MKV | CTCP Dược thú Y Cai  | Chăm sóc sức kh | 60.7 | B | Giữ |
+| 8 | PDN | CTCP Cảng Đồng Nai | Vận tải - kho b | 60.6 | B | Giữ |
+| 9 | QST | CTCP Sách và Thiết b | Công nghệ và th | 60.5 | B | Giữ |
+| 10 | HGM | CTCP Cơ khí và Khoán | Khai khoáng | 60.5 | B | Giữ |
 
 ---
 
@@ -45,30 +45,30 @@
 
 ## 📊 Tín hiệu kỹ thuật
 
-- **RSI Overbought (>70)**: 64 cổ phiếu
-- **RSI Oversold (<30)**: 45 cổ phiếu
-- **Uptrend**: 371 | **Downtrend**: 332
+- **RSI Overbought (>70)**: 27 cổ phiếu
+- **RSI Oversold (<30)**: 49 cổ phiếu
+- **Uptrend**: 306 | **Downtrend**: 399
 
 ### Top Gainers (5D)
+- ATS: +53.9%
 - GMA: +50.0%
-- HKT: +45.3%
-- HRC: +39.9%
-- PVC: +39.5%
-- SGH: +36.5%
+- HRC: +39.7%
+- KMT: +36.0%
+- HKT: +34.6%
 
 ### Top Losers (5D)
 - VNT: -32.1%
 - CJC: -30.2%
 - THS: -27.7%
 - VE3: -24.4%
-- BCG: -21.7%
+- HEV: -22.7%
 
 ---
 
 ## ⚠️ Cảnh báo
 
-⚠️ 64 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
-📢 45 cổ phiếu RSI < 30 - có thể là cơ hội mua
+⚠️ 27 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
+📢 49 cổ phiếu RSI < 30 - có thể là cơ hội mua
 
 ---
 
