@@ -116,7 +116,7 @@ export default function Sparkline({
           style={{
             position: 'fixed',
             left: hover.mouseX,
-            top: hover.mouseY - 100,
+            top: hover.mouseY - 115,
             transform: 'translateX(-50%)',
             zIndex: 9999,
             background: 'linear-gradient(180deg, #141b22 0%, #0a0f14 100%)',
@@ -126,6 +126,7 @@ export default function Sparkline({
             pointerEvents: 'none',
             overflow: 'hidden',
             minWidth: '70px',
+            maxWidth: '90px',
           }}
         >
           {hover.pt.date && (
