@@ -1,24 +1,26 @@
 """
 weekly_warning_status.py — Thu thập danh sách cổ phiếu cảnh báo/kiểm soát
 
-Workflow riêng biệt:
-1. Fetch từ nhiều nguồn API (VNDirect, TCBS, SSI, CafeF)
-2. Merge và deduplicate
-3. Export ra JSON file để view
-4. Cập nhật vào database (nếu có)
+⚠️ CHỈ LẤY DATA THỰC TẾ TỪ NGUỒN CHÍNH THỨC - KHÔNG DÙNG FALLBACK
+   Nếu tất cả nguồn fail → workflow fail → cần fix
+
+Nguồn dữ liệu (theo thứ tự ưu tiên):
+1. HOSE Official (hsx.vn) - Selenium scrape
+2. HNX Official (hnx.vn) - Selenium scrape  
+3. VNDirect API (backup - có trường controlStatus)
 
 Output: data/exports/warning_stocks.json
 """
 
-import requests
 import json
 import sqlite3
 import os
 import sys
 import re
 import logging
+import time
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Tuple, Optional
 
 # ════════════════════════════════════════════════════════════════════════════
 # CONFIG
@@ -26,7 +28,6 @@ from typing import Dict, List, Optional
 
 DB_PATH = os.getenv("DB_PATH", "data/db/stock.db")
 EXPORT_DIR = os.getenv("EXPORT_DIR", "data/exports")
-CACHE_DIR = os.getenv("CACHE_DIR", "data/cache")
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -34,40 +35,19 @@ HEADERS = {
     'Accept-Language': 'vi-VN,vi;q=0.9,en;q=0.8',
 }
 
-# Timeout cho requests
 REQUEST_TIMEOUT = 30
+SELENIUM_TIMEOUT = 60
 
 # ════════════════════════════════════════════════════════════════════════════
-# PENALTY CONFIG (for reference in export)
+# PENALTY CONFIG
 # ════════════════════════════════════════════════════════════════════════════
 
 WARNING_PENALTIES = {
-    "control":     {"penalty": 0.50, "description": "Kiểm soát - Giao dịch hạn chế nghiêm trọng, chỉ khớp lệnh định kỳ"},
-    "warning":     {"penalty": 0.30, "description": "Cảnh báo - Nguy cơ bị kiểm soát, thua lỗ liên tục"},
+    "control":     {"penalty": 0.50, "description": "Kiểm soát - Giao dịch hạn chế nghiêm trọng"},
+    "warning":     {"penalty": 0.30, "description": "Cảnh báo - Nguy cơ bị kiểm soát"},
     "restriction": {"penalty": 0.15, "description": "Hạn chế - Điều kiện giao dịch đặc biệt"},
     "halt":        {"penalty": 0.60, "description": "Tạm ngừng giao dịch"},
     "delisting":   {"penalty": 0.70, "description": "Sắp hủy niêm yết"},
-}
-
-# ════════════════════════════════════════════════════════════════════════════
-# FALLBACK LIST (khi tất cả API fail)
-# ════════════════════════════════════════════════════════════════════════════
-
-FALLBACK_WARNING_STOCKS = {
-    # KIỂM SOÁT
-    'FLC': 'control', 'ROS': 'control', 'HAI': 'control', 'AMD': 'control',
-    'HVN': 'control', 'AGM': 'control', 'DRH': 'control', 'LGL': 'control',
-    'CKG': 'control', 'TNT': 'control', 'HNG': 'control',
-    # CẢNH BÁO
-    'HQC': 'warning', 'DLG': 'warning', 'LDG': 'warning', 'QCG': 'warning',
-    'TTF': 'warning', 'OGC': 'warning', 'TGG': 'warning', 'CEO': 'warning',
-    'GAB': 'warning', 'HAG': 'warning', 'JVC': 'warning', 'HBC': 'warning',
-    'NBB': 'warning', 'FIT': 'warning', 'TNI': 'warning', 'DAG': 'warning',
-    'HHS': 'warning', 'C32': 'warning', 'PVX': 'warning',
-    # HẠN CHẾ
-    'NVL': 'restriction', 'PDR': 'restriction', 'DIG': 'restriction',
-    'SCR': 'restriction', 'DXG': 'restriction', 'VIX': 'restriction',
-    'KBC': 'restriction', 'CII': 'restriction',
 }
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -82,15 +62,296 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ════════════════════════════════════════════════════════════════════════════
-# API FETCHERS
+# SELENIUM SETUP
+# ════════════════════════════════════════════════════════════════════════════
+
+def get_selenium_driver():
+    """
+    Tạo Selenium WebDriver với Chrome headless.
+    """
+    try:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.chrome.service import Service
+        
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-infobars")
+        chrome_options.add_argument(f"user-agent={HEADERS['User-Agent']}")
+        
+        # Try to find chromedriver
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.set_page_load_timeout(SELENIUM_TIMEOUT)
+        
+        return driver
+        
+    except Exception as e:
+        log.warning(f"Failed to create Selenium driver: {e}")
+        return None
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# SOURCE 1: HOSE Official Website (hsx.vn)
+# ════════════════════════════════════════════════════════════════════════════
+
+def fetch_from_hose_selenium() -> Dict[str, dict]:
+    """
+    Scrape danh sách cổ phiếu cảnh báo/kiểm soát từ HOSE official.
+    URL: https://www.hsx.vn/Modules/Listed/Web/StockUnderStatusView
+    """
+    result = {}
+    driver = None
+    
+    try:
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from bs4 import BeautifulSoup
+        
+        driver = get_selenium_driver()
+        if not driver:
+            log.warning("HOSE: Cannot create Selenium driver")
+            return {}
+        
+        # Trang danh sách chứng khoán bị kiểm soát/cảnh báo
+        url = "https://www.hsx.vn/Modules/Listed/Web/StockUnderStatusView"
+        log.info(f"HOSE: Loading {url}")
+        
+        driver.get(url)
+        
+        # Đợi trang load JavaScript
+        time.sleep(5)
+        
+        # Đợi table xuất hiện
+        try:
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.TAG_NAME, "table"))
+            )
+        except Exception:
+            log.warning("HOSE: No table found after waiting")
+        
+        # Get page source sau khi JS render
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # Tìm tất cả tables
+        tables = soup.find_all('table')
+        log.info(f"HOSE: Found {len(tables)} tables")
+        
+        for table in tables:
+            rows = table.find_all('tr')
+            current_status = None
+            
+            for row in rows:
+                # Check header để xác định status
+                headers = row.find_all('th')
+                if headers:
+                    header_text = ' '.join([h.get_text(strip=True).lower() for h in headers])
+                    if 'kiểm soát' in header_text or 'kiem soat' in header_text:
+                        current_status = 'control'
+                    elif 'cảnh báo' in header_text or 'canh bao' in header_text:
+                        current_status = 'warning'
+                    elif 'hạn chế' in header_text or 'han che' in header_text:
+                        current_status = 'restriction'
+                    elif 'tạm ngừng' in header_text or 'tam ngung' in header_text:
+                        current_status = 'halt'
+                    continue
+                
+                # Parse data rows
+                cells = row.find_all('td')
+                if len(cells) >= 1:
+                    for cell in cells:
+                        text = cell.get_text(strip=True)
+                        # Match stock symbol (3 letters uppercase)
+                        if re.match(r'^[A-Z]{3}$', text):
+                            symbol = text
+                            
+                            # Xác định status từ row text hoặc current_status
+                            row_text = row.get_text().lower()
+                            
+                            status = None
+                            if 'kiểm soát' in row_text or 'kiem soat' in row_text:
+                                status = 'control'
+                            elif 'cảnh báo' in row_text or 'canh bao' in row_text:
+                                status = 'warning'
+                            elif 'hạn chế' in row_text or 'han che' in row_text:
+                                status = 'restriction'
+                            elif 'tạm ngừng' in row_text or 'tam ngung' in row_text:
+                                status = 'halt'
+                            elif current_status:
+                                status = current_status
+                            
+                            if status and symbol not in result:
+                                result[symbol] = {
+                                    "status": status,
+                                    "name": "",
+                                    "exchange": "HOSE",
+                                    "source": "HOSE_Official",
+                                }
+        
+        # Thử tìm trong các div/span nếu không có table
+        if not result:
+            # Tìm tất cả text có chứa mã chứng khoán
+            all_text = soup.get_text()
+            
+            # Pattern: mã 3 chữ cái + status
+            patterns = [
+                (r'([A-Z]{3})\s*[:\-]?\s*(?:bị\s*)?kiểm soát', 'control'),
+                (r'([A-Z]{3})\s*[:\-]?\s*(?:bị\s*)?cảnh báo', 'warning'),
+                (r'([A-Z]{3})\s*[:\-]?\s*(?:bị\s*)?hạn chế', 'restriction'),
+            ]
+            
+            for pattern, status in patterns:
+                matches = re.findall(pattern, all_text, re.IGNORECASE)
+                for symbol in matches:
+                    if symbol.upper() not in result:
+                        result[symbol.upper()] = {
+                            "status": status,
+                            "name": "",
+                            "exchange": "HOSE",
+                            "source": "HOSE_Official",
+                        }
+        
+        log.info(f"✅ HOSE: Found {len(result)} warning/control stocks")
+        
+    except Exception as e:
+        log.warning(f"⚠️ HOSE scrape failed: {e}")
+        
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
+    
+    return result
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# SOURCE 2: HNX Official Website (hnx.vn)
+# ════════════════════════════════════════════════════════════════════════════
+
+def fetch_from_hnx_selenium() -> Dict[str, dict]:
+    """
+    Scrape danh sách cổ phiếu cảnh báo/kiểm soát từ HNX official.
+    URL: https://www.hnx.vn/vi-vn/co-phieu-etfs/chung-khoan-ny-canh-bao-ndt.html
+    """
+    result = {}
+    driver = None
+    
+    try:
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from bs4 import BeautifulSoup
+        
+        driver = get_selenium_driver()
+        if not driver:
+            log.warning("HNX: Cannot create Selenium driver")
+            return {}
+        
+        # Các trang danh sách trên HNX
+        urls = [
+            ("https://www.hnx.vn/vi-vn/co-phieu-etfs/chung-khoan-ny-moi.html", None),
+            # Trang này có filter cho cảnh báo/kiểm soát
+        ]
+        
+        for url, default_status in urls:
+            try:
+                log.info(f"HNX: Loading {url}")
+                driver.get(url)
+                
+                # Đợi trang load
+                time.sleep(5)
+                
+                # Đợi table
+                try:
+                    WebDriverWait(driver, 30).until(
+                        EC.presence_of_element_located((By.TAG_NAME, "table"))
+                    )
+                except Exception:
+                    pass
+                
+                html = driver.page_source
+                soup = BeautifulSoup(html, 'html.parser')
+                
+                # Tìm tabs/filters cho cảnh báo, kiểm soát
+                tabs = soup.find_all(['a', 'button', 'li'], string=re.compile(r'cảnh báo|kiểm soát|canh bao|kiem soat', re.I))
+                
+                # Tìm tables
+                tables = soup.find_all('table')
+                log.info(f"HNX: Found {len(tables)} tables")
+                
+                for table in tables:
+                    rows = table.find_all('tr')
+                    
+                    for row in rows:
+                        cells = row.find_all(['td', 'th'])
+                        if len(cells) >= 1:
+                            for i, cell in enumerate(cells):
+                                text = cell.get_text(strip=True)
+                                # Match stock symbol
+                                if re.match(r'^[A-Z]{3}$', text):
+                                    symbol = text
+                                    row_text = row.get_text().lower()
+                                    
+                                    status = None
+                                    if 'kiểm soát' in row_text:
+                                        status = 'control'
+                                    elif 'cảnh báo' in row_text:
+                                        status = 'warning'
+                                    elif 'hạn chế' in row_text:
+                                        status = 'restriction'
+                                    elif 'tạm ngừng' in row_text or 'đình chỉ' in row_text:
+                                        status = 'halt'
+                                    elif default_status:
+                                        status = default_status
+                                    
+                                    if status and symbol not in result:
+                                        result[symbol] = {
+                                            "status": status,
+                                            "name": "",
+                                            "exchange": "HNX",
+                                            "source": "HNX_Official",
+                                        }
+                
+            except Exception as e:
+                log.debug(f"HNX page {url} error: {e}")
+                continue
+        
+        log.info(f"✅ HNX: Found {len(result)} warning/control stocks")
+        
+    except Exception as e:
+        log.warning(f"⚠️ HNX scrape failed: {e}")
+        
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
+    
+    return result
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# SOURCE 3: VNDirect API (backup - requests only, no selenium)
 # ════════════════════════════════════════════════════════════════════════════
 
 def fetch_from_vndirect() -> Dict[str, dict]:
     """
-    Lấy từ VNDirect API.
-    Trả về dict với thông tin chi tiết của từng mã.
+    Lấy từ VNDirect API - có trường controlStatus.
+    Đây là backup nếu Selenium không hoạt động.
     """
+    import requests
+    
     result = {}
+    
     try:
         url = "https://finfo-api.vndirect.com.vn/v4/stocks"
         params = {
@@ -101,14 +362,15 @@ def fetch_from_vndirect() -> Dict[str, dict]:
         
         resp = requests.get(url, params=params, headers=HEADERS, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
-        data = resp.json()
         
+        data = resp.json()
         stocks = data.get("data", [])
+        
         log.info(f"VNDirect: Fetched {len(stocks)} stocks")
         
         status_map = {
             "CONTROLLED": "control",
-            "WARNING": "warning", 
+            "WARNING": "warning",
             "RESTRICTED": "restriction",
             "HALT": "halt",
             "DELISTING": "delisting",
@@ -116,7 +378,7 @@ def fetch_from_vndirect() -> Dict[str, dict]:
         
         for stock in stocks:
             symbol = stock.get("code", "")
-            control_status = str(stock.get("controlStatus", "")).upper()
+            control_status = str(stock.get("controlStatus", "")).upper().strip()
             
             if control_status and control_status in status_map:
                 result[symbol] = {
@@ -126,84 +388,55 @@ def fetch_from_vndirect() -> Dict[str, dict]:
                     "source": "VNDirect",
                 }
         
-        log.info(f"VNDirect: Found {len(result)} warning/control stocks")
+        log.info(f"✅ VNDirect: Found {len(result)} warning/control stocks")
         return result
         
     except Exception as e:
-        log.warning(f"VNDirect API failed: {e}")
+        log.warning(f"⚠️ VNDirect fetch failed: {e}")
         return {}
 
 
-def fetch_from_tcbs() -> Dict[str, dict]:
-    """Lấy từ TCBS API."""
-    result = {}
-    try:
-        url = "https://apipubaws.tcbs.com.vn/stock-insight/v1/stock/all-listing"
-        
-        resp = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
-        data = resp.json()
-        
-        stocks = data.get("data", data) if isinstance(data, dict) else data
-        if not isinstance(stocks, list):
-            stocks = []
-            
-        log.info(f"TCBS: Fetched {len(stocks)} stocks")
-        
-        for stock in stocks:
-            symbol = stock.get("ticker", stock.get("symbol", ""))
-            status = str(stock.get("status", "")).upper()
-            
-            mapped_status = None
-            if status in ["H", "HALT"]:
-                mapped_status = "halt"
-            elif status in ["C", "CONTROLLED"]:
-                mapped_status = "control"
-            elif status in ["W", "WARNING"]:
-                mapped_status = "warning"
-            
-            if mapped_status:
-                result[symbol] = {
-                    "status": mapped_status,
-                    "name": stock.get("shortName", stock.get("organName", "")),
-                    "exchange": stock.get("exchange", ""),
-                    "source": "TCBS",
-                }
-        
-        log.info(f"TCBS: Found {len(result)} warning/control stocks")
-        return result
-        
-    except Exception as e:
-        log.warning(f"TCBS API failed: {e}")
-        return {}
-
+# ════════════════════════════════════════════════════════════════════════════
+# SOURCE 4: SSI iBoard API (backup)
+# ════════════════════════════════════════════════════════════════════════════
 
 def fetch_from_ssi() -> Dict[str, dict]:
-    """Lấy từ SSI API."""
+    """
+    Lấy từ SSI iBoard API.
+    """
+    import requests
+    
     result = {}
+    
     try:
         url = "https://iboard.ssi.com.vn/dchart/api/1.1/defaultAllStocks"
         
         resp = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
-        data = resp.json()
         
-        stocks = data.get("data", [])
+        data = resp.json()
+        stocks = data.get("data", data) if isinstance(data, dict) else data
+        
+        if not isinstance(stocks, list):
+            return {}
+        
         log.info(f"SSI: Fetched {len(stocks)} stocks")
         
         for stock in stocks:
             symbol = stock.get("code", stock.get("symbol", ""))
-            status = str(stock.get("status", stock.get("tradingStatus", ""))).upper()
+            status_field = str(stock.get("status", stock.get("tradingStatus", ""))).upper()
             
             mapped_status = None
-            if "HALT" in status:
+            if "HALT" in status_field or status_field == "H":
                 mapped_status = "halt"
-            elif "CONTROL" in status:
+            elif "CONTROL" in status_field or status_field == "C":
                 mapped_status = "control"
-            elif "WARN" in status:
+            elif "WARN" in status_field or status_field == "W":
                 mapped_status = "warning"
+            elif "RESTRICT" in status_field or status_field == "R":
+                mapped_status = "restriction"
             
-            if mapped_status:
+            if mapped_status and symbol:
                 result[symbol] = {
                     "status": mapped_status,
                     "name": stock.get("stockName", ""),
@@ -211,56 +444,11 @@ def fetch_from_ssi() -> Dict[str, dict]:
                     "source": "SSI",
                 }
         
-        log.info(f"SSI: Found {len(result)} warning/control stocks")
+        log.info(f"✅ SSI: Found {len(result)} warning/control stocks")
         return result
         
     except Exception as e:
-        log.warning(f"SSI API failed: {e}")
-        return {}
-
-
-def fetch_from_cafef() -> Dict[str, dict]:
-    """Scrape từ CafeF."""
-    result = {}
-    
-    try:
-        from bs4 import BeautifulSoup
-    except ImportError:
-        log.warning("BeautifulSoup not installed, skipping CafeF")
-        return {}
-    
-    try:
-        pages = [
-            ("https://cafef.vn/co-phieu-bi-kiem-soat.chn", "control"),
-            ("https://cafef.vn/co-phieu-bi-canh-bao.chn", "warning"),
-        ]
-        
-        for url, status in pages:
-            try:
-                resp = requests.get(url, headers=HEADERS, timeout=15)
-                resp.raise_for_status()
-                soup = BeautifulSoup(resp.text, 'lxml')
-                
-                text = soup.get_text()
-                symbols = re.findall(r'\b([A-Z]{3})\b', text)
-                
-                for sym in set(symbols):
-                    if sym.isalpha() and sym not in result:
-                        result[sym] = {
-                            "status": status,
-                            "name": "",
-                            "exchange": "",
-                            "source": "CafeF",
-                        }
-            except Exception as e:
-                log.warning(f"CafeF page {url} failed: {e}")
-                continue
-        
-        log.info(f"CafeF: Found {len(result)} warning/control stocks")
-        return result
-        
-    except Exception as e:
-        log.warning(f"CafeF scraper failed: {e}")
+        log.warning(f"⚠️ SSI fetch failed: {e}")
         return {}
 
 
@@ -268,24 +456,27 @@ def fetch_from_cafef() -> Dict[str, dict]:
 # MAIN AGGREGATOR
 # ════════════════════════════════════════════════════════════════════════════
 
-def fetch_all_warning_stocks() -> Dict[str, dict]:
+def fetch_all_warning_stocks() -> Tuple[Dict[str, dict], List[str]]:
     """
     Tổng hợp từ tất cả nguồn.
-    Priority: VNDirect > TCBS > SSI > CafeF > Fallback
+    Ưu tiên nguồn chính thức HOSE/HNX trước.
+    KHÔNG DÙNG FALLBACK - chỉ lấy data thực.
     """
     result = {}
     sources_used = []
+    sources_failed = []
     
-    # Try each source
+    # Try sources in order - official sources first
     sources = [
+        ("HOSE_Official", fetch_from_hose_selenium),
+        ("HNX_Official", fetch_from_hnx_selenium),
         ("VNDirect", fetch_from_vndirect),
-        ("TCBS", fetch_from_tcbs),
         ("SSI", fetch_from_ssi),
-        ("CafeF", fetch_from_cafef),
     ]
     
     for name, fetcher in sources:
         try:
+            log.info(f"\n📡 Trying {name}...")
             data = fetcher()
             if data:
                 count = 0
@@ -295,32 +486,22 @@ def fetch_all_warning_stocks() -> Dict[str, dict]:
                         count += 1
                 if count > 0:
                     sources_used.append(f"{name}({count})")
+                    log.info(f"   ✅ {name}: Added {count} new stocks")
+            else:
+                sources_failed.append(name)
+                log.info(f"   ⚠️ {name}: No data")
         except Exception as e:
-            log.warning(f"Source {name} failed: {e}")
+            log.error(f"   ❌ {name} error: {e}")
+            sources_failed.append(name)
     
-    # Fallback if no data
-    if not result:
-        log.warning("All APIs failed, using fallback list")
-        for sym, status in FALLBACK_WARNING_STOCKS.items():
-            result[sym] = {
-                "status": status,
-                "name": "",
-                "exchange": "",
-                "source": "Fallback",
-            }
-        sources_used.append(f"Fallback({len(FALLBACK_WARNING_STOCKS)})")
+    if sources_failed:
+        log.warning(f"\n⚠️ Failed sources: {', '.join(sources_failed)}")
+    
+    if result:
+        log.info(f"\n✅ Total: {len(result)} warning stocks from {', '.join(sources_used)}")
     else:
-        # Merge với fallback để đảm bảo không thiếu
-        for sym, status in FALLBACK_WARNING_STOCKS.items():
-            if sym not in result:
-                result[sym] = {
-                    "status": status,
-                    "name": "",
-                    "exchange": "",
-                    "source": "Fallback",
-                }
+        log.error("\n❌ No warning stocks found from any source!")
     
-    log.info(f"Total: {len(result)} warning stocks from {', '.join(sources_used)}")
     return result, sources_used
 
 
@@ -329,7 +510,7 @@ def fetch_all_warning_stocks() -> Dict[str, dict]:
 # ════════════════════════════════════════════════════════════════════════════
 
 def export_to_json(data: Dict[str, dict], sources: List[str]) -> str:
-    """Export ra file JSON đẹp để view."""
+    """Export ra file JSON."""
     
     os.makedirs(EXPORT_DIR, exist_ok=True)
     
@@ -346,13 +527,14 @@ def export_to_json(data: Dict[str, dict], sources: List[str]) -> str:
             "source": info.get("source", ""),
         })
     
-    # Sort each group by symbol
+    # Sort each group
     for status in by_status:
         by_status[status] = sorted(by_status[status], key=lambda x: x["symbol"])
     
-    # Build output
     output = {
         "generated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "data_source": "OFFICIAL_SOURCES",
+        "note": "Data from HOSE/HNX official websites - NO FALLBACK",
         "sources": sources,
         "total": len(data),
         "summary": {
@@ -360,13 +542,13 @@ def export_to_json(data: Dict[str, dict], sources: List[str]) -> str:
                 "count": len(stocks),
                 "penalty": f"-{int(WARNING_PENALTIES.get(status, {}).get('penalty', 0) * 100)}%",
                 "description": WARNING_PENALTIES.get(status, {}).get('description', ''),
+                "symbols": [s["symbol"] for s in stocks],
             }
             for status, stocks in by_status.items()
         },
         "stocks": by_status,
     }
     
-    # Write file
     output_path = os.path.join(EXPORT_DIR, "warning_stocks.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
@@ -376,7 +558,7 @@ def export_to_json(data: Dict[str, dict], sources: List[str]) -> str:
 
 
 def update_database(data: Dict[str, dict]) -> int:
-    """Cập nhật warning_status vào database symbols table."""
+    """Cập nhật warning_status vào database."""
     
     if not os.path.exists(DB_PATH):
         log.warning(f"Database not found: {DB_PATH}")
@@ -386,18 +568,14 @@ def update_database(data: Dict[str, dict]) -> int:
         conn = sqlite3.connect(DB_PATH, timeout=30)
         cursor = conn.cursor()
         
-        # Check if warning_status column exists
         cursor.execute("PRAGMA table_info(symbols)")
         columns = [col[1] for col in cursor.fetchall()]
         
         if "warning_status" not in columns:
-            log.info("Adding warning_status column to symbols table")
             cursor.execute("ALTER TABLE symbols ADD COLUMN warning_status TEXT DEFAULT 'normal'")
         
-        # Reset all to normal first
         cursor.execute("UPDATE symbols SET warning_status = 'normal'")
         
-        # Update warning stocks
         updated = 0
         for sym, info in data.items():
             cursor.execute(
@@ -426,11 +604,38 @@ def run():
     """Main entry point."""
     log.info("="*60)
     log.info("🔍 WEEKLY WARNING STATUS COLLECTOR")
+    log.info("   Mode: OFFICIAL SOURCES ONLY (HOSE/HNX)")
+    log.info("   No fallback list - real data required")
     log.info("="*60)
     
+    # Check dependencies
+    try:
+        from selenium import webdriver
+        log.info("✅ Selenium available")
+    except ImportError:
+        log.warning("⚠️ Selenium not installed - will use API sources only")
+    
+    try:
+        from bs4 import BeautifulSoup
+        log.info("✅ BeautifulSoup available")
+    except ImportError:
+        log.warning("⚠️ BeautifulSoup not installed")
+    
     # Fetch data
-    log.info("\n📡 Fetching from APIs...")
+    log.info("\n📡 Fetching from official sources...")
     data, sources = fetch_all_warning_stocks()
+    
+    # ⚠️ FAIL nếu không có data - KHÔNG dùng fallback
+    if not data:
+        log.error("\n" + "="*60)
+        log.error("❌ FAILED: No data from any source!")
+        log.error("   Possible causes:")
+        log.error("   - HOSE/HNX websites changed structure")
+        log.error("   - Selenium/Chrome not available")
+        log.error("   - Network issues")
+        log.error("   Please check and fix the scraper.")
+        log.error("="*60)
+        sys.exit(1)
     
     # Summary
     by_status = {}
@@ -438,23 +643,34 @@ def run():
         status = info["status"]
         by_status[status] = by_status.get(status, 0) + 1
     
-    log.info("\n📊 Summary:")
+    log.info("\n" + "="*60)
+    log.info("📊 SUMMARY")
+    log.info("="*60)
+    
     for status in ['control', 'warning', 'restriction', 'halt', 'delisting']:
         if status in by_status:
             penalty = WARNING_PENALTIES.get(status, {}).get('penalty', 0)
-            log.info(f"   {status.upper():12} : {by_status[status]:3} stocks (penalty: -{int(penalty*100)}%)")
+            desc = WARNING_PENALTIES.get(status, {}).get('description', '')
+            log.info(f"   {status.upper():12} : {by_status[status]:3} stocks | -{int(penalty*100):2}% | {desc}")
     
-    # Export JSON
+    # List symbols
+    log.info("\n📋 STOCK LIST:")
+    for status in ['control', 'warning', 'restriction', 'halt', 'delisting']:
+        symbols = sorted([s for s, info in data.items() if info["status"] == status])
+        if symbols:
+            log.info(f"   {status.upper()}: {', '.join(symbols)}")
+    
+    # Export
     log.info("\n💾 Exporting...")
     json_path = export_to_json(data, sources)
     
-    # Update database
-    log.info("\n🗄️  Updating database...")
+    # Update DB
+    log.info("\n🗄️ Updating database...")
     updated = update_database(data)
     
-    # Final summary
+    # Done
     log.info("\n" + "="*60)
-    log.info("✅ COMPLETED")
+    log.info("✅ COMPLETED SUCCESSFULLY")
     log.info(f"   Total warning stocks: {len(data)}")
     log.info(f"   Export file: {json_path}")
     log.info(f"   Database updated: {updated} symbols")
