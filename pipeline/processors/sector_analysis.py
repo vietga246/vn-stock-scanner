@@ -398,26 +398,24 @@ def export_sectors(sectors: list, rotation: dict, meta: dict):
 def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
     """
     Tạo screener.json: danh sách cổ phiếu với composite score + metadata.
-    Kết hợp với summary.json hiện có (nếu có) để thêm giá.
+    Kết hợp với prices.json để thêm history cho sparkline.
     """
     screener_path = os.path.join(EXPORT_DIR, "screener.json")
 
-    # Load giá từ summary.json nếu có
+    # Load history từ prices.json
     price_data = {}
-    summary_path = os.path.join(EXPORT_DIR, "summary.json")
-    if os.path.exists(summary_path):
-        with open(summary_path) as f:
-            summary = json.load(f)
-        for row in summary.get("screener", []):
-            sym = row.get("symbol")
-            if sym:
-                price_data[sym] = {
-                    "close":    row.get("close"),
-                    "pe":       row.get("pe"),
-                    "pb":       row.get("pb"),
-                    "roe":      row.get("roe"),
-                    "history":  row.get("history", []),
-                }
+    prices_path = os.path.join(EXPORT_DIR, "prices.json")
+    if os.path.exists(prices_path):
+        with open(prices_path) as f:
+            prices_json = json.load(f)
+        for sym, data in prices_json.get("prices", {}).items():
+            # Lấy 30 ngày gần nhất của close prices làm history
+            close_prices = data.get("close", [])
+            price_data[sym] = {
+                "close":   close_prices[-1] if close_prices else None,
+                "history": close_prices[-30:] if close_prices else [],
+            }
+        log.info("Loaded price history for %d symbols from prices.json", len(price_data))
 
     # Build symbols lookup
     sym_lookup = {}
@@ -452,8 +450,7 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
             # Financials
             "roe":                safe_float(row.get("roe")),
             "roa":                safe_float(row.get("roa")),
-            "pe":                 safe_float(row.get("pe")) or safe_float(price.get("pe")),
-            "pb":                 safe_float(price.get("pb")),
+            "pe":                 safe_float(row.get("pe")),
             "revenue_growth":     safe_float(row.get("revenue_growth")),
             "net_margin":         safe_float(row.get("net_margin")),
             "debt_equity":        safe_float(row.get("debt_equity")),
@@ -465,7 +462,7 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
             "trend_short":        safe_int(row.get("trend_short")),
             # Smart money
             "foreign_net_7d":     safe_float(row.get("foreign_net_7d"), 1),
-            # History sparkline (từ summary nếu có)
+            # History sparkline (từ prices.json)
             "history":            price.get("history", []),
             "data_completeness":  safe_float(row.get("data_completeness")),
         })
