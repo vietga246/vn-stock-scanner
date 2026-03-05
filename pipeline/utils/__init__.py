@@ -8,6 +8,8 @@ from .helpers import (
     safe_int,
     extract_wait_time,
     is_bond,
+    is_derivative,
+    is_stock,
     create_db_connection,
     setup_logging,
 )
@@ -20,6 +22,8 @@ __all__ = [
     "safe_int",
     "extract_wait_time",
     "is_bond",
+    "is_derivative",
+    "is_stock",
     "create_db_connection",
     "setup_logging",
 ]
