@@ -110,13 +110,14 @@ export default function Sparkline({
         )}
       </svg>
 
-      {/* Tooltip - Follow mouse cursor */}
+      {/* Tooltip - Follow mouse cursor (above) */}
       {hover && (
         <div
           style={{
             position: 'fixed',
-            left: hover.mouseX + 12,
-            top: hover.mouseY - 40,
+            left: hover.mouseX,
+            top: hover.mouseY - 80,
+            transform: 'translateX(-50%)',
             zIndex: 9999,
             background: 'linear-gradient(180deg, #141b22 0%, #0a0f14 100%)',
             border: '1px solid rgba(0, 212, 255, 0.5)',
