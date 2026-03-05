@@ -22,6 +22,8 @@ export default function Sparkline({
   const [hover, setHover] = useState<{
     pt: { x: number; y: number; value: number; vol?: number; date?: string };
     idx: number;
+    mouseX: number;
+    mouseY: number;
   } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -49,7 +51,12 @@ export default function Sparkline({
     const rect = ref.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const idx = Math.max(0, Math.min(data.length - 1, Math.round((x / width) * (data.length - 1))));
-    setHover({ pt: pts[idx], idx });
+    setHover({ 
+      pt: pts[idx], 
+      idx,
+      mouseX: e.clientX,
+      mouseY: e.clientY
+    });
   };
 
   return (
@@ -103,10 +110,14 @@ export default function Sparkline({
         )}
       </svg>
 
-      {/* Tooltip - Inline beside chart */}
+      {/* Tooltip - Follow mouse cursor */}
       {hover && (
         <div
           style={{
+            position: 'fixed',
+            left: hover.mouseX + 12,
+            top: hover.mouseY - 40,
+            zIndex: 9999,
             background: 'linear-gradient(180deg, #141b22 0%, #0a0f14 100%)',
             border: '1px solid rgba(0, 212, 255, 0.5)',
             borderRadius: '8px',
