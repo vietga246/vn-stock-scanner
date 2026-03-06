@@ -230,7 +230,7 @@ def load_smart_money(conn) -> pd.DataFrame:
     """, conn)
 
     if foreign_7d.empty and foreign_30d.empty and prop_7d.empty:
-        log.warning("Smart money data rỗng (chưa chạy foreign_trading.py)")
+        log.warning("Smart money data rỗng (chưa chạy daily_foreign_flow.py hoặc API trả về empty)")
         return pd.DataFrame(columns=["symbol", "foreign_net_7d", "foreign_net_30d", "prop_net_7d"])
 
     result = foreign_7d.merge(foreign_30d, on="symbol", how="outer")
@@ -252,7 +252,7 @@ def load_momentum(conn) -> pd.DataFrame:
     """, conn)
 
     if tech.empty:
-        log.warning("Technical indicators rỗng (chưa chạy technical_calc.py)")
+        log.warning("Technical indicators rỗng (chưa chạy technical_indicators.py)")
         return tech
 
     # RS vs market: (price_change_5d - median_5d) / std_5d
