@@ -39,7 +39,7 @@ jobs:
         id: collector
         env:
           DB_PATH: data/db/stock.db
-          TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
+          TEST_MODE: ${{ inputs.test_mode != false && 'true' || 'false' }}
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: |
           mkdir -p data/db
