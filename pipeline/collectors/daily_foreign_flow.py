@@ -47,7 +47,11 @@ log = setup_logging()
 # ─── DATABASE ──────────────────────────────────────────────────────────────
 
 def init_db(conn):
-    """Initialize foreign_trading and prop_trading tables."""
+    """Initialize foreign_trading table.
+    
+    Lưu ý: prop_trading table đã bị xóa — prop_trade() không tồn tại trong VCI source
+    và scoring_engine không còn dùng prop_net_7d nữa.
+    """
     conn.executescript("""
         CREATE TABLE IF NOT EXISTS foreign_trading (
             symbol        TEXT,
@@ -63,21 +67,6 @@ def init_db(conn):
         );
         CREATE INDEX IF NOT EXISTS idx_foreign_trading_symbol ON foreign_trading(symbol);
         CREATE INDEX IF NOT EXISTS idx_foreign_trading_date   ON foreign_trading(date);
-
-        CREATE TABLE IF NOT EXISTS prop_trading (
-            symbol        TEXT,
-            date          TEXT,
-            buy_volume    REAL,
-            sell_volume   REAL,
-            net_volume    REAL,
-            buy_value     REAL,
-            sell_value    REAL,
-            net_value     REAL,
-            data_json     TEXT,
-            PRIMARY KEY (symbol, date)
-        );
-        CREATE INDEX IF NOT EXISTS idx_prop_trading_symbol ON prop_trading(symbol);
-        CREATE INDEX IF NOT EXISTS idx_prop_trading_date   ON prop_trading(date);
     """)
     conn.commit()
 
@@ -248,7 +237,7 @@ def fetch_foreign_trading():
     total_net_val     = df["net_value"].sum() / 1e9 if "net_value" in df.columns else 0
 
     log.info("✅ Done — OK: %d, Failed: 0", inserted)
-    log.info("   foreign_trading rows: %d | prop_trading rows: 0 | symbols có data: %d/%d",
+    log.info("   foreign_trading rows: %d | symbols có data: %d/%d",
              inserted, symbols_with_data, symbols_with_data)
     log.info("   Ngày có data: %d | Net foreign tích lũy: %.2f tỷ đồng",
              dates_covered, total_net_val)
