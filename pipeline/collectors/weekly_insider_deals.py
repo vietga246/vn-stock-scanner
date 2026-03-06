@@ -175,17 +175,28 @@ def get_tickers() -> list:
 # ---------------- MAIN ---------------- #
 
 def fetch_insider_deals():
+    """
+    ⚠️  DISABLED: Trading.insider_deal() không được hỗ trợ trong vnstock 3.4.2 VCI source.
+
+    30/30 symbols đều trả về NotImplementedError (qua tenacity RetryError).
+    Mỗi symbol mất ~4 giây chờ retry → tổng ~2 phút bị lãng phí.
+
+    Function này chỉ khởi tạo DB schema (để backward compatible) rồi exit ngay.
+    Khi vnstock VCI source hỗ trợ insider_deal(), bỏ dòng return bên dưới.
+    """
     if API_KEY:
         os.environ["VNSTOCK_API_KEY"] = API_KEY
-        log.info("✅ Using API key")
-    else:
-        log.warning("⚠️  Guest mode")
 
-    tickers = get_tickers()
-    if TEST_MODE:
-        tickers = [t for t in tickers if t in VN30_SYMBOLS]
-        log.info(f"[TEST MODE] Giới hạn VN30: {len(tickers)} mã")
-    log.info(f"Bắt đầu lấy insider deals cho {len(tickers)} mã...")
+    # Vẫn khởi tạo DB để schema tồn tại (scoring engine, export không bị crash khi query)
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    init_db(conn)
+    conn.close()
+
+    log.warning("⚠️  insider_deal() không được hỗ trợ trong vnstock VCI source — skip toàn bộ")
+    log.info("   DB schema (insider_deals, insider_meta) đã sẵn sàng cho khi API hỗ trợ")
+    log.info("✅ Done — OK: 0, Skipped: 0, Failed: 0 (API unsupported)")
+    return  # ← Xóa dòng này khi VCI source hỗ trợ insider_deal()
 
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn   = sqlite3.connect(DB_PATH)
