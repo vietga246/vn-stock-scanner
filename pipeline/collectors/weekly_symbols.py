@@ -15,10 +15,21 @@ import logging
 import sys
 import os
 
+# Thêm pipeline vào path để import helpers
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from utils.helpers import is_stock
+
 # ---------------- CONFIG ---------------- #
 
-DB_PATH = os.getenv("DB_PATH", "data/db/stock.db")
-API_KEY = os.getenv("VNSTOCK_API_KEY", "")
+DB_PATH   = os.getenv("DB_PATH", "data/db/stock.db")
+API_KEY   = os.getenv("VNSTOCK_API_KEY", "")
+TEST_MODE = os.getenv("TEST_MODE", "false").lower() == "true"
+
+VN30_SYMBOLS = [
+    "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
+    "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
+    "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE",
+]
 
 # ---------------- LOGGING ---------------- #
 
@@ -59,21 +70,44 @@ def fetch_symbols():
 
     listing = Listing()
 
-    # 1. Lấy danh sách chứng quyền để lọc bỏ
+    # 1. Lấy danh sách chứng quyền để lọc bỏ (defense-in-depth)
     log.info("Lấy danh sách chứng quyền...")
     try:
         warrants = set(listing.all_covered_warrant().tolist())
         log.info(f"Chứng quyền: {len(warrants)} mã")
     except Exception as e:
-        log.warning(f"Không lấy được danh sách chứng quyền: {e} — dùng filter regex")
+        log.warning(f"Không lấy được danh sách chứng quyền: {e} — dùng is_stock() filter")
         warrants = set()
 
     # 2. Lấy danh sách mã HOSE + HNX
     log.info("Lấy danh sách mã HOSE+HNX...")
     df_exchange = listing.symbols_by_exchange()
     df_exchange = df_exchange[df_exchange["exchange"].str.upper().isin(["HOSE", "HNX"])]
-    df_exchange = df_exchange[~df_exchange["symbol"].isin(warrants)]
-    log.info(f"HOSE+HNX sau lọc chứng quyền: {len(df_exchange)} mã")
+
+    # Lọc theo cột 'type' nếu API trả về (ưu tiên nhất)
+    if "type" in df_exchange.columns:
+        before = len(df_exchange)
+        df_exchange = df_exchange[df_exchange["type"].str.upper() == "STOCK"]
+        log.info(f"Lọc theo type=STOCK: {before} → {len(df_exchange)} mã")
+
+    # Lọc theo is_stock() (loại bond, ETF, futures, chứng quyền theo pattern tên mã)
+    before = len(df_exchange)
+    df_exchange = df_exchange[df_exchange["symbol"].apply(is_stock)]
+    log.info(f"Lọc theo is_stock(): {before} → {len(df_exchange)} mã")
+
+    # Lọc thêm theo warrant list (defense-in-depth)
+    if warrants:
+        before = len(df_exchange)
+        df_exchange = df_exchange[~df_exchange["symbol"].isin(warrants)]
+        if before != len(df_exchange):
+            log.info(f"Lọc warrant list: {before} → {len(df_exchange)} mã")
+
+    log.info(f"HOSE+HNX cổ phiếu hợp lệ: {len(df_exchange)} mã")
+
+    # TEST MODE: chỉ xử lý VN30
+    if TEST_MODE:
+        df_exchange = df_exchange[df_exchange["symbol"].isin(VN30_SYMBOLS)]
+        log.info(f"[TEST MODE] Giới hạn VN30: {len(df_exchange)} mã")
 
     # 3. Lấy thông tin ngành
     log.info("Lấy thông tin ngành...")
