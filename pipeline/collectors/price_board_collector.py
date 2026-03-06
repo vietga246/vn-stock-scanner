@@ -11,12 +11,11 @@ Features:
 - Lưu bid/ask 3 bậc: áp lực mua/bán tức thời
 - TEST_MODE: chỉ dùng VN30
 
-Chạy: python -m pipeline.collectors.price_board_collector
-       TEST_MODE=true python -m pipeline.collectors.price_board_collector
+Chạy: python pipeline/collectors/price_board_collector.py
+       TEST_MODE=true python pipeline/collectors/price_board_collector.py
 """
 
-from vnstock import Listing
-from vnstock.explorer.vci.trading import Trading
+from vnstock import Listing, Trading
 from datetime import datetime
 import sqlite3
 import pandas as pd
@@ -299,8 +298,14 @@ def collect_price_board():
     # ── Gọi API (1 batch call) ────────────────────────────────────────────
     t_api_start = time.time()
     try:
-        trader = Trading(symbol=tickers[0], show_log=False)
-        df = trader.price_board(symbols_list=tickers, flatten_columns=True)
+        trader = Trading(symbol=tickers[0], source="VCI", show_log=False)
+        # flatten_columns=True được hỗ trợ từ vnstock >= 3.x
+        # Nếu version cũ không hỗ trợ, parse_row() tự handle MultiIndex columns
+        try:
+            df = trader.price_board(symbols_list=tickers, flatten_columns=True)
+        except TypeError:
+            log.warning("flatten_columns not supported — fetching without it")
+            df = trader.price_board(symbols_list=tickers)
         elapsed = time.time() - t_api_start
         log.info("✅ API responded in %.1fs — %d rows", elapsed, len(df))
     except Exception as e:
