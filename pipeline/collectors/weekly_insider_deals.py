@@ -26,6 +26,13 @@ MAX_REQUEST_PER_MIN  = 60
 MAX_RETRY            = 3
 COMMIT_BATCH         = 20
 SKIP_IF_UPDATED_DAYS = 7
+TEST_MODE            = os.getenv("TEST_MODE", "false").lower() == "true"
+
+VN30_SYMBOLS = [
+    "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
+    "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
+    "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE",
+]
 
 # ---------------- LOGGING ---------------- #
 
@@ -169,6 +176,9 @@ def fetch_insider_deals():
         log.warning("⚠️  Guest mode")
 
     tickers = get_tickers()
+    if TEST_MODE:
+        tickers = [t for t in tickers if t in VN30_SYMBOLS]
+        log.info(f"[TEST MODE] Giới hạn VN30: {len(tickers)} mã")
     log.info(f"Bắt đầu lấy insider deals cho {len(tickers)} mã...")
 
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
