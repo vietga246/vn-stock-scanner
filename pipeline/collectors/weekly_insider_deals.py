@@ -18,6 +18,12 @@ import os
 import time
 import re
 
+# tenacity là dependency của vnstock — import để catch RetryError đúng cách
+try:
+    from tenacity import RetryError as TenacityRetryError
+except ImportError:
+    TenacityRetryError = None
+
 # ---------------- CONFIG ---------------- #
 
 DB_PATH              = os.getenv("DB_PATH", "data/db/stock.db")
@@ -228,12 +234,23 @@ def fetch_insider_deals():
                 retry_count += 1
 
             except NotImplementedError:
-                # API không hỗ trợ insider deal cho mã này — bỏ qua, không retry
-                log.warning(f"⚠️  {symbol} — insider_deal() không được hỗ trợ (NotImplementedError), bỏ qua")
+                # bare NotImplementedError (không qua tenacity)
+                log.warning(f"⚠️  {symbol} — insider_deal() không được hỗ trợ, bỏ qua")
                 fail += 1
                 break
 
             except Exception as e:
+                # Kiểm tra tenacity.RetryError bọc NotImplementedError
+                is_retry_not_implemented = (
+                    (TenacityRetryError and isinstance(e, TenacityRetryError)) or
+                    "RetryError" in type(e).__name__
+                ) and "NotImplementedError" in str(e)
+
+                if is_retry_not_implemented:
+                    log.warning(f"⚠️  {symbol} — insider_deal() không được hỗ trợ (RetryError/NotImplementedError), bỏ qua")
+                    fail += 1
+                    break
+
                 err = str(e).lower()
                 if any(x in err for x in ["429", "rate limit", "exceeded", "giới hạn"]):
                     wait = extract_wait_time(str(e))
