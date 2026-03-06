@@ -185,18 +185,23 @@ def parse_row(row: dict, snapshot_time: str) -> dict:
                "symbol")
 
     # ── Foreign trading ────────────────────────────────────────────────────
-    f_buy_qty  = safe_float(g("match_foreign_buy_qty",   "match__foreign_buy_qty",
-                               "match_buyForeignQty",    "match__buyForeignQty"))
-    f_sell_qty = safe_float(g("match_foreign_sell_qty",  "match__foreign_sell_qty",
-                               "match_sellForeignQty",   "match__sellForeignQty"))
+    # API returns 'volume' not 'qty' for foreign trading
+    f_buy_qty  = safe_float(g("match_foreign_buy_volume",  "match__foreign_buy_volume",
+                               "match_foreign_buy_qty",    "match__foreign_buy_qty",
+                               "match_buyForeignQty",      "match__buyForeignQty"))
+    f_sell_qty = safe_float(g("match_foreign_sell_volume", "match__foreign_sell_volume",
+                               "match_foreign_sell_qty",   "match__foreign_sell_qty",
+                               "match_sellForeignQty",     "match__sellForeignQty"))
     f_net_qty  = None
     if f_buy_qty is not None and f_sell_qty is not None:
         f_net_qty = f_buy_qty - f_sell_qty
 
-    f_buy_val  = safe_float(g("match_buy_foreign_value",  "match__buy_foreign_value",
-                               "match_buyForeignValue",   "match__buyForeignValue"))
-    f_sell_val = safe_float(g("match_sell_foreign_value", "match__sell_foreign_value",
-                               "match_sellForeignValue",  "match__sellForeignValue"))
+    f_buy_val  = safe_float(g("match_foreign_buy_value",   "match__foreign_buy_value",
+                               "match_buy_foreign_value",  "match__buy_foreign_value",
+                               "match_buyForeignValue",    "match__buyForeignValue"))
+    f_sell_val = safe_float(g("match_foreign_sell_value",  "match__foreign_sell_value",
+                               "match_sell_foreign_value", "match__sell_foreign_value",
+                               "match_sellForeignValue",   "match__sellForeignValue"))
     f_net_val  = None
     if f_buy_val is not None and f_sell_val is not None:
         f_net_val = f_buy_val - f_sell_val
@@ -204,8 +209,9 @@ def parse_row(row: dict, snapshot_time: str) -> dict:
     # ── Price change ───────────────────────────────────────────────────────
     match_price = safe_float(g("match_match_price", "match__match_price",
                                 "match_matchPrice",  "match__matchPrice"))
-    ref_price   = safe_float(g("listing_ref_price", "listing__ref_price",
-                                "listing_refPrice",  "listing__refPrice"))
+    ref_price   = safe_float(g("listing_ref_price",     "listing__ref_price",
+                                "match_reference_price", "match__reference_price",
+                                "listing_refPrice",      "listing__refPrice"))
     price_change = None
     price_change_pct = None
     if match_price is not None and ref_price and ref_price != 0:
@@ -226,17 +232,21 @@ def parse_row(row: dict, snapshot_time: str) -> dict:
 
         # Match
         "match_price":        match_price,
-        "match_qty":          safe_float(g("match_match_qty",          "match__match_qty",
+        "match_qty":          safe_float(g("match_match_vol",          "match__match_vol",
+                                           "match_match_qty",          "match__match_qty",
                                            "match_matchQty",           "match__matchQty")),
         "open_price":         safe_float(g("match_open_price",         "match__open_price",
                                            "match_openPrice",          "match__openPrice")),
         "highest_price":      safe_float(g("match_highest",            "match__highest")),
         "lowest_price":       safe_float(g("match_lowest",             "match__lowest")),
-        "avg_price":          safe_float(g("match_avg_price",          "match__avg_price",
+        "avg_price":          safe_float(g("match_avg_match_price",     "match__avg_match_price",
+                                           "match_avg_price",          "match__avg_price",
                                            "match_avgPrice",           "match__avgPrice")),
-        "total_traded_qty":   safe_float(g("match_total_traded_qty",   "match__total_traded_qty",
+        "total_traded_qty":   safe_float(g("match_accumulated_volume",  "match__accumulated_volume",
+                                           "match_total_traded_qty",   "match__total_traded_qty",
                                            "match_totalTradedQty",     "match__totalTradedQty")),
-        "total_traded_value": safe_float(g("match_total_traded_value", "match__total_traded_value",
+        "total_traded_value": safe_float(g("match_accumulated_value",  "match__accumulated_value",
+                                           "match_total_traded_value", "match__total_traded_value",
                                            "match_totalTradedValue",   "match__totalTradedValue")),
         "price_change":       price_change,
         "price_change_pct":   price_change_pct,
@@ -248,7 +258,8 @@ def parse_row(row: dict, snapshot_time: str) -> dict:
         "foreign_buy_value":  f_buy_val,
         "foreign_sell_value": f_sell_val,
         "foreign_net_value":  f_net_val,
-        "foreign_room":       safe_float(g("listing_foreign_room",     "listing__foreign_room",
+        "foreign_room":       safe_float(g("match_current_room",       "match__current_room",
+                                           "listing_foreign_room",     "listing__foreign_room",
                                            "listing_foreignRoom",      "listing__foreignRoom")),
 
         # Bid/Ask
