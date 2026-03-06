@@ -48,7 +48,15 @@ jobs:
             echo "❌ Database not found!"
           fi
 
-      - name: Tính chỉ số kỹ thuật (MA, RSI, MACD, Bollinger)
+      - name: "🔧 DB Migration (thêm columns mới nếu chưa có)"
+        id: migrate
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+        run: python pipeline/utils/migrate_db.py
+        continue-on-error: true
+
+      - name: Tính chỉ số kỹ thuật (MA, RSI, MACD, Bollinger, ADX, FVG)
         id: technical
         if: steps.check_db.outputs.DB_EXISTS == 'true'
         env:
