@@ -29,6 +29,7 @@ from utils import (
     safe_float,
     extract_wait_time,
     is_bond,
+    is_stock,
     create_db_connection,
     setup_logging,
 )
@@ -106,29 +107,32 @@ def upsert_df(cursor, ticker: str, df: pd.DataFrame):
 # ─── TICKERS ───────────────────────────────────────────────────────────────
 
 def get_tickers() -> list:
-    """Get HOSE + HNX symbols, excluding bonds and UPCOM."""
+    """Get HOSE + HNX symbols, excluding bonds, warrants, futures, and ETFs."""
     listing = Listing()
-    
+
     try:
         df = listing.symbols_by_exchange()
         if "exchange" in df.columns:
             df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
-            tickers = df["symbol"].tolist()
-            
-            # Filter out bonds
-            before = len(tickers)
-            tickers = [t for t in tickers if not is_bond(t)]
-            
-            log.info("HOSE+HNX: %d symbols (excluded UPCOM + %d bonds)", 
+
+            # Lọc theo cột 'type' nếu có
+            if "type" in df.columns:
+                df = df[df["type"].str.upper() == "STOCK"]
+
+            # Lọc theo is_stock() — loại bond, ETF, futures, warrant theo pattern mã
+            before = len(df)
+            tickers = [t for t in df["symbol"].tolist() if is_stock(t)]
+
+            log.info("HOSE+HNX: %d stocks (excluded UPCOM + %d non-stocks: bonds/futures/warrants/ETFs)",
                     len(tickers), before - len(tickers))
             return tickers
-            
+
     except Exception as e:
         log.warning("symbols_by_exchange() failed: %s — using fallback", e)
-    
+
     # Fallback
     df = listing.all_symbols()
-    tickers = [t for t in df["symbol"].tolist() if not is_bond(t)]
+    tickers = [t for t in df["symbol"].tolist() if is_stock(t)]
     log.warning("Fallback: %d symbols", len(tickers))
     return tickers
 
