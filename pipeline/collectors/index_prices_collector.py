@@ -39,8 +39,8 @@ DB_PATH      = os.getenv("DB_PATH",      "data/db/stock.db")
 DAYS_LOOKBACK = int(os.getenv("DAYS_LOOKBACK", "7"))
 API_KEY      = os.getenv("VNSTOCK_API_KEY", "")
 
-# Danh sách index cần thu thập
-INDEX_SYMBOLS = ["VNINDEX", "VN30", "HNX30", "UPCOM"]
+# Danh sách index cần thu thập (UPCOM không hỗ trợ bởi VCI API)
+INDEX_SYMBOLS = ["VNINDEX", "VN30", "HNX30"]
 
 log = setup_logging()
 
