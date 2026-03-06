@@ -254,16 +254,20 @@ def fetch_symbol_data(symbol: str, limiter: ThreadSafeRateLimiter) -> dict:
                 df_f = t.foreign_trade()
                 if df_f is not None and not df_f.empty:
                     result['foreign_rows'] = prepare_trading_rows(symbol, df_f)
+                else:
+                    log.warning("[%s] foreign_trade() trả về empty", symbol)
             except Exception as e:
-                log.debug("[%s] foreign_trade error: %s", symbol, e)
+                log.warning("[%s] foreign_trade() lỗi: %s", symbol, e)
             
             # Proprietary trading
             try:
                 df_p = t.prop_trade()
                 if df_p is not None and not df_p.empty:
                     result['prop_rows'] = prepare_trading_rows(symbol, df_p)
+                else:
+                    log.warning("[%s] prop_trade() trả về empty", symbol)
             except Exception as e:
-                log.debug("[%s] prop_trade error: %s", symbol, e)
+                log.warning("[%s] prop_trade() lỗi: %s", symbol, e)
             
             return result
             
@@ -383,13 +387,21 @@ def fetch_foreign_trading():
     
     # Write all results to DB (single thread)
     log.info("Writing %d results to database...", len(all_results))
-    
+
+    foreign_rows_total = 0
+    prop_rows_total    = 0
+    ok_with_data       = 0
+
     for result in all_results:
         if result['status'] == 'ok':
             if result['foreign_rows']:
                 batch_insert(cursor, "foreign_trading", result['foreign_rows'])
+                foreign_rows_total += len(result['foreign_rows'])
             if result['prop_rows']:
                 batch_insert(cursor, "prop_trading", result['prop_rows'])
+                prop_rows_total += len(result['prop_rows'])
+            if result['foreign_rows'] or result['prop_rows']:
+                ok_with_data += 1
             ok += 1
             batch_counter += 1
         else:
@@ -403,8 +415,12 @@ def fetch_foreign_trading():
     # Final commit and close
     conn.commit()
     conn.close()
-    
+
     log.info("✅ Done — OK: %d, Failed: %d", ok, fail)
+    log.info("   foreign_trading rows: %d | prop_trading rows: %d | symbols có data: %d/%d",
+             foreign_rows_total, prop_rows_total, ok_with_data, ok)
+    if ok > 0 and ok_with_data == 0:
+        log.warning("⚠️  Tất cả symbol trả về empty — foreign/prop API có thể không hỗ trợ hoặc ngoài giờ giao dịch")
 
 
 if __name__ == "__main__":
