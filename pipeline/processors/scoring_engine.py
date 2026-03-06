@@ -363,7 +363,7 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
             df[col] = None
         return df
 
-    merge_cols = ["symbol", "price_change_1d", "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
+    merge_cols = ["symbol", "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
                   "rs_vs_market", "rsi14", "macd", "macd_signal", "macd_hist",
                   "trend_short", "trend_medium"]
     merge_cols = [c for c in merge_cols if c in tech_df.columns]
@@ -571,6 +571,15 @@ OUTPUT_COLS = [
 ]
 
 
+def _scalar(val):
+    """Ép kiểu về scalar – phòng khi val là Series/ndarray do merge duplicate columns."""
+    if isinstance(val, pd.Series):
+        return val.iloc[0] if len(val) > 0 else None
+    if isinstance(val, np.ndarray):
+        return val.flat[0] if val.size > 0 else None
+    return val
+
+
 def save_scores(conn, df: pd.DataFrame):
     now = datetime.now().isoformat()
     df  = df.copy()
@@ -580,7 +589,7 @@ def save_scores(conn, df: pd.DataFrame):
     for _, row in df.iterrows():
         record = {}
         for col in OUTPUT_COLS:
-            val = row.get(col)
+            val = _scalar(row.get(col))
             if col in ("trend_short", "rank_total"):
                 try:
                     record[col] = int(val) if val is not None and val == val else None
@@ -595,6 +604,13 @@ def save_scores(conn, df: pd.DataFrame):
 
     # Upsert via temp DataFrame
     out_df = pd.DataFrame(rows)
+    # Final safety pass: flatten any remaining non-scalar cells
+    for col in out_df.columns:
+        if out_df[col].dtype == object:
+            out_df[col] = out_df[col].apply(
+                lambda x: x.iloc[0] if isinstance(x, pd.Series) and len(x) > 0
+                else (x.flat[0] if isinstance(x, np.ndarray) and x.size > 0 else x)
+            )
     out_df.to_sql("stock_scores", conn, if_exists="replace", index=False)
     conn.commit()
     log.info("Saved %d rows to stock_scores", len(out_df))
@@ -605,13 +621,23 @@ def save_scores(conn, df: pd.DataFrame):
 def load_symbols(conn) -> pd.DataFrame:
     """Load symbols table nếu có, hoặc từ JSON export."""
     try:
-        df = pd.read_sql("SELECT symbol, industry_name, exchange, warning_status FROM symbols", conn)
-        if not df.empty:
-            # Fill missing warning_status with 'normal'
-            df["warning_status"] = df["warning_status"].fillna("normal")
-            return df
-    except Exception:
-        pass
+        # Kiểm tra cột tồn tại trước khi query (warning_status có thể chưa có)
+        cursor = conn.execute("PRAGMA table_info(symbols)")
+        cols_in_db = {row[1] for row in cursor.fetchall()}
+        if cols_in_db:
+            select_cols = ["symbol", "industry_name", "exchange"]
+            if "warning_status" in cols_in_db:
+                select_cols.append("warning_status")
+            df = pd.read_sql(f"SELECT {', '.join(select_cols)} FROM symbols", conn)
+            if not df.empty:
+                if "warning_status" not in df.columns:
+                    df["warning_status"] = "normal"
+                else:
+                    df["warning_status"] = df["warning_status"].fillna("normal")
+                log.info("Symbols loaded from DB: %d", len(df))
+                return df
+    except Exception as e:
+        log.warning("load_symbols DB error: %s", e)
 
     # Fallback: đọc từ JSON export (không có warning_status)
     import json
