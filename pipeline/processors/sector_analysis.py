@@ -145,6 +145,11 @@ def load_scores(conn) -> pd.DataFrame:
             if col not in df.columns:
                 df[col] = None
 
+        # Convert raw VND → tỷ đồng (stock_scores stores raw VND from foreign_trading.net_value)
+        for col in ["foreign_net_7d", "foreign_net_30d"]:
+            if col in df.columns and df[col].notna().any():
+                df[col] = df[col] / 1e9
+
         log.info("Scores loaded: %d symbols", len(df))
         return df
     except Exception as e:
