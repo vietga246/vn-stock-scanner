@@ -217,6 +217,12 @@ def fetch_insider_deals():
                 limiter.reset()
                 retry_count += 1
 
+            except NotImplementedError:
+                # API không hỗ trợ insider deal cho mã này — bỏ qua, không retry
+                log.warning(f"⚠️  {symbol} — insider_deal() không được hỗ trợ (NotImplementedError), bỏ qua")
+                fail += 1
+                break
+
             except Exception as e:
                 err = str(e).lower()
                 if any(x in err for x in ["429", "rate limit", "exceeded", "giới hạn"]):
