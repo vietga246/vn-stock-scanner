@@ -193,7 +193,50 @@ def init_db(conn):
         CREATE INDEX IF NOT EXISTS idx_scores_smart_money ON stock_scores(smart_money_score DESC);
     """)
     conn.commit()
+    _migrate_stock_scores(conn)
     log.info("stock_scores table OK")
+
+
+def _migrate_stock_scores(conn):
+    """Thêm columns mới vào stock_scores nếu chưa có — idempotent, safe."""
+    cur = conn.cursor()
+    cur.execute("PRAGMA table_info(stock_scores)")
+    existing = {row[1] for row in cur.fetchall()}
+
+    new_columns = [
+        ("roa",             "REAL"),
+        ("vol_ma20",        "REAL"),
+        ("pct_from_ma20",   "REAL"),
+        ("pct_from_ma50",   "REAL"),
+        ("adx14",           "REAL"),
+        ("plus_di14",       "REAL"),
+        ("minus_di14",      "REAL"),
+        ("di_spread",       "REAL"),
+        ("trend_strength",  "REAL"),
+        ("bb_width",        "REAL"),
+        ("atr14",           "REAL"),
+        ("atr_pct",         "REAL"),
+        ("macd_hist",       "REAL"),
+        ("fvg_bull",        "INTEGER"),
+        ("fvg_bear",        "INTEGER"),
+        ("fvg_bull_size",   "REAL"),
+        ("fvg_bear_size",   "REAL"),
+        ("fvg_bull_age",    "INTEGER"),
+        ("fvg_bear_age",    "INTEGER"),
+        ("fvg_bull_fill",   "REAL"),
+        ("fvg_bear_fill",   "REAL"),
+    ]
+
+    added = []
+    for col, col_type in new_columns:
+        if col not in existing:
+            conn.execute(f"ALTER TABLE stock_scores ADD COLUMN {col} {col_type}")
+            added.append(col)
+
+    if added:
+        conn.commit()
+        log.info("Migration stock_scores: thêm %d columns mới: %s",
+                 len(added), ", ".join(added))
 
 
 # ─── DATA LOADING ────────────────────────────────────────────────────────────

@@ -147,7 +147,74 @@ def init_db(conn):
         CREATE INDEX IF NOT EXISTS idx_tech_fvg    ON technical_indicators(fvg_bull, fvg_bear);
     """)
     conn.commit()
+
+    # ── Migration: thêm columns mới vào bảng đã tồn tại ──────────────────────
+    # SQLite không hỗ trợ IF NOT EXISTS cho ALTER TABLE ADD COLUMN,
+    # nên phải kiểm tra PRAGMA table_info trước.
+    _migrate_add_columns(conn)
+
     log.info("DB schema OK")
+
+
+def _migrate_add_columns(conn):
+    """
+    Thêm columns mới vào technical_indicators nếu chưa có.
+    Chạy mỗi lần nhưng chỉ thực sự ALTER khi cần — idempotent.
+    """
+    cur = conn.cursor()
+    cur.execute("PRAGMA table_info(technical_indicators)")
+    existing = {row[1] for row in cur.fetchall()}
+
+    # Danh sách (column_name, column_def) theo thứ tự thêm vào
+    new_columns = [
+        # ADX
+        ("adx14",          "REAL"),
+        ("plus_di14",       "REAL"),
+        ("minus_di14",      "REAL"),
+        ("di_spread",       "REAL"),
+        # Trend Strength
+        ("trend_strength",  "REAL"),
+        # Volume baseline
+        ("vol_ma20",        "REAL"),
+        # Price vs MAs (có thể chưa có ở DB cũ)
+        ("pct_from_ma20",   "REAL"),
+        ("pct_from_ma50",   "REAL"),
+        # FVG
+        ("fvg_bull",        "INTEGER"),
+        ("fvg_bear",        "INTEGER"),
+        ("fvg_bull_size",   "REAL"),
+        ("fvg_bear_size",   "REAL"),
+        ("fvg_bull_age",    "INTEGER"),
+        ("fvg_bear_age",    "INTEGER"),
+        ("fvg_bull_fill",   "REAL"),
+        ("fvg_bear_fill",   "REAL"),
+    ]
+
+    added = []
+    for col, col_type in new_columns:
+        if col not in existing:
+            conn.execute(
+                f"ALTER TABLE technical_indicators ADD COLUMN {col} {col_type}"
+            )
+            added.append(col)
+
+    if added:
+        conn.commit()
+        log.info("Migration: thêm %d columns mới: %s", len(added), ", ".join(added))
+
+    # Thêm indexes mới nếu chưa có (CREATE INDEX IF NOT EXISTS — an toàn)
+    try:
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tech_adx "
+            "ON technical_indicators(adx14)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tech_fvg "
+            "ON technical_indicators(fvg_bull, fvg_bear)"
+        )
+        conn.commit()
+    except Exception:
+        pass  # index đã tồn tại hoặc columns chưa có → bỏ qua
 
 
 # ─── INDICATOR CALCULATIONS ─────────────────────────────────────────────────
