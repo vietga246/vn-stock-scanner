@@ -343,9 +343,6 @@ def collect_price_board():
             df = trader.price_board(symbols_list=tickers)
         elapsed = time.time() - t_api_start
         log.info("✅ API responded in %.1fs — %d rows", elapsed, len(df))
-        # Log toàn bộ column names để verify mapping
-        all_cols = list(df.columns)
-        log.info("📋 DataFrame columns (%d total): %s", len(all_cols), all_cols)
     except Exception as e:
         log.error("❌ price_board() failed: %s", e)
         raise
@@ -366,11 +363,6 @@ def collect_price_board():
         try:
             parsed = parse_row(raw_row.to_dict(), snapshot_time)
             if not parsed.get("symbol"):
-                if rows_skipped == 0:
-                    # Log keys của row đầu tiên bị skip để debug
-                    row_dict = raw_row.to_dict()
-                    log.warning("⚠️  symbol=None on first row. Available keys: %s",
-                                list(row_dict.keys())[:15])
                 rows_skipped += 1
                 continue
             cursor.execute(INSERT_SQL, parsed)
