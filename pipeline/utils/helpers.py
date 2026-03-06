@@ -295,21 +295,31 @@ def is_derivative(symbol: str) -> bool:
 
 def is_stock(symbol: str) -> bool:
     """
-    Check if symbol is a regular stock (not bond, futures, or warrant).
-    
+    Check if symbol is a regular stock (not bond, futures, ETF, or warrant).
+
+    Valid Vietnamese stock codes:
+    - HOSE: exactly 3 uppercase letters (e.g. FPT, VCB, HPG)
+    - HNX:  3 chars starting with a letter, may contain digits (e.g. S99, D2D, VC3, PC1)
+
+    Excluded:
+    - Covered warrants: C + 2-3 letters + 4 digits, total 7-8 chars (e.g. CHPG2401)
+    - Futures: start with FU (e.g. FUEMAVND, FUEKIV30)
+    - ETFs: start with E1 or similar (e.g. E1VFVN30)
+    - Bonds: 2-4 letters + 4+ digits, total > 6 chars (e.g. CACB2510001)
+
     Args:
         symbol: Stock symbol to check
-        
+
     Returns:
         True if symbol is a regular stock
     """
     if not symbol:
         return False
-    
-    # Must be 3 letters (standard Vietnamese stock codes)
-    if not re.match(r'^[A-Z]{3}$', symbol):
+
+    # Must be exactly 3 characters, starting with a letter, rest alphanumeric
+    if not re.match(r'^[A-Z][A-Z0-9]{2}$', symbol):
         return False
-    
+
     return True
 
 
