@@ -92,7 +92,7 @@ jobs:
         env:
           DB_PATH: data/db/stock.db
           EXPORT_DIR: data/exports
-          PRICE_DAYS_LIMIT: "30"
+          PRICE_DAYS_LIMIT: "200"
         run: python pipeline/exporters/export_prices.py
         continue-on-error: true
 
