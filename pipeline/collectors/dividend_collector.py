@@ -25,6 +25,12 @@ import sys
 import os
 import time
 
+# tenacity là dependency của vnstock — import để catch RetryError đúng cách
+try:
+    from tenacity import RetryError as TenacityRetryError
+except ImportError:
+    TenacityRetryError = None
+
 # Import shared utilities
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from utils import (
@@ -176,25 +182,55 @@ def parse_dividend_row(symbol: str, row: dict) -> dict | None:
 
 def fetch_dividends(symbol: str) -> list[dict]:
     """Lấy lịch sử cổ tức từ Company.dividends()."""
-    try:
-        company = Company(symbol=symbol, source="VCI")
-        df = company.dividends()
+    for attempt in range(1, MAX_RETRY + 1):
+        try:
+            company = Company(symbol=symbol, source="VCI")
+            df = company.dividends()
 
-        if df is None or df.empty:
-            return []
+            if df is None or df.empty:
+                log.warning("[%s] dividends() trả về empty", symbol)
+                return []
 
-        results = []
-        for _, row in df.iterrows():
-            parsed = parse_dividend_row(symbol, row.to_dict())
-            if parsed:
-                results.append(parsed)
+            results = []
+            for _, row in df.iterrows():
+                parsed = parse_dividend_row(symbol, row.to_dict())
+                if parsed:
+                    results.append(parsed)
 
-        log.debug("[%s] Fetched %d dividend records", symbol, len(results))
-        return results
+            if not results:
+                log.warning("[%s] dividends() có data nhưng parse ra 0 records — columns: %s",
+                            symbol, list(df.columns))
+            else:
+                log.debug("[%s] Fetched %d dividend records", symbol, len(results))
+            return results
 
-    except Exception as e:
-        log.debug("[%s] dividends() failed: %s", symbol, e)
-        return []
+        except Exception as e:
+            err_str = str(e)
+            err_lower = err_str.lower()
+
+            # Kiểm tra NotImplementedError (bare hoặc qua tenacity RetryError)
+            is_not_implemented = isinstance(e, NotImplementedError) or (
+                ((TenacityRetryError and isinstance(e, TenacityRetryError)) or
+                 "RetryError" in type(e).__name__) and
+                "NotImplementedError" in err_str
+            )
+            if is_not_implemented:
+                log.warning("[%s] dividends() không được hỗ trợ (NotImplementedError), bỏ qua", symbol)
+                return []
+
+            # Rate limit — retry
+            if any(x in err_lower for x in ["429", "rate limit", "exceeded", "giới hạn"]):
+                wait = 65
+                log.warning("[%s] Rate limit (attempt %d/%d) -> sleep %ds", symbol, attempt, MAX_RETRY, wait)
+                time.sleep(wait)
+                continue
+
+            # Lỗi khác — log rõ để debug
+            log.warning("[%s] dividends() lỗi (attempt %d/%d): %s", symbol, attempt, MAX_RETRY, e)
+            if attempt >= MAX_RETRY:
+                return []
+
+    return []
 
 
 # ─── CALC DIVIDEND YIELD ───────────────────────────────────────────────────
