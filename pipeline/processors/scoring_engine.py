@@ -4,7 +4,8 @@ scoring.py — Composite Scoring Engine cho VN Stock Scanner
 Tính điểm tổng hợp (0–100) cho từng cổ phiếu dựa trên 4 trụ cột:
 
   A. Fundamental Score  (35%): PE, ROE, ROA, revenue growth, net margin, D/E
-  B. Smart Money Score  (30%): Net foreign flow, prop trading, insider deals
+  B. Smart Money Score  (30%): Net foreign flow 7d + 30d
+                               (prop trading và insider deals không có data từ VCI source)
   C. Momentum Score     (20%): Price momentum 5d/20d, volume surge, RS vs market
   D. Technical Score    (15%): RSI, MACD signal, Bollinger position, trend
 
@@ -61,9 +62,10 @@ FUNDAMENTAL_WEIGHTS = {
 }
 
 SMART_MONEY_WEIGHTS = {
-    "foreign_net_7d_score":  0.40,
-    "foreign_net_30d_score": 0.30,
-    "prop_net_7d_score":     0.30,
+    # prop_trading không có data từ VCI source → chỉ dùng foreign flow
+    # 0.30 (prop) được redistribute: foreign_7d +0.20, foreign_30d +0.10
+    "foreign_net_7d_score":  0.60,
+    "foreign_net_30d_score": 0.40,
 }
 
 MOMENTUM_WEIGHTS = {
@@ -120,7 +122,7 @@ def init_db(conn):
 
             foreign_net_7d_score  REAL,
             foreign_net_30d_score REAL,
-            prop_net_7d_score     REAL,
+            -- prop_net_7d_score removed: prop_trading không có data từ VCI source
 
             price_5d_score      REAL,
             price_20d_score     REAL,
@@ -147,9 +149,9 @@ def init_db(conn):
             trend_short         INTEGER,
             
             -- Smart money raw values (tỷ đồng)
+            -- prop_net_7d removed: không có data từ VCI source
             foreign_net_7d      REAL,
             foreign_net_30d     REAL,
-            prop_net_7d         REAL,
 
             -- Ranking
             rank_total          INTEGER,
@@ -199,8 +201,10 @@ def load_fundamentals(conn) -> pd.DataFrame:
 
 def load_smart_money(conn) -> pd.DataFrame:
     """
-    Tổng hợp dòng tiền thông minh.
-    Nếu foreign_trading rỗng (chưa có data), trả về DataFrame rỗng.
+    Tổng hợp dòng tiền nước ngoài (foreign flow).
+    
+    Lưu ý: prop_trading và insider_deals không có data từ VCI source →
+    đã loại bỏ khỏi Smart Money Score. Chỉ dùng foreign flow.
     """
     # Foreign flow 7 ngày
     foreign_7d = pd.read_sql("""
@@ -221,20 +225,11 @@ def load_smart_money(conn) -> pd.DataFrame:
         GROUP BY symbol
     """, conn)
 
-    # Prop trading 7 ngày
-    prop_7d = pd.read_sql("""
-        SELECT symbol, SUM(net_value) AS prop_net_7d
-        FROM prop_trading
-        WHERE date >= date('now', '-7 days')
-        GROUP BY symbol
-    """, conn)
-
-    if foreign_7d.empty and foreign_30d.empty and prop_7d.empty:
+    if foreign_7d.empty and foreign_30d.empty:
         log.warning("Smart money data rỗng (chưa chạy daily_foreign_flow.py hoặc API trả về empty)")
-        return pd.DataFrame(columns=["symbol", "foreign_net_7d", "foreign_net_30d", "prop_net_7d"])
+        return pd.DataFrame(columns=["symbol", "foreign_net_7d", "foreign_net_30d"])
 
     result = foreign_7d.merge(foreign_30d, on="symbol", how="outer")
-    result = result.merge(prop_7d, on="symbol", how="outer")
     log.info("Smart money loaded: %d symbols", len(result))
     return result
 
@@ -325,27 +320,23 @@ def score_fundamentals(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def score_smart_money(df: pd.DataFrame, smart_df: pd.DataFrame) -> pd.DataFrame:
-    """Merge và tính Smart Money Score."""
+    """Merge và tính Smart Money Score (chỉ foreign flow — prop/insider không có data VCI)."""
     if smart_df.empty:
-        for col in ["smart_money_score", "foreign_net_7d_score",
-                    "foreign_net_30d_score", "prop_net_7d_score"]:
+        for col in ["smart_money_score", "foreign_net_7d_score", "foreign_net_30d_score"]:
             df[col] = 50.0  # neutral khi không có data
         df["foreign_net_7d"]  = None
         df["foreign_net_30d"] = None
-        df["prop_net_7d"]     = None
         return df
 
-    df = df.merge(smart_df[["symbol", "foreign_net_7d", "foreign_net_30d", "prop_net_7d"]],
+    df = df.merge(smart_df[["symbol", "foreign_net_7d", "foreign_net_30d"]],
                   on="symbol", how="left")
 
     df["foreign_net_7d_score"]  = percentile_rank(df.get("foreign_net_7d",  pd.Series()))
     df["foreign_net_30d_score"] = percentile_rank(df.get("foreign_net_30d", pd.Series()))
-    df["prop_net_7d_score"]     = percentile_rank(df.get("prop_net_7d",     pd.Series()))
 
     df["smart_money_score"] = (
         df["foreign_net_7d_score"]  * SMART_MONEY_WEIGHTS["foreign_net_7d_score"] +
-        df["foreign_net_30d_score"] * SMART_MONEY_WEIGHTS["foreign_net_30d_score"] +
-        df["prop_net_7d_score"]     * SMART_MONEY_WEIGHTS["prop_net_7d_score"]
+        df["foreign_net_30d_score"] * SMART_MONEY_WEIGHTS["foreign_net_30d_score"]
     )
 
     return df
@@ -558,14 +549,16 @@ OUTPUT_COLS = [
     "technical_score", "composite_score",
     "roe_score", "roa_score", "revenue_growth_score", "net_margin_score",
     "pe_score", "debt_equity_score",
-    "foreign_net_7d_score", "foreign_net_30d_score", "prop_net_7d_score",
+    "foreign_net_7d_score", "foreign_net_30d_score",
+    # prop_net_7d_score removed: không có data từ VCI source
     "price_5d_score", "price_20d_score", "vol_surge_score", "rs_vs_market_score",
     "rsi_score", "macd_score", "trend_score",
     "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
     "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
     "rsi14", "macd_hist", "trend_short",
-    # Smart money raw values (for export)
-    "foreign_net_7d", "foreign_net_30d", "prop_net_7d",
+    # Smart money raw values
+    "foreign_net_7d", "foreign_net_30d",
+    # prop_net_7d removed: không có data từ VCI source
     "rank_total", "rank_pct", "tier",
     "data_completeness",
 ]
@@ -730,9 +723,9 @@ def run():
         warning_flag = f" ⚠️{r['warning_status']}" if r.get("warning_status", "normal") != "normal" else ""
         log.info("  #%d %s%s — Score: %.1f (%s) | ROE: %s | PE: %s | RevGrowth: %s",
                  r["rank_total"], r["symbol"], warning_flag, r["composite_score"], r["tier"],
-                 f"{r['roe']:.1f}%" if r["roe"] else "N/A",
+                 f"{r['roe']*100:.1f}%" if r["roe"] else "N/A",
                  f"{r['pe']:.1f}x" if r["pe"] else "N/A",
-                 f"{r['revenue_growth']:.1f}%" if r["revenue_growth"] else "N/A")
+                 f"{r['revenue_growth']*100:.1f}%" if r["revenue_growth"] else "N/A")
 
     conn.close()
     log.info("✅ Scoring done — %d symbols scored", len(df))
