@@ -158,39 +158,54 @@ def _get(row: dict, *keys, default=None):
 
 def parse_row(row: dict, snapshot_time: str) -> dict:
     """
-    Chuyển 1 row từ price_board DataFrame (đã flatten) thành dict để INSERT.
-    Xử lý cả MultiIndex columns (tuple keys) và flat string keys.
+    Chuyển 1 row từ price_board DataFrame thành dict để INSERT.
+
+    vnstock flatten_columns=True trả về single underscore: listing_symbol
+    MultiIndex (flatten_columns không hỗ trợ) trả về tuple → join thành: listing__symbol
+    → Mỗi field thử cả 2 dạng để tương thích.
     """
     # Flatten tuple keys nếu DataFrame vẫn có MultiIndex
     flat = {}
     for k, v in row.items():
         if isinstance(k, tuple):
-            flat["__".join(k)] = v
+            # MultiIndex: ('listing', 'symbol') → 'listing__symbol'
+            flat["__".join(str(x) for x in k)] = v
         else:
             flat[k] = v
 
-    # Helper: thử nhiều tên cột
+    # Helper: thử nhiều tên cột, ưu tiên theo thứ tự
     def g(*keys, default=None):
         return _get(flat, *keys, default=default)
 
-    symbol = g("listing__symbol", "match__symbol", "bid_ask__symbol", "symbol")
+    # ── Symbol ─────────────────────────────────────────────────────────────
+    # flatten_columns=True  → 'listing_symbol'  (single underscore)
+    # MultiIndex fallback   → 'listing__symbol' (double underscore)
+    symbol = g("listing_symbol", "listing__symbol",
+               "match_symbol",   "match__symbol",
+               "symbol")
 
-    # Tính foreign net
-    f_buy_qty  = safe_float(g("match__foreign_buy_qty",  "match__buyForeignQty"))
-    f_sell_qty = safe_float(g("match__foreign_sell_qty", "match__sellForeignQty"))
+    # ── Foreign trading ────────────────────────────────────────────────────
+    f_buy_qty  = safe_float(g("match_foreign_buy_qty",   "match__foreign_buy_qty",
+                               "match_buyForeignQty",    "match__buyForeignQty"))
+    f_sell_qty = safe_float(g("match_foreign_sell_qty",  "match__foreign_sell_qty",
+                               "match_sellForeignQty",   "match__sellForeignQty"))
     f_net_qty  = None
     if f_buy_qty is not None and f_sell_qty is not None:
         f_net_qty = f_buy_qty - f_sell_qty
 
-    f_buy_val  = safe_float(g("match__buy_foreign_value",  "match__buyForeignValue"))
-    f_sell_val = safe_float(g("match__sell_foreign_value", "match__sellForeignValue"))
+    f_buy_val  = safe_float(g("match_buy_foreign_value",  "match__buy_foreign_value",
+                               "match_buyForeignValue",   "match__buyForeignValue"))
+    f_sell_val = safe_float(g("match_sell_foreign_value", "match__sell_foreign_value",
+                               "match_sellForeignValue",  "match__sellForeignValue"))
     f_net_val  = None
     if f_buy_val is not None and f_sell_val is not None:
         f_net_val = f_buy_val - f_sell_val
 
-    # Price change
-    match_price = safe_float(g("match__match_price", "match__matchPrice"))
-    ref_price   = safe_float(g("listing__ref_price", "listing__refPrice"))
+    # ── Price change ───────────────────────────────────────────────────────
+    match_price = safe_float(g("match_match_price", "match__match_price",
+                                "match_matchPrice",  "match__matchPrice"))
+    ref_price   = safe_float(g("listing_ref_price", "listing__ref_price",
+                                "listing_refPrice",  "listing__refPrice"))
     price_change = None
     price_change_pct = None
     if match_price is not None and ref_price and ref_price != 0:
@@ -202,19 +217,27 @@ def parse_row(row: dict, snapshot_time: str) -> dict:
         "snapshot_time":      snapshot_time,
 
         # Listing
-        "exchange":           g("listing__exchange",   "listing__board"),
-        "stock_type":         g("listing__stock_type", "listing__stockType"),
-        "organ_name":         g("listing__organ_name", "listing__organName"),
+        "exchange":           g("listing_exchange",          "listing__exchange",
+                                "listing_board",             "listing__board"),
+        "stock_type":         g("listing_stock_type",        "listing__stock_type",
+                                "listing_stockType",         "listing__stockType"),
+        "organ_name":         g("listing_organ_name",        "listing__organ_name",
+                                "listing_organName",         "listing__organName"),
 
         # Match
         "match_price":        match_price,
-        "match_qty":          safe_float(g("match__match_qty",         "match__matchQty")),
-        "open_price":         safe_float(g("match__open_price",        "match__openPrice")),
-        "highest_price":      safe_float(g("match__highest",           "match__highest")),
-        "lowest_price":       safe_float(g("match__lowest",            "match__lowest")),
-        "avg_price":          safe_float(g("match__avg_price",         "match__avgPrice")),
-        "total_traded_qty":   safe_float(g("match__total_traded_qty",  "match__totalTradedQty")),
-        "total_traded_value": safe_float(g("match__total_traded_value","match__totalTradedValue")),
+        "match_qty":          safe_float(g("match_match_qty",          "match__match_qty",
+                                           "match_matchQty",           "match__matchQty")),
+        "open_price":         safe_float(g("match_open_price",         "match__open_price",
+                                           "match_openPrice",          "match__openPrice")),
+        "highest_price":      safe_float(g("match_highest",            "match__highest")),
+        "lowest_price":       safe_float(g("match_lowest",             "match__lowest")),
+        "avg_price":          safe_float(g("match_avg_price",          "match__avg_price",
+                                           "match_avgPrice",           "match__avgPrice")),
+        "total_traded_qty":   safe_float(g("match_total_traded_qty",   "match__total_traded_qty",
+                                           "match_totalTradedQty",     "match__totalTradedQty")),
+        "total_traded_value": safe_float(g("match_total_traded_value", "match__total_traded_value",
+                                           "match_totalTradedValue",   "match__totalTradedValue")),
         "price_change":       price_change,
         "price_change_pct":   price_change_pct,
 
@@ -225,21 +248,22 @@ def parse_row(row: dict, snapshot_time: str) -> dict:
         "foreign_buy_value":  f_buy_val,
         "foreign_sell_value": f_sell_val,
         "foreign_net_value":  f_net_val,
-        "foreign_room":       safe_float(g("listing__foreign_room",    "listing__foreignRoom")),
+        "foreign_room":       safe_float(g("listing_foreign_room",     "listing__foreign_room",
+                                           "listing_foreignRoom",      "listing__foreignRoom")),
 
         # Bid/Ask
-        "bid1_price":  safe_float(g("bid_ask__bid_1_price")),
-        "bid1_volume": safe_float(g("bid_ask__bid_1_volume")),
-        "ask1_price":  safe_float(g("bid_ask__ask_1_price")),
-        "ask1_volume": safe_float(g("bid_ask__ask_1_volume")),
-        "bid2_price":  safe_float(g("bid_ask__bid_2_price")),
-        "bid2_volume": safe_float(g("bid_ask__bid_2_volume")),
-        "ask2_price":  safe_float(g("bid_ask__ask_2_price")),
-        "ask2_volume": safe_float(g("bid_ask__ask_2_volume")),
-        "bid3_price":  safe_float(g("bid_ask__bid_3_price")),
-        "bid3_volume": safe_float(g("bid_ask__bid_3_volume")),
-        "ask3_price":  safe_float(g("bid_ask__ask_3_price")),
-        "ask3_volume": safe_float(g("bid_ask__ask_3_volume")),
+        "bid1_price":  safe_float(g("bid_ask_bid_1_price",  "bid_ask__bid_1_price")),
+        "bid1_volume": safe_float(g("bid_ask_bid_1_volume", "bid_ask__bid_1_volume")),
+        "ask1_price":  safe_float(g("bid_ask_ask_1_price",  "bid_ask__ask_1_price")),
+        "ask1_volume": safe_float(g("bid_ask_ask_1_volume", "bid_ask__ask_1_volume")),
+        "bid2_price":  safe_float(g("bid_ask_bid_2_price",  "bid_ask__bid_2_price")),
+        "bid2_volume": safe_float(g("bid_ask_bid_2_volume", "bid_ask__bid_2_volume")),
+        "ask2_price":  safe_float(g("bid_ask_ask_2_price",  "bid_ask__ask_2_price")),
+        "ask2_volume": safe_float(g("bid_ask_ask_2_volume", "bid_ask__ask_2_volume")),
+        "bid3_price":  safe_float(g("bid_ask_bid_3_price",  "bid_ask__bid_3_price")),
+        "bid3_volume": safe_float(g("bid_ask_bid_3_volume", "bid_ask__bid_3_volume")),
+        "ask3_price":  safe_float(g("bid_ask_ask_3_price",  "bid_ask__ask_3_price")),
+        "ask3_volume": safe_float(g("bid_ask_ask_3_volume", "bid_ask__ask_3_volume")),
 
         # Raw JSON
         "raw_json": json.dumps(
@@ -308,10 +332,9 @@ def collect_price_board():
             df = trader.price_board(symbols_list=tickers)
         elapsed = time.time() - t_api_start
         log.info("✅ API responded in %.1fs — %d rows", elapsed, len(df))
-        # Log column names để debug mapping (xóa sau khi stable)
-        log.info("📋 DataFrame columns: %s", list(df.columns)[:20])
-        if hasattr(df.columns, 'tolist') and isinstance(df.columns[0], tuple):
-            log.info("   (MultiIndex detected — will flatten with '__')")
+        # Log toàn bộ column names để verify mapping
+        all_cols = list(df.columns)
+        log.info("📋 DataFrame columns (%d total): %s", len(all_cols), all_cols)
     except Exception as e:
         log.error("❌ price_board() failed: %s", e)
         raise
