@@ -529,7 +529,7 @@ export default function Dashboard() {
                         color: (s.foreign_net_7d || 0) >= 0 ? '#00ff88' : '#ff3366',
                         textShadow: `0 0 6px ${(s.foreign_net_7d || 0) >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`,
                       }}>
-                        {(s.foreign_net_7d || 0) >= 0 ? '+' : ''}{(s.foreign_net_7d || 0).toFixed(1)}B
+                        {(s.foreign_net_7d || 0) >= 0 ? '+' : ''}{Math.abs(s.foreign_net_7d || 0) >= 1000 ? ((s.foreign_net_7d || 0) / 1000).toFixed(1) + 'K' : (s.foreign_net_7d || 0).toFixed(1)}B
                       </td>
                       <td className="p-2 text-right overflow-visible" onClick={(e) => e.stopPropagation()}>
                         {s.price_history && s.price_history.length > 1 ? (
