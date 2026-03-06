@@ -15,7 +15,7 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,7 +37,41 @@ jobs:
           key: stock-db-${{ github.run_id }}
           restore-keys: stock-db-
 
-      - name: Cập nhật giá OHLCV hàng ngày
+      - name: Tạo thư mục
+        run: mkdir -p data/db data/exports
+
+      # ── STEP 1: Price Board snapshot (ATC) ───────────────────────────────
+      - name: "📡 Price Board snapshot (ATC)"
+        id: price_board
+        env:
+          DB_PATH: data/db/stock.db
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+          TEST_MODE: ${{ inputs.test_mode != false && 'true' || 'false' }}
+        run: |
+          echo "🔧 TEST_MODE=$TEST_MODE"
+          python pipeline/collectors/price_board_collector.py
+        continue-on-error: true
+
+      - name: Check price_board result
+        if: steps.price_board.outcome == 'failure'
+        run: echo "PRICE_BOARD_FAILED=true" >> $GITHUB_ENV
+
+      # ── STEP 2: Index prices ──────────────────────────────────────────────
+      - name: "📈 Cập nhật giá Index (VNINDEX, VN30, HNX30)"
+        id: index_prices
+        env:
+          DB_PATH: data/db/stock.db
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+          DAYS_LOOKBACK: "7"
+        run: python pipeline/collectors/index_prices_collector.py
+        continue-on-error: true
+
+      - name: Check index_prices result
+        if: steps.index_prices.outcome == 'failure'
+        run: echo "INDEX_PRICES_FAILED=true" >> $GITHUB_ENV
+
+      # ── STEP 3: Daily OHLCV prices ────────────────────────────────────────
+      - name: "💹 Cập nhật giá OHLCV hàng ngày"
         id: prices
         env:
           DB_PATH: data/db/stock.db
@@ -45,18 +79,16 @@ jobs:
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
           TEST_MODE: ${{ inputs.test_mode == true && 'true' || 'false' }}
         run: |
-          mkdir -p data/db
           echo "🔧 TEST_MODE=$TEST_MODE"
           python pipeline/collectors/daily_prices.py
         continue-on-error: true
 
       - name: Check prices result
         if: steps.prices.outcome == 'failure'
-        run: |
-          echo "⚠️ daily_prices.py failed but continuing..."
-          echo "PRICES_FAILED=true" >> $GITHUB_ENV
+        run: echo "PRICES_FAILED=true" >> $GITHUB_ENV
 
-      - name: Cập nhật giao dịch khối ngoại & tự doanh
+      # ── STEP 4: Foreign & Proprietary trading flow ────────────────────────
+      - name: "🌍 Cập nhật giao dịch khối ngoại & tự doanh"
         id: foreign
         env:
           DB_PATH: data/db/stock.db
@@ -71,39 +103,77 @@ jobs:
 
       - name: Check foreign result
         if: steps.foreign.outcome == 'failure'
-        run: |
-          echo "⚠️ daily_foreign_flow.py failed"
-          echo "FOREIGN_FAILED=true" >> $GITHUB_ENV
+        run: echo "FOREIGN_FAILED=true" >> $GITHUB_ENV
 
+      # ── STEP 5: Export price board → JSON ────────────────────────────────
+      - name: "📤 Export price board → JSON"
+        id: export_pb
+        if: steps.price_board.outcome == 'success'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: python pipeline/exporters/export_price_board.py
+        continue-on-error: true
+
+      # ── Lưu DB ────────────────────────────────────────────────────────────
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
         with:
           path: data/db/stock.db
           key: stock-db-${{ github.run_id }}
 
-      - name: Summary
+      # ── Commit price_board.json ───────────────────────────────────────────
+      - name: Commit price_board.json
+        if: steps.export_pb.outcome == 'success'
         run: |
-          echo "## Daily Collect Results" >> $GITHUB_STEP_SUMMARY
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f "data/exports/price_board.json" ]; then
+            git add data/exports/price_board.json
+            git diff --cached --quiet || git commit -m "chore: price board $(date +'%Y-%m-%d')"
+            git push || echo "Nothing to push"
+          fi
+
+      # ── Summary ───────────────────────────────────────────────────────────
+      - name: Summary
+        if: always()
+        run: |
+          echo "## ② Daily Collect Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
           if [ "${{ inputs.test_mode }}" = "true" ]; then
             echo "### 🧪 TEST MODE (VN30 only)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          if [ "$PRICES_FAILED" = "true" ]; then
-            echo "- ⚠️ Prices: **FAILED**" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          if [ "$PRICE_BOARD_FAILED" = "true" ]; then
+            echo "| 📡 Price Board | ⚠️ FAILED |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- ✅ Prices: **OK**" >> $GITHUB_STEP_SUMMARY
+            echo "| 📡 Price Board | ✅ OK |" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "$INDEX_PRICES_FAILED" = "true" ]; then
+            echo "| 📈 Index Prices | ⚠️ FAILED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 📈 Index Prices | ✅ OK |" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "$PRICES_FAILED" = "true" ]; then
+            echo "| 💹 OHLCV Prices | ⚠️ FAILED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 💹 OHLCV Prices | ✅ OK |" >> $GITHUB_STEP_SUMMARY
           fi
           if [ "$FOREIGN_FAILED" = "true" ]; then
-            echo "- ⚠️ Foreign: **FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "| 🌍 Foreign Flow | ⚠️ FAILED |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- ✅ Foreign: **OK**" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌍 Foreign Flow | ✅ OK |" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f "data/db/stock.db" ]; then
+            SIZE=$(du -sh data/db/stock.db | cut -f1)
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**DB size:** $SIZE" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Fail if both failed
+      - name: Fail if core collectors failed
         if: steps.prices.outcome == 'failure' && steps.foreign.outcome == 'failure'
         run: |
-          echo "❌ Both collectors failed!"
+          echo "❌ Both core collectors failed!"
           exit 1

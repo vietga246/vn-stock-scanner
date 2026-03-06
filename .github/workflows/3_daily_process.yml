@@ -10,12 +10,11 @@ jobs:
   process:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
-    # Only run if triggered manually or if collect workflow succeeded
+
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,6 +54,16 @@ jobs:
         env:
           DB_PATH: data/db/stock.db
         run: python pipeline/processors/technical_indicators.py
+        continue-on-error: true
+
+      # ── Market Breadth [NEW] ──────────────────────────────────────────────
+      - name: "📊 Tính Market Breadth (A/D Line, % above MA)"
+        id: breadth
+        if: steps.technical.outcome == 'success'
+        env:
+          DB_PATH: data/db/stock.db
+          DAYS_LOOKBACK: "30"
+        run: python pipeline/processors/market_breadth_processor.py
         continue-on-error: true
 
       - name: Tính composite score toàn thị trường
@@ -107,55 +116,30 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Add exports if they exist
-          if [ -f "data/exports/screener.json" ]; then
-            git add data/exports/screener.json
-          fi
-          if [ -f "data/exports/sectors.json" ]; then
-            git add data/exports/sectors.json
-          fi
-          if [ -f "data/exports/prices.json" ]; then
-            git add data/exports/prices.json
-          fi
-          if [ -f "data/exports/summary.json" ]; then
-            git add data/exports/summary.json
-          fi
-          
-          # Commit if there are changes
+          for f in screener sectors prices summary; do
+            if [ -f "data/exports/$f.json" ]; then
+              git add "data/exports/$f.json"
+            fi
+          done
           git diff --cached --quiet || git commit -m "chore: daily scoring $(date +'%Y-%m-%d')"
           git push || echo "Nothing to push"
 
       - name: Summary
+        if: always()
         run: |
-          echo "## Daily Process Results" >> $GITHUB_STEP_SUMMARY
+          echo "## ③ Daily Process Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
-          
           if [ "${{ steps.check_db.outputs.DB_EXISTS }}" = "true" ]; then
             echo "| Database | ✅ Found |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Database | ❌ Missing |" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          if [ "${{ steps.technical.outcome }}" = "success" ]; then
-            echo "| Technical | ✅ OK |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Technical | ⚠️ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ "${{ steps.scoring.outcome }}" = "success" ]; then
-            echo "| Scoring | ✅ OK |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Scoring | ⚠️ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ "${{ steps.sector.outcome }}" = "success" ]; then
-            echo "| Sector | ✅ OK |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Sector | ⚠️ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "| Technical | ${{ steps.technical.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Market Breadth | ${{ steps.breadth.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Scoring | ${{ steps.scoring.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Sector | ${{ steps.sector.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail if critical steps failed
         if: steps.check_db.outputs.DB_EXISTS == 'false' || steps.scoring.outcome == 'failure'

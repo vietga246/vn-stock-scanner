@@ -4,11 +4,17 @@ on:
   schedule:
     - cron: "0 1 * * 0"   # 01:00 UTC = 08:00 ICT Chủ nhật
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "🧪 TEST MODE - Chỉ chạy VN30 (30 mã)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   update-symbols:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,30 +35,92 @@ jobs:
           key: stock-db-${{ github.run_id }}
           restore-keys: stock-db-
 
-      - name: Cập nhật thông tin công ty (tên, ngành, sàn, P/E, ROE)
+      - name: Tạo thư mục
+        run: mkdir -p data/db data/exports
+
+      # ── STEP 1: Symbols (tên, ngành, sàn) ────────────────────────────────
+      - name: "🏢 Cập nhật thông tin công ty (tên, ngành, sàn)"
+        id: symbols
         env:
           DB_PATH: data/db/stock.db
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-        run: |
-          mkdir -p data/db
-          python pipeline/collectors/weekly_symbols.py
+        run: python pipeline/collectors/weekly_symbols.py
+        continue-on-error: true
 
-      - name: Export dữ liệu web
+      # ── STEP 2: Insider deals ─────────────────────────────────────────────
+      - name: "🔍 Cập nhật giao dịch nội bộ (insider deals)"
+        id: insider
+        env:
+          DB_PATH: data/db/stock.db
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+        run: python pipeline/collectors/weekly_insider_deals.py
+        continue-on-error: true
+
+      # ── STEP 3: Ownership & shareholders [NEW] ────────────────────────────
+      - name: "🏦 Cập nhật cơ cấu cổ đông (ownership)"
+        id: ownership
+        env:
+          DB_PATH: data/db/stock.db
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+          TEST_MODE: ${{ inputs.test_mode != false && 'true' || 'false' }}
+          SKIP_DAYS: "30"
+        run: |
+          echo "🔧 TEST_MODE=$TEST_MODE"
+          python pipeline/collectors/ownership_collector.py
+        continue-on-error: true
+
+      # ── STEP 4: Dividends [NEW] ───────────────────────────────────────────
+      - name: "💰 Cập nhật lịch sử cổ tức (dividends)"
+        id: dividends
+        env:
+          DB_PATH: data/db/stock.db
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+          TEST_MODE: ${{ inputs.test_mode != false && 'true' || 'false' }}
+          SKIP_DAYS: "30"
+        run: |
+          echo "🔧 TEST_MODE=$TEST_MODE"
+          python pipeline/collectors/dividend_collector.py
+        continue-on-error: true
+
+      # ── STEP 5: Export JSON ───────────────────────────────────────────────
+      - name: "📤 Export dữ liệu web"
+        id: export
         env:
           DB_PATH: data/db/stock.db
           EXPORT_DIR: data/exports
         run: python pipeline/exporters/export_financials.py
+        continue-on-error: true
 
+      # ── Lưu DB ────────────────────────────────────────────────────────────
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
         with:
           path: data/db/stock.db
           key: stock-db-${{ github.run_id }}
 
-      - name: Commit & push
+      # ── Commit ────────────────────────────────────────────────────────────
+      - name: Commit & push exports
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/exports/symbols.json
-          git diff --cached --quiet || git commit -m "chore: update symbols $(date +'%Y-%m-%d')"
-          git push
+          git add data/exports/ || true
+          git diff --cached --quiet || git commit -m "chore: weekly symbols+ownership+dividends $(date +'%Y-%m-%d')"
+          git push || echo "Nothing to push"
+
+      # ── Summary ───────────────────────────────────────────────────────────
+      - name: Summary
+        if: always()
+        run: |
+          echo "## ④a Weekly Symbols Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.test_mode }}" = "true" ]; then
+            echo "### 🧪 TEST MODE (VN30 only)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏢 Symbols | ${{ steps.symbols.outcome == 'success' && '✅ OK' || '⚠️ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Insider | ${{ steps.insider.outcome == 'success' && '✅ OK' || '⚠️ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏦 Ownership | ${{ steps.ownership.outcome == 'success' && '✅ OK' || '⚠️ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 💰 Dividends | ${{ steps.dividends.outcome == 'success' && '✅ OK' || '⚠️ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📤 Export | ${{ steps.export.outcome == 'success' && '✅ OK' || '⚠️ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
