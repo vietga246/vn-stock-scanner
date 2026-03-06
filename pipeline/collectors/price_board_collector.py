@@ -308,6 +308,10 @@ def collect_price_board():
             df = trader.price_board(symbols_list=tickers)
         elapsed = time.time() - t_api_start
         log.info("✅ API responded in %.1fs — %d rows", elapsed, len(df))
+        # Log column names để debug mapping (xóa sau khi stable)
+        log.info("📋 DataFrame columns: %s", list(df.columns)[:20])
+        if hasattr(df.columns, 'tolist') and isinstance(df.columns[0], tuple):
+            log.info("   (MultiIndex detected — will flatten with '__')")
     except Exception as e:
         log.error("❌ price_board() failed: %s", e)
         raise
@@ -328,12 +332,17 @@ def collect_price_board():
         try:
             parsed = parse_row(raw_row.to_dict(), snapshot_time)
             if not parsed.get("symbol"):
+                if rows_skipped == 0:
+                    # Log keys của row đầu tiên bị skip để debug
+                    row_dict = raw_row.to_dict()
+                    log.warning("⚠️  symbol=None on first row. Available keys: %s",
+                                list(row_dict.keys())[:15])
                 rows_skipped += 1
                 continue
             cursor.execute(INSERT_SQL, parsed)
             rows_inserted += 1
         except Exception as e:
-            log.debug("Parse error for row: %s", e)
+            log.warning("Parse error for row: %s", e)
             rows_skipped += 1
 
     conn.commit()
