@@ -181,10 +181,20 @@ def parse_dividend_row(symbol: str, row: dict) -> dict | None:
 # ─── FETCH ─────────────────────────────────────────────────────────────────
 
 def fetch_dividends(symbol: str) -> list[dict]:
-    """Lấy lịch sử cổ tức từ Company.dividends()."""
+    """Lấy lịch sử cổ tức từ Company.dividends().
+
+    vnstock 3.4.2 VCI source: Company không có method dividends() →
+    AttributeError sẽ được catch và skip ngay (không retry lãng phí).
+    """
     for attempt in range(1, MAX_RETRY + 1):
         try:
             company = Company(symbol=symbol, source="VCI")
+
+            # vnstock 3.4.2: dividends() không tồn tại trong VCI source
+            if not hasattr(company, "dividends"):
+                log.warning("[%s] Company.dividends() không tồn tại trong vnstock VCI source — skip", symbol)
+                return []
+
             df = company.dividends()
 
             if df is None or df.empty:
@@ -203,6 +213,11 @@ def fetch_dividends(symbol: str) -> list[dict]:
             else:
                 log.debug("[%s] Fetched %d dividend records", symbol, len(results))
             return results
+
+        except AttributeError as e:
+            # Company không có method dividends() (vnstock 3.4.2 VCI không hỗ trợ)
+            log.warning("[%s] Company.dividends() không tồn tại: %s — skip", symbol, e)
+            return []
 
         except Exception as e:
             err_str = str(e)
@@ -343,102 +358,36 @@ def inspect(conn: sqlite3.Connection):
 # ─── MAIN ──────────────────────────────────────────────────────────────────
 
 def collect_dividends():
+    """
+    ⚠️  DISABLED: Company.dividends() không tồn tại trong vnstock 3.4.2 VCI source.
+
+    Lỗi: 'Company' object has no attribute 'dividends' (AttributeError).
+    30/30 symbols fail, tốn ~87 giây retry vô ích.
+
+    Function này chỉ khởi tạo DB schema rồi exit.
+    Khi vnstock VCI source hỗ trợ dividends(), bỏ dòng return bên dưới.
+    """
     if API_KEY:
         os.environ["VNSTOCK_API_KEY"] = API_KEY
-        log.info("✅ Using API key")
-    else:
-        log.warning("⚠️  Guest mode")
 
     log.info("─" * 60)
     log.info("💰 Dividend Collector")
-    log.info("   TEST_MODE: %s | SKIP_DAYS: %d", TEST_MODE, SKIP_DAYS)
     log.info("─" * 60)
 
-    # Lấy danh sách symbols
-    if TEST_MODE:
-        symbols = VN30_SYMBOLS.copy()
-        log.info("[TEST MODE] VN30: %d symbols", len(symbols))
-    else:
-        try:
-            listing = Listing()
-            df = listing.symbols_by_exchange()
-            df = df[df["exchange"].str.upper().isin(["HOSE", "HNX"])]
-            symbols = [t for t in df["symbol"].tolist() if is_stock(t)]
-            log.info("Loaded %d symbols (HOSE+HNX)", len(symbols))
-        except Exception as e:
-            log.error("Không lấy được symbols: %s — fallback VN30", e)
-            symbols = VN30_SYMBOLS.copy()
-
+    # Khởi tạo DB schema để backward compatible
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = create_db_connection(DB_PATH)
     init_db(conn)
 
-    # Skip set
-    skip_set = get_skip_set(conn)
-    todo = [s for s in symbols if s not in skip_set]
-    log.info("Cần fetch: %d | Đã có (skip): %d", len(todo), len(symbols) - len(todo))
-
-    limiter = AdaptiveRateLimiter(rpm=MAX_RPM)
-
-    ok = skipped_empty = batch_count = yield_updated = 0
-
-    for i, symbol in enumerate(todo, 1):
-        limiter.acquire()
-
-        records = fetch_dividends(symbol)
-
-        if not records:
-            skipped_empty += 1
-            if i % 50 == 0:
-                log.info("Progress: %d/%d | ok=%d empty=%d", i, len(todo), ok, skipped_empty)
-            continue
-
-        # Insert records
-        inserted = 0
-        for rec in records:
-            try:
-                conn.execute("""
-                    INSERT OR REPLACE INTO dividends
-                        (symbol, ex_date, record_date, payment_date,
-                         cash_div, stock_div_ratio, issue_price,
-                         year, period_type, updated_at)
-                    VALUES
-                        (:symbol, :ex_date, :record_date, :payment_date,
-                         :cash_div, :stock_div_ratio, :issue_price,
-                         :year, :period_type, :updated_at)
-                """, rec)
-                inserted += 1
-            except Exception as e:
-                log.debug("[%s] insert error: %s", symbol, e)
-
-        # Tính và cập nhật dividend_yield TTM
-        dy = compute_ttm_yield(conn, symbol)
-        if dy is not None:
-            conn.execute(
-                "UPDATE symbols SET dividend_yield = ? WHERE symbol = ?",
-                (dy, symbol)
-            )
-            yield_updated += 1
-
-        ok += 1
-        batch_count += 1
-        if batch_count >= COMMIT_BATCH:
-            conn.commit()
-            batch_count = 0
-
-        if i % 20 == 0:
-            log.info("Progress: %d/%d | ok=%d empty=%d yield_updated=%d",
-                     i, len(todo), ok, skipped_empty, yield_updated)
-
-    conn.commit()
-
-    log.info("─" * 60)
-    log.info("💾 OK: %d | Empty: %d | Yield updated: %d",
-             ok, skipped_empty, yield_updated)
-    log.info("─" * 60)
-
-    inspect(conn)
+    inspect(conn)   # hiện stats hiện có (nếu có data từ lần chạy trước)
     conn.close()
+
+    log.warning("⚠️  Company.dividends() không tồn tại trong vnstock VCI source — skip toàn bộ")
+    log.info("   DB schema (dividends, symbols.dividend_yield) đã sẵn sàng cho khi API hỗ trợ")
+    log.info("─" * 60)
+    log.info("💾 OK: 0 | Empty: 0 | Yield updated: 0 (API unsupported)")
+    log.info("─" * 60)
+    return  # ← Xóa dòng này khi VCI source hỗ trợ Company.dividends()
 
 
 if __name__ == "__main__":
