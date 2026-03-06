@@ -105,7 +105,7 @@ def init_db(conn):
         CREATE TABLE IF NOT EXISTS stock_scores (
             symbol              TEXT PRIMARY KEY,
 
-            -- Component Scores (0–100)
+            -- Component Scores (0-100)
             fundamental_score   REAL,
             smart_money_score   REAL,
             momentum_score      REAL,
@@ -119,47 +119,71 @@ def init_db(conn):
             net_margin_score    REAL,
             pe_score            REAL,
             debt_equity_score   REAL,
-
             foreign_net_7d_score  REAL,
             foreign_net_30d_score REAL,
-            -- prop_net_7d_score removed: prop_trading không có data từ VCI source
-
             price_5d_score      REAL,
             price_20d_score     REAL,
             vol_surge_score     REAL,
             rs_vs_market_score  REAL,
-
             rsi_score           REAL,
             macd_score          REAL,
             trend_score         REAL,
 
-            -- Raw values (for display/debug)
+            -- Fundamental raw values
             roe                 REAL,
             roa                 REAL,
             pe                  REAL,
             revenue_growth      REAL,
             net_margin          REAL,
             debt_equity         REAL,
+
+            -- Price momentum
             price_change_1d     REAL,
             price_change_5d     REAL,
             price_change_20d    REAL,
+
+            -- Technical core
             vol_ratio           REAL,
+            vol_ma20            REAL,
             rsi14               REAL,
             macd_hist           REAL,
             trend_short         INTEGER,
-            
-            -- Smart money raw values (tỷ đồng)
-            -- prop_net_7d removed: không có data từ VCI source
+            pct_from_ma20       REAL,
+            pct_from_ma50       REAL,
+
+            -- ADX + Trend Strength (NEW)
+            adx14               REAL,
+            plus_di14           REAL,
+            minus_di14          REAL,
+            di_spread           REAL,
+            trend_strength      REAL,
+
+            -- Volatility (NEW — previously calculated but not stored in scores)
+            bb_width            REAL,
+            atr14               REAL,
+            atr_pct             REAL,
+
+            -- FVG signals (NEW)
+            fvg_bull            INTEGER,
+            fvg_bear            INTEGER,
+            fvg_bull_size       REAL,
+            fvg_bear_size       REAL,
+            fvg_bull_age        INTEGER,
+            fvg_bear_age        INTEGER,
+            fvg_bull_fill       REAL,
+            fvg_bear_fill       REAL,
+
+            -- Smart money raw values (ty dong)
             foreign_net_7d      REAL,
             foreign_net_30d     REAL,
 
             -- Ranking
             rank_total          INTEGER,
-            rank_pct            REAL,    -- percentile (100 = best)
-            tier                TEXT,    -- A/B/C/D/F
+            rank_pct            REAL,
+            tier                TEXT,
 
             -- Metadata
-            data_completeness   REAL,    -- % chỉ số có data (0–1)
+            data_completeness   REAL,
             scored_at           TEXT
         );
 
@@ -235,11 +259,32 @@ def load_smart_money(conn) -> pd.DataFrame:
 
 
 def load_momentum(conn) -> pd.DataFrame:
-    """Lấy momentum từ technical_indicators (latest) + tính RS vs market."""
-    tech = pd.read_sql("""
-        SELECT symbol, date, close, price_change_1d, price_change_5d, price_change_20d,
+    """
+    Lấy momentum + technical indicators mới nhất của từng symbol.
+    Bao gồm các fields mới: adx14, trend_strength, bb_width, fvg_*, vol_ma20.
+    Dùng PRAGMA để kiểm tra columns available (backward-compatible với DB cũ).
+    """
+    # Kiểm tra columns tồn tại để backward-compatible
+    cur = conn.cursor()
+    cur.execute("PRAGMA table_info(technical_indicators)")
+    existing = {r[1] for r in cur.fetchall()}
+
+    base_select = """symbol, date, close, price_change_1d, price_change_5d, price_change_20d,
                vol_ratio, rsi14, macd, macd_signal, macd_hist,
-               trend_short, trend_medium, pct_from_ma20, pct_from_ma50
+               trend_short, trend_medium, pct_from_ma20, pct_from_ma50"""
+
+    # Thêm các fields mới nếu đã có trong DB
+    new_fields = [
+        "adx14", "plus_di14", "minus_di14", "di_spread", "trend_strength",
+        "vol_ma20", "bb_width", "atr14", "atr_pct",
+        "fvg_bull", "fvg_bear", "fvg_bull_size", "fvg_bear_size",
+        "fvg_bull_age", "fvg_bear_age", "fvg_bull_fill", "fvg_bear_fill",
+    ]
+    extra = ", ".join(f for f in new_fields if f in existing)
+    select_clause = base_select + (f", {extra}" if extra else "")
+
+    tech = pd.read_sql(f"""
+        SELECT {select_clause}
         FROM technical_indicators
         WHERE (symbol, date) IN (
             SELECT symbol, MAX(date) FROM technical_indicators GROUP BY symbol
@@ -354,10 +399,19 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
             df[col] = None
         return df
 
-    merge_cols = ["symbol", "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
-                  "rs_vs_market", "rsi14", "macd", "macd_signal", "macd_hist",
-                  "trend_short", "trend_medium"]
-    merge_cols = [c for c in merge_cols if c in tech_df.columns]
+    # Dùng tất cả fields available trong tech_df (backward-compatible)
+    passthrough_cols = [
+        "symbol", "price_change_1d", "price_change_5d", "price_change_20d",
+        "vol_ratio", "vol_ma20",
+        "rs_vs_market", "rsi14", "macd", "macd_signal", "macd_hist",
+        "trend_short", "trend_medium", "pct_from_ma20", "pct_from_ma50",
+        # NEW technical fields
+        "adx14", "plus_di14", "minus_di14", "di_spread", "trend_strength",
+        "bb_width", "atr14", "atr_pct",
+        "fvg_bull", "fvg_bear", "fvg_bull_size", "fvg_bear_size",
+        "fvg_bull_age", "fvg_bear_age", "fvg_bull_fill", "fvg_bear_fill",
+    ]
+    merge_cols = [c for c in passthrough_cols if c in tech_df.columns]
     df = df.merge(tech_df[merge_cols], on="symbol", how="left")
 
     # Momentum sub-scores
@@ -545,20 +599,34 @@ def calc_sector_scores(scores_df: pd.DataFrame, symbols_df: pd.DataFrame, conn) 
 
 OUTPUT_COLS = [
     "symbol",
+    # Component scores
     "fundamental_score", "smart_money_score", "momentum_score",
     "technical_score", "composite_score",
+    # Sub-scores
     "roe_score", "roa_score", "revenue_growth_score", "net_margin_score",
     "pe_score", "debt_equity_score",
     "foreign_net_7d_score", "foreign_net_30d_score",
-    # prop_net_7d_score removed: không có data từ VCI source
     "price_5d_score", "price_20d_score", "vol_surge_score", "rs_vs_market_score",
     "rsi_score", "macd_score", "trend_score",
+    # Fundamental raw values
     "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
-    "price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
-    "rsi14", "macd_hist", "trend_short",
+    # Price momentum
+    "price_change_1d", "price_change_5d", "price_change_20d",
+    # Technical — core
+    "vol_ratio", "vol_ma20", "rsi14", "macd_hist", "trend_short",
+    "pct_from_ma20", "pct_from_ma50",
+    # Technical — NEW: ADX + trend strength
+    "adx14", "plus_di14", "minus_di14", "di_spread", "trend_strength",
+    # Technical — NEW: volatility
+    "bb_width", "atr14", "atr_pct",
+    # Technical — NEW: FVG signals
+    "fvg_bull", "fvg_bear",
+    "fvg_bull_size", "fvg_bear_size",
+    "fvg_bull_age", "fvg_bear_age",
+    "fvg_bull_fill", "fvg_bear_fill",
     # Smart money raw values
     "foreign_net_7d", "foreign_net_30d",
-    # prop_net_7d removed: không có data từ VCI source
+    # Ranking
     "rank_total", "rank_pct", "tier",
     "data_completeness",
 ]

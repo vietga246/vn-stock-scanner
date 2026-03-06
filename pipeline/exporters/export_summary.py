@@ -31,32 +31,59 @@ log = setup_logging()
 # ─── VN-INDEX ──────────────────────────────────────────────────────────────
 
 def get_vnindex() -> dict:
-    """Lấy VN-Index từ vnstock."""
+    """
+    Lấy VN-Index từ vnstock.
+    Tính change_1d, change_5d, change_20d để RS vs Market calculation chính xác.
+    """
     try:
         quote = Quote(symbol="VNINDEX", source="VCI")
-        df = quote.history(start="2026-01-01", end=datetime.now().strftime("%Y-%m-%d"))
-        
+        # Lấy đủ 30 ngày để có change_5d và change_20d
+        start_date = (datetime.now() - __import__("datetime").timedelta(days=60)).strftime("%Y-%m-%d")
+        df = quote.history(start=start_date, end=datetime.now().strftime("%Y-%m-%d"))
+
         if df is not None and len(df) >= 2:
-            # Lấy 2 ngày cuối
-            latest = df.iloc[-1]
-            prev = df.iloc[-2]
-            
-            close = safe_float(latest.get("close", latest.get("Close")))
-            prev_close = safe_float(prev.get("close", prev.get("Close")))
-            
-            if close and prev_close:
-                change = ((close - prev_close) / prev_close) * 100
-                log.info("VN-Index: %.2f (%.2f%%)", close, change)
-                return {
-                    "vnindex": round(close, 2),
-                    "vnindex_change": round(change, 2),
-                }
+            # Normalize column names (vnstock trả về lowercase hoặc Title case)
+            df.columns = [c.lower() for c in df.columns]
+            close_col = "close" if "close" in df.columns else df.columns[3]
+            closes = df[close_col].dropna().values
+
+            latest_close = safe_float(closes[-1])
+            prev_close   = safe_float(closes[-2]) if len(closes) >= 2 else None
+
+            change_1d  = None
+            change_5d  = None
+            change_20d = None
+
+            if latest_close and prev_close and prev_close != 0:
+                change_1d = round((latest_close - prev_close) / prev_close * 100, 2)
+            if latest_close and len(closes) >= 6:
+                c5 = safe_float(closes[-6])
+                if c5 and c5 != 0:
+                    change_5d = round((latest_close - c5) / c5 * 100, 2)
+            if latest_close and len(closes) >= 21:
+                c20 = safe_float(closes[-21])
+                if c20 and c20 != 0:
+                    change_20d = round((latest_close - c20) / c20 * 100, 2)
+
+            log.info("VN-Index: %.2f | 1d: %s%% | 5d: %s%% | 20d: %s%%",
+                     latest_close or 0, change_1d, change_5d, change_20d)
+
+            return {
+                "vnindex":            round(latest_close, 2) if latest_close else None,
+                "vnindex_change":     change_1d,   # backward-compat alias
+                "vnindex_change_1d":  change_1d,
+                "vnindex_change_5d":  change_5d,   # NEW — dùng cho RS vs Market
+                "vnindex_change_20d": change_20d,  # NEW — dùng cho RS vs Market
+            }
     except Exception as e:
         log.warning("Không lấy được VN-Index: %s", e)
-    
+
     return {
-        "vnindex": None,
-        "vnindex_change": None,
+        "vnindex":            None,
+        "vnindex_change":     None,
+        "vnindex_change_1d":  None,
+        "vnindex_change_5d":  None,
+        "vnindex_change_20d": None,
     }
 
 

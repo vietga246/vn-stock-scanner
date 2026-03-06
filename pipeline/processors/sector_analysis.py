@@ -127,12 +127,24 @@ def load_scores(conn) -> pd.DataFrame:
         base_cols = [
             "symbol", "composite_score", "fundamental_score",
             "smart_money_score", "momentum_score", "technical_score",
-            "tier", "roe", "pe", "revenue_growth", "net_margin",
+            "tier", "roe", "roa", "pe", "revenue_growth", "net_margin",
             "price_change_1d", "price_change_5d", "price_change_20d",
             "rsi14", "trend_short", "rank_total", "rank_pct",
-            "debt_equity", "vol_ratio",
+            "debt_equity", "vol_ratio", "macd_hist",
         ]
-        optional_cols = ["foreign_net_7d", "foreign_net_30d"]
+        # NEW: additional technical fields from technical_indicators (via scoring pipeline)
+        optional_cols = [
+            "foreign_net_7d", "foreign_net_30d",
+            # ADX + trend strength
+            "adx14", "plus_di14", "minus_di14", "di_spread", "trend_strength",
+            # Volatility
+            "bb_width", "atr14", "atr_pct", "pct_from_ma20", "pct_from_ma50",
+            # FVG signals
+            "fvg_bull", "fvg_bear",
+            "fvg_bull_size", "fvg_bear_size",
+            "fvg_bull_age", "fvg_bear_age",
+            "fvg_bull_fill", "fvg_bear_fill",
+        ]
         # prop_net_7d removed: không có data từ VCI source
 
         select_cols = [c for c in base_cols if c in existing_cols]
@@ -459,14 +471,37 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
             "revenue_growth":     safe_float(row.get("revenue_growth")),
             "net_margin":         safe_float(row.get("net_margin")),
             "debt_equity":        safe_float(row.get("debt_equity")),
-            # Technical
+            # Technical — core
             "rsi14":              safe_float(row.get("rsi14")),
             "price_change_1d":    safe_float(row.get("price_change_1d")),
             "price_change_5d":    safe_float(row.get("price_change_5d")),
             "price_change_20d":   safe_float(row.get("price_change_20d")),
             "trend_short":        safe_int(row.get("trend_short")),
+            # Technical — NEW exports (previously computed but not exported)
+            "adx14":              safe_float(row.get("adx14"), 2),
+            "plus_di14":          safe_float(row.get("plus_di14"), 2),
+            "minus_di14":         safe_float(row.get("minus_di14"), 2),
+            "di_spread":          safe_float(row.get("di_spread"), 2),
+            "trend_strength":     safe_float(row.get("trend_strength"), 2),
+            "bb_width":           safe_float(row.get("bb_width"), 4),
+            "atr14":              safe_float(row.get("atr14"), 4),
+            "atr_pct":            safe_float(row.get("atr_pct"), 4),
+            "vol_ratio":          safe_float(row.get("vol_ratio"), 4),
+            "macd_hist":          safe_float(row.get("macd_hist"), 6),
+            "pct_from_ma20":      safe_float(row.get("pct_from_ma20"), 2),
+            "pct_from_ma50":      safe_float(row.get("pct_from_ma50"), 2),
+            # FVG — Fair Value Gap (filtered quality signals)
+            "fvg_bull":           safe_int(row.get("fvg_bull")),
+            "fvg_bear":           safe_int(row.get("fvg_bear")),
+            "fvg_bull_size":      safe_float(row.get("fvg_bull_size"), 2),
+            "fvg_bear_size":      safe_float(row.get("fvg_bear_size"), 2),
+            "fvg_bull_age":       safe_int(row.get("fvg_bull_age")),
+            "fvg_bear_age":       safe_int(row.get("fvg_bear_age")),
+            "fvg_bull_fill":      safe_float(row.get("fvg_bull_fill"), 1),
+            "fvg_bear_fill":      safe_float(row.get("fvg_bear_fill"), 1),
             # Smart money
             "foreign_net_7d":     safe_float(row.get("foreign_net_7d"), 1),
+            "foreign_net_30d":    safe_float(row.get("foreign_net_30d"), 1),
             # History sparkline (từ prices.json)
             "history":            price.get("history", []),
             "data_completeness":  safe_float(row.get("data_completeness")),
