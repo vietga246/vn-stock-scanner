@@ -1,299 +1,322 @@
 {
-  "generated_at": "2026-03-05T12:13:42.826753Z",
+  "generated_at": "2026-03-06T09:51:04.040014Z",
   "model": "ai-",
   "total_analyzed": 15,
   "summary": {
     "STRONG_BUY": 0,
-    "BUY": 1,
-    "HOLD": 14,
+    "BUY": 7,
+    "HOLD": 8,
     "SELL": 0,
     "STRONG_SELL": 0
   },
   "analyses": {
-    "FDC": {
-      "recommendation": "BUY",
-      "summary": "FDC hiện đang có dấu hiệu tích cực với chỉ số kỹ thuật mạnh và giá cổ phiếu có xu hướng tăng. Tuy nhiên, việc đầu tư có liên quan đến một số rủi ro nhất định.",
-      "highlights": [
-        {
-          "text": "Fundamental Score cao (80.8/100) cho thấy cơ bản tốt.",
-          "type": "positive"
-        },
-        {
-          "text": "Giá cổ phiếu tăng đều trong ngắn hạn, phản ánh niềm tin của nhà đầu tư.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "ROE và ROA thấp, phản ánh hiệu quả sử dụng vốn kém.",
-          "type": "negative"
-        },
-        {
-          "text": "Không có dòng tiền từ khối ngoại trong thời gian gần đây.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "Cơ bản mạnh với Fundamental Score 80.8.",
-      "technical_view": "Kỹ thuật tích cực với xu hướng tăng ngắn hạn.",
-      "flow_view": "Dòng tiền yếu có thể là một dấu hiệu cảnh báo.",
-      "symbol": "FDC"
-    },
-    "HMH": {
+    "DCM": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu HMH cho thấy dấu hiệu tăng trưởng mạnh mẽ về mặt kỹ thuật, nhưng yếu kém về cơ bản và dòng tiền không ổn định.",
+      "summary": "Cổ phiếu DCM có sự cân bằng giữa yếu tố kỹ thuật mạnh và cơ bản yếu với ngành SX Nhựa - Hóa chất trung lập.",
       "highlights": [
         {
-          "text": "Momentum Score cao (98.7/100) cho thấy sự quan tâm mạnh mẽ từ thị trường.",
+          "text": "Smart Money Score đạt tỉ lệ cao nhất 100.0, cho thấy sự ủng hộ mạnh mẽ từ nhà đầu tư thông minh.",
           "type": "positive"
         },
         {
-          "text": "Tăng trưởng giá cổ phiếu ấn tượng trong ngắn hạn (tới 44.6% trong 20 ngày).",
+          "text": "Momentum và Technical Score cao, phản ánh xu hướng tăng giá và sự lạc quan từ phía thị trường.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Cơ bản yếu kém với chỉ số ROE và ROA rất thấp (0.1%).",
+          "text": "ROE và ROA thấp chỉ ở mức 0.2% và 0.1%, cho thấy hiệu quả sử dụng vốn không cao.",
           "type": "negative"
         },
         {
-          "text": "RSI cao (74) cảnh báo về trạng thái mua quá mức có thể dẫn đến điều chỉnh giá.",
+          "text": "RSI ở mức 74, tiếp cận ngưỡng quá mua có thể dẫn đến rủi ro giảm giá ngắn hạn.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản không mạnh, với các chỉ số ROE, ROA và Net Margin thấp.",
-      "technical_view": "Kỹ thuật mạnh với xu hướng tăng giá ngắn hạn và RSI cao.",
-      "flow_view": "Dòng tiền từ khối ngoại không ổn định, không hỗ trợ lâu dài.",
-      "symbol": "HMH"
+      "fundamental_view": "Cơ bản không mạnh với Fundamental Score ở mức trung bình và chỉ số tài chính yếu.",
+      "technical_view": "Kỹ thuật tích cực với xu hướng tăng và điểm số kỹ thuật cao.",
+      "flow_view": "Dòng tiền từ khối ngoại mạnh, cho thấy sự quan tâm từ nhà đầu tư nước ngoài.",
+      "symbol": "DCM"
+    },
+    "PVT": {
+      "recommendation": "HOLD",
+      "summary": "PVT có hiệu suất tài chính và kỹ thuật tốt với sự quan tâm lớn từ dòng tiền thông minh, nhưng vẫn tồn tại nhiều rủi ro và cảnh báo cần lưu ý.",
+      "highlights": [
+        {
+          "text": "Smart Money Score cao nhất là một chỉ số rất quan trọng, chứng tỏ sự quan tâm và đánh giá cao từ phía nhà đầu tư lớn.",
+          "type": "positive"
+        },
+        {
+          "text": "Momentum Score và Technical Score đều ở mức cao, cho thấy xu hướng tăng giá mạnh mẽ trong ngắn hạn.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Fundamental Score thấp, chỉ ra rằng cơ bản tài chính của công ty không mạnh.",
+          "type": "negative"
+        },
+        {
+          "text": "RSI cao (82), indicating the stock may be overbought.",
+          "type": "warning"
+        }
+      ],
+      "fundamental_view": "Cơ bản tài chính yếu với ROE và ROA thấp, có nguy cơ không ổn định về lâu dài.",
+      "technical_view": "Trend và Momentum đang mạnh, nhưng RSI cao cảnh báo rủi ro về quá mua.",
+      "flow_view": "Dòng tiền mạnh từ khối ngoại cho thấy sự tin tưởng và quan tâm, nhưng cần cẩn trọng đối với khả năng phục hồi bền vững.",
+      "symbol": "PVT"
     },
     "VVS": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu VVS cho thấy sự cải thiện kỹ thuật ấn tượng với một số cảnh báo về tình hình cơ bản. Mặc dù có sự tăng trưởng giá đáng kể trong ngắn hạn, nhưng các chỉ số tài chính cơ bản yếu kém.",
+      "summary": "Cổ phiếu VVS hiện có một số điểm tích cực về mặt kỹ thuật và dòng tiền, nhưng yếu tố cơ bản không mạnh.",
       "highlights": [
         {
-          "text": "Momentum Score và Technical Score cao, cho thấy xu hướng tăng trưởng giá tích cực",
+          "text": "Momentum Score và Technical Score cao, thể hiện sự tăng giá mạnh mẽ gần đây.",
           "type": "positive"
         },
         {
-          "text": "Thay đổi giá trong 20 ngày lên tới 63.1%, phản ánh sự quan tâm mạnh mẽ từ thị trường",
+          "text": "Dòng tiền mạnh từ khối ngoại, thể hiện sự tin tưởng từ các nhà đầu tư nước ngoài.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Chỉ số ROE và ROA thấp cho thấy hiệu suất tài chính kém",
+          "text": "ROE và ROA thấp, phản ánh hiệu suất sinh lời kém.",
           "type": "negative"
         },
         {
-          "text": "RSI ở mức 77, cho thấy khả năng cổ phiếu đang trong trạng thái mua quá mức và có nguy cơ điều chỉnh",
+          "text": "RSI cao (80) có thể chỉ ra rằng cổ phiếu đã bị mua quá mức và có thể đối mặt với áp lực bán.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Với chỉ số cơ bản trung bình và tăng trưởng doanh thu hạn chế, cảnh báo về tính bền vững của tăng trưởng.",
-      "technical_view": "Cổ phiếu hiện nằm trong xu hướng tăng ngắn hạn mạnh, nhưng dấu hiệu mua quá mức làm tăng rủi ro điều chỉnh.",
-      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, cho thấy thiếu sự quan tâm mới từ các nhà đầu tư nước ngoài.",
+      "fundamental_view": "Các chỉ số tài chính yếu, đặc biệt là ROE và ROA thấp.",
+      "technical_view": "Uptrend ngắn hạn với RSI cao, nhưng cần cảnh giác với dấu hiệu overbought.",
+      "flow_view": "Sự quan tâm mạnh mẽ từ khối ngoại, thể hiện qua dòng tiền tích cực.",
       "symbol": "VVS"
     },
-    "AST": {
+    "BSR": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu AST đang hiển thị một số yếu tố tích cực nhưng cũng kèm theo rủi ro cụ thể, nên nhanh chóng mở rộng quy mô hoặc cải thiện mạnh mẽ hơn nữa để khẳng định vị thế.",
+      "summary": "BSR cho thấy một số tín hiệu tích cực về dòng tiền và động lực thị trường, nhưng cơ bản tài chính yếu và định giá cao là những nguyên nhân cản trở.",
       "highlights": [
         {
-          "text": "Fundamental Score khả quan với 73.1/100, báo hiệu về sức khỏe tài chính và tiềm năng tăng trưởng.",
+          "text": "Smart Money Score đạt mức tối đa, cho thấy sự quan tâm mạnh mẽ từ các nhà đầu tư thông minh.",
           "type": "positive"
         },
         {
-          "text": "RSI và xu hướng kỹ thuật ngắn hạn cho thấy cơ hội tăng giá.",
+          "text": "Momentum Score và kỹ thuật thị trường tốt với chỉ số RSI cao và xu hướng tăng ngắn hạn.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Mức tăng trưởng doanh thu yếu, chỉ 0.4%.",
+          "text": "Fundamental Score thấp cho thấy những lo ngại về khả năng tạo lợi nhuận và hiệu quả hoạt động.",
           "type": "negative"
         },
         {
-          "text": "Cảnh báo về Smart Money và Momentum Score thấp, chỉ ra thách thức về dòng tiền và động lực giá.",
+          "text": "P/E cao và gần như không có tăng trưởng doanh thu, cảnh báo về định giá quá cao.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Đánh giá cơ bản cho thấy một bức tranh lẫn lộn với kết quả tài chính tạm ổn nhưng không quá ấn tượng.",
-      "technical_view": "Kỹ thuật mạnh mẽ với Technical Score cao, báo hiệu xu hướng tăng có thể duy trì.",
-      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, cảnh báo sự thiếu hứng thú từ nhà đầu tư nước ngoài.",
-      "symbol": "AST"
+      "fundamental_view": "Yếu tố cơ bản kém hấp dẫn với ROE và ROA cực kỳ thấp.",
+      "technical_view": "Biểu đồ kỹ thuật cho thấy xu hướng tăng, nhưng RSI cao dẫn đến lo ngại về sự quá mua.",
+      "flow_view": "Dòng tiền từ khối ngoại mạnh mẽ, tạo lập lập luận cho thái độ lạc quan.",
+      "symbol": "BSR"
     },
-    "PMC": {
+    "DGC": {
       "recommendation": "HOLD",
-      "summary": "PMC hiện thể hiện một bức tranh hỗn hợp giữa kỹ thuật mạnh mẽ và cơ bản yếu. Cổ phiếu này phù hợp cho nhà đầu tư tìm kiếm cơ hội ngắn hạn nhưng cần thận trọng với các rủi ro.",
+      "summary": "Cổ phiếu DGC có vị thế vững chắc trong ngành hóa chất nhưng hiện tại gặp phải sự thận trọng với các chỉ số cơ bản không mạnh mẽ.",
       "highlights": [
         {
-          "text": "Technical Score cao 90.6/100, cho thấy xu hướng kỹ thuật tích cực",
+          "text": "Smart Money Score cao cho thấy sự quan tâm lớn từ các nhà đầu tư thông thái.",
           "type": "positive"
         },
         {
-          "text": "Có sự tăng giá ổn định trong ngắn hạn",
+          "text": "Technical Score tốt báo hiệu một xu hướng kỹ thuật mạnh mẽ.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Các chỉ số tài chính như ROE, ROA, và Net Margin rất thấp",
+          "text": "Fundamental Score thấp cho thấy tiềm năng tăng trưởng cơ bản hạn chế.",
           "type": "negative"
         },
         {
-          "text": "Không có sự tham gia mạnh mẽ từ khối ngoại",
+          "text": "Momentum Score thấp gợi ý rằng mức độ hứng thú của thị trường có thể đang giảm.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản của PMC yếu với các chỉ số tài chính không ấn tượng.",
-      "technical_view": "Xu hướng kỹ thuật tích cực nhờ điểm Technical Score cao.",
-      "flow_view": "Dòng tiền vào từ khối ngoại không đáng kể, thiếu sự ủng hộ.",
-      "symbol": "PMC"
+      "fundamental_view": "Các chỉ số cơ bản phản ánh tiềm năng tăng trưởng hạn chế.",
+      "technical_view": "Chỉ số kỹ thuật mạnh, báo hiệu về sự ổn định của giá cổ phiếu.",
+      "flow_view": "Dòng tiền từ khối ngoại mạnh mẽ ủng hộ cổ phiếu.",
+      "symbol": "DGC"
     },
-    "SCS": {
+    "FDC": {
       "recommendation": "HOLD",
-      "summary": "SCS hiện là một lựa chọn ổn định trong ngành Vận tải - kho bãi với sự cân bằng giữa cơ bản và kỹ thuật. Mặc dù có một số hạn chế về mặt tăng trưởng và dòng tiền, cổ phiếu này vẫn có những điểm mạnh đáng chú ý.",
+      "summary": "FDC, với định giá hợp lý và hiệu suất kinh doanh cơ bản vững, đang cho thấy dấu hiệu tiềm năng tăng giá ở mức độ nhất định. Tuy nhiên, điều kiện thị trường tổng thể và dòng tiền ra khỏi cổ phiếu cần được cân nhắc kỹ.",
       "highlights": [
         {
-          "text": "Fundamental Score cao 75.7, phản ánh một nền tảng tài chính vững chắc",
+          "text": "Fundamental Score cao, cho thấy cơ bản vững vàng",
           "type": "positive"
         },
         {
-          "text": "Technical Score 74.7 và xu hướng tăng ngắn hạn, giúp cổ phiếu này trở nên thu hút hơn",
+          "text": "RSI và Trend Short thể hiện sự tích cực về mặt kỹ thuật",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA thấp, chỉ ra hiệu suất sử dụng vốn kém",
+          "text": "Momentum thấp có thể hạn chế khả năng tăng giá",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền từ khối ngoại không đổi, cảnh báo về sự thiếu hứng thú ở phía nhà đầu tư nước ngoài",
+          "text": "Dòng vốn rút ra mạnh mẽ từ khối ngoại có thể là dấu hiệu tiêu cực",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cổ phiếu có nền tảng tài chính vững vàng nhưng tốc độ tăng trưởng hạn chế.",
-      "technical_view": "Trend kỹ thuật ngắn hạn tăng, báo hiệu sự ổn định.",
-      "flow_view": "Dòng tiền từ khối ngoại không biến động, cho thấy sự chần chừ của nhà đầu tư.",
-      "symbol": "SCS"
+      "fundamental_view": "Fundamental xuất sắc với P/E thấp và tỷ suất lợi nhuận hợp lý.",
+      "technical_view": "Xu hướng ngắn hạn tốt, nhưng cần theo dõi sát sao RSI để tránh mua vào đỉnh.",
+      "flow_view": "Dòng tiền ra khỏi cổ phiếu cho thấy sự thận trọng của nhà đầu tư nước ngoài.",
+      "symbol": "FDC"
     },
-    "MKV": {
-      "recommendation": "HOLD",
-      "summary": "MKV cho thấy một số tín hiệu tích cực ở momentum và kỹ thuật nhưng có vấn đề về hiệu suất tài chính cơ bản.",
+    "PVD": {
+      "recommendation": "BUY",
+      "summary": "Cổ phiếu PVD có các chỉ số kỹ thuật mạnh, hứa hẹn về dòng tiền và sự quan tâm mạnh mẽ từ 'smart money', dù cơ bản còn yếu.",
       "highlights": [
         {
-          "text": "Momentum Score và Technical Score cao với 81.0 và 69.5.",
+          "text": "Smart Money Score tối đa cho thấy sự tin tưởng cao từ nhà đầu tư thông minh.",
           "type": "positive"
         },
         {
-          "text": "Giá cổ phiếu tăng mạnh trong 20 ngày qua với mức tăng 56.0%.",
+          "text": "Tăng trưởng giá đáng kể trong ngắn hạn và xu hướng kỹ thuật tích cực.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Hiệu suất tài chính yếu với ROE và ROA rất thấp ở 0.2% và 0.1%.",
+          "text": "Fundamental Score thấp, phản ánh một cơ sở cơ bản không mạnh.",
           "type": "negative"
         },
         {
-          "text": "Revenue Growth và Net Margin thấp chỉ ở mức 0.3% và 0.2%.",
+          "text": "ROE và ROA cực thấp, cảnh báo về hiệu quả sử dụng vốn.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Các chỉ số tài chính cơ bản yếu, cần cải thiện để cổ phiếu trở nên hấp dẫn hơn.",
-      "technical_view": "Xu hướng tăng mạnh ngắn hạn và RSI cao, cho thấy tính bullish nhưng cũng tiềm ẩn rủi ro quá mua.",
-      "flow_view": "Dòng tiền từ khối ngoại yếu, không ghi nhận sự quan tâm đặc biệt nào từ họ trong thời gian gần đây.",
-      "symbol": "MKV"
-    },
-    "PDN": {
-      "recommendation": "HOLD",
-      "summary": "Cổ phiếu PDN ghi nhận sự ổn định trên cả hai mặt cơ bản và kỹ thuật, nhưng mức tăng trưởng và hoạt động kinh doanh hạn chế kìm hãm tiềm năng tăng giá.",
-      "highlights": [
-        {
-          "text": "Technical Score cao 78.9, phản ánh xu hướng tăng giá mạnh mẽ.",
-          "type": "positive"
-        },
-        {
-          "text": "Debt/Equity thấp 0.24, chỉ ra cấu trúc tài chính vững vàng.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "ROE và ROA cực thấp, cho thấy hiệu quả sử dụng vốn kém.",
-          "type": "negative"
-        },
-        {
-          "text": "Tăng trưởng doanh thu và biên lợi nhuận rất thấp, phản ánh sự trì trệ trong hoạt động kinh doanh.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "Mặc dù Fundamental Score khá tốt nhưng tăng trưởng và hiệu quả kinh doanh kém nên cần thận trọng.",
-      "technical_view": "Kỹ thuật chứng khoán mạnh mẽ với Trend Short tăng và RSI ở mức 64 cho thấy áp lực mua.",
-      "flow_view": "Dòng tiền từ khối ngoại không thay đổi, cho thấy sự thận trọng từ nhà đầu tư nước ngoài.",
-      "symbol": "PDN"
+      "fundamental_view": "Yếu tố cơ bản chưa vững chắc, có thể là hạn chế lớn cho sự tăng trưởng lâu dài.",
+      "technical_view": "Xu hướng kỹ thuật và momentum tích cực, RSI cao cho thấy sự quan tâm mạnh.",
+      "flow_view": "Dòng tiền từ khối ngoại mạnh mẽ, chỉ ra sự ủng hộ lớn từ nhà đầu tư nước ngoài.",
+      "symbol": "PVD"
     },
     "QST": {
       "recommendation": "HOLD",
-      "summary": "QST hiện đang có một số yếu tố đáng lưu ý với tiềm năng tăng trưởng kỹ thuật, nhưng cơ bản kém và rủi ro cao về nợ.",
+      "summary": "QST hiện thị vẻ mạnh mẽ từ góc độ kỹ thuật, nhưng yếu kém về cơ bản và dòng tiền không ổn định, khó đoán định.",
       "highlights": [
         {
-          "text": "Momentum và Technical Score cao, phản ánh triển vọng kỹ thuật tốt",
+          "text": "Momentum Score và Technical Score cao cho thấy đà tăng mạnh mẽ.",
           "type": "positive"
         },
         {
-          "text": "P/E thấp so với ngành, có thể hấp dẫn đối với nhà đầu tư giá trị",
+          "text": "Composite Score ở mức Tier B cho thấy tiềm năng tăng trưởng so với thị trường chung.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA thấp, phản ánh hiệu quả sử dụng vốn kém",
+          "text": "Fundamental Score thấp, chỉ ra một cơ sở kinh doanh yếu kém.",
           "type": "negative"
         },
         {
-          "text": "Tỷ lệ nợ trên vốn chủ sở hữu cao, tăng rủi ro tài chính",
+          "text": "Debt/Equity cao 1.14, cảnh báo về vấn đề quản lý tài chính.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "QST có bảng cân đối kém với hiệu quả sử dụng vốn thấp.",
-      "technical_view": "Tín hiệu mua mạnh từ các chỉ báo kỹ thuật, trong bối cảnh giá có xu hướng tăng.",
-      "flow_view": "Không có dấu hiệu dòng tiền lớn từ khối ngoại, gợi ý sự thiếu hỗ trợ từ nhà đầu tư lớn.",
+      "fundamental_view": "Cơ bản yếu kém do ROE và ROA thấp, không khuyến khích cho đầu tư dài hạn.",
+      "technical_view": "Kỹ thuật mạnh với RSI và xu hướng tăng, hấp dẫn cho giao dịch ngắn hạn.",
+      "flow_view": "Dòng tiền từ khối ngoại không đổi, cho thấy sự thiếu hưởng ứng từ nhà đầu tư lớn.",
       "symbol": "QST"
     },
-    "HGM": {
+    "HMH": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu HGM hiện tại có một số yếu tố hứa hẹn nhưng cùng lúc đối mặt với một số thách thức cần được lưu ý. Cơ bản tốt nhưng động lực tăng trưởng và dòng tiền hạn chế.",
+      "summary": "Cổ phiếu HMH có momentum mạnh nhưng cơ sở tài chính yếu, cẩn trọng với dòng vốn rút ra mạnh mẽ từ khối ngoại.",
       "highlights": [
         {
-          "text": "Chỉ số P/E thấp 5.6x, mô tả về một mức định giá hấp dẫn.",
+          "text": "Tăng trưởng giá cổ phiếu mạnh mẽ với Momentum Score 98.6/100",
           "type": "positive"
         },
         {
-          "text": "Technical Score cao 84.7 cho thấy mã này mạnh về mặt kỹ thuật.",
+          "text": "Trend kỹ thuật ngắn hạn tích cực",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Tăng trưởng doanh thu âm (-0.3%) cho thấy khả năng tăng trưởng hạn chế.",
+          "text": "Chỉ số cơ bản yếu với ROE và ROA thấp",
           "type": "negative"
         },
         {
-          "text": "Momentum Score thấp 34.0, cảnh báo về động lực tăng giá yếu.",
+          "text": "Dòng tiền khối ngoại tiêu cực đáng kể trong 30 ngày qua",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản của HGM tương đối mạnh với Fundamental Score 74.2.",
-      "technical_view": "Kỹ thuật mạnh nhưng chưa đủ để đảo ngược xu hướng giảm gần đây.",
-      "flow_view": "Không có dòng tiền từ khối ngoại thời gian gần đây, báo hiệu sự thờ ơ của nhà đầu tư nước ngoài.",
-      "symbol": "HGM"
+      "fundamental_view": "Cơ bản yếu với Fundamental Score chỉ 47.4/100.",
+      "technical_view": "Kỹ thuật mạnh với RSI cao và xu hướng ngắn hạn tăng.",
+      "flow_view": "Dòng tiền tiêu cực từ khối ngoại có thể ảnh hưởng tới giá trong trung hạn.",
+      "symbol": "HMH"
+    },
+    "MKV": {
+      "recommendation": "BUY",
+      "summary": "MKV cho thấy tiềm năng tăng trưởng với Momentum và Technical Score cao. Dòng tiền lớn từ nhà đầu tư nước ngoài là một dấu hiệu tích cực.",
+      "highlights": [
+        {
+          "text": "Smart Money Score và Momentum Score rất cao, cho thấy sự ưa chuộng từ các nhà đầu tư thông minh và đà tăng trưởng mạnh.",
+          "type": "positive"
+        },
+        {
+          "text": "Thu hút dòng tiền khối ngoại đáng kể trong 30 ngày qua.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Chỉ số ROE và ROA thấp đáng lo ngại, phản ánh hiệu quả sử dụng vốn kém.",
+          "type": "negative"
+        },
+        {
+          "text": "P/E thấp có thể báo hiệu thị trường đang đánh giá thấp cổ phiếu này hoặc tăng trưởng tương lai không mạnh.",
+          "type": "warning"
+        }
+      ],
+      "fundamental_view": "Cơ bản yếu với ROE và ROA thấp, cần quan sát cải thiện trong tương lai.",
+      "technical_view": "Kỹ thuật mạnh với chỉ số RSI cao và xu hướng tăng trưởng giá.",
+      "flow_view": "Dòng tiền mạnh từ khối ngoại, báo hiệu sự tin tưởng của nhà đầu tư quốc tế.",
+      "symbol": "MKV"
+    },
+    "VCF": {
+      "symbol": "VCF",
+      "recommendation": "BUY",
+      "summary": "VCF có điểm số tốt (66.8) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "highlights": [
+        {
+          "text": "Điểm cơ bản 66/100 - Tài chính ổn định",
+          "type": "neutral"
+        },
+        {
+          "text": "Tín hiệu kỹ thuật tích cực",
+          "type": "positive"
+        },
+        {
+          "text": "RSI 59 - Vùng tăng bền vững",
+          "type": "positive"
+        }
+      ],
+      "risks": [],
+      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
+      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
+      "flow_view": "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
     },
     "SVT": {
       "symbol": "SVT",
-      "recommendation": "HOLD",
-      "summary": "SVT đang trong vùng trung tính (60.4). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+      "recommendation": "BUY",
+      "summary": "SVT có điểm số tốt (66.7) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
       "highlights": [
         {
           "text": "Điểm cơ bản 75/100 - Tài chính ổn định",
@@ -304,7 +327,7 @@
           "type": "positive"
         },
         {
-          "text": "RSI 56 - Vùng tăng bền vững",
+          "text": "RSI 54 - Vùng tăng bền vững",
           "type": "positive"
         }
       ],
@@ -316,44 +339,52 @@
       ],
       "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
       "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
+      "flow_view": "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
     },
-    "DCM": {
-      "symbol": "DCM",
-      "recommendation": "HOLD",
-      "summary": "DCM đang trong vùng trung tính (60.4). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+    "AST": {
+      "symbol": "AST",
+      "recommendation": "BUY",
+      "summary": "AST có điểm số tốt (66.6) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
       "highlights": [
         {
-          "text": "Momentum mạnh - Đà tăng tích cực",
-          "type": "positive"
+          "text": "Điểm cơ bản 73/100 - Tài chính ổn định",
+          "type": "neutral"
         },
         {
-          "text": "Tăng 28.9% trong 20 phiên - Uptrend mạnh",
+          "text": "Khối ngoại mua ròng +89880000.0B trong 7 ngày",
           "type": "positive"
         },
         {
           "text": "Tín hiệu kỹ thuật tích cực",
           "type": "positive"
+        },
+        {
+          "text": "RSI 54 - Vùng tăng bền vững",
+          "type": "positive"
+        },
+        {
+          "text": "Ngành Vận tải - kho bãi đang được tích lũy",
+          "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Điểm cơ bản 50/100 - Tài chính cần cải thiện",
+          "text": "Momentum yếu - Đà tăng suy giảm",
           "type": "negative"
         }
       ],
-      "fundamental_view": "Nền tảng tài chính cần được cải thiện, theo dõi khả năng trả nợ.",
+      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
       "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
+      "flow_view": "Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục."
     },
-    "HAH": {
-      "symbol": "HAH",
-      "recommendation": "HOLD",
-      "summary": "HAH đang trong vùng trung tính (60.0). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
+    "VCI": {
+      "symbol": "VCI",
+      "recommendation": "BUY",
+      "summary": "VCI có điểm số tốt (66.6) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
       "highlights": [
         {
-          "text": "Điểm cơ bản 60/100 - Tài chính ổn định",
-          "type": "neutral"
+          "text": "Khối ngoại mua ròng +59678289000.0B trong 7 ngày",
+          "type": "positive"
         },
         {
           "text": "Tín hiệu kỹ thuật tích cực",
@@ -364,62 +395,50 @@
           "type": "positive"
         }
       ],
-      "risks": [],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
-    },
-    "DRL": {
-      "symbol": "DRL",
-      "recommendation": "HOLD",
-      "summary": "DRL đang trong vùng trung tính (59.7). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
-      "highlights": [
-        {
-          "text": "Điểm cơ bản 74/100 - Tài chính ổn định",
-          "type": "neutral"
-        },
-        {
-          "text": "Tín hiệu kỹ thuật tích cực",
-          "type": "positive"
-        }
-      ],
       "risks": [
+        {
+          "text": "Điểm cơ bản 44/100 - Tài chính cần cải thiện",
+          "type": "negative"
+        },
         {
           "text": "Momentum yếu - Đà tăng suy giảm",
           "type": "negative"
-        }
-      ],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
-    },
-    "PVT": {
-      "symbol": "PVT",
-      "recommendation": "HOLD",
-      "summary": "PVT đang trong vùng trung tính (59.3). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.",
-      "highlights": [
-        {
-          "text": "Momentum mạnh - Đà tăng tích cực",
-          "type": "positive"
         },
         {
-          "text": "Tăng 40.0% trong 20 phiên - Uptrend mạnh",
-          "type": "positive"
-        },
-        {
-          "text": "Tín hiệu kỹ thuật tích cực",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Điểm cơ bản 45/100 - Tài chính cần cải thiện",
+          "text": "Ngành Chứng khoán đang bị phân phối",
           "type": "negative"
         }
       ],
       "fundamental_view": "Nền tảng tài chính cần được cải thiện, theo dõi khả năng trả nợ.",
       "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền đang rút ra, khối ngoại bán ròng."
+      "flow_view": "Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục."
+    },
+    "DNC": {
+      "symbol": "DNC",
+      "recommendation": "BUY",
+      "summary": "DNC có điểm số tốt (66.4) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "highlights": [
+        {
+          "text": "Điểm cơ bản 68/100 - Tài chính ổn định",
+          "type": "neutral"
+        },
+        {
+          "text": "Tín hiệu kỹ thuật tích cực",
+          "type": "positive"
+        },
+        {
+          "text": "RSI 58 - Vùng tăng bền vững",
+          "type": "positive"
+        },
+        {
+          "text": "Ngành Tiện ích đang được tích lũy",
+          "type": "positive"
+        }
+      ],
+      "risks": [],
+      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
+      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
+      "flow_view": "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
     }
   }
 }

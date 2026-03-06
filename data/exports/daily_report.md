@@ -1,6 +1,6 @@
-# 📊 Báo cáo thị trường - 05/03/2026
+# 📊 Báo cáo thị trường - 06/03/2026
 
-> Cập nhật lúc 12:13 ICT
+> Cập nhật lúc 09:51 ICT
 
 ---
 
@@ -9,10 +9,10 @@
 | Chỉ số | Giá trị |
 |--------|---------|
 | Tổng số cổ phiếu | 706 |
-| Tier A (≥70 điểm) | 0 |
-| Tier B (55-69) | 56 |
-| Tier C (40-54) | 536 |
-| Score TB | 46.2 |
+| Tier A (≥70 điểm) | 7 |
+| Tier B (55-69) | 255 |
+| Tier C (40-54) | 409 |
+| Score TB | 52.2 |
 
 ---
 
@@ -20,41 +20,49 @@
 
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
-| 1 | FDC | CTCP Ngoại thương và | Bất động sản | 65.3 | B | Mua |
-| 2 | HMH | CTCP Hải Minh | Vận tải - kho b | 61.7 | B | Giữ |
-| 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 61.4 | B | Giữ |
-| 4 | AST | CTCP Dịch vụ Hàng kh | Vận tải - kho b | 61.4 | B | Giữ |
-| 5 | PMC | CTCP Dược phẩm Dược  | Chăm sóc sức kh | 61.1 | B | Giữ |
-| 6 | SCS | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 61.0 | B | Giữ |
-| 7 | MKV | CTCP Dược thú Y Cai  | Chăm sóc sức kh | 60.7 | B | Giữ |
-| 8 | PDN | CTCP Cảng Đồng Nai | Vận tải - kho b | 60.6 | B | Giữ |
-| 9 | QST | CTCP Sách và Thiết b | Công nghệ và th | 60.5 | B | Giữ |
-| 10 | HGM | CTCP Cơ khí và Khoán | Khai khoáng | 60.5 | B | Giữ |
+| 1 | DCM | CTCP - Tổng công ty  | SX Nhựa - Hóa c | 75.1 | A | Giữ |
+| 2 | PVT | Tổng Công ty cổ phần | Vận tải - kho b | 72.9 | A | Giữ |
+| 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 71.5 | A | Giữ |
+| 4 | BSR | CTCP Lọc hóa Dầu Bìn | SX Phụ trợ | 71.3 | A | Giữ |
+| 5 | DGC | CTCP Tập đoàn Hóa ch | SX Nhựa - Hóa c | 71.1 | A | Giữ |
+| 6 | FDC | CTCP Ngoại thương và | Bất động sản | 71.1 | A | Giữ |
+| 7 | PVD | Tổng Công ty cổ phần | Khai khoáng | 71.0 | A | Mua |
+| 8 | QST | CTCP Sách và Thiết b | Công nghệ và th | 69.9 | B | Giữ |
+| 9 | HMH | CTCP Hải Minh | Vận tải - kho b | 68.6 | B | Giữ |
+| 10 | MKV | CTCP Dược thú Y Cai  | Chăm sóc sức kh | 67.8 | B | Mua |
 
 ---
 
 ## 🔥 Ngành nổi bật
 
 ### Dòng tiền vào mạnh nhất
-- Không có
+- **Tiện ích**: +10446286600.0B VND (Score: 56.4)
+- **Vận tải - kho bãi**: +83374184250.0B VND (Score: 55.7)
+- **SX Nhựa - Hóa chất**: +171697798000.0B VND (Score: 54.3)
+- **Chế biến Thủy sản**: +19387135160.0B VND (Score: 53.1)
+- **SX Phụ trợ**: +172732678900.0B VND (Score: 52.9)
 
 ### Dòng tiền ra
-- Không có
+- **Khai khoáng**: -53947181900.0B VND (Score: 56.3)
+- **Chăm sóc sức khỏe**: -333090370.0B VND (Score: 54.6)
+- **Sản phẩm cao su**: -74905000.0B VND (Score: 54.0)
+- **Thực phẩm - Đồ uống**: -55544789500.0B VND (Score: 53.2)
+- **Dịch vụ tư vấn, hỗ trợ**: -2740756000.0B VND (Score: 52.6)
 
 ---
 
 ## 📊 Tín hiệu kỹ thuật
 
-- **RSI Overbought (>70)**: 27 cổ phiếu
-- **RSI Oversold (<30)**: 49 cổ phiếu
-- **Uptrend**: 306 | **Downtrend**: 399
+- **RSI Overbought (>70)**: 23 cổ phiếu
+- **RSI Oversold (<30)**: 59 cổ phiếu
+- **Uptrend**: 274 | **Downtrend**: 428
 
 ### Top Gainers (5D)
 - ATS: +53.9%
 - GMA: +50.0%
+- QST: +44.9%
 - HRC: +39.7%
 - KMT: +36.0%
-- HKT: +34.6%
 
 ### Top Losers (5D)
 - VNT: -32.1%
@@ -67,8 +75,9 @@
 
 ## ⚠️ Cảnh báo
 
-⚠️ 27 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
-📢 49 cổ phiếu RSI < 30 - có thể là cơ hội mua
+⚠️ 23 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
+📢 59 cổ phiếu RSI < 30 - có thể là cơ hội mua
+⚠️ Số cổ phiếu downtrend nhiều hơn uptrend - cẩn trọng
 
 ---
 
