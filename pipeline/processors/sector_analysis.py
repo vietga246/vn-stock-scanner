@@ -132,7 +132,8 @@ def load_scores(conn) -> pd.DataFrame:
             "rsi14", "trend_short", "rank_total", "rank_pct",
             "debt_equity", "vol_ratio",
         ]
-        optional_cols = ["foreign_net_7d", "foreign_net_30d", "prop_net_7d"]
+        optional_cols = ["foreign_net_7d", "foreign_net_30d"]
+        # prop_net_7d removed: không có data từ VCI source
 
         select_cols = [c for c in base_cols if c in existing_cols]
         select_cols += [c for c in optional_cols if c in existing_cols]
@@ -267,13 +268,12 @@ def build_sector_data(scores_df: pd.DataFrame, symbols_df: pd.DataFrame,
         flow = merged.groupby("industry_name").agg(
             foreign_net_7d  = ("foreign_net_7d",  "sum"),
             foreign_net_30d = ("foreign_net_30d", "sum"),
-            prop_net_7d     = ("prop_net_7d",     "sum"),
+            # prop_net_7d removed: không có data từ VCI source
         ).reset_index()
         sector = sector.merge(flow, on="industry_name", how="left")
     else:
         sector["foreign_net_7d"]  = None
         sector["foreign_net_30d"] = None
-        sector["prop_net_7d"]     = None
 
     # ── Rankings ─────────────────────────────────────────────────────────────
     sector["money_flow_rank"]  = sector["foreign_net_7d"].rank(ascending=False, na_option="bottom").astype(int)
@@ -311,7 +311,7 @@ def build_sector_data(scores_df: pd.DataFrame, symbols_df: pd.DataFrame,
             "avg_price_20d":       safe_float(row.get("avg_price_20d")),
             "foreign_net_7d":      safe_float(row.get("foreign_net_7d"), 1),
             "foreign_net_30d":     safe_float(row.get("foreign_net_30d"), 1),
-            "prop_net_7d":         safe_float(row.get("prop_net_7d"), 1),
+            # prop_net_7d removed: không có data từ VCI source
             "tier_a_pct":          safe_float(row.get("tier_a_pct")),
             "tier_a_count":        safe_int(row.get("tier_a_count", 0)),
             "tier_b_count":        safe_int(row.get("tier_b_count", 0)),
