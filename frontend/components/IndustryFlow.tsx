@@ -55,7 +55,7 @@ export default function IndustryFlow({
           }}
         >
           {isUp ? '+' : ''}
-          {Math.abs(value) >= 1000 ? (value / 1000).toFixed(1) + 'K' : value.toFixed(1)}B
+          {Math.abs(value) >= 1000 ? (value / 1000).toFixed(2) + 'TB' : value.toFixed(1) + 'B'}
         </span>
       </div>
     );
