@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import type { Stock, AIAnalysis, ICTSignal } from '@/lib/types';
 import { generateAnalysis, getRecommendationDisplay } from '@/lib/analysis';
+import { generateDeskAnalysis } from '@/lib/desk_analysis';
+import type { DeskAnalysis, SignalGroup, SignalItem, TradeSetup, TradeAction } from '@/lib/types';
 import { formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
 import Sparkline from './Sparkline';
 
@@ -136,6 +138,8 @@ export default function StockModal({
 
   // Use preloaded AI analysis or generate on-the-fly
   const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus);
+  // Desk analysis — prop trading style
+  const deskAnalysis = generateDeskAnalysis(stock, ictSignal, sectorStatus);
   const recDisplay = getRecommendationDisplay(analysis.recommendation);
   const tierColor = getTierColor(stock.tier);
   const price = stock.close || stock.price || 0;
@@ -273,103 +277,179 @@ export default function StockModal({
         {/* Content */}
         <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 220px)' }}>
           {/* Analysis Tab */}
-          {activeTab === 'analysis' && (
-            <div>
-              {/* Summary */}
-              <div
-                className="p-3 rounded-lg mb-3"
-                style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Info size={12} color="#00d4ff" />
-                  <span className="text-[10px] font-semibold" style={{ color: '#00d4ff' }}>
-                    NHẬN ĐỊNH
-                  </span>
+          {activeTab === 'analysis' && (() => {
+            const d = deskAnalysis;
+
+            // Action config
+            const actionCfg: Record<string, { label: string; color: string; bg: string }> = {
+              STRONG_BUY: { label: 'STRONG BUY',  color: '#00ff88', bg: '#00ff8820' },
+              BUY:        { label: 'BUY',          color: '#00ff88', bg: '#00ff8815' },
+              ACCUMULATE: { label: 'ACCUMULATE',   color: '#00d4ff', bg: '#00d4ff15' },
+              HOLD:       { label: 'HOLD',         color: '#ffcc00', bg: '#ffcc0015' },
+              REDUCE:     { label: 'REDUCE',       color: '#ff9500', bg: '#ff950015' },
+              SELL:       { label: 'SELL',         color: '#ff3366', bg: '#ff336615' },
+              AVOID:      { label: 'AVOID',        color: '#ff3366', bg: '#ff336615' },
+            };
+            const convCfg: Record<string, { label: string; color: string }> = {
+              HIGH:   { label: 'HIGH CONVICTION',   color: '#00ff88' },
+              MEDIUM: { label: 'MEDIUM CONVICTION', color: '#ffcc00' },
+              LOW:    { label: 'LOW CONVICTION',    color: '#8b99a8' },
+            };
+            const strengthCfg: Record<string, { color: string; bar: number }> = {
+              STRONG:   { color: '#00ff88', bar: 90 },
+              MODERATE: { color: '#00d4ff', bar: 65 },
+              NEUTRAL:  { color: '#8b99a8', bar: 50 },
+              WEAK:     { color: '#ff9500', bar: 35 },
+              NEGATIVE: { color: '#ff3366', bar: 15 },
+            };
+            const statusStyle: Record<string, { color: string; bg: string }> = {
+              positive: { color: '#00ff88', bg: '#00ff8812' },
+              negative: { color: '#ff3366', bg: '#ff336612' },
+              neutral:  { color: '#8b99a8', bg: '#1e2832' },
+              warning:  { color: '#ff9500', bg: '#ff950012' },
+            };
+
+            const ac = actionCfg[d.setup.action] ?? actionCfg.HOLD;
+            const cc = convCfg[d.setup.conviction] ?? convCfg.LOW;
+
+            return (
+              <div>
+                {/* ── 1. Headline + Action ─────────────────────────────── */}
+                <div className="rounded-xl p-3 mb-3"
+                  style={{ background: ac.bg, border: `1px solid ${ac.color}30` }}>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <div className="font-bold text-sm" style={{ color: ac.color }}>{d.headline}</div>
+                      <div className="text-[9px] mt-0.5 font-semibold tracking-widest" style={{ color: cc.color }}>{cc.label}</div>
+                    </div>
+                    <div className="px-3 py-1.5 rounded-lg font-black text-sm shrink-0"
+                      style={{ background: ac.color, color: '#05080a' }}>
+                      {ac.label}
+                    </div>
+                  </div>
+                  <p className="text-[11px] leading-relaxed" style={{ color: '#c8d4e0' }}>{d.narrative}</p>
                 </div>
-                <p className="text-[12px] leading-relaxed" style={{ color: '#e8edf2' }}>
-                  {analysis.summary}
-                </p>
+
+                {/* ── 2. Trade Setup ───────────────────────────────────── */}
+                {(d.setup.entry_zone || d.setup.stop_loss) && (
+                  <div className="rounded-xl p-3 mb-3"
+                    style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
+                    <div className="text-[9px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>TRADE SETUP</div>
+                    <div className="grid grid-cols-2 gap-2 text-[10px]">
+                      {[
+                        { label: '📍 Entry Zone',     val: d.setup.entry_zone    },
+                        { label: '🛑 Stop Loss',      val: d.setup.stop_loss     },
+                        { label: '🎯 Target 1',       val: d.setup.target_1      },
+                        { label: '🚀 Target 2',       val: d.setup.target_2      },
+                        { label: '⚖️ Risk / Reward',  val: d.setup.risk_reward   },
+                        { label: '⏱ Time Horizon',   val: d.setup.time_horizon  },
+                      ].filter(r => r.val).map(({ label, val }) => (
+                        <div key={label} className="p-2 rounded-lg" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                          <div style={{ color: '#4a5a6a' }}>{label}</div>
+                          <div className="font-mono font-semibold mt-0.5" style={{ color: '#e8edf2' }}>{val}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {d.setup.invalidation && (
+                      <div className="mt-2 p-2 rounded-lg text-[10px]"
+                        style={{ background: '#ff336610', border: '1px solid #ff336630' }}>
+                        <span style={{ color: '#ff3366' }}>⚡ Invalidation: </span>
+                        <span style={{ color: '#c8d4e0' }}>{d.setup.invalidation}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── 3. Catalysts & Risks ────────────────────────────── */}
+                {(d.catalysts.length > 0 || d.key_risks.length > 0) && (
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    {d.catalysts.length > 0 && (
+                      <div className="rounded-xl p-2.5" style={{ background: '#00ff8808', border: '1px solid #00ff8830' }}>
+                        <div className="text-[9px] font-semibold mb-1.5 tracking-widest" style={{ color: '#00ff88' }}>✅ CATALYSTS</div>
+                        <ul className="space-y-1">
+                          {d.catalysts.map((c, i) => (
+                            <li key={i} className="text-[10px] leading-snug flex gap-1.5" style={{ color: '#c8d4e0' }}>
+                              <span style={{ color: '#00ff88' }}>+</span>{c}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {d.key_risks.length > 0 && (
+                      <div className="rounded-xl p-2.5" style={{ background: '#ff336808', border: '1px solid #ff336830' }}>
+                        <div className="text-[9px] font-semibold mb-1.5 tracking-widest" style={{ color: '#ff3366' }}>⚠️ KEY RISKS</div>
+                        <ul className="space-y-1">
+                          {d.key_risks.map((r, i) => (
+                            <li key={i} className="text-[10px] leading-snug flex gap-1.5" style={{ color: '#c8d4e0' }}>
+                              <span style={{ color: '#ff3366' }}>–</span>{r}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── 4. Signal Groups ─────────────────────────────────── */}
+                <div className="text-[9px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
+                  SIGNAL ANALYSIS — {d.signal_groups.length} GROUPS
+                </div>
+                <div className="space-y-2">
+                  {d.signal_groups.map((group) => {
+                    const sc = strengthCfg[group.strength] ?? strengthCfg.NEUTRAL;
+                    return (
+                      <div key={group.id} className="rounded-xl overflow-hidden"
+                        style={{ border: `1px solid ${sc.color}25`, background: '#0a0f14' }}>
+                        {/* Group header */}
+                        <div className="flex items-center justify-between px-3 py-2"
+                          style={{ background: `${sc.color}08`, borderBottom: `1px solid ${sc.color}20` }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{group.icon}</span>
+                            <span className="text-[10px] font-bold tracking-widest" style={{ color: sc.color }}>
+                              {group.label}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {/* Score bar */}
+                            <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
+                              <div className="h-full rounded-full"
+                                style={{ width: `${group.score}%`, background: sc.color, boxShadow: `0 0 4px ${sc.color}60` }} />
+                            </div>
+                            <span className="font-mono font-bold text-[10px]" style={{ color: sc.color }}>
+                              {group.strength}
+                            </span>
+                          </div>
+                        </div>
+                        {/* Signal items */}
+                        <div className="divide-y" style={{ borderColor: '#1e2832' }}>
+                          {group.signals.map((sig, i) => {
+                            const ss = statusStyle[sig.status] ?? statusStyle.neutral;
+                            return (
+                              <div key={i} className="flex items-start justify-between px-3 py-2 gap-2"
+                                style={{ background: i % 2 === 0 ? 'transparent' : '#0f151905' }}>
+                                <div className="flex items-start gap-2 flex-1 min-w-0">
+                                  <div className="w-1 h-1 rounded-full mt-1.5 shrink-0"
+                                    style={{ background: ss.color }} />
+                                  <div className="min-w-0">
+                                    <div className="text-[9px] font-semibold" style={{ color: '#8b99a8' }}>{sig.label}</div>
+                                    {sig.note && <div className="text-[9px] mt-0.5 leading-snug" style={{ color: '#4a5a6a' }}>{sig.note}</div>}
+                                  </div>
+                                </div>
+                                <div className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold shrink-0"
+                                  style={{ background: ss.bg, color: ss.color, border: `1px solid ${ss.color}30` }}>
+                                  {sig.value}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-
-              {/* Highlights */}
-              {analysis.highlights.length > 0 && (
-                <div className="mb-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle size={12} color="#00ff88" />
-                    <span className="text-[10px] font-semibold" style={{ color: '#00ff88' }}>
-                      ĐIỂM TÍCH CỰC
-                    </span>
-                  </div>
-                  {analysis.highlights.map((item, idx) => (
-                    <HighlightItem key={idx} item={item} />
-                  ))}
-                </div>
-              )}
-
-              {/* Risks */}
-              {analysis.risks.length > 0 && (
-                <div className="mb-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle size={12} color="#ff3366" />
-                    <span className="text-[10px] font-semibold" style={{ color: '#ff3366' }}>
-                      RỦI RO CẦN LƯU Ý
-                    </span>
-                  </div>
-                  {analysis.risks.map((item, idx) => (
-                    <HighlightItem key={idx} item={item} />
-                  ))}
-                </div>
-              )}
-
-              {/* Detailed Analysis */}
-              <div className="space-y-2">
-                <div
-                  className="p-2.5 rounded-lg"
-                  style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Shield size={11} color="#a855f7" />
-                    <span className="text-[10px] font-semibold" style={{ color: '#a855f7' }}>
-                      CƠ BẢN
-                    </span>
-                  </div>
-                  <p className="text-[11px]" style={{ color: '#8b99a8' }}>
-                    {analysis.fundamental_view}
-                  </p>
-                </div>
-
-                <div
-                  className="p-2.5 rounded-lg"
-                  style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Globe size={11} color="#00d4ff" />
-                    <span className="text-[10px] font-semibold" style={{ color: '#00d4ff' }}>
-                      DÒNG TIỀN
-                    </span>
-                  </div>
-                  <p className="text-[11px]" style={{ color: '#8b99a8' }}>
-                    {analysis.flow_view}
-                  </p>
-                </div>
-
-                <div
-                  className="p-2.5 rounded-lg"
-                  style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Activity size={11} color="#ffcc00" />
-                    <span className="text-[10px] font-semibold" style={{ color: '#ffcc00' }}>
-                      KỸ THUẬT
-                    </span>
-                  </div>
-                  <p className="text-[11px]" style={{ color: '#8b99a8' }}>
-                    {analysis.technical_view}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Scores Tab */}
           {activeTab === 'scores' && (
