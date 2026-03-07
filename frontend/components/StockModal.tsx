@@ -18,7 +18,7 @@ import {
   ArrowDownCircle,
   Info,
 } from 'lucide-react';
-import type { Stock, AIAnalysis } from '@/lib/types';
+import type { Stock, AIAnalysis, ICTSignal } from '@/lib/types';
 import { generateAnalysis, getRecommendationDisplay } from '@/lib/analysis';
 import { formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
 import Sparkline from './Sparkline';
@@ -27,6 +27,7 @@ interface StockModalProps {
   stock: Stock | null;
   sectorStatus?: 'accumulating' | 'distributing' | 'neutral';
   preloadedAnalysis?: AIAnalysis;
+  ictSignal?: ICTSignal;
   onClose: () => void;
 }
 
@@ -114,10 +115,11 @@ export default function StockModal({
   stock,
   sectorStatus,
   preloadedAnalysis,
+  ictSignal,
   onClose,
 }: StockModalProps) {
   const [visible, setVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState<'analysis' | 'scores' | 'chart'>('analysis');
+  const [activeTab, setActiveTab] = useState<'analysis' | 'scores' | 'chart' | 'ict'>('analysis');
 
   useEffect(() => {
     if (stock) {
@@ -247,6 +249,7 @@ export default function StockModal({
             { id: 'analysis' as const, label: 'Phân tích', icon: Target },
             { id: 'scores' as const, label: 'Điểm số', icon: Activity },
             { id: 'chart' as const, label: 'Biểu đồ', icon: BarChart3 },
+          ...(ictSignal ? [{ id: 'ict' as const, label: '🧠 ICT', icon: Activity }] : []),
           ].map((tab) => (
             <button
               key={tab.id}
@@ -523,6 +526,113 @@ export default function StockModal({
             </div>
           )}
         </div>
+
+          {/* ICT Tab */}
+          {activeTab === 'ict' && ictSignal && (() => {
+            const qColors: Record<string, string> = { 'A+': '#00ff88', 'A': '#00d4ff', 'B': '#a78bfa', 'C': '#ffcc00', 'SKIP': '#4a5a6a' };
+            const qCol = qColors[ictSignal.setup_quality] || '#4a5a6a';
+            const structCol = ictSignal.structure === 'BULLISH' ? '#00ff88' : ictSignal.structure === 'BEARISH' ? '#ff3366' : '#4a5a6a';
+            return (
+              <div>
+                {/* ICT Score summary */}
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {[
+                    { label: 'ALPHA SCORE', val: ictSignal.alpha_score.toFixed(1), col: qCol },
+                    { label: 'ICT SCORE',   val: ictSignal.ict_score.toFixed(1),   col: '#00d4ff' },
+                    { label: 'QUALITY',     val: ictSignal.setup_quality,          col: qCol },
+                  ].map(({ label, val, col }) => (
+                    <div key={label} className="rounded-lg p-2 text-center" style={{ background: '#0a0f14', border: `1px solid ${col}30` }}>
+                      <div className="text-[8px] mb-1 tracking-widest" style={{ color: '#4a5a6a' }}>{label}</div>
+                      <div className="font-mono font-bold text-sm" style={{ color: col }}>{val}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Market Structure */}
+                <div className="p-2.5 rounded-lg mb-2" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                  <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>MARKET STRUCTURE</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-bold text-sm" style={{ color: structCol }}>
+                      {ictSignal.structure === 'BULLISH' ? '↑ BULLISH' : ictSignal.structure === 'BEARISH' ? '↓ BEARISH' : '— NEUTRAL'}
+                    </span>
+                    {(ictSignal.smart_money || ictSignal.wyckoff_spring) && (
+                      <span className="text-base">{ictSignal.smart_money ? '💎' : ''}{ictSignal.wyckoff_spring ? '💧' : ''}</span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 text-[10px]">
+                    {[
+                      { label: 'BOS Bullish',   on: ictSignal.bos_bull,         col: '#00ff88' },
+                      { label: 'BOS Bearish',   on: ictSignal.bos_bear,         col: '#ff3366' },
+                      { label: 'CHoCH Bull',    on: ictSignal.choch_bull,       col: '#00ff88' },
+                      { label: 'CHoCH Bear',    on: ictSignal.choch_bear,       col: '#ff3366' },
+                    ].map(({ label, on, col }) => (
+                      <div key={label} className="flex items-center justify-between px-2 py-1 rounded" style={{ background: '#0f1519', opacity: on ? 1 : 0.35 }}>
+                        <span style={{ color: '#8b99a8' }}>{label}</span>
+                        <span className="font-bold text-[9px]" style={{ color: on ? col : '#2a3642' }}>{on ? 'YES' : 'no'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ICT Confluences */}
+                <div className="p-2.5 rounded-lg mb-2" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                  <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>ICT CONFLUENCES ({ictSignal.ict_confluence} signals)</div>
+                  <div className="grid grid-cols-2 gap-1 text-[10px]">
+                    {[
+                      { label: 'Fair Value Gap', on: !!ictSignal.fvg_bull,          col: '#00ff88', extra: '' },
+                      { label: 'Order Block',    on: ictSignal.ob_bull && !ictSignal.ob_mitigated, col: '#00d4ff', extra: ictSignal.ob_price_at ? ' 🎯' : '' },
+                      { label: 'Liq Sweep',      on: ictSignal.sweep_bull,           col: '#a78bfa', extra: '' },
+                      { label: 'Stop Hunt',      on: ictSignal.stop_hunt_bull,       col: '#ff9500', extra: '' },
+                      { label: 'Wyckoff Spring', on: ictSignal.wyckoff_spring,       col: '#a78bfa', extra: '' },
+                      { label: 'Smart Money',    on: ictSignal.smart_money,          col: '#ffcc00', extra: '' },
+                      { label: 'Breakout',       on: ictSignal.breakout_imminent,    col: '#ffcc00', extra: ' imminent' },
+                      { label: 'Flow IN',        on: ictSignal.flow_direction === 'in', col: '#00ff88', extra: '' },
+                    ].map(({ label, on, col, extra }) => (
+                      <div key={label} className="flex items-center justify-between px-2 py-1 rounded" style={{ background: '#0f1519', opacity: on ? 1 : 0.3 }}>
+                        <span style={{ color: '#8b99a8' }}>{label}</span>
+                        <span className="font-bold text-[9px]" style={{ color: on ? col : '#2a3642' }}>{on ? `YES${extra}` : 'no'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Signal Breakdown bars */}
+                <div className="p-2.5 rounded-lg mb-2" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                  <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>SIGNAL BREAKDOWN</div>
+                  <div className="space-y-1.5">
+                    {Object.entries(ictSignal.signal_breakdown).map(([key, val]) => {
+                      const col = val >= 70 ? '#00ff88' : val >= 55 ? '#00d4ff' : val >= 40 ? '#ffcc00' : '#ff3366';
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <div className="text-[9px] w-28 shrink-0 font-mono" style={{ color: '#8b99a8' }}>
+                            {key.replace(/_/g, ' ')}
+                          </div>
+                          <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
+                            <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(val, 0)}%`, background: col, boxShadow: `0 0 4px ${col}60` }} />
+                          </div>
+                          <div className="font-mono text-[9px] w-7 text-right" style={{ color: col }}>{val.toFixed(0)}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Top signals */}
+                {ictSignal.top_signals.length > 0 && (
+                  <div className="p-2.5 rounded-lg" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                    <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>TOP SIGNALS</div>
+                    <ul className="space-y-1">
+                      {ictSignal.top_signals.map((sig, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-[10px]" style={{ color: '#8b99a8' }}>
+                          <span style={{ color: '#00d4ff' }}>•</span>{sig}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
         {/* Footer Disclaimer */}
         <div className="px-4 py-2" style={{ borderTop: '1px solid #1e2832', background: '#0a0f14' }}>
