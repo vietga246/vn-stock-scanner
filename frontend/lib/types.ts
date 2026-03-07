@@ -66,6 +66,10 @@ export interface Stock {
   price_history?: number[];
   volume_history?: number[];
   dates?: string[];
+  // Full OHLCV for candlestick chart
+  open_history?: number[];
+  high_history?: number[];
+  low_history?: number[];
   // Price board (from price_board.json)
   bid1_price?: number; bid1_volume?: number;
   bid2_price?: number; bid2_volume?: number;
