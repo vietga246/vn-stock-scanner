@@ -171,26 +171,40 @@ function buildFlowGroup(stock: Stock, ict?: ICTSignal): SignalGroup {
   const nn7d = stock.foreign_net_7d ?? 0;
   const nn30d = stock.foreign_net_30d ?? 0;
 
+  // Detect if 7D ≈ 30D (same value = only 1 day of data in DB)
+  // In that case, treat as "today's accumulated" data — don't show 30D as separate insight
+  const sameAs30d = Math.abs(nn7d - nn30d) < 0.01;
+  const flowLabel = sameAs30d ? 'Khối ngoại (tích lũy)' : 'Khối ngoại 7D';
+  const flowNote7d = sameAs30d ? 'Tích lũy từ đầu phiên' : undefined;
+
   // Foreign net
   if (nn7d > 50) {
-    signals.push(pos('Khối ngoại 7D', `+${nn7d.toFixed(1)}B`, nn30d > 0 ? `30D: +${nn30d.toFixed(1)}B — tích lũy bền vững` : undefined));
+    const note = sameAs30d
+      ? flowNote7d
+      : (nn30d > 0 ? `30D: +${nn30d.toFixed(1)}B — tích lũy bền vững` : undefined);
+    signals.push(pos(flowLabel, `+${nn7d.toFixed(1)}B`, note));
   } else if (nn7d > 0) {
-    signals.push(neu('Khối ngoại 7D', `+${nn7d.toFixed(1)}B`, 'Mua nhỏ, chờ xác nhận'));
+    signals.push(neu(flowLabel, `+${nn7d.toFixed(1)}B`, sameAs30d ? flowNote7d : 'Mua nhỏ, chờ xác nhận'));
   } else if (nn7d < -50) {
-    signals.push(neg('Khối ngoại 7D', `${nn7d.toFixed(1)}B`, nn30d < 0 ? `30D: ${nn30d.toFixed(1)}B — phân phối liên tục` : 'Cần theo dõi'));
+    const note = sameAs30d
+      ? flowNote7d
+      : (nn30d < 0 ? `30D: ${nn30d.toFixed(1)}B — phân phối liên tục` : 'Cần theo dõi');
+    signals.push(neg(flowLabel, `${nn7d.toFixed(1)}B`, note));
   } else if (nn7d < 0) {
-    signals.push(warn('Khối ngoại 7D', `${nn7d.toFixed(1)}B`, 'Bán nhỏ, chưa đáng ngại'));
+    signals.push(warn(flowLabel, `${nn7d.toFixed(1)}B`, sameAs30d ? flowNote7d : 'Bán nhỏ, chưa đáng ngại'));
   } else {
-    signals.push(neu('Khối ngoại 7D', '–', 'Trung lập'));
+    signals.push(neu(flowLabel, '–', 'Trung lập'));
   }
 
-  // 30D trend
-  if (nn30d > 0 && nn7d > 0) {
-    signals.push(pos('Flow Trend', 'Mua ròng liên tục 30D', `+${nn30d.toFixed(1)}B`));
-  } else if (nn30d < 0 && nn7d < 0) {
-    signals.push(neg('Flow Trend', 'Bán ròng liên tục 30D', `${nn30d.toFixed(1)}B`));
-  } else if (nn30d !== 0) {
-    signals.push(neu('Flow Trend', 'Mixed 30D', `30D: ${fmtPct((nn30d / Math.abs(nn30d || 1)) * 10)}`));
+  // 30D trend — only show when 30D has DIFFERENT (richer) data than 7D
+  if (!sameAs30d) {
+    if (nn30d > 0 && nn7d > 0) {
+      signals.push(pos('Flow Trend', 'Mua ròng liên tục 30D', `+${nn30d.toFixed(1)}B`));
+    } else if (nn30d < 0 && nn7d < 0) {
+      signals.push(neg('Flow Trend', 'Bán ròng liên tục 30D', `${nn30d.toFixed(1)}B`));
+    } else if (nn30d !== 0) {
+      signals.push(neu('Flow Trend', 'Mixed 30D', `30D: ${nn30d.toFixed(1)}B vs 7D: ${nn7d.toFixed(1)}B`));
+    }
   }
 
   // ICT flow data
