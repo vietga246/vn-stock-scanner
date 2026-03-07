@@ -218,6 +218,10 @@ export interface ICTSignal {
   ob_bull: boolean;
   ob_bull_top?: number;
   ob_bull_bottom?: number;
+  ob_bull_age?: number;
+  ob_bear?: boolean;
+  ob_bear_top?: number;
+  ob_bear_bottom?: number;
   ob_price_at: boolean;
   ob_mitigated: boolean;
 
@@ -225,6 +229,7 @@ export interface ICTSignal {
   sweep_bull: boolean;
   stop_hunt_bull: boolean;
   sweep_price?: number;
+  sweep_age?: number;
 
   // Volume / Accumulation
   accumulation_score: number;
