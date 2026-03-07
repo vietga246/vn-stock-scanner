@@ -110,14 +110,55 @@ export interface SummaryResponse {
   market: {
     vnindex: number;
     vnindex_change: number;
+    vnindex_change_1d?: number;
+    vnindex_change_5d?: number;
+    vnindex_change_20d?: number;
     hnxindex?: number;
     upcom?: number;
   };
-  top_gainers: Stock[];
-  top_losers: Stock[];
-  most_active: Stock[];
-  foreign_buy: Stock[];
-  foreign_sell: Stock[];
+  top_gainers: Array<{ symbol: string; change: number }>;
+  top_losers: Array<{ symbol: string; change: number }>;
+  most_active: Array<{ symbol: string; volume?: number }>;
+  foreign_buy: Array<{ symbol: string; net: number }>;
+  foreign_sell: Array<{ symbol: string; net: number }>;
+}
+
+export interface PriceBoardStock {
+  symbol: string;
+  exchange?: string;
+  organ_name?: string;
+  match_price?: number;
+  open_price?: number;
+  highest_price?: number;
+  lowest_price?: number;
+  avg_price?: number;
+  price_change?: number;
+  price_change_pct?: number;
+  total_traded_qty?: number;
+  total_traded_value?: number;
+  foreign_buy_qty?: number;
+  foreign_sell_qty?: number;
+  foreign_net_qty?: number;
+  foreign_net_value_bn?: number;
+  foreign_room?: number;
+  bid1_price?: number;
+  bid1_volume?: number;
+  ask1_price?: number;
+  ask1_volume?: number;
+  buy_pressure_pct?: number;
+}
+
+export interface PriceBoardResponse {
+  generated_at: string;
+  snapshot_time: string | null;
+  total_symbols: number;
+  summary: {
+    symbols_with_price: number;
+    total_foreign_net_qty: number;
+    total_foreign_net_value_bn: number;
+    avg_buy_pressure_pct: number | null;
+  };
+  stocks: PriceBoardStock[];
 }
 
 // AI Analysis types (để match với frontend design)
