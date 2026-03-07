@@ -455,6 +455,10 @@ export default function Dashboard() {
           summary={summaryData}
           ictData={ictData}
           priceBoard={priceBoardData}
+          onSymbolClick={(symbol) => {
+            const stock = stocks.find((s) => s.symbol === symbol);
+            if (stock) setSelectedStock(stock);
+          }}
         />
       </div>
 
