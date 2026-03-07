@@ -145,6 +145,52 @@ export interface AIAnalysisResponse {
   analyses: Record<string, AIAnalysis>;
 }
 
+
+// ─── Desk Analysis — Prop Trading Style ─────────────────────────────────────
+
+export type SignalStrength = 'STRONG' | 'MODERATE' | 'WEAK' | 'NEUTRAL' | 'NEGATIVE';
+export type ConvictionLevel = 'HIGH' | 'MEDIUM' | 'LOW';
+export type TradeAction = 'STRONG_BUY' | 'BUY' | 'ACCUMULATE' | 'HOLD' | 'REDUCE' | 'SELL' | 'AVOID';
+
+export interface SignalGroup {
+  id: string;
+  label: string;           // "MACRO / REGIME", "STRUCTURE", etc.
+  icon: string;            // emoji icon
+  strength: SignalStrength;
+  score: number;           // 0-100
+  signals: SignalItem[];
+}
+
+export interface SignalItem {
+  label: string;
+  value: string;
+  status: 'positive' | 'negative' | 'neutral' | 'warning';
+  note?: string;
+}
+
+export interface TradeSetup {
+  action: TradeAction;
+  conviction: ConvictionLevel;
+  entry_zone?: string;      // e.g. "12,400 – 12,800"
+  stop_loss?: string;       // e.g. "11,900 (-4%)"
+  target_1?: string;
+  target_2?: string;
+  risk_reward?: string;     // e.g. "1:2.5"
+  time_horizon: string;     // "Swing 5-10 phiên" | "Position 1-3 tháng"
+  invalidation?: string;    // "Đóng cửa dưới 11,900 và volume cao"
+}
+
+export interface DeskAnalysis {
+  symbol: string;
+  generated_at: string;
+  headline: string;         // 1-line thesis
+  narrative: string;        // 2-3 câu tổng hợp
+  setup: TradeSetup;
+  signal_groups: SignalGroup[];
+  key_risks: string[];
+  catalysts: string[];
+}
+
 // ─── ICT Signal Types ────────────────────────────────────────────────────────
 
 export interface ICTSignal {
