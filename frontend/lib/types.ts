@@ -36,6 +36,14 @@ export interface Stock {
   fvg_bear?: boolean;
   pct_from_ma20?: number;
   pct_from_ma50?: number;
+  vol_ratio?: number;
+  atr14?: number;
+  atr_pct?: number;
+  bb_width?: number;
+  macd_hist?: number;
+  di_spread?: number;
+  plus_di14?: number;
+  minus_di14?: number;
   
   // Smart Money (billion VND)
   foreign_net_7d?: number;
@@ -58,6 +66,16 @@ export interface Stock {
   price_history?: number[];
   volume_history?: number[];
   dates?: string[];
+  // Price board (from price_board.json)
+  bid1_price?: number; bid1_volume?: number;
+  bid2_price?: number; bid2_volume?: number;
+  bid3_price?: number; bid3_volume?: number;
+  ask1_price?: number; ask1_volume?: number;
+  ask2_price?: number; ask2_volume?: number;
+  ask3_price?: number; ask3_volume?: number;
+  buy_pressure_pct?: number;
+  foreign_buy_qty?: number;
+  foreign_sell_qty?: number;
 }
 
 export interface ScreenerResponse {
