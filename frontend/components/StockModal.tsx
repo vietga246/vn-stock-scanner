@@ -24,6 +24,7 @@ import { generateDeskAnalysis } from '@/lib/desk_analysis';
 import type { DeskAnalysis, SignalGroup, SignalItem, TradeSetup, TradeAction } from '@/lib/types';
 import { formatPrice, formatPercent, getScoreColor, getTierColor, getStockDetails } from '@/lib/api';
 import Sparkline from './Sparkline';
+import CandlestickChart from './CandlestickChart';
 
 interface StockModalProps {
   stock: Stock | null;
@@ -545,90 +546,34 @@ export default function StockModal({
           {/* Chart Tab */}
           {activeTab === 'chart' && (
             <div>
-              <div
-                className="p-3 rounded-lg mb-3"
-                style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-              >
-                <div className="text-[10px] mb-3" style={{ color: '#4a5a6a', letterSpacing: '0.5px' }}>
-                  BIẾN ĐỘNG GIÁ 30 NGÀY
-                </div>
-                {stock.price_history ? (
+              {stock.open_history && stock.high_history && stock.low_history && stock.price_history && stock.volume_history && stock.dates ? (
+                <CandlestickChart
+                  symbol={stock.symbol}
+                  open={stock.open_history}
+                  high={stock.high_history}
+                  low={stock.low_history}
+                  close={stock.price_history}
+                  volume={stock.volume_history}
+                  dates={stock.dates}
+                />
+              ) : (
+                <div>
                   <Sparkline
-                    data={stock.price_history}
+                    data={stock.price_history ?? []}
                     volume={stock.volume_history}
                     dates={stock.dates}
                     width={320}
                     height={80}
                   />
-                ) : (
-                  <div className="text-center py-8 text-[11px]" style={{ color: '#4a5a6a' }}>
-                    Không có dữ liệu lịch sử giá
+                  <div className="text-center py-2 text-[10px]" style={{ color: '#4a5a6a' }}>
+                    Dữ liệu OHLC chưa sẵn sàng
                   </div>
-                )}
-              </div>
-
-              {/* Price Stats */}
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {[
-                  { label: '1D', value: stock.change_1d },
-                  { label: '5D', value: stock.change_5d },
-                  { label: '20D', value: stock.change_20d },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="p-2.5 rounded-lg text-center"
-                    style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-                  >
-                    <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>
-                      {item.label}
-                    </div>
-                    <div
-                      className="font-mono font-semibold text-sm"
-                      style={{ color: (item.value || 0) >= 0 ? '#00ff88' : '#ff3366' }}
-                    >
-                      {formatPercent(item.value)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Foreign Flow */}
-              <div
-                className="p-3 rounded-lg"
-                style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-              >
-                <div className="text-[10px] mb-2" style={{ color: '#4a5a6a', letterSpacing: '0.5px' }}>
-                  DÒNG TIỀN KHỐI NGOẠI 7D
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {(stock.foreign_net_7d || 0) >= 0 ? (
-                      <TrendingUp size={16} color="#00ff88" />
-                    ) : (
-                      <TrendingDown size={16} color="#ff3366" />
-                    )}
-                    <span
-                      className="font-mono font-bold text-lg"
-                      style={{ color: (stock.foreign_net_7d || 0) >= 0 ? '#00ff88' : '#ff3366' }}
-                    >
-                      {(stock.foreign_net_7d || 0) >= 0 ? '+' : ''}
-                      {(stock.foreign_net_7d || 0).toFixed(1)}B
-                    </span>
-                  </div>
-                  <span
-                    className="text-[11px]"
-                    style={{ color: (stock.foreign_net_7d || 0) >= 0 ? '#00ff88' : '#ff3366' }}
-                  >
-                    {(stock.foreign_net_7d || 0) >= 0 ? 'Mua ròng' : 'Bán ròng'}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
           )}
-        </div>
 
-          {/* ICT Tab */}
-          {activeTab === 'ict' && ictSignal && (() => {
+                    {activeTab === 'ict' && ictSignal && (() => {
             const qColors: Record<string, string> = { 'A+': '#00ff88', 'A': '#00d4ff', 'B': '#a78bfa', 'C': '#ffcc00', 'SKIP': '#4a5a6a' };
             const qCol = qColors[ictSignal.setup_quality] || '#4a5a6a';
             const structCol = ictSignal.structure === 'BULLISH' ? '#00ff88' : ictSignal.structure === 'BEARISH' ? '#ff3366' : '#4a5a6a';
