@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search, Star, BarChart3, X } from 'lucide-react';
-import type { Stock, Sector, AIAnalysis } from '@/lib/types';
+import type { Stock, Sector, AIAnalysis, ICTSignal, ICTSignalsResponse } from '@/lib/types';
 import { getDashboardData, getSummary, loadPrices, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
 import IndustryFlow from './IndustryFlow';
 import ICTDashboard from './ICTDashboard';
@@ -65,7 +65,7 @@ function PriceChange({ value }: { value?: number }) {
 }
 
 // Type-safe sort keys (Q4 fix)
-type SortableKey = 'rank' | 'close' | 'change_1d' | 'change_5d' | 'change_20d' | 'composite_score' | 'foreign_net_7d';
+type SortableKey = 'rank' | 'close' | 'change_1d' | 'change_5d' | 'change_20d' | 'composite_score' | 'foreign_net_7d' | 'adx14' | 'rsi14';
 
 function getSortValue(stock: Stock, key: SortableKey): number {
   return stock[key] ?? 0;
@@ -80,6 +80,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [generatedAt, setGeneratedAt] = useState<string>('');
   const [vnindex, setVnindex] = useState<{ value: number; change: number } | null>(null);
+  const [ictMap, setIctMap] = useState<Record<string, ICTSignal>>({});
 
   // UI state
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
@@ -134,6 +135,18 @@ export default function Dashboard() {
         loadPrices(data.stocks).then((stocksWithPrices) => {
           setStocks(stocksWithPrices);
         });
+
+        // Lazy-load ICT signals
+        fetch('/api/ict-signals')
+          .then((r) => r.json())
+          .then((ict: ICTSignalsResponse) => {
+            if (ict?.signals) {
+              const map: Record<string, ICTSignal> = {};
+              ict.signals.forEach((s) => { map[s.symbol] = s; });
+              setIctMap(map);
+            }
+          })
+          .catch(() => { /* ICT signals optional */ });
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
@@ -494,13 +507,16 @@ export default function Dashboard() {
                   <th onClick={() => handleSort('change_20d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>20D</th>
                   <th onClick={() => handleSort('composite_score')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>SCORE</th>
                   <th onClick={() => handleSort('foreign_net_7d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>NN 7D</th>
+                  <th onClick={() => handleSort('adx14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>ADX</th>
+                  <th onClick={() => handleSort('rsi14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>RSI</th>
+                  <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>ICT</th>
                   <th className="p-2 text-right text-[9px] font-medium w-[100px]" style={{ color: '#4a5a6a' }}>30D</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedStocks.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="p-8 text-center">
+                    <td colSpan={13} className="p-8 text-center">
                       <div style={{ color: '#4a5a6a' }}>
                         <Search size={32} className="mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Không tìm thấy kết quả</p>
@@ -559,6 +575,64 @@ export default function Dashboard() {
                       }}>
                         {(s.foreign_net_7d || 0) >= 0 ? '+' : ''}{Math.abs(s.foreign_net_7d || 0) >= 1000 ? ((s.foreign_net_7d || 0) / 1000).toFixed(2) + 'TB' : (s.foreign_net_7d || 0).toFixed(1) + 'B'}
                       </td>
+                      <td className="p-2 text-right">
+                        {s.adx14 != null ? (
+                          <div className="flex flex-col items-end gap-0.5">
+                            <span
+                              className="font-mono text-[10px] font-semibold"
+                              style={{ color: (s.adx14 || 0) >= 25 ? '#00d4ff' : '#4a5a6a' }}
+                            >
+                              {(s.adx14 || 0).toFixed(0)}
+                            </span>
+                            {s.trend_short != null && (
+                              <span className="text-[8px]" style={{ color: (s.trend_short || 0) > 0 ? '#00ff88' : (s.trend_short || 0) < 0 ? '#ff3366' : '#4a5a6a' }}>
+                                {(s.trend_short || 0) > 0 ? '↑' : (s.trend_short || 0) < 0 ? '↓' : '—'}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[10px]" style={{ color: '#2a3642' }}>–</span>
+                        )}
+                      </td>
+                      <td className="p-2 text-right">
+                        {s.rsi14 != null ? (
+                          <span
+                            className="font-mono text-[10px] font-semibold"
+                            style={{
+                              color: (s.rsi14 || 0) > 70 ? '#ff3366' : (s.rsi14 || 0) < 30 ? '#00ff88' : '#8b99a8',
+                            }}
+                          >
+                            {(s.rsi14 || 0).toFixed(0)}
+                          </span>
+                        ) : (
+                          <span className="text-[10px]" style={{ color: '#2a3642' }}>–</span>
+                        )}
+                      </td>
+                      <td className="p-2 text-center">
+                        <div className="flex items-center justify-center gap-0.5 flex-wrap">
+                          {s.fvg_bull && (
+                            <span
+                              className="px-1 py-0.5 rounded text-[7px] font-bold"
+                              style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}
+                              title="Fair Value Gap Bullish"
+                            >
+                              FVG
+                            </span>
+                          )}
+                          {(s.trend_strength != null && (s.trend_strength || 0) >= 65) && (
+                            <span
+                              className="px-1 py-0.5 rounded text-[7px] font-bold"
+                              style={{ background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}
+                              title={`Trend strength: ${s.trend_strength}`}
+                            >
+                              TRD
+                            </span>
+                          )}
+                          {!s.fvg_bull && !(s.trend_strength != null && (s.trend_strength || 0) >= 65) && (
+                            <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="p-2 text-right overflow-visible" onClick={(e) => e.stopPropagation()}>
                         {s.price_history && s.price_history.length > 1 ? (
                           <Sparkline data={s.price_history} volume={s.volume_history} dates={s.dates} />
@@ -606,6 +680,7 @@ export default function Dashboard() {
           stock={selectedStock}
           sectorStatus={getStockSectorStatus(selectedStock)}
           preloadedAnalysis={aiAnalyses[selectedStock.symbol]}
+          ictSignal={ictMap[selectedStock.symbol]}
           onClose={() => setSelectedStock(null)}
         />
       )}
