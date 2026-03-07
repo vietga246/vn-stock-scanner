@@ -47,9 +47,10 @@ export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | '
       type: 'positive'
     });
     
-    if (stock.roe && stock.roe > 15) {
+    if (stock.roe && stock.roe > 0.15) {
+      const roeDisplay = stock.roe > 1 ? stock.roe : stock.roe * 100;
       analysis.highlights.push({
-        text: `ROE ${stock.roe.toFixed(1)}% - Sinh lời trên vốn cao`,
+        text: `ROE ${roeDisplay.toFixed(1)}% - Sinh lời trên vốn cao`,
         type: 'positive'
       });
     }
