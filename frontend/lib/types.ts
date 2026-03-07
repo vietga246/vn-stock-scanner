@@ -138,3 +138,121 @@ export interface AIAnalysisResponse {
   model: string;
   analyses: Record<string, AIAnalysis>;
 }
+
+// ─── ICT Signal Types ────────────────────────────────────────────────────────
+
+export interface ICTSignal {
+  symbol: string;
+  ict_rank: number;
+  alpha_score: number;
+  ict_score: number;
+  ict_confluence: number;
+  setup_quality: 'A+' | 'A' | 'B' | 'C' | 'SKIP';
+  actionable: boolean;
+  bull_weight: number;
+
+  // Structure
+  structure: 'BULLISH' | 'BEARISH' | 'NEUTRAL';
+  bos_bull: boolean;
+  bos_bear: boolean;
+  choch_bull: boolean;
+  choch_bear: boolean;
+  last_sh?: number;
+  last_sl?: number;
+  eq_high_count: number;
+  eq_low_count: number;
+
+  // Order Block
+  ob_bull: boolean;
+  ob_bull_top?: number;
+  ob_bull_bottom?: number;
+  ob_price_at: boolean;
+  ob_mitigated: boolean;
+
+  // Liquidity Sweep
+  sweep_bull: boolean;
+  stop_hunt_bull: boolean;
+  sweep_price?: number;
+
+  // Volume / Accumulation
+  accumulation_score: number;
+  distribution_score: number;
+  vol_spike: number;
+  vol_trend: 'increasing' | 'decreasing' | 'flat';
+  wyckoff_spring: boolean;
+  nr7: boolean;
+  breakout_imminent: boolean;
+
+  // Institutional Flow
+  inst_flow_score: number;
+  flow_direction: 'in' | 'out' | 'neutral';
+  smart_money: boolean;
+  buy_pressure_pct?: number;
+  flow_trend: string;
+
+  // Pass-through from screener
+  composite_score: number;
+  industry: string;
+  tier: string;
+  rsi14?: number;
+  adx14?: number;
+  fvg_bull?: boolean;
+  trend_strength?: number;
+  price_change_1d?: number;
+  price_change_5d?: number;
+  foreign_net_7d?: number;
+
+  // Signals
+  top_signals: string[];
+  signal_breakdown: Record<string, number>;
+}
+
+export interface ICTRegime {
+  regime: 'BULL' | 'BEAR' | 'RANGE' | 'TRANSITION' | 'UNKNOWN';
+  regime_strength: number;
+  bull_weight: number;
+  composite_score: number;
+  vnindex?: number;
+  vnindex_change_1d?: number;
+  vnindex_change_5d?: number;
+  vnindex_change_20d?: number;
+  breadth_advance_pct?: number;
+  bull_sectors?: number;
+  bear_sectors?: number;
+  foreign_net_total_bn?: number;
+}
+
+export interface ICTMarketStats {
+  total_symbols: number;
+  bullish_structure: number;
+  bearish_structure: number;
+  bullish_pct: number;
+  bos_bull: number;
+  bos_bear: number;
+  choch_bull: number;
+  accumulating: number;
+  wyckoff_spring: number;
+  flow_in: number;
+  smart_money_conf: number;
+}
+
+export interface ICTSignalsResponse {
+  generated_at: string;
+  elapsed_seconds: number;
+  total_symbols: number;
+  actionable_count: number;
+  regime: ICTRegime;
+  sector_rotation: {
+    leading: string[];
+    lagging: string[];
+    rotating_in: string[];
+    rotating_out: string[];
+    accumulating: string[];
+    distributing: string[];
+    hot_sectors: string[];
+    breakout_candidate: string[];
+  };
+  market_stats: ICTMarketStats;
+  quality_distribution: Record<string, number>;
+  signals: ICTSignal[];
+}

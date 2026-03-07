@@ -2,6 +2,7 @@
 // Giải quyết vấn đề CORS khi fetch từ client-side
 
 import type {
+  ICTSignalsResponse,
   ScreenerResponse,
   SectorsResponse,
   PricesResponse,
@@ -219,4 +220,8 @@ export function getRecommendation(stock: Stock): {
   if (score >= 55) return { text: 'HOLD', color: '#ffcc00' };
   if (score >= 45) return { text: 'SELL', color: '#ff3366' };
   return { text: 'STRONG SELL', color: '#ff3366' };
+}
+
+export async function getICTSignals(): Promise<ICTSignalsResponse> {
+  return fetchFromAPI<ICTSignalsResponse>('ict-signals');
 }

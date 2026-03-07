@@ -5,6 +5,7 @@ import { Search, Star, BarChart3, X } from 'lucide-react';
 import type { Stock, Sector, AIAnalysis } from '@/lib/types';
 import { getDashboardData, getSummary, loadPrices, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
 import IndustryFlow from './IndustryFlow';
+import ICTDashboard from './ICTDashboard';
 import StockModal from './StockModal';
 import Sparkline from './Sparkline';
 
@@ -88,6 +89,7 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState<SortableKey>('rank');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<'screener' | 'ict'>('screener');
 
   // P5: Watchlist persisted to localStorage
   const [watchlist, setWatchlist] = useState<Set<string>>(() => {
@@ -349,6 +351,27 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Tab switcher */}
+          <div className="flex items-center gap-1" style={{ background: '#0f1519', border: '1px solid #1e2832', borderRadius: 8, padding: 3 }}>
+            {([
+              { key: 'screener', label: 'SCREENER' },
+              { key: 'ict',      label: '🧠 ICT' },
+            ] as { key: 'screener' | 'ict'; label: string }[]).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className="px-3 py-1 rounded text-[10px] font-bold transition-all"
+                style={{
+                  background: activeTab === key ? (key === 'ict' ? '#a78bfa25' : '#00d4ff15') : 'transparent',
+                  color: activeTab === key ? (key === 'ict' ? '#a78bfa' : '#00d4ff') : '#4a5a6a',
+                  border: activeTab === key ? `1px solid ${key === 'ict' ? '#a78bfa40' : '#00d4ff30'}` : '1px solid transparent',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           {/* Live indicator */}
           <div
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md"
@@ -434,6 +457,11 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
+      {activeTab === 'ict' ? (
+        <div className="p-3">
+          <ICTDashboard />
+        </div>
+      ) : (
       <div className="flex gap-3 p-3">
         {/* Industry Flow Panel */}
         <div className="w-[260px] flex-shrink-0">
@@ -580,6 +608,7 @@ export default function Dashboard() {
           preloadedAnalysis={aiAnalyses[selectedStock.symbol]}
           onClose={() => setSelectedStock(null)}
         />
+      )}
       )}
     </div>
   );
