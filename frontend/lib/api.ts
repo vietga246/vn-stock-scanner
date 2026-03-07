@@ -8,6 +8,7 @@ import type {
   PricesResponse,
   SummaryResponse,
   PriceBoardResponse,
+  StocksResponse,
   AIAnalysisResponse,
   AIAnalysis,
   Stock
@@ -172,6 +173,11 @@ export async function loadPrices(stocks: Stock[]): Promise<Stock[]> {
 }
 
 // ============ Utility Functions ============
+
+
+export async function getStockDetails(): Promise<StocksResponse> {
+  return fetchFromAPI<StocksResponse>('stocks');
+}
 
 export function formatPrice(price: number | undefined | null): string {
   if (price === undefined || price === null) return '-';
