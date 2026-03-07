@@ -229,41 +229,41 @@ function buildFundamentalsGroup(stock: Stock): SignalGroup {
     else signals.push(warn('P/E', `${fmt(pe)}x`, 'Định giá cao, rủi ro kỳ vọng'));
   }
 
-  // Profitability
-  const roe = stock.roe;
-  if (roe != null) {
-    if (roe >= 20) signals.push(pos('ROE', `${fmt(roe)}%`, 'Sinh lời vốn chủ xuất sắc'));
-    else if (roe >= 12) signals.push(pos('ROE', `${fmt(roe)}%`, 'Tốt'));
-    else if (roe >= 5) signals.push(neu('ROE', `${fmt(roe)}%`, 'Trung bình ngành'));
-    else signals.push(neg('ROE', `${fmt(roe)}%`, 'Hiệu quả sử dụng vốn thấp'));
+  // Profitability — data stored as decimal (0.18 = 18%), convert to pct
+  const roePct = stock.roe != null ? (stock.roe > 1 ? stock.roe : stock.roe * 100) : null;
+  if (roePct != null) {
+    if (roePct >= 20) signals.push(pos('ROE', `${fmt(roePct)}%`, 'Sinh lời vốn chủ xuất sắc'));
+    else if (roePct >= 12) signals.push(pos('ROE', `${fmt(roePct)}%`, 'Tốt'));
+    else if (roePct >= 5) signals.push(neu('ROE', `${fmt(roePct)}%`, 'Trung bình ngành'));
+    else signals.push(neg('ROE', `${fmt(roePct)}%`, 'Hiệu quả sử dụng vốn thấp'));
   }
 
-  const roa = stock.roa;
-  if (roa != null) {
-    if (roa >= 10) signals.push(pos('ROA', `${fmt(roa)}%`, 'Asset productivity cao'));
-    else if (roa >= 4) signals.push(neu('ROA', `${fmt(roa)}%`));
-    else signals.push(neg('ROA', `${fmt(roa)}%`, 'Tài sản tạo ra ít lợi nhuận'));
+  const roaPct = stock.roa != null ? (stock.roa > 1 ? stock.roa : stock.roa * 100) : null;
+  if (roaPct != null) {
+    if (roaPct >= 10) signals.push(pos('ROA', `${fmt(roaPct)}%`, 'Asset productivity cao'));
+    else if (roaPct >= 4) signals.push(neu('ROA', `${fmt(roaPct)}%`));
+    else signals.push(neg('ROA', `${fmt(roaPct)}%`, 'Tài sản tạo ra ít lợi nhuận'));
   }
 
-  // Growth
-  const revGrowth = stock.revenue_growth;
-  if (revGrowth != null) {
-    if (revGrowth >= 20) signals.push(pos('Rev Growth', `+${fmt(revGrowth)}%`, 'Tăng trưởng cao'));
-    else if (revGrowth >= 5) signals.push(neu('Rev Growth', `+${fmt(revGrowth)}%`));
-    else if (revGrowth < 0) signals.push(neg('Rev Growth', `${fmt(revGrowth)}%`, 'Doanh thu sụt giảm'));
-    else signals.push(neu('Rev Growth', `+${fmt(revGrowth)}%`, 'Tăng trưởng chậm'));
+  // Growth — decimal (0.15 = 15%)
+  const revGrowthPct = stock.revenue_growth != null ? (Math.abs(stock.revenue_growth) > 1 ? stock.revenue_growth : stock.revenue_growth * 100) : null;
+  if (revGrowthPct != null) {
+    if (revGrowthPct >= 20) signals.push(pos('Rev Growth', `+${fmt(revGrowthPct)}%`, 'Tăng trưởng cao'));
+    else if (revGrowthPct >= 5) signals.push(neu('Rev Growth', `+${fmt(revGrowthPct)}%`));
+    else if (revGrowthPct < 0) signals.push(neg('Rev Growth', `${fmt(revGrowthPct)}%`, 'Doanh thu sụt giảm'));
+    else signals.push(neu('Rev Growth', `+${fmt(revGrowthPct)}%`, 'Tăng trưởng chậm'));
   }
 
-  // Net Margin
-  const margin = stock.net_margin;
-  if (margin != null) {
-    if (margin >= 20) signals.push(pos('Net Margin', `${fmt(margin)}%`, 'Biên lợi nhuận cao'));
-    else if (margin >= 8) signals.push(neu('Net Margin', `${fmt(margin)}%`));
-    else if (margin > 0) signals.push(warn('Net Margin', `${fmt(margin)}%`, 'Biên mỏng'));
-    else signals.push(neg('Net Margin', `${fmt(margin)}%`, 'Lỗ'));
+  // Net Margin — decimal (0.1 = 10%)
+  const marginPct = stock.net_margin != null ? (stock.net_margin > 1 ? stock.net_margin : stock.net_margin * 100) : null;
+  if (marginPct != null) {
+    if (marginPct >= 20) signals.push(pos('Net Margin', `${fmt(marginPct)}%`, 'Biên lợi nhuận cao'));
+    else if (marginPct >= 8) signals.push(neu('Net Margin', `${fmt(marginPct)}%`));
+    else if (marginPct > 0) signals.push(warn('Net Margin', `${fmt(marginPct)}%`, 'Biên mỏng'));
+    else signals.push(neg('Net Margin', `${fmt(marginPct)}%`, 'Lỗ'));
   }
 
-  // Leverage
+  // Leverage — D/E thường là ratio, giữ nguyên
   const de = stock.debt_equity;
   if (de != null) {
     if (de < 0.5) signals.push(pos('D/E', `${fmt(de)}x`, 'Bảng cân đối lành mạnh'));
@@ -532,7 +532,7 @@ function buildNarrative(
   if (ict?.breakout_imminent) catalysts.push('NR7 + volume compression — breakout sắp xảy ra');
   if ((stock.foreign_net_7d ?? 0) > 50) catalysts.push(`Khối ngoại mua ròng mạnh +${(stock.foreign_net_7d ?? 0).toFixed(1)}B`);
   if (stock.rsi14 != null && stock.rsi14 < 30) catalysts.push(`RSI ${stock.rsi14.toFixed(0)} — vùng oversold, tiềm năng bounce`);
-  if (stock.revenue_growth != null && stock.revenue_growth > 20) catalysts.push(`Tăng trưởng doanh thu +${stock.revenue_growth.toFixed(0)}%`);
+  if (stock.revenue_growth != null && stock.revenue_growth > 0.15) catalysts.push(`Tăng trưởng doanh thu +${(stock.revenue_growth > 1 ? stock.revenue_growth : stock.revenue_growth * 100).toFixed(0)}%`);
 
   // Risks
   const key_risks: string[] = [];
