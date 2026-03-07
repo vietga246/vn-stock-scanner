@@ -8,6 +8,7 @@ interface MarketBreadthProps {
   ictData: ICTSignalsResponse | null;
   priceBoard: PriceBoardResponse | null;
   vnindexBaseValue?: number; // điểm VN-Index hôm qua (để tính điểm thay đổi)
+  onSymbolClick?: (symbol: string) => void;
 }
 
 function StatCell({
@@ -88,6 +89,7 @@ export default function MarketBreadth({
   summary,
   ictData,
   priceBoard,
+  onSymbolClick,
 }: MarketBreadthProps) {
   const market = summary?.market;
   const regime = ictData?.regime;
@@ -357,8 +359,11 @@ export default function MarketBreadth({
             {(summary?.top_gainers ?? []).slice(0, 5).map((s) => (
               <div
                 key={s.symbol}
-                className="flex items-center gap-1 px-1.5 py-0.5 rounded"
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded cursor-pointer transition-all"
                 style={{ background: '#00ff8810', border: '1px solid #00ff8825' }}
+                onClick={() => onSymbolClick?.(s.symbol)}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00ff8825'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00ff8855'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00ff8810'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00ff8825'; }}
               >
                 <span className="font-semibold text-[10px]">{s.symbol}</span>
                 <span className="font-mono text-[9px]" style={{ color: '#00ff88' }}>
@@ -381,8 +386,11 @@ export default function MarketBreadth({
             {mostActive.slice(0, 5).map((s) => (
               <div
                 key={s.symbol}
-                className="flex items-center gap-1 px-1.5 py-0.5 rounded"
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded cursor-pointer transition-all"
                 style={{ background: '#00d4ff10', border: '1px solid #00d4ff25' }}
+                onClick={() => onSymbolClick?.(s.symbol)}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00d4ff25'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00d4ff55'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00d4ff10'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00d4ff25'; }}
               >
                 <span className="font-semibold text-[10px]">{s.symbol}</span>
                 <span className="font-mono text-[9px]" style={{ color: '#00d4ff' }}>
@@ -414,8 +422,11 @@ export default function MarketBreadth({
             {(summary?.top_losers ?? []).slice(0, 5).map((s) => (
               <div
                 key={s.symbol}
-                className="flex items-center gap-1 px-1.5 py-0.5 rounded"
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded cursor-pointer transition-all"
                 style={{ background: '#ff336610', border: '1px solid #ff336625' }}
+                onClick={() => onSymbolClick?.(s.symbol)}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#ff336625'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #ff336655'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#ff336610'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #ff336625'; }}
               >
                 <span className="font-semibold text-[10px]">{s.symbol}</span>
                 <span className="font-mono text-[9px]" style={{ color: '#ff3366' }}>
@@ -436,7 +447,14 @@ export default function MarketBreadth({
           </div>
           <div className="flex flex-col gap-0.5">
             {(summary?.foreign_buy ?? []).slice(0, 2).map((s) => (
-              <div key={s.symbol} className="flex items-center justify-between text-[9px]">
+              <div
+                key={s.symbol}
+                className="flex items-center justify-between text-[9px] px-1.5 py-0.5 rounded cursor-pointer transition-all"
+                style={{ borderRadius: 4 }}
+                onClick={() => onSymbolClick?.(s.symbol)}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00ff8812'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+              >
                 <span className="font-semibold">{s.symbol}</span>
                 <span className="font-mono" style={{ color: '#00ff88' }}>
                   +{s.net.toFixed(1)}B
@@ -444,7 +462,14 @@ export default function MarketBreadth({
               </div>
             ))}
             {(summary?.foreign_sell ?? []).slice(0, 2).map((s) => (
-              <div key={s.symbol} className="flex items-center justify-between text-[9px]">
+              <div
+                key={s.symbol}
+                className="flex items-center justify-between text-[9px] px-1.5 py-0.5 rounded cursor-pointer transition-all"
+                style={{ borderRadius: 4 }}
+                onClick={() => onSymbolClick?.(s.symbol)}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#ff336612'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+              >
                 <span className="font-semibold">{s.symbol}</span>
                 <span className="font-mono" style={{ color: '#ff3366' }}>
                   {s.net.toFixed(1)}B
