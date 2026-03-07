@@ -27,9 +27,15 @@ export interface Stock {
   
   // Technical
   rsi14?: number;
+  adx14?: number;
   trend_short?: number;  // 1 = up, 0 = sideways, -1 = down
   trend_medium?: number;
+  trend_strength?: number;
   macd_signal?: number;
+  fvg_bull?: boolean;
+  fvg_bear?: boolean;
+  pct_from_ma20?: number;
+  pct_from_ma50?: number;
   
   // Smart Money (billion VND)
   foreign_net_7d?: number;
