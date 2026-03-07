@@ -2,7 +2,7 @@ name: "③ Daily Process — Scoring & Sector (sau Daily Collect)"
 
 on:
   workflow_run:
-    workflows: ["② Daily Collect — Giá & Dòng tiền (15:15 ICT T2-T6)"]
+    workflows: ["② Daily Collect — Giá & Dòng tiền (2x/ngày T2-T6)"]
     types: [completed]
   workflow_dispatch:
 
@@ -29,6 +29,23 @@ jobs:
       - name: Install dependencies
         run: pip install -r pipeline/requirements.txt
 
+      # Xác định phiên để label commit
+      - name: "🕐 Xác định phiên giao dịch"
+        id: session
+        run: |
+          HOUR=$(date -u +%H)
+          MINUTE=$(date -u +%M)
+          TOTAL_MIN=$((HOUR * 60 + MINUTE))
+          if [ "$TOTAL_MIN" -lt 390 ]; then
+            echo "SESSION=morning" >> $GITHUB_OUTPUT
+            echo "SESSION_LABEL=sáng" >> $GITHUB_OUTPUT
+            echo "🌅 Phiên SÁNG"
+          else
+            echo "SESSION=afternoon" >> $GITHUB_OUTPUT
+            echo "SESSION_LABEL=chiều (EOD)" >> $GITHUB_OUTPUT
+            echo "🌇 Phiên CHIỀU (EOD)"
+          fi
+
       - name: Khôi phục DB từ cache
         uses: actions/cache@v4
         with:
@@ -47,6 +64,90 @@ jobs:
             echo "DB_EXISTS=false" >> $GITHUB_OUTPUT
             echo "❌ Database not found!"
           fi
+
+      # ── Import foreign history nếu DB vừa restore từ cache cũ / miss ─────
+      # Đảm bảo foreign_trading có đủ 7D/30D data trước khi scoring
+      - name: "📥 Import foreign history từ CSV vào DB"
+        id: import_foreign
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: |
+          if [ -f "data/exports/foreign_history.csv" ]; then
+            echo "📂 Tìm thấy foreign_history.csv — đồng bộ vào DB..."
+            python pipeline/exporters/export_foreign_history.py import
+          else
+            echo "ℹ️  foreign_history.csv chưa có (lần đầu chạy)"
+          fi
+        continue-on-error: true
+
+      # ── Verify foreign data trước khi scoring ────────────────────────────
+      - name: "🔍 Verify foreign_trading data"
+        id: verify_foreign
+        if: steps.check_db.outputs.DB_EXISTS == 'true'
+        env:
+          DB_PATH: data/db/stock.db
+        run: |
+          python3 << 'PYEOF'
+          import sqlite3, os
+          from datetime import datetime, timedelta
+
+          conn = sqlite3.connect(os.getenv("DB_PATH", "data/db/stock.db"))
+          try:
+              # Check table exists
+              tables = [r[0] for r in conn.execute(
+                  "SELECT name FROM sqlite_master WHERE type='table'"
+              ).fetchall()]
+              if "foreign_trading" not in tables:
+                  print("⚠️  foreign_trading table chưa tồn tại")
+                  exit(0)
+
+              # Count days in 7D / 30D windows
+              r = conn.execute("""
+                  SELECT
+                      COUNT(DISTINCT date) AS total_days,
+                      MIN(date) AS earliest,
+                      MAX(date) AS latest,
+                      COUNT(DISTINCT symbol) AS symbols,
+                      SUM(CASE WHEN date >= date('now','-7 days')  THEN 1 ELSE 0 END) AS rows_7d,
+                      SUM(CASE WHEN date >= date('now','-30 days') THEN 1 ELSE 0 END) AS rows_30d
+                  FROM foreign_trading
+              """).fetchone()
+
+              total, earliest, latest, symbols, rows_7d, rows_30d = r
+
+              # Count distinct dates in windows
+              days_7d  = conn.execute("SELECT COUNT(DISTINCT date) FROM foreign_trading WHERE date >= date('now','-7 days')").fetchone()[0]
+              days_30d = conn.execute("SELECT COUNT(DISTINCT date) FROM foreign_trading WHERE date >= date('now','-30 days')").fetchone()[0]
+
+              print(f"=== foreign_trading ===")
+              print(f"  Tổng: {total} ngày ({earliest} → {latest}) | {symbols} symbols")
+              print(f"  7D window : {days_7d}/7 ngày  — {'✅ ĐỦ' if days_7d >= 7  else '⏳ thiếu ' + str(7-days_7d)}")
+              print(f"  30D window: {days_30d}/30 ngày — {'✅ ĐỦ' if days_30d >= 30 else '⏳ thiếu ' + str(30-days_30d)}")
+
+              # Check today's data
+              today = datetime.now().strftime("%Y-%m-%d")
+              today_count = conn.execute(
+                  "SELECT COUNT(*) FROM foreign_trading WHERE date = ?", (today,)
+              ).fetchone()[0]
+              print(f"  Hôm nay ({today}): {today_count} symbols có data")
+
+              # Sample top 3 by abs net_value today
+              top = conn.execute("""
+                  SELECT symbol, net_value/1e9 AS net_bn
+                  FROM foreign_trading WHERE date = ?
+                  ORDER BY ABS(net_value) DESC LIMIT 3
+              """, (today,)).fetchall()
+              if top:
+                  print(f"  Top 3 hôm nay: " + " | ".join(f"{r[0]} {r[1]:+.1f}B" for r in top))
+
+          except Exception as e:
+              print(f"  Error: {e}")
+          finally:
+              conn.close()
+          PYEOF
+        continue-on-error: true
 
       - name: "🔧 DB Migration (thêm columns mới nếu chưa có)"
         id: migrate
@@ -137,13 +238,15 @@ jobs:
               git add "data/exports/$f.json"
             fi
           done
-          git diff --cached --quiet || git commit -m "chore: daily scoring $(date +'%Y-%m-%d')"
+          SESSION="${{ steps.session.outputs.SESSION_LABEL }}"
+          git diff --cached --quiet || git commit -m "chore: scoring $SESSION $(date +'%Y-%m-%d %H:%M') UTC"
           git push || echo "Nothing to push"
 
       - name: Summary
         if: always()
         run: |
-          echo "## ③ Daily Process Results" >> $GITHUB_STEP_SUMMARY
+          SESSION="${{ steps.session.outputs.SESSION_LABEL }}"
+          echo "## ③ Daily Process — $SESSION" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
@@ -152,11 +255,19 @@ jobs:
           else
             echo "| Database | ❌ Missing |" >> $GITHUB_STEP_SUMMARY
           fi
+          echo "| 📥 Import Foreign | ${{ steps.import_foreign.outcome == 'success' && '✅ OK' || '⚠️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Verify Foreign | ${{ steps.verify_foreign.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Technical | ${{ steps.technical.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Market Breadth | ${{ steps.breadth.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Scoring | ${{ steps.scoring.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Sector | ${{ steps.sector.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ICT Scanner | ${{ steps.ict.outcome == 'success' && '✅ OK' || '⚠️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$SESSION" = "chiều (EOD)" ]; then
+            echo "✅ **EOD run** — screener.json có data đầy đủ cả ngày" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **Mid-day run** — screener.json có data phiên sáng. EOD run (15:20 ICT) sẽ cập nhật đầy đủ." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Fail if critical steps failed
         if: steps.check_db.outputs.DB_EXISTS == 'false' || steps.scoring.outcome == 'failure'
