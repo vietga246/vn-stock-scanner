@@ -161,9 +161,12 @@ export async function loadPrices(stocks: Stock[]): Promise<Stock[]> {
 
       return {
         ...stock,
-        price_history: priceData.close?.slice(-30),
-        volume_history: priceData.volume?.slice(-30),
-        dates: priceData.dates?.slice(-30),
+        price_history: priceData.close,
+        volume_history: priceData.volume,
+        dates: priceData.dates,
+        open_history: priceData.open,
+        high_history: priceData.high,
+        low_history: priceData.low,
         close: priceData.close?.[priceData.close.length - 1] || stock.close,
       };
     });
