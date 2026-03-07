@@ -49,6 +49,26 @@ jobs:
       - name: Tạo thư mục
         run: mkdir -p data/db data/exports
 
+      # Xác định đây là phiên sáng hay chiều dựa vào giờ UTC
+      # Phiên sáng  : cron 04:45 UTC (11:45 ICT)
+      # Phiên chiều : cron 08:20 UTC (15:20 ICT)
+      - name: "🕐 Xác định phiên giao dịch"
+        id: session
+        run: |
+          HOUR=$(date -u +%H)
+          MINUTE=$(date -u +%M)
+          TOTAL_MIN=$((HOUR * 60 + MINUTE))
+          # 04:45 UTC = 285 phút | 08:20 UTC = 500 phút | ngưỡng 06:30 UTC = 390 phút
+          if [ "$TOTAL_MIN" -lt 390 ]; then
+            echo "SESSION=morning" >> $GITHUB_OUTPUT
+            echo "SESSION_LABEL=phiên sáng (11:45 ICT)" >> $GITHUB_OUTPUT
+            echo "🌅 Phiên SÁNG — snapshot sau ATC sáng 11:30 ICT"
+          else
+            echo "SESSION=afternoon" >> $GITHUB_OUTPUT
+            echo "SESSION_LABEL=phiên chiều (15:20 ICT)" >> $GITHUB_OUTPUT
+            echo "🌇 Phiên CHIỀU — snapshot sau ATC chiều 15:00 ICT (EOD)"
+          fi
+
       # ── IMPORT: Nạp lại foreign history từ Git (phòng khi cache expire) ──
       - name: "📥 Import foreign history từ CSV (nếu DB mới/cache miss)"
         id: import_foreign
@@ -176,7 +196,8 @@ jobs:
             CHANGED=true
           fi
           if [ "$CHANGED" = "true" ]; then
-            git diff --cached --quiet || git commit -m "chore: price board + foreign history $(date +'%Y-%m-%d')"
+            SESSION_LABEL="${{ steps.session.outputs.SESSION_LABEL }}"
+            git diff --cached --quiet || git commit -m "chore: collect $SESSION_LABEL $(date +'%Y-%m-%d %H:%M') UTC"
             git push || echo "Nothing to push"
           fi
 
@@ -184,7 +205,8 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## ② Daily Collect Results" >> $GITHUB_STEP_SUMMARY
+          SESSION="${{ steps.session.outputs.SESSION_LABEL }}"
+          echo "## ② Daily Collect — $SESSION" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ inputs.test_mode }}" = "true" ]; then
             echo "### 🧪 TEST MODE (VN30 only)" >> $GITHUB_STEP_SUMMARY
