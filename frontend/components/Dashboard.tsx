@@ -64,6 +64,38 @@ function PriceChange({ value }: { value?: number }) {
   );
 }
 
+function SignalBadge({ score, foreignNet7d }: { score: number; foreignNet7d?: number }) {
+  const nn = foreignNet7d ?? 0;
+  let label: string;
+  let color: string;
+  let bg: string;
+  let border: string;
+
+  if (score >= 72) {
+    label = 'STRONG BUY'; color = '#00ff88'; bg = '#00ff8822'; border = '#00ff8850';
+  } else if (score >= 62) {
+    label = 'BUY';        color = '#00ff88'; bg = '#00ff8814'; border = '#00ff8838';
+  } else if (score >= 52) {
+    label = 'HOLD';       color = '#ffcc00'; bg = '#ffcc0014'; border = '#ffcc0040';
+  } else if (score >= 42) {
+    label = 'REDUCE';     color = '#ff9500'; bg = '#ff950014'; border = '#ff950040';
+  } else {
+    label = 'SELL';       color = '#ff3366'; bg = '#ff336614'; border = '#ff336640';
+  }
+  // Boost: strong foreign buy + near-BUY score
+  if (label === 'HOLD' && nn > 100 && score >= 58) {
+    label = 'BUY'; color = '#00ff88'; bg = '#00ff8814'; border = '#00ff8838';
+  }
+  return (
+    <span
+      className="px-1.5 py-0.5 rounded font-bold text-[9px] tracking-wide whitespace-nowrap"
+      style={{ color, background: bg, border: `1px solid ${border}`, boxShadow: `0 0 8px ${color}20` }}
+    >
+      {label}
+    </span>
+  );
+}
+
 // Type-safe sort keys (Q4 fix)
 type SortableKey = 'rank' | 'close' | 'change_1d' | 'change_5d' | 'change_20d' | 'composite_score' | 'foreign_net_7d' | 'adx14' | 'rsi14';
 
@@ -507,6 +539,8 @@ export default function Dashboard() {
                   <th onClick={() => handleSort('change_5d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>5D</th>
                   <th onClick={() => handleSort('change_20d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>20D</th>
                   <th onClick={() => handleSort('composite_score')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>SCORE</th>
+                  <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>SIGNAL</th>
+                  <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>SIGNAL</th>
                   <th onClick={() => handleSort('foreign_net_7d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>NN 7D</th>
                   <th onClick={() => handleSort('adx14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>ADX</th>
                   <th onClick={() => handleSort('rsi14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>RSI</th>
@@ -517,7 +551,7 @@ export default function Dashboard() {
               <tbody>
                 {paginatedStocks.length === 0 ? (
                   <tr>
-                    <td colSpan={13} className="p-8 text-center">
+                    <td colSpan={14} className="p-8 text-center">
                       <div style={{ color: '#4a5a6a' }}>
                         <Search size={32} className="mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Không tìm thấy kết quả</p>
@@ -570,6 +604,12 @@ export default function Dashboard() {
                       <td className="p-2 text-right"><PriceChange value={s.change_5d} /></td>
                       <td className="p-2 text-right"><PriceChange value={s.change_20d} /></td>
                       <td className="p-2 text-right"><ScoreBadge value={s.composite_score} /></td>
+                      <td className="p-2 text-center">
+                        <SignalBadge score={s.composite_score} foreignNet7d={s.foreign_net_7d} />
+                      </td>
+                      <td className="p-2 text-center">
+                        <SignalBadge score={s.composite_score} foreignNet7d={s.foreign_net_7d} />
+                      </td>
                       <td className="p-2 text-right font-mono text-[10px]" style={{
                         color: (s.foreign_net_7d || 0) >= 0 ? '#00ff88' : '#ff3366',
                         textShadow: `0 0 6px ${(s.foreign_net_7d || 0) >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`,
