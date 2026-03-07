@@ -103,6 +103,12 @@ export default function MarketBreadth({
   const pts1d = vnindex != null && change1d != null
     ? (vnindex / (1 + change1d / 100)) * (change1d / 100)
     : null;
+  const pts5d = vnindex != null && change5d != null
+    ? (vnindex / (1 + change5d / 100)) * (change5d / 100)
+    : null;
+  const pts20d = vnindex != null && change20d != null
+    ? (vnindex / (1 + change20d / 100)) * (change20d / 100)
+    : null;
 
   const regimeColor =
     regime?.regime === 'BULL' ? '#00ff88' :
@@ -191,8 +197,8 @@ export default function MarketBreadth({
             {/* Chips thay đổi */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <ChangeChip value={change1d} label="1D" points={pts1d} />
-              <ChangeChip value={change5d} label="5D" />
-              <ChangeChip value={change20d} label="20D" />
+              <ChangeChip value={change5d} label="5D" points={pts5d} />
+              <ChangeChip value={change20d} label="20D" points={pts20d} />
             </div>
           </div>
         </div>
