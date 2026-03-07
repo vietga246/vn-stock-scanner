@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search, Star, BarChart3, X } from 'lucide-react';
-import type { Stock, Sector, AIAnalysis, ICTSignal, ICTSignalsResponse } from '@/lib/types';
-import { getDashboardData, getSummary, loadPrices, formatPrice, formatPercent, getScoreColor, getTierColor } from '@/lib/api';
+import type { Stock, Sector, AIAnalysis, ICTSignal, ICTSignalsResponse, SummaryResponse, PriceBoardResponse } from '@/lib/types';
+import { getDashboardData, getSummary, loadPrices, getPriceBoard, formatPrice, formatPercent, getScoreColor, getTierColor, getICTSignals } from '@/lib/api';
 import IndustryFlow from './IndustryFlow';
 import ICTDashboard from './ICTDashboard';
+import MarketBreadth from './MarketBreadth';
 import StockModal from './StockModal';
 import Sparkline from './Sparkline';
 
@@ -114,6 +115,9 @@ export default function Dashboard() {
   const [generatedAt, setGeneratedAt] = useState<string>('');
   const [vnindex, setVnindex] = useState<{ value: number; change: number } | null>(null);
   const [ictMap, setIctMap] = useState<Record<string, ICTSignal>>({});
+  const [summaryData, setSummaryData] = useState<SummaryResponse | null>(null);
+  const [ictData, setIctData] = useState<ICTSignalsResponse | null>(null);
+  const [priceBoardData, setPriceBoardData] = useState<PriceBoardResponse | null>(null);
 
   // UI state
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
@@ -156,11 +160,14 @@ export default function Dashboard() {
         setSectors(data.sectors);
         setAiAnalyses(data.aiAnalyses || {});
         setGeneratedAt(data.generatedAt);
-        if (summary?.market) {
-          setVnindex({
-            value: summary.market.vnindex,
-            change: summary.market.vnindex_change,
-          });
+        if (summary) {
+          setSummaryData(summary);
+          if (summary.market) {
+            setVnindex({
+              value: summary.market.vnindex,
+              change: summary.market.vnindex_change,
+            });
+          }
         }
         setError(null);
 
@@ -170,9 +177,9 @@ export default function Dashboard() {
         });
 
         // Lazy-load ICT signals
-        fetch('/api/ict-signals')
-          .then((r) => r.json())
+        getICTSignals()
           .then((ict: ICTSignalsResponse) => {
+            setIctData(ict);
             if (ict?.signals) {
               const map: Record<string, ICTSignal> = {};
               ict.signals.forEach((s) => { map[s.symbol] = s; });
@@ -180,6 +187,14 @@ export default function Dashboard() {
             }
           })
           .catch(() => { /* ICT signals optional */ });
+
+        // Lazy-load price board for most_active + market breadth
+        getPriceBoard()
+          .then((pb: PriceBoardResponse) => {
+            setPriceBoardData(pb);
+          })
+          .catch(() => { /* price board optional */ });
+
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError('Không thể tải dữ liệu. Vui lòng thử lại sau.');
@@ -434,37 +449,13 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Market Stats Bar */}
-      <div className="p-2.5 flex gap-3 flex-wrap" style={{ background: '#0a0f14', borderBottom: '1px solid #1e2832' }}>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-          <span className="text-[10px]" style={{ color: '#4a5a6a' }}>VN-INDEX</span>
-          <span className="font-mono font-semibold">
-            {vnindex?.value != null ? vnindex.value.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}
-          </span>
-          {vnindex?.value != null && vnindex?.change != null && (
-            <span
-              className="font-mono text-xs"
-              style={{
-                color: vnindex.change >= 0 ? '#00ff88' : '#ff3366',
-                textShadow: `0 0 6px ${vnindex.change >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`
-              }}
-            >
-              {vnindex.change >= 0 ? '+' : ''}{vnindex.change.toFixed(2)}%
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-          <span className="text-[10px]" style={{ color: '#4a5a6a' }}>STOCKS</span>
-          <span className="font-mono font-semibold" style={{ color: '#00d4ff' }}>{stocks.length}</span>
-        </div>
-        {generatedAt && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md ml-auto" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-            <span className="text-[10px]" style={{ color: '#4a5a6a' }}>Updated</span>
-            <span className="text-[10px] font-mono" style={{ color: '#8b99a8' }}>
-              {new Date(generatedAt).toLocaleDateString('vi-VN')}
-            </span>
-          </div>
-        )}
+      {/* Market Breadth Panel */}
+      <div className="px-3 pt-3">
+        <MarketBreadth
+          summary={summaryData}
+          ictData={ictData}
+          priceBoard={priceBoardData}
+        />
       </div>
 
       {/* Filters */}
@@ -493,13 +484,21 @@ export default function Dashboard() {
             />
           </div>
         )}
-        {searchQuery && (
-          <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
+          {searchQuery && (
             <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
               Tìm thấy <span style={{ color: '#00d4ff' }}>{filteredStocks.length}</span> kết quả
             </span>
-          </div>
-        )}
+          )}
+          <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
+            <span style={{ color: '#00d4ff' }}>{stocks.length}</span> cổ phiếu
+          </span>
+          {generatedAt && (
+            <span className="text-[10px] font-mono" style={{ color: '#4a5a6a' }}>
+              Cập nhật: <span style={{ color: '#8b99a8' }}>{new Date(generatedAt).toLocaleDateString('vi-VN')}</span>
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Main Content */}
@@ -540,7 +539,6 @@ export default function Dashboard() {
                   <th onClick={() => handleSort('change_20d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>20D</th>
                   <th onClick={() => handleSort('composite_score')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>SCORE</th>
                   <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>SIGNAL</th>
-                  <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>SIGNAL</th>
                   <th onClick={() => handleSort('foreign_net_7d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>NN 7D</th>
                   <th onClick={() => handleSort('adx14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>ADX</th>
                   <th onClick={() => handleSort('rsi14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>RSI</th>
@@ -551,7 +549,7 @@ export default function Dashboard() {
               <tbody>
                 {paginatedStocks.length === 0 ? (
                   <tr>
-                    <td colSpan={14} className="p-8 text-center">
+                    <td colSpan={13} className="p-8 text-center">
                       <div style={{ color: '#4a5a6a' }}>
                         <Search size={32} className="mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Không tìm thấy kết quả</p>
@@ -604,9 +602,6 @@ export default function Dashboard() {
                       <td className="p-2 text-right"><PriceChange value={s.change_5d} /></td>
                       <td className="p-2 text-right"><PriceChange value={s.change_20d} /></td>
                       <td className="p-2 text-right"><ScoreBadge value={s.composite_score} /></td>
-                      <td className="p-2 text-center">
-                        <SignalBadge score={s.composite_score} foreignNet7d={s.foreign_net_7d} />
-                      </td>
                       <td className="p-2 text-center">
                         <SignalBadge score={s.composite_score} foreignNet7d={s.foreign_net_7d} />
                       </td>
