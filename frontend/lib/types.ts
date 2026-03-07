@@ -318,6 +318,19 @@ export interface ICTRegime {
   bull_sectors?: number;
   bear_sectors?: number;
   foreign_net_total_bn?: number;
+  components?: {
+    market_breadth?: {
+      advance?: number;
+      decline?: number;
+      total?: number;
+      advance_pct?: number;
+      score?: number;
+      signal?: string;
+    };
+    vnindex_momentum?: { score?: number; signal?: string; detail?: string };
+    sector_breadth?: { score?: number; bull_sectors?: number; bear_sectors?: number; total_sectors?: number };
+    foreign_flow?: { score?: number; net_total_bn?: number; signal?: string };
+  };
 }
 
 export interface ICTMarketStats {
