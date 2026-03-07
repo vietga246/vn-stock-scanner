@@ -394,28 +394,28 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 }
 
 function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-const fmtB = (v: number | null | undefined) =>
+  const fmtB = (v: number | null | undefined) =>
   v == null ? '–' : Math.abs(v) >= 1000 ? `${(v/1000).toFixed(1)}T` : `${v.toFixed(0)}B`;
-const colPct = (v: number) =>
+  const colPct = (v: number) =>
   v >= 20 ? '#00ff88' : v >= 10 ? '#00d4ff' : v >= 0 ? '#ffcc00' : '#ff3366';
 
-if (detailLoading) return (
+  if (detailLoading) return (
   <div className="flex items-center justify-center py-12">
     <div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải dữ liệu tài chính...</div>
   </div>
-);
-if (!detail) return (
+  );
+  if (!detail) return (
   <div className="flex items-center justify-center py-12">
     <div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu chi tiết</div>
   </div>
-);
+  );
 
-const income = [...detail.income].sort((a,b) => b.year*10+b.quarter - (a.year*10+a.quarter)).slice(0,8);
-const ratio = [...detail.ratio].sort((a,b) => b.year*10+b.quarter - (a.year*10+a.quarter));
-const latestR = ratio[0];
+  const income = [...detail.income].sort((a,b) => b.year*10+b.quarter - (a.year*10+a.quarter)).slice(0,8);
+  const ratio = [...detail.ratio].sort((a,b) => b.year*10+b.quarter - (a.year*10+a.quarter));
+  const latestR = ratio[0];
 
   const cf6 = detail?.cashflow ? [...detail.cashflow].sort((a,b) => b.year*10+b.quarter-(a.year*10+a.quarter)).slice(0,6) : [];
-return (
+  return (
   <div className="space-y-3">
     {/* Chỉ tiêu định giá + sinh lời */}
     {latestR && (
@@ -474,7 +474,7 @@ return (
 
     {/* Cashflow */}
     {detail.cashflow && detail.cashflow.length > 0 && (
-<div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+  <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
   <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
     DÒNG TIỀN (tỷ đồng)
   </div>
@@ -501,26 +501,26 @@ return (
       </tbody>
     </table>
   </div>
-</div>
+  </div>
     )}
   </div>
-);
+  );
 }
 
 function TradingTab({ stock }: { stock: Stock }) {
-const pb = (stock as any)._priceBoard;
-const history = stock.price_history ?? [];
-const volumes = stock.volume_history ?? [];
-const dates = stock.dates ?? [];
-const price = stock.close || stock.price || 0;
+  const pb = (stock as any)._priceBoard;
+  const history = stock.price_history ?? [];
+  const volumes = stock.volume_history ?? [];
+  const dates = stock.dates ?? [];
+  const price = stock.close || stock.price || 0;
 
-// Mini candlestick bars (dùng history)
-const maxVol = Math.max(...(volumes.length ? volumes : [1]));
-const minP = Math.min(...(history.length ? history : [price]));
-const maxP = Math.max(...(history.length ? history : [price]));
-const priceRange = maxP - minP || 1;
+  // Mini candlestick bars (dùng history)
+  const maxVol = Math.max(...(volumes.length ? volumes : [1]));
+  const minP = Math.min(...(history.length ? history : [price]));
+  const maxP = Math.max(...(history.length ? history : [price]));
+  const priceRange = maxP - minP || 1;
 
-return (
+  return (
   <div className="space-y-3">
     {/* Price board snapshot */}
     <div className="grid grid-cols-2 gap-2">
@@ -609,24 +609,24 @@ return (
       ))}
     </div>
   </div>
-);
+  );
 }
 
 function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-const fmtB = (v: number | null | undefined) =>
+  const fmtB = (v: number | null | undefined) =>
   v == null ? '–' : Math.abs(v) >= 1000 ? `${(v/1000).toFixed(1)}T` : `${v.toFixed(0)}B`;
 
-if (detailLoading) return <div className="flex items-center justify-center py-12"><div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải...</div></div>;
-if (!detail) return <div className="flex items-center justify-center py-12"><div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu</div></div>;
+  if (detailLoading) return <div className="flex items-center justify-center py-12"><div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải...</div></div>;
+  if (!detail) return <div className="flex items-center justify-center py-12"><div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu</div></div>;
 
-const bal = [...detail.balance].sort((a,b) => b.year*10+b.quarter - (a.year*10+a.quarter));
+  const bal = [...detail.balance].sort((a,b) => b.year*10+b.quarter - (a.year*10+a.quarter));
 
-// Annual data (Q4 only)
-const annual = bal.filter(b => b.quarter === 4).slice(0, 5).reverse();
-const latest = bal[0];
+  // Annual data (Q4 only)
+  const annual = bal.filter(b => b.quarter === 4).slice(0, 5).reverse();
+  const latest = bal[0];
 
-// Visual bar chart helper
-const BarRow = ({ label, val, max, color }: { label: string; val: number; max: number; color: string }) => (
+  // Visual bar chart helper
+  const BarRow = ({ label, val, max, color }: { label: string; val: number; max: number; color: string }) => (
   <div className="mb-2">
     <div className="flex justify-between mb-1">
       <span className="text-[10px]" style={{ color: '#8b99a8' }}>{label}</span>
@@ -636,9 +636,9 @@ const BarRow = ({ label, val, max, color }: { label: string; val: number; max: n
       <div className="h-full rounded-full" style={{ width: `${Math.min((val/max)*100, 100)}%`, background: color, boxShadow: `0 0 4px ${color}60` }} />
     </div>
   </div>
-);
+  );
 
-return (
+  return (
   <div className="space-y-3">
     {/* Latest snapshot */}
     {latest && (
@@ -697,15 +697,15 @@ return (
       </div>
     )}
   </div>
-);
+  );
 }
 
 function StatsTab({ stock }: { stock: Stock }) {
-const history = stock.price_history ?? [];
-const volumes = stock.volume_history ?? [];
-const dates = stock.dates ?? [];
+  const history = stock.price_history ?? [];
+  const volumes = stock.volume_history ?? [];
+  const dates = stock.dates ?? [];
 
-return (
+  return (
   <div className="space-y-3">
     {/* Performance summary */}
     <div className="grid grid-cols-3 gap-2">
@@ -788,7 +788,7 @@ return (
       </div>
     )}
   </div>
-);
+  );
 }
 
 // ============ Main Component ============
