@@ -1,8 +1,17 @@
-name: "② Daily Collect — Giá & Dòng tiền (15:15 ICT T2-T6)"
+name: "② Daily Collect — Giá & Dòng tiền (2x/ngày T2-T6)"
+
+# Lịch phiên giao dịch HOSE/HNX:
+#   Phiên sáng : 09:00 – 11:30 ICT  (ATC 11:30, PTM đến 11:45)
+#   Phiên chiều: 13:00 – 15:00 ICT  (ATC 15:00, PTM đến 15:15)
+#
+# Workflow chạy 2 lần/ngày:
+#   Run 1 — Sau phiên SÁNG : 11:45 ICT = 04:45 UTC  → thu thập mid-day snapshot
+#   Run 2 — Sau phiên CHIỀU: 15:20 ICT = 08:20 UTC  → thu thập ATC cuối ngày (chính)
 
 on:
   schedule:
-    - cron: "15 8 * * 1-5"    # 15:15 ICT (UTC+7) = 08:15 UTC, Thứ 2-6
+    - cron: "45 4 * * 1-5"   # 11:45 ICT — sau phiên sáng
+    - cron: "20 8 * * 1-5"   # 15:20 ICT — sau phiên chiều (ATC + PTM xong)
   workflow_dispatch:
     inputs:
       test_mode:
@@ -39,6 +48,21 @@ jobs:
 
       - name: Tạo thư mục
         run: mkdir -p data/db data/exports
+
+      # ── IMPORT: Nạp lại foreign history từ Git (phòng khi cache expire) ──
+      - name: "📥 Import foreign history từ CSV (nếu DB mới/cache miss)"
+        id: import_foreign
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+        run: |
+          if [ -f "data/exports/foreign_history.csv" ]; then
+            echo "📂 Tìm thấy foreign_history.csv — import vào DB..."
+            python pipeline/exporters/export_foreign_history.py import
+          else
+            echo "ℹ️  foreign_history.csv chưa có — bỏ qua import (lần chạy đầu tiên)"
+          fi
+        continue-on-error: true
 
       # ── STEP 1: Price Board snapshot (ATC) ───────────────────────────────
       - name: "📡 Price Board snapshot (ATC)"
@@ -115,6 +139,20 @@ jobs:
         run: python pipeline/exporters/export_price_board.py
         continue-on-error: true
 
+      # ── STEP 6: Export foreign history → CSV (backup lên Git) ────────────
+      # QUAN TRỌNG: Đây là cơ chế bảo vệ chống mất data khi cache expire.
+      # foreign_history.csv được commit lên Git → khi DB bị reset,
+      # workflow sẽ tự import lại toàn bộ lịch sử foreign_trading.
+      - name: "💾 Export foreign history → CSV"
+        id: export_foreign
+        if: steps.foreign.outcome == 'success'
+        env:
+          DB_PATH: data/db/stock.db
+          EXPORT_DIR: data/exports
+          FOREIGN_HISTORY_DAYS: "60"
+        run: python pipeline/exporters/export_foreign_history.py export
+        continue-on-error: true
+
       # ── Lưu DB ────────────────────────────────────────────────────────────
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
@@ -122,15 +160,23 @@ jobs:
           path: data/db/stock.db
           key: stock-db-${{ github.run_id }}
 
-      # ── Commit price_board.json ───────────────────────────────────────────
-      - name: Commit price_board.json
-        if: steps.export_pb.outcome == 'success'
+      # ── Commit exports ────────────────────────────────────────────────────
+      - name: "📤 Commit price_board.json + foreign_history.csv"
+        if: steps.export_pb.outcome == 'success' || steps.export_foreign.outcome == 'success'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          CHANGED=false
           if [ -f "data/exports/price_board.json" ]; then
             git add data/exports/price_board.json
-            git diff --cached --quiet || git commit -m "chore: price board $(date +'%Y-%m-%d')"
+            CHANGED=true
+          fi
+          if [ -f "data/exports/foreign_history.csv" ]; then
+            git add data/exports/foreign_history.csv
+            CHANGED=true
+          fi
+          if [ "$CHANGED" = "true" ]; then
+            git diff --cached --quiet || git commit -m "chore: price board + foreign history $(date +'%Y-%m-%d')"
             git push || echo "Nothing to push"
           fi
 
@@ -164,7 +210,20 @@ jobs:
           if [ "$FOREIGN_FAILED" = "true" ]; then
             echo "| 🌍 Foreign Flow | ⚠️ FAILED |" >> $GITHUB_STEP_SUMMARY
           else
-          echo "| 🌍 Foreign Flow | ✅ OK |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🌍 Foreign Flow | ✅ OK |" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "| 💾 Foreign History CSV | ${{ steps.export_foreign.outcome == 'success' && '✅ OK' || '⚠️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          if [ -f "data/exports/foreign_history.csv" ]; then
+            DAYS=$(tail -n +2 data/exports/foreign_history.csv | cut -d',' -f2 | sort -u | wc -l)
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Foreign history:** $DAYS ngày tích lũy" >> $GITHUB_STEP_SUMMARY
+            if [ "$DAYS" -ge 30 ]; then
+              echo "✅ Đủ 30D — foreign_net_30D chính xác" >> $GITHUB_STEP_SUMMARY
+            elif [ "$DAYS" -ge 7 ]; then
+              echo "✅ Đủ 7D — foreign_net_7D chính xác | ⏳ Cần thêm $((30-DAYS)) ngày cho 30D" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⏳ Cần thêm $((7-DAYS)) ngày cho 7D, $((30-DAYS)) ngày cho 30D" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
           if [ -f "data/db/stock.db" ]; then
             SIZE=$(du -sh data/db/stock.db | cut -f1)
