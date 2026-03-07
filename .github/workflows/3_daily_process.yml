@@ -113,6 +113,14 @@ jobs:
         run: python pipeline/exporters/export_summary.py
         continue-on-error: true
 
+      - name: "🧠 ICT Scanner — Smart Money Signals"
+        id: ict
+        if: steps.sector.outcome == 'success'
+        env:
+          EXPORT_DIR: data/exports
+        run: python pipeline/ict/main_scanner.py
+        continue-on-error: true
+
       - name: Lưu DB vào cache
         uses: actions/cache/save@v4
         with:
@@ -124,7 +132,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          for f in screener sectors prices summary; do
+          for f in screener sectors prices summary ict_signals; do
             if [ -f "data/exports/$f.json" ]; then
               git add "data/exports/$f.json"
             fi
@@ -148,6 +156,7 @@ jobs:
           echo "| Market Breadth | ${{ steps.breadth.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Scoring | ${{ steps.scoring.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Sector | ${{ steps.sector.outcome == 'success' && '✅ OK' || '⚠️ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ICT Scanner | ${{ steps.ict.outcome == 'success' && '✅ OK' || '⚠️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail if critical steps failed
         if: steps.check_db.outputs.DB_EXISTS == 'false' || steps.scoring.outcome == 'failure'
