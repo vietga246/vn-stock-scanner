@@ -673,6 +673,7 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+      )}
 
       {/* Stock Modal */}
       {selectedStock && (
@@ -683,7 +684,6 @@ export default function Dashboard() {
           ictSignal={ictMap[selectedStock.symbol]}
           onClose={() => setSelectedStock(null)}
         />
-      )}
       )}
     </div>
   );
