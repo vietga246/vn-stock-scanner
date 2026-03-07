@@ -68,7 +68,8 @@ function PriceChange({ value }: { value?: number }) {
 type SortableKey = 'rank' | 'close' | 'change_1d' | 'change_5d' | 'change_20d' | 'composite_score' | 'foreign_net_7d' | 'adx14' | 'rsi14';
 
 function getSortValue(stock: Stock, key: SortableKey): number {
-  return stock[key] ?? 0;
+  const v = stock[key as keyof Stock];
+  return (typeof v === 'number' ? v : 0);
 }
 
 export default function Dashboard() {
