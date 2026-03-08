@@ -601,7 +601,7 @@ export default function ICTDashboard() {
               </tr>
             ) : (
               signals.map((s) => (
-                <SignalRow key={s.symbol} signal={s} onClick={() => setSelected(s)} />
+                <div key={s.symbol}><SignalRow signal={s} onClick={() => setSelected(s)} /></div>
               ))
             )}
           </tbody>
