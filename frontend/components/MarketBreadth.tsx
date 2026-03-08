@@ -313,7 +313,7 @@ export default function MarketBreadth({
                 label="ACCUMULATE"
                 value={stats.accumulating}
                 color="#00d4ff"
-                sub={`${total > 0 ? (stats.accumulating / total * 100).toFixed(0) : 0}%`}
+                sub={`${total > 0 ? (stats.accumulating / total * 100).toFixed(0) : 0}% · acc≥60`}
               />
               <StatCell
                 label="FLOW IN"
@@ -340,7 +340,7 @@ export default function MarketBreadth({
                 : '—'
             }
             color={foreignNetColor}
-            sub="7D tỷ đồng"
+            sub={priceBoard?.summary?.total_foreign_net_value_bn != null ? 'hôm nay / tỷ đồng' : '7D tỷ đồng'}
           />
         </div>
       </div>
