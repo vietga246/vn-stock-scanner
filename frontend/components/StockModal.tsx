@@ -826,44 +826,32 @@ function StatsTab({ stock }: { stock: Stock }) {
 
 // ============ Main Component ============
 
-export default function StockModal({
+// ─── Inner Modal (no hooks - pure render) ────────────────────────────────────
+function ModalInner({
   stock,
   sectorStatus,
   preloadedAnalysis,
   ictSignal,
+  detail,
+  detailLoading,
+  visible,
+  activeTab,
+  setActiveTab,
   onClose,
-}: StockModalProps) {
-  const [visible, setVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState<'analysis' | 'scores' | 'chart' | 'ict' | 'finance' | 'trading' | 'capital' | 'stats'>('analysis');
-  const [detail, setDetail] = useState<StockDetail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-
-  useEffect(() => {
-    if (stock) {
-      requestAnimationFrame(() => setVisible(true));
-    }
-  }, [stock]);
-
-  // Lazy-load detail data khi cần
-  useEffect(() => {
-    if (!stock || detail) return;
-    const needsDetail = ['finance','trading','capital','stats'].includes(activeTab);
-    if (!needsDetail) return;
-    setDetailLoading(true);
-    getStockDetails()
-      .then((res) => {
-        const d = res?.details?.[stock.symbol];
-        if (d) setDetail(d);
-      })
-      .catch(() => {})
-      .finally(() => setDetailLoading(false));
-  }, [stock, activeTab, detail]);
-
-  if (!stock) return null;
-
+}: {
+  stock: Stock;
+  sectorStatus?: 'accumulating' | 'distributing' | 'neutral';
+  preloadedAnalysis?: AIAnalysis;
+  ictSignal?: ICTSignal;
+  detail: StockDetail | null;
+  detailLoading: boolean;
+  visible: boolean;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  onClose: () => void;
+}) {
   const close = () => {
-    setVisible(false);
-    setTimeout(onClose, 150);
+    onClose();
   };
 
   const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus);
@@ -872,15 +860,16 @@ export default function StockModal({
   const tierColor = getTierColor(stock.tier);
   const price = stock.close || stock.price || 0;
   const change = stock.change_20d || stock.change_5d || 0;
-  const tabs = [
+  const baseTabs = [
     { id: 'analysis', label: 'Phân tích', icon: Target },
     { id: 'scores',   label: 'Điểm số',   icon: Activity },
     { id: 'finance',  label: 'Tài chính',  icon: BarChart3 },
     { id: 'trading',  label: 'Giao dịch',  icon: TrendingUp },
     { id: 'capital',  label: 'Vốn',        icon: Shield },
     { id: 'stats',    label: 'Thống kê',   icon: Activity },
-    ...(ictSignal ? [{ id: 'ict', label: '🧠 ICT', icon: Zap }] : []),
   ];
+  const tabs = ictSignal ? [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Zap }] : baseTabs;
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1135,5 +1124,61 @@ export default function StockModal({
       </div>
     </div>
   </div>
+  );
+}
+
+// ─── Main Export (hooks only) ─────────────────────────────────────────────────
+export default function StockModal({
+  stock,
+  sectorStatus,
+  preloadedAnalysis,
+  ictSignal,
+  onClose,
+}: StockModalProps) {
+  const [visible, setVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('analysis');
+  const [detail, setDetail] = useState<StockDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  useEffect(() => {
+    if (stock) {
+      requestAnimationFrame(() => setVisible(true));
+    } else {
+      setVisible(false);
+    }
+  }, [stock]);
+
+  useEffect(() => {
+    if (!stock || detail) return;
+    const needsDetail = ['finance', 'trading', 'capital', 'stats'].includes(activeTab);
+    if (!needsDetail) return;
+    setDetailLoading(true);
+    getStockDetails()
+      .then((res) => {
+        const d = res?.details?.[stock.symbol];
+        if (d) setDetail(d);
+      })
+      .catch(() => {})
+      .finally(() => setDetailLoading(false));
+  }, [stock, activeTab, detail]);
+
+  if (!stock) return null;
+
+  return (
+    <ModalInner
+      stock={stock}
+      sectorStatus={sectorStatus}
+      preloadedAnalysis={preloadedAnalysis}
+      ictSignal={ictSignal}
+      detail={detail}
+      detailLoading={detailLoading}
+      visible={visible}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      onClose={() => {
+        setVisible(false);
+        setTimeout(onClose, 150);
+      }}
+    />
   );
 }
