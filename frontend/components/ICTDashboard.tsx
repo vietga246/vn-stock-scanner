@@ -211,12 +211,12 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
     <tr
       onClick={onClick}
       className="cursor-pointer transition-colors"
-      style={{ borderBottom: '1px solid #1e2832' }}
+      style={{ borderBottom: '1px solid #1e2832', verticalAlign: 'top' }}
       onMouseEnter={(e) => (e.currentTarget.style.background = '#1e283215')}
       onMouseLeave={(e) => (e.currentTarget.style.background = '')}
     >
       {/* Rank */}
-      <td className="p-2 text-center font-mono text-[9px]" style={{ color: '#4a5a6a' }}>
+      <td className="p-2 text-center font-mono text-[9px]" style={{ color: '#4a5a6a', verticalAlign: 'middle' }}>
         {signal.ict_rank}
       </td>
 
@@ -310,29 +310,24 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
         </div>
       </td>
 
-      {/* Volume */}
-      <td className="p-2 text-right">
+      {/* Volume — only vol_spike, single line */}
+      <td className="p-2 text-right" style={{ verticalAlign: 'middle' }}>
         <div
           className="font-mono text-[10px] font-semibold"
           style={{ color: signal.vol_spike >= 2 ? '#ffcc00' : signal.vol_spike >= 1.5 ? '#00d4ff' : '#8b99a8' }}
         >
           {fmt(signal.vol_spike, 1)}x
         </div>
-        <div className="text-[8px]" style={{ color: signal.accumulation_score >= 65 ? '#00ff88' : signal.distribution_score >= 65 ? '#ff3366' : '#4a5a6a' }}>
-          {signal.accumulation_score >= 65 ? 'ACC' : signal.distribution_score >= 65 ? 'DIST' : 'NEU'}
-        </div>
       </td>
 
-      {/* Flow */}
-      <td className="p-2 text-center">
+      {/* Flow — direction + acc/dist label aligned */}
+      <td className="p-2 text-center" style={{ verticalAlign: 'middle' }}>
         <div className="text-[9px] font-semibold" style={{ color: flowCol }}>
           {signal.flow_direction === 'in' ? '▲ IN' : signal.flow_direction === 'out' ? '▼ OUT' : '— NEU'}
         </div>
-        {signal.foreign_net_7d != null && (
-          <div className="font-mono text-[9px]" style={{ color: flowCol }}>
-            {fmtBn(signal.foreign_net_7d)}
-          </div>
-        )}
+        <div className="text-[8px] mt-0.5" style={{ color: signal.accumulation_score >= 65 ? '#00ff88' : signal.distribution_score >= 65 ? '#ff3366' : '#4a5a6a' }}>
+          {signal.accumulation_score >= 65 ? 'ACC' : signal.distribution_score >= 65 ? 'DIST' : 'NEU'}
+        </div>
       </td>
 
       {/* Price change */}
