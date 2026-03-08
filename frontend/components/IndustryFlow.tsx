@@ -147,7 +147,7 @@ export default function IndustryFlow({
                 </span>
               </div>
               {accumulating.map((sector) => (
-                <SectorItem key={sector.name} sector={sector} />
+                <div key={sector.name}><SectorItem sector={sector} /></div>
               ))}
             </div>
           )}
@@ -175,7 +175,7 @@ export default function IndustryFlow({
                 </span>
               </div>
               {distributing.map((sector) => (
-                <SectorItem key={sector.name} sector={sector} />
+                <div key={sector.name}><SectorItem sector={sector} /></div>
               ))}
             </div>
           )}
