@@ -464,7 +464,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
               <tbody>
                 {[
                   { label: 'Doanh thu', key: 'revenue' as const },
-                  { label: 'Lợi nhuận', key: 'net_income' as const },
+                  { label: 'Lợi nhuận', key: 'net_profit' as const },
                 ].map(({ label, key }) => (
                   <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
                     <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>{label}</td>
