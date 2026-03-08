@@ -2,6 +2,7 @@
 // This generates analysis when ai_analysis.json is not available from backend
 
 import type { Stock, AIAnalysis, AnalysisPoint } from './types';
+import { computeSignal, actionToRecommendation } from './signals';
 
 export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | 'distributing' | 'neutral'): AIAnalysis {
   const analysis: AIAnalysis = {
@@ -21,23 +22,17 @@ export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | '
   const m = stock.momentum_score;
   const t = stock.technical_score;
 
-  // ============ Determine Recommendation ============
-  if (score >= 75) {
-    analysis.recommendation = 'STRONG_BUY';
-    analysis.summary = `${stock.symbol} đang có điểm số xuất sắc (${score.toFixed(1)}) với tất cả các chỉ báo đều tích cực. Cổ phiếu thuộc nhóm chất lượng cao, đây là thời điểm tốt để tích lũy.`;
-  } else if (score >= 65) {
-    analysis.recommendation = 'BUY';
-    analysis.summary = `${stock.symbol} có điểm số tốt (${score.toFixed(1)}) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.`;
-  } else if (score >= 55) {
-    analysis.recommendation = 'HOLD';
-    analysis.summary = `${stock.symbol} đang trong vùng trung tính (${score.toFixed(1)}). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.`;
-  } else if (score >= 45) {
-    analysis.recommendation = 'SELL';
-    analysis.summary = `${stock.symbol} có nhiều chỉ báo tiêu cực (${score.toFixed(1)}). Nên cân nhắc chốt lời hoặc cắt lỗ để bảo toàn vốn.`;
-  } else {
-    analysis.recommendation = 'STRONG_SELL';
-    analysis.summary = `${stock.symbol} đang trong xu hướng giảm mạnh (${score.toFixed(1)}) với nhiều rủi ro. Khuyến nghị thoát hàng và chờ cơ hội tốt hơn.`;
-  }
+  // ============ Determine Recommendation (dùng shared computeSignal) ============
+  const sig = computeSignal(score, 0.5, undefined, stock.foreign_net_7d);
+  analysis.recommendation = actionToRecommendation(sig.action);
+  const recLabels: Record<string, string> = {
+    STRONG_BUY:  `${stock.symbol} đang có điểm số xuất sắc (${score.toFixed(1)}) với tất cả các chỉ báo đều tích cực. Cổ phiếu thuộc nhóm chất lượng cao, đây là thời điểm tốt để tích lũy.`,
+    BUY:         `${stock.symbol} có điểm số tốt (${score.toFixed(1)}) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.`,
+    HOLD:        `${stock.symbol} đang trong vùng trung tính (${score.toFixed(1)}). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động.`,
+    SELL:        `${stock.symbol} có nhiều chỉ báo tiêu cực (${score.toFixed(1)}). Nên cân nhắc chốt lời hoặc cắt lỗ để bảo toàn vốn.`,
+    STRONG_SELL: `${stock.symbol} đang trong xu hướng giảm mạnh (${score.toFixed(1)}) với nhiều rủi ro. Khuyến nghị thoát hàng và chờ cơ hội tốt hơn.`,
+  };
+  analysis.summary = recLabels[analysis.recommendation] ?? recLabels.HOLD;
 
   // ============ Fundamental Analysis ============
   if (f >= 75) {
