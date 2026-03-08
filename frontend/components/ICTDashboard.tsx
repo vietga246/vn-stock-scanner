@@ -200,181 +200,166 @@ function SectorBadges({ rotation }: { rotation: ICTSignalsResponse['sector_rotat
   );
 }
 
+// Grid columns definition — shared by header and rows
+const GRID = '32px minmax(140px,1.8fr) minmax(100px,1.2fr) minmax(90px,1fr) minmax(120px,1.5fr) minmax(60px,0.7fr) minmax(85px,1fr) minmax(75px,0.9fr) minmax(85px,1fr)';
+
 function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onClick: () => void }) {
-  const qCol = qualityColor(signal.setup_quality);
+  const qCol     = qualityColor(signal.setup_quality);
   const structCol = signal.structure === 'BULLISH' ? '#00ff88' : signal.structure === 'BEARISH' ? '#ff3366' : '#4a5a6a';
-  const flowCol = signal.flow_direction === 'in' ? '#00ff88' : signal.flow_direction === 'out' ? '#ff3366' : '#4a5a6a';
+  const flowCol   = signal.flow_direction === 'in' ? '#00ff88' : signal.flow_direction === 'out' ? '#ff3366' : '#4a5a6a';
   const p1d = signal.price_change_1d;
   const p5d = signal.price_change_5d;
   const accLabel = signal.accumulation_score >= 65 ? 'ACC' : signal.distribution_score >= 65 ? 'DIST' : 'NEU';
   const accCol   = signal.accumulation_score >= 65 ? '#00ff88' : signal.distribution_score >= 65 ? '#ff3366' : '#4a5a6a';
-  const rs = signal.signal_breakdown?.rs_sector;
+  const rs    = signal.signal_breakdown?.rs_sector;
   const rsCol = rs != null ? (rs >= 80 ? '#00ff88' : rs >= 65 ? '#00d4ff' : '#4a5a6a') : '#4a5a6a';
 
-  const hoverOn  = (e: React.MouseEvent<HTMLTableRowElement>) => { e.currentTarget.style.background = '#1e283218'; };
-  const hoverOff = (e: React.MouseEvent<HTMLTableRowElement>) => { e.currentTarget.style.background = ''; };
+  const cellBase: React.CSSProperties = { padding: '10px 8px 2px', overflow: 'hidden', minWidth: 0 };
+  const cell2Base: React.CSSProperties = { padding: '2px 8px 10px', overflow: 'hidden', minWidth: 0 };
 
-  // Row 1: main data line
-  // Row 2: sub info line — same columns, lighter text
   return (
-    <>
+    <div
+      onClick={onClick}
+      className="cursor-pointer"
+      style={{ borderBottom: '1px solid #1e2832' }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = '#1e283218')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = '')}
+    >
       {/* ── Row 1: main ── */}
-      <tr
-        onClick={onClick}
-        className="cursor-pointer"
-        style={{ borderTop: '1px solid #1e2832' }}
-        onMouseEnter={hoverOn}
-        onMouseLeave={hoverOff}
-      >
+      <div style={{ display: 'grid', gridTemplateColumns: GRID, alignItems: 'end' }}>
+
         {/* # */}
-        <td className="pl-2 pr-1 pt-2 pb-0 text-center font-mono text-[9px]" style={{ color: '#4a5a6a' }}>
+        <div style={{ ...cellBase, textAlign: 'center', fontFamily: 'monospace', fontSize: 9, color: '#4a5a6a' }}>
           {signal.ict_rank}
-        </td>
+        </div>
 
         {/* SYMBOL */}
-        <td className="pl-2 pr-3 pt-2 pb-0">
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold text-xs">{signal.symbol}</span>
+        <div style={{ ...cellBase }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+            <span style={{ fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>{signal.symbol}</span>
             {signal.setup_quality === 'SKIP' ? (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
-                style={{ background: '#1e283280', color: '#4a5a6a', border: '1px solid #2a364250' }}>WATCH</span>
+              <span style={{ padding: '1px 5px', borderRadius: 3, fontSize: 8, fontWeight: 700, background: '#1e283280', color: '#4a5a6a', border: '1px solid #2a364250', whiteSpace: 'nowrap' }}>WATCH</span>
             ) : (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
-                style={{ background: `${qCol}20`, color: qCol, border: `1px solid ${qCol}40` }}>{signal.setup_quality}</span>
+              <span style={{ padding: '1px 5px', borderRadius: 3, fontSize: 8, fontWeight: 700, background: `${qCol}20`, color: qCol, border: `1px solid ${qCol}40`, whiteSpace: 'nowrap' }}>{signal.setup_quality}</span>
             )}
-            {signal.smart_money && <span className="text-[8px]">💎</span>}
-            {signal.wyckoff_spring && <span className="text-[8px]">💧</span>}
+            {signal.smart_money   && <span style={{ fontSize: 8 }}>💎</span>}
+            {signal.wyckoff_spring && <span style={{ fontSize: 8 }}>💧</span>}
           </div>
-        </td>
+        </div>
 
         {/* SCORE */}
-        <td className="px-2 pt-2 pb-0 text-right">
-          <div className="flex items-center justify-end gap-1.5">
-            <span className="font-mono font-bold text-xs" style={{ color: qCol }}>{fmt(signal.alpha_score)}</span>
+        <div style={{ ...cellBase, textAlign: 'right' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+            <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 12, color: qCol }}>{fmt(signal.alpha_score)}</span>
             {rs != null && (
-              <span className="font-mono text-[8px] px-1 rounded" style={{ color: rsCol, background: '#1e283240' }}>rs{rs.toFixed(0)}</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 8, padding: '1px 4px', borderRadius: 3, color: rsCol, background: '#1e283240', whiteSpace: 'nowrap' }}>rs{rs.toFixed(0)}</span>
             )}
           </div>
-        </td>
+        </div>
 
         {/* STRUCTURE */}
-        <td className="px-2 pt-2 pb-0 text-center">
-          <span className="text-[9px] font-semibold" style={{ color: structCol }}>
+        <div style={{ ...cellBase, textAlign: 'center' }}>
+          <span style={{ fontSize: 9, fontWeight: 600, color: structCol, whiteSpace: 'nowrap' }}>
             {signal.structure === 'BULLISH' ? '↑ BULL' : signal.structure === 'BEARISH' ? '↓ BEAR' : '— NEU'}
           </span>
-        </td>
+        </div>
 
         {/* ICT SIGNALS */}
-        <td className="px-2 pt-2 pb-0">
-          <div className="flex gap-1 flex-wrap">
-            {!!signal.fvg_bull && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}>FVG</span>}
-            {!!signal.ob_bull && !signal.ob_mitigated && (
-              <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}>
-                {signal.ob_price_at ? 'OB🎯' : 'OB'}
-              </span>
-            )}
-            {!!signal.sweep_bull && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}>SWP</span>}
-            {!!signal.stop_hunt_bull && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ff950015', color: '#ff9500', border: '1px solid #ff950030' }}>HUNT</span>}
-            {!!signal.breakout_imminent && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}>BRK</span>}
+        <div style={{ ...cellBase }}>
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'nowrap' }}>
+            {!!signal.fvg_bull        && <span style={{ padding: '1px 4px', borderRadius: 3, fontSize: 8, background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}>FVG</span>}
+            {!!signal.ob_bull && !signal.ob_mitigated && <span style={{ padding: '1px 4px', borderRadius: 3, fontSize: 8, background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}>{signal.ob_price_at ? 'OB🎯' : 'OB'}</span>}
+            {!!signal.sweep_bull      && <span style={{ padding: '1px 4px', borderRadius: 3, fontSize: 8, background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}>SWP</span>}
+            {!!signal.stop_hunt_bull  && <span style={{ padding: '1px 4px', borderRadius: 3, fontSize: 8, background: '#ff950015', color: '#ff9500', border: '1px solid #ff950030' }}>HUNT</span>}
+            {!!signal.breakout_imminent && <span style={{ padding: '1px 4px', borderRadius: 3, fontSize: 8, background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}>BRK</span>}
             {!signal.fvg_bull && !signal.ob_bull && !signal.sweep_bull && !signal.stop_hunt_bull && !signal.breakout_imminent && (
-              <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>
+              <span style={{ fontSize: 9, color: '#2a3642' }}>–</span>
             )}
           </div>
-        </td>
+        </div>
 
         {/* VOL */}
-        <td className="px-2 pt-2 pb-0 text-right">
-          <span className="font-mono text-[10px] font-semibold"
-            style={{ color: signal.vol_spike >= 2 ? '#ffcc00' : signal.vol_spike >= 1.5 ? '#00d4ff' : '#8b99a8' }}>
+        <div style={{ ...cellBase, textAlign: 'right' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 600, color: signal.vol_spike >= 2 ? '#ffcc00' : signal.vol_spike >= 1.5 ? '#00d4ff' : '#8b99a8' }}>
             {fmt(signal.vol_spike, 1)}x
           </span>
-        </td>
+        </div>
 
         {/* FLOW */}
-        <td className="px-2 pt-2 pb-0 text-center">
-          <span className="text-[9px] font-semibold" style={{ color: flowCol }}>
+        <div style={{ ...cellBase, textAlign: 'center' }}>
+          <span style={{ fontSize: 9, fontWeight: 600, color: flowCol, whiteSpace: 'nowrap' }}>
             {signal.flow_direction === 'in' ? '▲ IN' : signal.flow_direction === 'out' ? '▼ OUT' : '— NEU'}
           </span>
-        </td>
+        </div>
 
-        {/* 1D/5D */}
-        <td className="px-2 pt-2 pb-0 text-right">
-          {p1d != null ? (
-            <span className="font-mono text-[10px]" style={{ color: p1d >= 0 ? '#00ff88' : '#ff3366' }}>{pct(p1d)}</span>
-          ) : (
-            <span className="font-mono text-[10px]" style={{ color: '#2a3642' }}>—</span>
-          )}
-        </td>
+        {/* 1D */}
+        <div style={{ ...cellBase, textAlign: 'right' }}>
+          {p1d != null
+            ? <span style={{ fontFamily: 'monospace', fontSize: 10, color: p1d >= 0 ? '#00ff88' : '#ff3366' }}>{pct(p1d)}</span>
+            : <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#2a3642' }}>—</span>}
+        </div>
 
-        {/* ADX/RSI */}
-        <td className="px-2 pt-2 pb-0 text-right">
-          <span className="font-mono text-[9px]" style={{ color: (signal.adx14 ?? 0) >= 25 ? '#00d4ff' : '#4a5a6a' }}>
+        {/* ADX */}
+        <div style={{ ...cellBase, textAlign: 'right' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 9, color: (signal.adx14 ?? 0) >= 25 ? '#00d4ff' : '#4a5a6a', whiteSpace: 'nowrap' }}>
             {signal.adx14 != null ? `ADX ${fmt(signal.adx14, 0)}` : ''}
           </span>
-        </td>
-      </tr>
+        </div>
+      </div>
 
-      {/* ── Row 2: sub info ── */}
-      <tr
-        onClick={onClick}
-        className="cursor-pointer"
-        style={{ borderBottom: '1px solid #1e2832' }}
-        onMouseEnter={hoverOn}
-        onMouseLeave={hoverOff}
-      >
-        {/* # placeholder */}
-        <td className="pl-2 pr-1 pb-2 pt-0" />
+      {/* ── Row 2: sub ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: GRID, alignItems: 'start' }}>
+
+        {/* # empty */}
+        <div style={cell2Base} />
 
         {/* industry */}
-        <td className="pl-2 pr-3 pb-2 pt-0">
-          <span className="text-[9px] truncate block max-w-[150px]" style={{ color: '#8b99a8' }}>{signal.industry}</span>
-        </td>
+        <div style={{ ...cell2Base }}>
+          <span style={{ fontSize: 9, color: '#8b99a8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{signal.industry}</span>
+        </div>
 
         {/* ict score */}
-        <td className="px-2 pb-2 pt-0 text-right">
-          <span className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>ict {fmt(signal.ict_score)}</span>
-        </td>
+        <div style={{ ...cell2Base, textAlign: 'right' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#4a5a6a' }}>ict {fmt(signal.ict_score)}</span>
+        </div>
 
         {/* bos/choch */}
-        <td className="px-2 pb-2 pt-0 text-center">
-          <span className="text-[8px]" style={{ color: '#4a5a6a' }}>
+        <div style={{ ...cell2Base, textAlign: 'center' }}>
+          <span style={{ fontSize: 8, color: '#4a5a6a' }}>
             {signal.bos_bull ? 'BOS↑' : signal.choch_bull ? 'CHoCH↑' : signal.bos_bear ? 'BOS↓' : ''}
           </span>
-        </td>
+        </div>
 
         {/* conf */}
-        <td className="px-2 pb-2 pt-0">
-          <span className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>conf: {signal.ict_confluence}</span>
-        </td>
+        <div style={{ ...cell2Base }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#4a5a6a' }}>conf: {signal.ict_confluence}</span>
+        </div>
 
-        {/* VOL sub: empty — vol_spike already on row1 */}
-        <td className="px-2 pb-2 pt-0 text-right" />
+        {/* VOL empty */}
+        <div style={cell2Base} />
 
-        {/* FLOW sub: acc/dist label */}
-        <td className="px-2 pb-2 pt-0 text-center">
-          <span className="text-[8px]" style={{ color: accCol }}>{accLabel}</span>
-        </td>
+        {/* FLOW: acc/dist */}
+        <div style={{ ...cell2Base, textAlign: 'center' }}>
+          <span style={{ fontSize: 8, color: accCol }}>{accLabel}</span>
+        </div>
 
         {/* 5D */}
-        <td className="px-2 pb-2 pt-0 text-right">
-          {p5d != null ? (
-            <span className="font-mono text-[9px]" style={{ color: p5d >= 0 ? '#00ff8888' : '#ff336688' }}>{pct(p5d)}</span>
-          ) : (
-            <span className="font-mono text-[9px]" style={{ color: '#2a3642' }}>—</span>
-          )}
-        </td>
+        <div style={{ ...cell2Base, textAlign: 'right' }}>
+          {p5d != null
+            ? <span style={{ fontFamily: 'monospace', fontSize: 9, color: p5d >= 0 ? '#00ff8888' : '#ff336688' }}>{pct(p5d)}</span>
+            : <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#2a3642' }}>—</span>}
+        </div>
 
         {/* RSI */}
-        <td className="px-2 pb-2 pt-0 text-right">
+        <div style={{ ...cell2Base, textAlign: 'right' }}>
           {signal.rsi14 != null && (
-            <span className="font-mono text-[9px]"
-              style={{ color: signal.rsi14 > 70 ? '#ff3366' : signal.rsi14 < 30 ? '#00ff88' : '#8b99a8' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 9, color: signal.rsi14 > 70 ? '#ff3366' : signal.rsi14 < 30 ? '#00ff88' : '#8b99a8', whiteSpace: 'nowrap' }}>
               RSI {fmt(signal.rsi14, 0)}
             </span>
           )}
-        </td>
-      </tr>
-    </>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -632,50 +617,43 @@ export default function ICTDashboard() {
 
       {/* Signal Table */}
       <div className="rounded-xl overflow-hidden" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-        <table style={{ width: '100%', tableLayout: 'fixed' }}>
-          <colgroup>
-            <col style={{ width: '32px' }} />
-            <col style={{ width: '20%', minWidth: '150px' }} />
-            <col style={{ width: '13%', minWidth: '110px' }} />
-            <col style={{ width: '10%', minWidth: '90px' }} />
-            <col style={{ width: '15%', minWidth: '130px' }} />
-            <col style={{ width: '7%',  minWidth: '70px' }} />
-            <col style={{ width: '10%', minWidth: '90px' }} />
-            <col style={{ width: '8%',  minWidth: '80px' }} />
-            <col style={{ width: '9%',  minWidth: '90px' }} />
-          </colgroup>
-          <thead>
-            <tr style={{ background: '#0a0f14' }}>
-              {(['#', 'SYMBOL', 'SCORE', 'STRUCTURE', 'ICT SIGNALS', 'VOL', 'FLOW', '1D / 5D', 'ADX/RSI'] as const).map((h) => (
-                <th key={h} className="p-2 text-[9px] font-medium text-left" style={{ color: '#4a5a6a', letterSpacing: '0.8px' }}>
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {signals.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="p-8 text-center text-xs" style={{ color: '#4a5a6a' }}>
-                  {data.regime.regime === 'BEAR'
-                    ? '⚠️ BEAR market — Tất cả signals bị SKIP do bull_weight=0.3. Bỏ filter "ACTIONABLE" để xem watchlist chuẩn bị.'
-                    : 'Không có signals phù hợp với filter hiện tại'}
-                </td>
-              </tr>
-            ) : (
-              signals.map((s) => {
-                const sym: ICTSignal = s as ICTSignal;
-                return (
-                  <SignalRow
-                    key={sym.symbol}
-                    signal={sym}
-                    onClick={() => setSelected(sym)}
-                  />
-                );
-              })
-            )}
-          </tbody>
-        </table>
+        {/* Header */}
+        <div style={{ display: 'grid', gridTemplateColumns: GRID, background: '#0a0f14', padding: '6px 0', borderBottom: '1px solid #1e2832' }}>
+          {([
+            { label: '#',           align: 'center' },
+            { label: 'SYMBOL',      align: 'left'   },
+            { label: 'SCORE',       align: 'right'  },
+            { label: 'STRUCTURE',   align: 'center' },
+            { label: 'ICT SIGNALS', align: 'left'   },
+            { label: 'VOL',         align: 'right'  },
+            { label: 'FLOW',        align: 'center' },
+            { label: '1D / 5D',     align: 'right'  },
+            { label: 'ADX/RSI',     align: 'right'  },
+          ] as const).map(({ label, align }) => (
+            <div key={label} style={{ padding: '0 8px', fontSize: 9, fontWeight: 500, letterSpacing: '0.8px', color: '#4a5a6a', textAlign: align, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              {label}
+            </div>
+          ))}
+        </div>
+        {/* Rows */}
+        {signals.length === 0 ? (
+          <div className="p-8 text-center text-xs" style={{ color: '#4a5a6a' }}>
+            {data.regime.regime === 'BEAR'
+              ? '⚠️ BEAR market — Tất cả signals bị SKIP do bull_weight=0.3. Bỏ filter "ACTIONABLE" để xem watchlist chuẩn bị.'
+              : 'Không có signals phù hợp với filter hiện tại'}
+          </div>
+        ) : (
+          signals.map((s) => {
+            const sym: ICTSignal = s as ICTSignal;
+            return (
+              <SignalRow
+                key={sym.symbol}
+                signal={sym}
+                onClick={() => setSelected(sym)}
+              />
+            );
+          })
+        )}
       </div>
 
       {/* Disclaimer */}
