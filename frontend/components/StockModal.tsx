@@ -873,10 +873,8 @@ export default function StockModal({
     ? [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }, { id: 'ict', label: '🧠 ICT', icon: Zap }]
     : [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }];
 
-  if (!stock || !analysis || !deskAnalysis || !recDisplay) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ display: (!stock || !analysis || !deskAnalysis || !recDisplay) ? 'none' : undefined }}>
       {/* Backdrop */}
       <div
         className="absolute inset-0 transition-opacity duration-200"
