@@ -859,19 +859,20 @@ export default function StockModal({
       .finally(() => setDetailLoading(false));
   }, [stock, activeTab, detail]);
 
-  const close = () => {
+  const close = useCallback(() => {
     setVisible(false);
     setTimeout(onClose, 150);
-  };
+  }, [onClose]);
 
-  const analysis = stock ? (preloadedAnalysis || generateAnalysis(stock, sectorStatus)) : null;
-  const deskAnalysis = stock ? generateDeskAnalysis(stock, ictSignal, sectorStatus) : null;
-  const recDisplay = analysis ? getRecommendationDisplay(analysis.recommendation) : null;
-  const tierColor = stock ? getTierColor(stock.tier) : '#8b99a8';
-  const price = stock ? (stock.close || stock.price || 0) : 0;
-  const tabList = ictSignal
+  const analysis = useMemo(() => stock ? (preloadedAnalysis || generateAnalysis(stock, sectorStatus)) : null, [stock, preloadedAnalysis, sectorStatus]);
+  const deskAnalysis = useMemo(() => stock ? generateDeskAnalysis(stock, ictSignal, sectorStatus) : null, [stock, ictSignal, sectorStatus]);
+  const recDisplay = useMemo(() => analysis ? getRecommendationDisplay(analysis.recommendation) : null, [analysis]);
+  const tierColor = useMemo(() => stock ? getTierColor(stock.tier) : '#8b99a8', [stock]);
+  const price = useMemo(() => stock ? (stock.close || stock.price || 0) : 0, [stock]);
+  const tabList = useMemo(() => ictSignal
     ? [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }, { id: 'ict', label: '🧠 ICT', icon: Zap }]
-    : [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }];
+    : [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }]
+  , [ictSignal]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ display: (!stock || !analysis || !deskAnalysis || !recDisplay) ? 'none' : undefined }}>
