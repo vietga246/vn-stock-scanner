@@ -200,7 +200,7 @@ function SectorBadges({ rotation }: { rotation: ICTSignalsResponse['sector_rotat
   );
 }
 
-function SignalRow({ signal, onClick }: { signal: ICTSignal; onClick: () => void }) {
+function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onClick: () => void }) {
   const qCol = qualityColor(signal.setup_quality);
   const structCol = signal.structure === 'BULLISH' ? '#00ff88' : signal.structure === 'BEARISH' ? '#ff3366' : '#4a5a6a';
   const flowCol = signal.flow_direction === 'in' ? '#00ff88' : signal.flow_direction === 'out' ? '#ff3366' : '#4a5a6a';
@@ -224,12 +224,22 @@ function SignalRow({ signal, onClick }: { signal: ICTSignal; onClick: () => void
       <td className="p-2">
         <div className="flex items-center gap-1.5">
           <span className="font-bold text-xs">{signal.symbol}</span>
-          <span
-            className="px-1.5 py-0.5 rounded text-[8px] font-bold"
-            style={{ background: `${qCol}20`, color: qCol, border: `1px solid ${qCol}40` }}
-          >
-            {signal.setup_quality}
-          </span>
+          {signal.setup_quality === 'SKIP' ? (
+            <span
+              className="px-1.5 py-0.5 rounded text-[8px] font-bold"
+              style={{ background: '#1e283280', color: '#4a5a6a', border: '1px solid #2a364250' }}
+              title="BEAR market — theo dõi khi phase đổi"
+            >
+              WATCH
+            </span>
+          ) : (
+            <span
+              className="px-1.5 py-0.5 rounded text-[8px] font-bold"
+              style={{ background: `${qCol}20`, color: qCol, border: `1px solid ${qCol}40` }}
+            >
+              {signal.setup_quality}
+            </span>
+          )}
           {signal.smart_money && (
             <span className="text-[8px]" title="Smart Money Confluence">💎</span>
           )}
@@ -250,6 +260,11 @@ function SignalRow({ signal, onClick }: { signal: ICTSignal; onClick: () => void
         <div className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>
           ict {fmt(signal.ict_score)}
         </div>
+        {signal.signal_breakdown?.rs_sector != null && (
+          <div className="font-mono text-[8px]" style={{ color: signal.signal_breakdown.rs_sector >= 70 ? '#00ff88' : '#4a5a6a' }}>
+            rs {signal.signal_breakdown.rs_sector.toFixed(0)}
+          </div>
+        )}
       </td>
 
       {/* Structure */}
@@ -542,7 +557,7 @@ export default function ICTDashboard() {
               }}
             >
               {q}
-              {q !== 'ALL' && data.quality_distribution[q] != null && (
+              {q !== 'ALL' && data.quality_distribution[q] != null && data.quality_distribution[q] > 0 && (
                 <span className="ml-1 font-mono" style={{ color: active ? col : '#2a3642' }}>
                   {data.quality_distribution[q]}
                 </span>
@@ -557,11 +572,12 @@ export default function ICTDashboard() {
           className="px-2.5 py-1 rounded-md text-[10px] font-bold transition-all"
           style={{
             background: actionOnly ? '#00ff8825' : 'transparent',
-            color: actionOnly ? '#00ff88' : '#4a5a6a',
+            color: actionOnly ? '#00ff88' : (data.regime.regime === 'BEAR' ? '#ff336688' : '#4a5a6a'),
             border: `1px solid ${actionOnly ? '#00ff8860' : '#1e2832'}`,
           }}
+          title={data.regime.regime === 'BEAR' ? 'BEAR market: 0 actionable — bỏ filter này để xem watchlist' : ''}
         >
-          ⚡ ACTIONABLE {data.actionable_count > 0 && `(${data.actionable_count})`}
+          ⚡ {data.regime.regime === 'BEAR' ? 'ACTIONABLE (BEAR: 0)' : `ACTIONABLE${data.actionable_count > 0 ? ` (${data.actionable_count})` : ''}`}
         </button>
 
         {/* Search */}
@@ -577,6 +593,24 @@ export default function ICTDashboard() {
           {signals.length} signals
         </span>
       </div>
+
+      {/* BEAR Watchlist Banner */}
+      {data.regime.regime === 'BEAR' && (
+        <div className="rounded-xl p-3 mb-3 flex items-start gap-3" style={{ background: '#ff336608', border: '1px solid #ff336630' }}>
+          <span className="text-base shrink-0">⚠️</span>
+          <div>
+            <div className="text-[10px] font-bold mb-1" style={{ color: '#ff9500' }}>
+              BEAR MARKET — WATCHLIST MODE
+            </div>
+            <div className="text-[9px] leading-relaxed" style={{ color: '#8b99a8' }}>
+              Bull weight <span className="font-mono font-bold" style={{ color: '#ffcc00' }}>{(data.regime.bull_weight * 100).toFixed(0)}%</span> — 
+              Tất cả setups bị SKIP. Danh sách này là <strong style={{ color: '#e8edf2' }}>watchlist chuẩn bị</strong>: 
+              stocks có relative strength cao nhất vs thị trường, sẽ breakout sớm nhất khi phase đổi.
+              Chờ bull_weight &gt; 30% để hành động.
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Signal Table */}
       <div className="rounded-xl overflow-hidden" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
@@ -595,14 +629,21 @@ export default function ICTDashboard() {
               <tr>
                 <td colSpan={9} className="p-8 text-center text-xs" style={{ color: '#4a5a6a' }}>
                   {data.regime.regime === 'BEAR'
-                    ? '⚠️ BEAR market — bull_weight=0.3, không có actionable setup. Theo dõi các setup SKIP để chuẩn bị khi market chuyển phase.'
+                    ? '⚠️ BEAR market — Tất cả signals bị SKIP do bull_weight=0.3. Bỏ filter "ACTIONABLE" để xem watchlist chuẩn bị.'
                     : 'Không có signals phù hợp với filter hiện tại'}
                 </td>
               </tr>
             ) : (
-              signals.map((s) => (
-                <div key={s.symbol}><SignalRow signal={s} onClick={() => setSelected(s)} /></div>
-              ))
+              signals.map((s) => {
+                const sym: ICTSignal = s as ICTSignal;
+                return (
+                  <SignalRow
+                    key={sym.symbol}
+                    signal={sym}
+                    onClick={() => setSelected(sym)}
+                  />
+                );
+              })
             )}
           </tbody>
         </table>
