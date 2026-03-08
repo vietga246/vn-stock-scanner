@@ -204,160 +204,181 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
   const qCol = qualityColor(signal.setup_quality);
   const structCol = signal.structure === 'BULLISH' ? '#00ff88' : signal.structure === 'BEARISH' ? '#ff3366' : '#4a5a6a';
   const flowCol = signal.flow_direction === 'in' ? '#00ff88' : signal.flow_direction === 'out' ? '#ff3366' : '#4a5a6a';
-  const p1d = signal.price_change_1d ?? 0;
-  const p5d = signal.price_change_5d ?? 0;
+  const p1d = signal.price_change_1d;
+  const p5d = signal.price_change_5d;
+  const accLabel = signal.accumulation_score >= 65 ? 'ACC' : signal.distribution_score >= 65 ? 'DIST' : 'NEU';
+  const accCol   = signal.accumulation_score >= 65 ? '#00ff88' : signal.distribution_score >= 65 ? '#ff3366' : '#4a5a6a';
+  const rs = signal.signal_breakdown?.rs_sector;
+  const rsCol = rs != null ? (rs >= 80 ? '#00ff88' : rs >= 65 ? '#00d4ff' : '#4a5a6a') : '#4a5a6a';
 
+  const hoverOn  = (e: React.MouseEvent<HTMLTableRowElement>) => { e.currentTarget.style.background = '#1e283218'; };
+  const hoverOff = (e: React.MouseEvent<HTMLTableRowElement>) => { e.currentTarget.style.background = ''; };
+
+  // Row 1: main data line
+  // Row 2: sub info line — same columns, lighter text
   return (
-    <tr
-      onClick={onClick}
-      className="cursor-pointer transition-colors"
-      style={{ borderBottom: '1px solid #1e2832', verticalAlign: 'top' }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = '#1e283215')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = '')}
-    >
-      {/* Rank */}
-      <td className="p-2 text-center font-mono text-[9px]" style={{ color: '#4a5a6a', verticalAlign: 'middle' }}>
-        {signal.ict_rank}
-      </td>
+    <>
+      {/* ── Row 1: main ── */}
+      <tr
+        onClick={onClick}
+        className="cursor-pointer"
+        style={{ borderTop: '1px solid #1e2832' }}
+        onMouseEnter={hoverOn}
+        onMouseLeave={hoverOff}
+      >
+        {/* # */}
+        <td className="pl-2 pr-1 pt-2 pb-0 text-center font-mono text-[9px]" style={{ color: '#4a5a6a' }}>
+          {signal.ict_rank}
+        </td>
 
-      {/* Symbol + Quality */}
-      <td className="p-2">
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-xs">{signal.symbol}</span>
-          {signal.setup_quality === 'SKIP' ? (
-            <span
-              className="px-1.5 py-0.5 rounded text-[8px] font-bold"
-              style={{ background: '#1e283280', color: '#4a5a6a', border: '1px solid #2a364250' }}
-              title="BEAR market — theo dõi khi phase đổi"
-            >
-              WATCH
-            </span>
+        {/* SYMBOL */}
+        <td className="pl-2 pr-3 pt-2 pb-0">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-xs">{signal.symbol}</span>
+            {signal.setup_quality === 'SKIP' ? (
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
+                style={{ background: '#1e283280', color: '#4a5a6a', border: '1px solid #2a364250' }}>WATCH</span>
+            ) : (
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
+                style={{ background: `${qCol}20`, color: qCol, border: `1px solid ${qCol}40` }}>{signal.setup_quality}</span>
+            )}
+            {signal.smart_money && <span className="text-[8px]">💎</span>}
+            {signal.wyckoff_spring && <span className="text-[8px]">💧</span>}
+          </div>
+        </td>
+
+        {/* SCORE */}
+        <td className="px-2 pt-2 pb-0 text-right">
+          <div className="flex items-center justify-end gap-1.5">
+            <span className="font-mono font-bold text-xs" style={{ color: qCol }}>{fmt(signal.alpha_score)}</span>
+            {rs != null && (
+              <span className="font-mono text-[8px] px-1 rounded" style={{ color: rsCol, background: '#1e283240' }}>rs{rs.toFixed(0)}</span>
+            )}
+          </div>
+        </td>
+
+        {/* STRUCTURE */}
+        <td className="px-2 pt-2 pb-0 text-center">
+          <span className="text-[9px] font-semibold" style={{ color: structCol }}>
+            {signal.structure === 'BULLISH' ? '↑ BULL' : signal.structure === 'BEARISH' ? '↓ BEAR' : '— NEU'}
+          </span>
+        </td>
+
+        {/* ICT SIGNALS */}
+        <td className="px-2 pt-2 pb-0">
+          <div className="flex gap-1 flex-wrap">
+            {!!signal.fvg_bull && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}>FVG</span>}
+            {!!signal.ob_bull && !signal.ob_mitigated && (
+              <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}>
+                {signal.ob_price_at ? 'OB🎯' : 'OB'}
+              </span>
+            )}
+            {!!signal.sweep_bull && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}>SWP</span>}
+            {!!signal.stop_hunt_bull && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ff950015', color: '#ff9500', border: '1px solid #ff950030' }}>HUNT</span>}
+            {!!signal.breakout_imminent && <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}>BRK</span>}
+            {!signal.fvg_bull && !signal.ob_bull && !signal.sweep_bull && !signal.stop_hunt_bull && !signal.breakout_imminent && (
+              <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>
+            )}
+          </div>
+        </td>
+
+        {/* VOL */}
+        <td className="px-2 pt-2 pb-0 text-right">
+          <span className="font-mono text-[10px] font-semibold"
+            style={{ color: signal.vol_spike >= 2 ? '#ffcc00' : signal.vol_spike >= 1.5 ? '#00d4ff' : '#8b99a8' }}>
+            {fmt(signal.vol_spike, 1)}x
+          </span>
+        </td>
+
+        {/* FLOW */}
+        <td className="px-2 pt-2 pb-0 text-center">
+          <span className="text-[9px] font-semibold" style={{ color: flowCol }}>
+            {signal.flow_direction === 'in' ? '▲ IN' : signal.flow_direction === 'out' ? '▼ OUT' : '— NEU'}
+          </span>
+        </td>
+
+        {/* 1D/5D */}
+        <td className="px-2 pt-2 pb-0 text-right">
+          {p1d != null ? (
+            <span className="font-mono text-[10px]" style={{ color: p1d >= 0 ? '#00ff88' : '#ff3366' }}>{pct(p1d)}</span>
           ) : (
-            <span
-              className="px-1.5 py-0.5 rounded text-[8px] font-bold"
-              style={{ background: `${qCol}20`, color: qCol, border: `1px solid ${qCol}40` }}
-            >
-              {signal.setup_quality}
+            <span className="font-mono text-[10px]" style={{ color: '#2a3642' }}>—</span>
+          )}
+        </td>
+
+        {/* ADX/RSI */}
+        <td className="px-2 pt-2 pb-0 text-right">
+          <span className="font-mono text-[9px]" style={{ color: (signal.adx14 ?? 0) >= 25 ? '#00d4ff' : '#4a5a6a' }}>
+            {signal.adx14 != null ? `ADX ${fmt(signal.adx14, 0)}` : ''}
+          </span>
+        </td>
+      </tr>
+
+      {/* ── Row 2: sub info ── */}
+      <tr
+        onClick={onClick}
+        className="cursor-pointer"
+        style={{ borderBottom: '1px solid #1e2832' }}
+        onMouseEnter={hoverOn}
+        onMouseLeave={hoverOff}
+      >
+        {/* # placeholder */}
+        <td className="pl-2 pr-1 pb-2 pt-0" />
+
+        {/* industry */}
+        <td className="pl-2 pr-3 pb-2 pt-0">
+          <span className="text-[9px] truncate block max-w-[150px]" style={{ color: '#8b99a8' }}>{signal.industry}</span>
+        </td>
+
+        {/* ict score */}
+        <td className="px-2 pb-2 pt-0 text-right">
+          <span className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>ict {fmt(signal.ict_score)}</span>
+        </td>
+
+        {/* bos/choch */}
+        <td className="px-2 pb-2 pt-0 text-center">
+          <span className="text-[8px]" style={{ color: '#4a5a6a' }}>
+            {signal.bos_bull ? 'BOS↑' : signal.choch_bull ? 'CHoCH↑' : signal.bos_bear ? 'BOS↓' : ''}
+          </span>
+        </td>
+
+        {/* conf */}
+        <td className="px-2 pb-2 pt-0">
+          <span className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>conf: {signal.ict_confluence}</span>
+        </td>
+
+        {/* acc/dist */}
+        <td className="px-2 pb-2 pt-0 text-right">
+          <span className="text-[8px]" style={{ color: accCol }}>{accLabel}</span>
+        </td>
+
+        {/* foreign net */}
+        <td className="px-2 pb-2 pt-0 text-center">
+          {signal.foreign_net_7d != null ? (
+            <span className="font-mono text-[9px]" style={{ color: flowCol }}>{fmtBn(signal.foreign_net_7d)}</span>
+          ) : null}
+        </td>
+
+        {/* 5D */}
+        <td className="px-2 pb-2 pt-0 text-right">
+          {p5d != null ? (
+            <span className="font-mono text-[9px]" style={{ color: p5d >= 0 ? '#00ff8888' : '#ff336688' }}>{pct(p5d)}</span>
+          ) : (
+            <span className="font-mono text-[9px]" style={{ color: '#2a3642' }}>—</span>
+          )}
+        </td>
+
+        {/* RSI */}
+        <td className="px-2 pb-2 pt-0 text-right">
+          {signal.rsi14 != null && (
+            <span className="font-mono text-[9px]"
+              style={{ color: signal.rsi14 > 70 ? '#ff3366' : signal.rsi14 < 30 ? '#00ff88' : '#8b99a8' }}>
+              RSI {fmt(signal.rsi14, 0)}
             </span>
           )}
-          {signal.smart_money && (
-            <span className="text-[8px]" title="Smart Money Confluence">💎</span>
-          )}
-          {signal.wyckoff_spring && (
-            <span className="text-[8px]" title="Wyckoff Spring">💧</span>
-          )}
-        </div>
-        <div className="text-[9px] mt-0.5 truncate max-w-[140px]" style={{ color: '#8b99a8' }}>
-          {signal.industry}
-        </div>
-      </td>
-
-      {/* Alpha score */}
-      <td className="p-2 text-right">
-        <div className="flex items-center justify-end gap-1.5">
-          <div className="font-mono font-bold text-xs" style={{ color: qCol }}>
-            {fmt(signal.alpha_score)}
-          </div>
-          {signal.signal_breakdown?.rs_sector != null && (
-            <div className="font-mono text-[8px] px-1 rounded" style={{ color: signal.signal_breakdown.rs_sector >= 80 ? '#00ff88' : signal.signal_breakdown.rs_sector >= 65 ? '#00d4ff' : '#4a5a6a', background: '#1e283240' }}>
-              rs{signal.signal_breakdown.rs_sector.toFixed(0)}
-            </div>
-          )}
-        </div>
-        <div className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>
-          ict {fmt(signal.ict_score)}
-        </div>
-      </td>
-
-      {/* Structure */}
-      <td className="p-2 text-center">
-        <div className="text-[9px] font-semibold" style={{ color: structCol }}>
-          {signal.structure === 'BULLISH' ? '↑ BULL' : signal.structure === 'BEARISH' ? '↓ BEAR' : '— NEU'}
-        </div>
-        <div className="text-[8px]" style={{ color: '#4a5a6a', minHeight: '14px' }}>
-          {signal.bos_bull ? 'BOS↑ ' : signal.choch_bull ? 'CHoCH↑ ' : signal.bos_bear ? 'BOS↓' : ' '}
-        </div>
-      </td>
-
-      {/* ICT Signals */}
-      <td className="p-2">
-        <div className="flex gap-1 flex-wrap">
-          {!!signal.fvg_bull && (
-            <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}>FVG</span>
-          )}
-          {!!signal.ob_bull && !signal.ob_mitigated && (
-            <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}>
-              {signal.ob_price_at ? 'OB🎯' : 'OB'}
-            </span>
-          )}
-          {!!signal.sweep_bull && (
-            <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}>SWP</span>
-          )}
-          {!!signal.stop_hunt_bull && (
-            <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ff950015', color: '#ff9500', border: '1px solid #ff950030' }}>HUNT</span>
-          )}
-          {!!signal.breakout_imminent && (
-            <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}>BRK</span>
-          )}
-          {!signal.fvg_bull && !signal.ob_bull && !signal.sweep_bull && !signal.stop_hunt_bull && !signal.breakout_imminent && (
-            <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>
-          )}
-        </div>
-        <div className="text-[9px] font-mono" style={{ color: '#4a5a6a', minHeight: '14px' }}>
-          conf: {signal.ict_confluence}
-        </div>
-      </td>
-
-      {/* Volume */}
-      <td className="p-2 text-right">
-        <div className="font-mono text-[10px] font-semibold"
-          style={{ color: signal.vol_spike >= 2 ? '#ffcc00' : signal.vol_spike >= 1.5 ? '#00d4ff' : '#8b99a8' }}>
-          {fmt(signal.vol_spike, 1)}x
-        </div>
-        <div className="text-[8px]"
-          style={{ color: signal.accumulation_score >= 65 ? '#00ff88' : signal.distribution_score >= 65 ? '#ff3366' : '#4a5a6a' }}>
-          {signal.accumulation_score >= 65 ? 'ACC' : signal.distribution_score >= 65 ? 'DIST' : 'NEU'}
-        </div>
-      </td>
-
-      {/* Flow */}
-      <td className="p-2 text-center">
-        <div className="text-[9px] font-semibold" style={{ color: flowCol }}>
-          {signal.flow_direction === 'in' ? '▲ IN' : signal.flow_direction === 'out' ? '▼ OUT' : '— NEU'}
-        </div>
-        <div className="font-mono text-[9px]" style={{ color: flowCol, minHeight: '14px' }}>
-          {signal.foreign_net_7d != null ? fmtBn(signal.foreign_net_7d) : ' '}
-        </div>
-      </td>
-
-      {/* Price change */}
-      <td className="p-2 text-right">
-        {signal.price_change_1d != null ? (
-          <div className="font-mono text-[10px]" style={{ color: p1d >= 0 ? '#00ff88' : '#ff3366' }}>
-            {pct(p1d)}
-          </div>
-        ) : (
-          <div className="font-mono text-[10px]" style={{ color: '#2a3642' }}>—</div>
-        )}
-        {signal.price_change_5d != null ? (
-          <div className="font-mono text-[9px]" style={{ color: p5d >= 0 ? '#00ff8888' : '#ff336688' }}>
-            {pct(p5d)}
-          </div>
-        ) : (
-          <div className="font-mono text-[9px]" style={{ color: '#2a3642' }}>—</div>
-        )}
-      </td>
-
-      {/* ADX / RSI */}
-      <td className="p-2 text-right">
-        <div className="font-mono text-[9px]" style={{ color: (signal.adx14 ?? 0) >= 25 ? '#00d4ff' : '#4a5a6a', minHeight: '14px' }}>
-          {signal.adx14 != null ? `ADX ${fmt(signal.adx14, 0)}` : ' '}
-        </div>
-        <div className="font-mono text-[9px]" style={{ color: (signal.rsi14 ?? 50) > 70 ? '#ff3366' : (signal.rsi14 ?? 50) < 30 ? '#00ff88' : '#8b99a8', minHeight: '14px' }}>
-          {signal.rsi14 != null ? `RSI ${fmt(signal.rsi14, 0)}` : ' '}
-        </div>
-      </td>
-    </tr>
+        </td>
+      </tr>
+    </>
   );
 }
 
