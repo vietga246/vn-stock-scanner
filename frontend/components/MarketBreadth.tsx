@@ -132,13 +132,18 @@ export default function MarketBreadth({
     ? (foreignNetBn >= 0 ? '#00ff88' : '#ff3366')
     : '#8b99a8';
 
-  // Most active từ price_board
-  const mostActive = priceBoard?.stocks
-    ? [...priceBoard.stocks]
-        .filter((s) => s.total_traded_value != null && s.total_traded_value > 0)
-        .sort((a, b) => (b.total_traded_value ?? 0) - (a.total_traded_value ?? 0))
-        .slice(0, 5)
-    : [];
+  // Most active — ưu tiên summary.most_active (đã filter valid stocks),
+  // fallback sang price_board nếu chưa có
+  const mostActiveSummary = (summary as any)?.most_active as Array<{ symbol: string; value_bn: number | null }> | undefined;
+  const mostActive: Array<{ symbol: string; total_traded_value?: number | null; value_bn?: number | null }> =
+    mostActiveSummary && mostActiveSummary.length > 0
+      ? mostActiveSummary.slice(0, 5)
+      : priceBoard?.stocks
+        ? [...priceBoard.stocks]
+            .filter((s) => s.total_traded_value != null && s.total_traded_value > 0)
+            .sort((a, b) => (b.total_traded_value ?? 0) - (a.total_traded_value ?? 0))
+            .slice(0, 5)
+        : [];
 
   // Breadth bar width
   const advanceBarW = advancePct ?? 0;
@@ -384,8 +389,10 @@ export default function MarketBreadth({
           </div>
           <div className="flex flex-wrap gap-1">
             {mostActive.slice(0, 5).map((s) => {
-              // total_traded_value đơn vị: triệu đồng → /1000 = tỷ
-              const tyValue = s.total_traded_value != null ? s.total_traded_value / 1000 : null;
+              // value_bn = tỷ đồng (từ summary); total_traded_value = triệu đồng (từ price_board)
+              const tyValue = (s as any).value_bn != null
+                ? (s as any).value_bn
+                : s.total_traded_value != null ? s.total_traded_value / 1000 : null;
               const tvLabel = tyValue == null ? '—'
                 : tyValue >= 1000 ? (tyValue / 1000).toFixed(1) + 'nghìn tỷ'
                 : tyValue >= 100  ? Math.round(tyValue) + 'T'
