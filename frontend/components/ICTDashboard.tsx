@@ -632,10 +632,21 @@ export default function ICTDashboard() {
 
       {/* Signal Table */}
       <div className="rounded-xl overflow-hidden" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-        <table className="w-full">
+        <table style={{ width: '100%', tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '32px' }} />       {/* # */}
+            <col />                                  {/* SYMBOL — auto fills remaining */}
+            <col style={{ width: '130px' }} />      {/* SCORE */}
+            <col style={{ width: '110px' }} />      {/* STRUCTURE */}
+            <col style={{ width: '160px' }} />      {/* ICT SIGNALS */}
+            <col style={{ width: '80px' }} />       {/* VOL */}
+            <col style={{ width: '110px' }} />      {/* FLOW */}
+            <col style={{ width: '90px' }} />       {/* 1D/5D */}
+            <col style={{ width: '100px' }} />      {/* ADX/RSI */}
+          </colgroup>
           <thead>
             <tr style={{ background: '#0a0f14' }}>
-              {['#', 'SYMBOL', 'SCORE', 'STRUCTURE', 'ICT SIGNALS', 'VOL', 'FLOW', '1D / 5D', 'ADX/RSI'].map((h) => (
+              {(['#', 'SYMBOL', 'SCORE', 'STRUCTURE', 'ICT SIGNALS', 'VOL', 'FLOW', '1D / 5D', 'ADX/RSI'] as const).map((h) => (
                 <th key={h} className="p-2 text-[9px] font-medium text-left" style={{ color: '#4a5a6a', letterSpacing: '0.8px' }}>
                   {h}
                 </th>
