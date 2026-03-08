@@ -22,6 +22,7 @@ import type {
   ConvictionLevel,
   TradeSetup,
 } from './types';
+import { computeSignal } from './signals';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -418,25 +419,10 @@ function buildTradeSetup(
   const bullWeight = ict?.bull_weight ?? 0.5;
   const effectiveScore = avgScore * bullWeight + composite * (1 - bullWeight);
 
-  // Action
-  let action: TradeAction;
-  let conviction: ConvictionLevel;
-  if (bullWeight <= 0.3) {
-    action = effectiveScore >= 65 ? 'HOLD' : 'AVOID';
-    conviction = 'LOW';
-  } else if (effectiveScore >= 75) {
-    action = 'STRONG_BUY'; conviction = 'HIGH';
-  } else if (effectiveScore >= 65) {
-    action = 'BUY'; conviction = 'HIGH';
-  } else if (effectiveScore >= 58) {
-    action = 'ACCUMULATE'; conviction = 'MEDIUM';
-  } else if (effectiveScore >= 48) {
-    action = 'HOLD'; conviction = 'LOW';
-  } else if (effectiveScore >= 38) {
-    action = 'REDUCE'; conviction = 'MEDIUM';
-  } else {
-    action = bullWeight <= 0.3 ? 'AVOID' : 'SELL'; conviction = 'HIGH';
-  }
+  // Action — dùng shared computeSignal (đồng bộ với Dashboard & StockModal)
+  const sig = computeSignal(composite, bullWeight, groups, stock.foreign_net_7d);
+  let action: TradeAction = sig.action;
+  let conviction: ConvictionLevel = sig.conviction;
 
   // Entry zone
   let entry_zone: string | undefined;
