@@ -241,7 +241,7 @@ function AnalysisTab({ stock, deskAnalysis }: { stock: Stock; deskAnalysis: Desk
               style={{ border: '1px solid ' + (sc.color) + '25', background: '#0a0f14' }}>
               {/* Group header */}
               <div className="flex items-center justify-between px-3 py-2"
-                style={{ background: `${sc.color}08`, borderBottom: `1px solid ${sc.color}20` }}>
+                style={{ background: (sc.color) + '08', borderBottom: '1px solid ' + (sc.color) + '20' }}>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{group.icon}</span>
                   <span className="text-[10px] font-bold tracking-widest" style={{ color: sc.color }}>
@@ -352,7 +352,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
           ].map(({ label, on, col, extra }) => (
             <div key={label} className="flex items-center justify-between px-2 py-1 rounded" style={{ background: '#0f1519', opacity: on ? 1 : 0.3 }}>
               <span style={{ color: '#8b99a8' }}>{label}</span>
-              <span className="font-bold text-[9px]" style={{ color: on ? col : '#2a3642' }}>{on ? `YES${extra}` : 'no'}</span>
+              <span className="font-bold text-[9px]" style={{ color: on ? col : '#2a3642' }}>{on ? 'YES' + (extra) : 'no'}</span>
             </div>
           ))}
         </div>
@@ -398,7 +398,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
 // ─── Finance Tab ─────────────────────────────────────────────────────────────
 function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-  const fmtB = (v: number | null | undefined) => v == null ? '–' : Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(1)}T` : `${v.toFixed(0)}B`;
+  const fmtB = (v: number | null | undefined) => v == null ? '–' : Math.abs(v) >= 1000 ? ((v / 1000).toFixed(1)) + 'T' : (v.toFixed(0)) + 'B';
   const colPct = (v: number) => v >= 20 ? '#00ff88' : v >= 10 ? '#00d4ff' : v >= 0 ? '#ffcc00' : '#ff3366';
   const cf6 = detail?.cashflow ? [...detail.cashflow].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6) : [];
 
@@ -421,21 +421,23 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
   const ratio = [...detail.ratio].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
   const latestR = ratio[0];
 
+  const ratioItems = latestR ? [
+    { label: 'P/E', val: latestR.pe != null ? latestR.pe.toFixed(1) : '–', note: 'x', color: undefined },
+    { label: 'P/B', val: latestR.pb != null ? latestR.pb.toFixed(2) : '–', note: 'x', color: undefined },
+    { label: 'EV/EBITDA', val: latestR.ev_ebitda != null ? latestR.ev_ebitda.toFixed(1) : '–', note: 'x', color: undefined },
+    { label: 'ROE', val: latestR.roe != null ? latestR.roe.toFixed(1) : '–', note: '%', color: colPct(latestR.roe ?? 0) },
+    { label: 'ROA', val: latestR.roa != null ? latestR.roa.toFixed(1) : '–', note: '%', color: colPct(latestR.roa ?? 0) },
+    { label: 'ROIC', val: latestR.roic != null ? latestR.roic.toFixed(1) : '–', note: '%', color: colPct(latestR.roic ?? 0) },
+    { label: 'Gross Margin', val: latestR.gross_margin != null ? latestR.gross_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.gross_margin ?? 0) },
+    { label: 'Net Margin', val: latestR.net_margin != null ? latestR.net_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.net_margin ?? 0) },
+    { label: 'D/E', val: latestR.debt_equity != null ? latestR.debt_equity.toFixed(2) : '–', note: 'x', color: undefined },
+  ] : [];
+
   return (
     <div className="space-y-3">
-      {latestR && (
+      {ratioItems.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
-          {([
-            { label: 'P/E', val: latestR.pe?.toFixed(1) ?? '–', note: 'x' },
-            { label: 'P/B', val: latestR.pb?.toFixed(2) ?? '–', note: 'x' },
-            { label: 'EV/EBITDA', val: latestR.ev_ebitda?.toFixed(1) ?? '–', note: 'x' },
-            { label: 'ROE', val: latestR.roe?.toFixed(1) ?? '–', note: '%', color: colPct(latestR.roe ?? 0) },
-            { label: 'ROA', val: latestR.roa?.toFixed(1) ?? '–', note: '%', color: colPct(latestR.roa ?? 0) },
-            { label: 'ROIC', val: latestR.roic?.toFixed(1) ?? '–', note: '%', color: colPct(latestR.roic ?? 0) },
-            { label: 'Gross Margin', val: latestR.gross_margin?.toFixed(1) ?? '–', note: '%', color: colPct(latestR.gross_margin ?? 0) },
-            { label: 'Net Margin', val: latestR.net_margin?.toFixed(1) ?? '–', note: '%', color: colPct(latestR.net_margin ?? 0) },
-            { label: 'D/E', val: latestR.debt_equity?.toFixed(2) ?? '–', note: 'x' },
-          ]).map(({ label, val, note, color }) => (
+          {ratioItems.map(({ label, val, note, color }) => (
             <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
               <div className="text-[8px] mb-1 tracking-wide" style={{ color: '#4a5a6a' }}>{label}</div>
               <div className="font-mono font-bold text-[13px]" style={{ color: color ?? '#e8edf2' }}>
@@ -466,7 +468,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
                   <td className="p-2 text-right font-mono" style={{ color: '#e8edf2' }}>{fmtB(r.gross_profit)}</td>
                   <td className="p-2 text-right font-mono" style={{ color: (r.net_profit ?? 0) >= 0 ? '#00ff88' : '#ff3366' }}>{fmtB(r.net_profit)}</td>
                   <td className="p-2 text-right font-mono" style={{ color: (r.revenue_growth ?? 0) >= 0 ? '#00ff88' : '#ff3366' }}>
-                    {r.revenue_growth != null ? `${r.revenue_growth >= 0 ? '+' : ''}${r.revenue_growth.toFixed(1)}%` : '–'}
+                    {r.revenue_growth != null ? (r.revenue_growth >= 0 ? '+' : '') + r.revenue_growth.toFixed(1) + '%' : '–'}
                   </td>
                 </tr>
               ))}
@@ -494,7 +496,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
                     <td className="p-2 font-mono" style={{ color: '#8b99a8' }}>Q{r.quarter}/{r.year}</td>
                     {([r.cfo, r.cfi, r.cff, r.capex]).map((v, j) => (
                       <td key={j} className="p-2 text-right font-mono" style={{ color: v == null ? '#4a5a6a' : v > 0 ? '#00ff88' : '#ff3366' }}>
-                        {v == null ? '–' : `${v > 0 ? '+' : ''}${fmtB(v)}`}
+                        {v == null ? '–' : (v > 0 ? '+' : '') + fmtB(v)}
                       </td>
                     ))}
                   </tr>
@@ -514,18 +516,26 @@ function TradingTab({ stock }: { stock: Stock }) {
   const volumes = stock.volume_history ?? [];
   const dates = stock.dates ?? [];
   const price = stock.close || stock.price || 0;
+  const chg1d = stock.change_1d ?? 0;
+  const priceItems = [
+    { label: 'Giá hiện tại', val: formatPrice(price), color: chg1d >= 0 ? '#00ff88' : '#ff3366' },
+    { label: 'Thay đổi 1D', val: (chg1d >= 0 ? '+' : '') + chg1d.toFixed(2) + '%', color: chg1d >= 0 ? '#00ff88' : '#ff3366' },
+    { label: 'Vol Ratio', val: stock.vol_ratio != null ? stock.vol_ratio.toFixed(2) + 'x' : '–', color: '#00d4ff' },
+    { label: 'ATR (14)', val: stock.atr14 != null ? stock.atr14.toFixed(2) : '–', color: '#ffcc00' },
+    { label: 'BB Width', val: stock.bb_width != null ? stock.bb_width.toFixed(1) : '–', color: '#a78bfa' },
+    { label: 'MACD Hist', val: stock.macd_hist != null ? stock.macd_hist.toFixed(3) : '–', color: (stock.macd_hist ?? 0) > 0 ? '#00ff88' : '#ff3366' },
+  ];
+  const fnet = stock.foreign_net_7d ?? 0;
+  const foreignItems = [
+    { label: 'NN Mua', val: stock.foreign_buy_qty != null ? (stock.foreign_buy_qty / 1000).toFixed(0) + 'K' : '–', color: '#00ff88' },
+    { label: 'NN Bán', val: stock.foreign_sell_qty != null ? (stock.foreign_sell_qty / 1000).toFixed(0) + 'K' : '–', color: '#ff3366' },
+    { label: 'NN Ròng 7D', val: (fnet >= 0 ? '+' : '') + fnet.toFixed(1) + 'B', color: fnet >= 0 ? '#00ff88' : '#ff3366' },
+  ];
 
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        {([
-          { label: 'Giá hiện tại', val: formatPrice(price), color: (stock.change_1d ?? 0) >= 0 ? '#00ff88' : '#ff3366' },
-          { label: 'Thay đổi 1D', val: `${(stock.change_1d ?? 0) >= 0 ? '+' : ''}${(stock.change_1d ?? 0).toFixed(2)}%`, color: (stock.change_1d ?? 0) >= 0 ? '#00ff88' : '#ff3366' },
-          { label: 'Vol Ratio', val: stock.vol_ratio != null ? `${stock.vol_ratio.toFixed(2)}x` : '–', color: '#00d4ff' },
-          { label: 'ATR (14)', val: stock.atr14 != null ? `${stock.atr14.toFixed(2)}` : '–', color: '#ffcc00' },
-          { label: 'BB Width', val: stock.bb_width != null ? `${stock.bb_width.toFixed(1)}` : '–', color: '#a78bfa' },
-          { label: 'MACD Hist', val: stock.macd_hist != null ? `${stock.macd_hist.toFixed(3)}` : '–', color: (stock.macd_hist ?? 0) > 0 ? '#00ff88' : '#ff3366' },
-        ]).map(({ label, val, color }) => (
+        {priceItems.map(({ label, val, color }) => (
           <div key={label} className="p-2.5 rounded-lg" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
             <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
@@ -552,7 +562,7 @@ function TradingTab({ stock }: { stock: Stock }) {
                 {i === 0 && stock.bid1_price != null ? formatPrice(stock.bid1_price) : i === 1 && stock.bid2_price != null ? formatPrice(stock.bid2_price) : i === 2 && stock.bid3_price != null ? formatPrice(stock.bid3_price) : '–'}
               </span>
               <span className="font-mono text-[10px]" style={{ color: '#8b99a8' }}>
-                {i === 0 && stock.bid1_volume != null ? `${(stock.bid1_volume / 1000).toFixed(0)}K` : i === 1 && stock.bid2_volume != null ? `${(stock.bid2_volume / 1000).toFixed(0)}K` : i === 2 && stock.bid3_volume != null ? `${(stock.bid3_volume / 1000).toFixed(0)}K` : '–'}
+                {i === 0 && stock.bid1_volume != null ? (stock.bid1_volume / 1000).toFixed(0) + 'K' : i === 1 && stock.bid2_volume != null ? (stock.bid2_volume / 1000).toFixed(0) + 'K' : i === 2 && stock.bid3_volume != null ? (stock.bid3_volume / 1000).toFixed(0) + 'K' : '–'}
               </span>
             </div>
             <div className="flex justify-between px-3 py-1.5">
@@ -560,7 +570,7 @@ function TradingTab({ stock }: { stock: Stock }) {
                 {i === 0 && stock.ask1_price != null ? formatPrice(stock.ask1_price) : i === 1 && stock.ask2_price != null ? formatPrice(stock.ask2_price) : i === 2 && stock.ask3_price != null ? formatPrice(stock.ask3_price) : '–'}
               </span>
               <span className="font-mono text-[10px]" style={{ color: '#8b99a8' }}>
-                {i === 0 && stock.ask1_volume != null ? `${(stock.ask1_volume / 1000).toFixed(0)}K` : i === 1 && stock.ask2_volume != null ? `${(stock.ask2_volume / 1000).toFixed(0)}K` : i === 2 && stock.ask3_volume != null ? `${(stock.ask3_volume / 1000).toFixed(0)}K` : '–'}
+                {i === 0 && stock.ask1_volume != null ? (stock.ask1_volume / 1000).toFixed(0) + 'K' : i === 1 && stock.ask2_volume != null ? (stock.ask2_volume / 1000).toFixed(0) + 'K' : i === 2 && stock.ask3_volume != null ? (stock.ask3_volume / 1000).toFixed(0) + 'K' : '–'}
               </span>
             </div>
           </div>
@@ -580,11 +590,7 @@ function TradingTab({ stock }: { stock: Stock }) {
         )}
       </div>
       <div className="grid grid-cols-3 gap-2">
-        {([
-          { label: 'NN Mua', val: stock.foreign_buy_qty != null ? `${(stock.foreign_buy_qty / 1000).toFixed(0)}K` : '–', color: '#00ff88' },
-          { label: 'NN Bán', val: stock.foreign_sell_qty != null ? `${(stock.foreign_sell_qty / 1000).toFixed(0)}K` : '–', color: '#ff3366' },
-          { label: 'NN Ròng 7D', val: `${(stock.foreign_net_7d ?? 0) >= 0 ? '+' : ''}${(stock.foreign_net_7d ?? 0).toFixed(1)}B`, color: (stock.foreign_net_7d ?? 0) >= 0 ? '#00ff88' : '#ff3366' },
-        ]).map(({ label, val, color }) => (
+        {foreignItems.map(({ label, val, color }) => (
           <div key={label} className="p-2.5 rounded-lg text-center" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
             <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
@@ -597,7 +603,7 @@ function TradingTab({ stock }: { stock: Stock }) {
 
 // ─── Capital Tab ─────────────────────────────────────────────────────────────
 function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-  const fmtB = (v: number | null | undefined) => v == null ? '–' : Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(1)}T` : `${v.toFixed(0)}B`;
+  const fmtB = (v: number | null | undefined) => v == null ? '–' : Math.abs(v) >= 1000 ? ((v / 1000).toFixed(1)) + 'T' : (v.toFixed(0)) + 'B';
 
   if (detailLoading) {
     return (
@@ -618,6 +624,14 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
   const annual = bal.filter(b => b.quarter === 4).slice(0, 5).reverse();
   const latest = bal[0];
 
+  const barItems = latest ? [
+    { label: 'Tổng tài sản', val: latest.total_assets, max: latest.total_assets, color: '#00d4ff' },
+    { label: 'Vốn chủ sở hữu', val: latest.total_equity, max: latest.total_assets, color: '#00ff88' },
+    { label: 'Tổng nợ', val: latest.total_debt, max: latest.total_assets, color: '#ff9500' },
+    { label: 'Nợ ngắn hạn', val: latest.short_term_debt, max: latest.total_assets, color: '#ff3366' },
+    { label: 'Tiền mặt', val: latest.cash, max: latest.total_assets, color: '#a78bfa' },
+  ] : [];
+
   return (
     <div className="space-y-3">
       {latest && (
@@ -625,13 +639,7 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
           <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
             BẢNG CÂN ĐỐI — Q{latest.quarter}/{latest.year}
           </div>
-          {([
-            { label: 'Tổng tài sản', val: latest.total_assets, max: latest.total_assets, color: '#00d4ff' },
-            { label: 'Vốn chủ sở hữu', val: latest.total_equity, max: latest.total_assets, color: '#00ff88' },
-            { label: 'Tổng nợ', val: latest.total_debt, max: latest.total_assets, color: '#ff9500' },
-            { label: 'Nợ ngắn hạn', val: latest.short_term_debt, max: latest.total_assets, color: '#ff3366' },
-            { label: 'Tiền mặt', val: latest.cash, max: latest.total_assets, color: '#a78bfa' },
-          ]).map(({ label, val, max, color }) => (
+          {barItems.map(({ label, val, max, color }) => (
             <div key={label} className="mb-2">
               <div className="flex justify-between mb-1">
                 <span className="text-[10px]" style={{ color: '#8b99a8' }}>{label}</span>
@@ -643,10 +651,10 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
             </div>
           ))}
           <div className="grid grid-cols-2 gap-2 mt-3">
-            {([
-              { label: 'Đòn bẩy (D/E)', val: `${(latest.total_debt / latest.total_equity).toFixed(2)}x`, color: latest.total_debt / latest.total_equity > 2 ? '#ff3366' : '#00d4ff' },
-              { label: 'Cash / Equity', val: `${((latest.cash / latest.total_equity) * 100).toFixed(1)}%`, color: '#a78bfa' },
-            ]).map(({ label, val, color }) => (
+            {latest ? [
+              { label: 'Đòn bẩy (D/E)', val: (latest.total_debt / latest.total_equity).toFixed(2) + 'x', color: latest.total_debt / latest.total_equity > 2 ? '#ff3366' : '#00d4ff' },
+              { label: 'Cash / Equity', val: ((latest.cash / latest.total_equity) * 100).toFixed(1) + '%', color: '#a78bfa' },
+            ].map(({ label, val, color }) => (
               <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
                 <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
                 <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
@@ -694,18 +702,34 @@ function StatsTab({ stock }: { stock: Stock }) {
   const volumes = stock.volume_history ?? [];
   const dates = stock.dates ?? [];
 
+  const perfItems = [
+    { label: '1 Ngày', val: stock.change_1d },
+    { label: '5 Ngày', val: stock.change_5d },
+    { label: '20 Ngày', val: stock.change_20d },
+  ];
+  const rsi = stock.rsi14 ?? 50;
+  const adx = stock.adx14 ?? 0;
+  const ma20diff = stock.pct_from_ma20 ?? 0;
+  const ma50diff = stock.pct_from_ma50 ?? 0;
+  const indicatorItems = [
+    { label: 'RSI (14)', val: stock.rsi14 != null ? stock.rsi14.toFixed(0) : '–', color: rsi > 70 ? '#ff3366' : rsi < 30 ? '#00ff88' : '#ffcc00', note: rsi > 70 ? 'Overbought' : rsi < 30 ? 'Oversold' : 'Normal' },
+    { label: 'ADX (14)', val: stock.adx14 != null ? stock.adx14.toFixed(0) : '–', color: adx >= 25 ? '#00d4ff' : '#8b99a8', note: adx >= 30 ? 'Strong trend' : 'Moderate' },
+    { label: '+DI', val: stock.plus_di14 != null ? stock.plus_di14.toFixed(1) : '–', color: '#00ff88', note: 'Bull pressure' },
+    { label: '-DI', val: stock.minus_di14 != null ? stock.minus_di14.toFixed(1) : '–', color: '#ff3366', note: 'Bear pressure' },
+    { label: 'Từ MA20', val: stock.pct_from_ma20 != null ? (ma20diff >= 0 ? '+' : '') + ma20diff.toFixed(1) + '%' : '–', color: ma20diff >= 0 ? '#00d4ff' : '#ff9500', note: 'vs MA20' },
+    { label: 'Từ MA50', val: stock.pct_from_ma50 != null ? (ma50diff >= 0 ? '+' : '') + ma50diff.toFixed(1) + '%' : '–', color: ma50diff >= 0 ? '#00d4ff' : '#ff9500', note: 'vs MA50' },
+    { label: 'Vol Ratio', val: stock.vol_ratio != null ? stock.vol_ratio.toFixed(2) : '–', color: (stock.vol_ratio ?? 1) >= 1.5 ? '#ffcc00' : '#8b99a8', note: 'Volume vs MA' },
+    { label: 'ATR %', val: stock.atr_pct != null ? stock.atr_pct.toFixed(2) : '–', color: '#a78bfa', note: 'Volatility' },
+  ];
+
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
-        {([
-          { label: '1 Ngày', val: stock.change_1d },
-          { label: '5 Ngày', val: stock.change_5d },
-          { label: '20 Ngày', val: stock.change_20d },
-        ]).map(({ label, val }) => (
+        {perfItems.map(({ label, val }) => (
           <div key={label} className="p-2.5 rounded-lg text-center" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
             <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color: (val ?? 0) >= 0 ? '#00ff88' : '#ff3366' }}>
-              {val != null ? `${val >= 0 ? '+' : ''}${val.toFixed(2)}%` : '–'}
+              {val != null ? (val >= 0 ? '+' : '') + val.toFixed(2) + '%' : '–'}
             </div>
           </div>
         ))}
@@ -716,8 +740,8 @@ function StatsTab({ stock }: { stock: Stock }) {
           { label: 'ADX (14)', val: stock.adx14?.toFixed(0) ?? '–', color: (stock.adx14 ?? 0) >= 25 ? '#00d4ff' : '#8b99a8', note: (stock.adx14 ?? 0) >= 30 ? 'Strong trend' : 'Moderate' },
           { label: '+DI', val: stock.plus_di14?.toFixed(1) ?? '–', color: '#00ff88', note: 'Bull pressure' },
           { label: '-DI', val: stock.minus_di14?.toFixed(1) ?? '–', color: '#ff3366', note: 'Bear pressure' },
-          { label: 'Từ MA20', val: stock.pct_from_ma20 != null ? `${stock.pct_from_ma20 >= 0 ? '+' : ''}${stock.pct_from_ma20.toFixed(1)}%` : '–', color: (stock.pct_from_ma20 ?? 0) >= 0 ? '#00d4ff' : '#ff9500', note: 'vs MA20' },
-          { label: 'Từ MA50', val: stock.pct_from_ma50 != null ? `${stock.pct_from_ma50 >= 0 ? '+' : ''}${stock.pct_from_ma50.toFixed(1)}%` : '–', color: (stock.pct_from_ma50 ?? 0) >= 0 ? '#00d4ff' : '#ff9500', note: 'vs MA50' },
+          { label: 'Từ MA20', val: stock.pct_from_ma20 != null ? (ma20diff >= 0 ? '+' : '') + ma20diff.toFixed(1) + '%' : '–', color: (stock.pct_from_ma20 ?? 0) >= 0 ? '#00d4ff' : '#ff9500', note: 'vs MA20' },
+          { label: 'Từ MA50', val: stock.pct_from_ma50 != null ? (ma50diff >= 0 ? '+' : '') + ma50diff.toFixed(1) + '%' : '–', color: (stock.pct_from_ma50 ?? 0) >= 0 ? '#00d4ff' : '#ff9500', note: 'vs MA50' },
           { label: 'Vol Ratio', val: stock.vol_ratio?.toFixed(2) ?? '–', color: (stock.vol_ratio ?? 1) >= 1.5 ? '#ffcc00' : '#8b99a8', note: 'Volume vs MA' },
           { label: 'ATR %', val: stock.atr_pct?.toFixed(2) ?? '–', color: '#a78bfa', note: 'Volatility' },
         ]).map(({ label, val, color, note }) => (
@@ -762,7 +786,7 @@ function StatsTab({ stock }: { stock: Stock }) {
                         {chg >= 0 ? '+' : ''}{chg.toFixed(2)}%
                       </td>
                       <td className="p-2 text-right font-mono" style={{ color: volRatio >= 1.5 ? '#ffcc00' : '#8b99a8' }}>
-                        {isFinite(volRatio) ? `${volRatio.toFixed(1)}x` : '–'}
+                        {isFinite(volRatio) ? volRatio.toFixed(1) + 'x' : '–'}
                       </td>
                     </tr>
                   );
@@ -878,9 +902,9 @@ export default function StockModal({
                 <span
                   className="px-2 py-0.5 rounded text-[10px] font-bold"
                   style={{
-                    background: `${tierColor}20`,
+                    background: (tierColor) + '20',
                     color: tierColor,
-                    border: `1px solid ${tierColor}40`,
+                    border: '1px solid ' + (tierColor) + '40',
                   }}
                 >
                   {stock.tier}
@@ -919,9 +943,9 @@ export default function StockModal({
               <div
                 className="px-3 py-1.5 rounded-lg font-bold text-sm flex items-center gap-1.5"
                 style={{
-                  background: `${recDisplay.color}20`,
+                  background: (recDisplay.color) + '20',
                   color: recDisplay.color,
-                  border: `1px solid ${recDisplay.color}50`,
+                  border: '1px solid ' + (recDisplay.color) + '50',
                   boxShadow: '0 0 15px ' + (recDisplay.color) + '30',
                 }}
               >
