@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search, Star, BarChart3, X } from 'lucide-react';
 import type { Stock, Sector, AIAnalysis, ICTSignal, ICTSignalsResponse, SummaryResponse, PriceBoardResponse } from '@/lib/types';
 import { getDashboardData, getSummary, loadPrices, getPriceBoard, formatPrice, formatPercent, getScoreColor, getTierColor, getICTSignals } from '@/lib/api';
+import { getStockSignal } from '@/lib/signals';
 import IndustryFlow from './IndustryFlow';
 import ICTDashboard from './ICTDashboard';
 import MarketBreadth from './MarketBreadth';
@@ -65,34 +66,14 @@ function PriceChange({ value }: { value?: number }) {
   );
 }
 
-function SignalBadge({ score, foreignNet7d }: { score: number; foreignNet7d?: number }) {
-  const nn = foreignNet7d ?? 0;
-  let label: string;
-  let color: string;
-  let bg: string;
-  let border: string;
-
-  if (score >= 72) {
-    label = 'STRONG BUY'; color = '#00ff88'; bg = '#00ff8822'; border = '#00ff8850';
-  } else if (score >= 62) {
-    label = 'BUY';        color = '#00ff88'; bg = '#00ff8814'; border = '#00ff8838';
-  } else if (score >= 52) {
-    label = 'HOLD';       color = '#ffcc00'; bg = '#ffcc0014'; border = '#ffcc0040';
-  } else if (score >= 42) {
-    label = 'REDUCE';     color = '#ff9500'; bg = '#ff950014'; border = '#ff950040';
-  } else {
-    label = 'SELL';       color = '#ff3366'; bg = '#ff336614'; border = '#ff336640';
-  }
-  // Boost: strong foreign buy + near-BUY score
-  if (label === 'HOLD' && nn > 100 && score >= 58) {
-    label = 'BUY'; color = '#00ff88'; bg = '#00ff8814'; border = '#00ff8838';
-  }
+function SignalBadge({ stock, ict }: { stock: Stock; ict?: import('@/lib/types').ICTSignal }) {
+  const sig = getStockSignal(stock, ict);
   return (
     <span
       className="px-1.5 py-0.5 rounded font-bold text-[9px] tracking-wide whitespace-nowrap"
-      style={{ color, background: bg, border: `1px solid ${border}`, boxShadow: `0 0 8px ${color}20` }}
+      style={{ color: sig.color, background: sig.bg, border: `1px solid ${sig.border}`, boxShadow: `0 0 8px ${sig.color}20` }}
     >
-      {label}
+      {sig.label}
     </span>
   );
 }
@@ -607,7 +588,7 @@ export default function Dashboard() {
                       <td className="p-2 text-right"><PriceChange value={s.change_20d} /></td>
                       <td className="p-2 text-right"><ScoreBadge value={s.composite_score} /></td>
                       <td className="p-2 text-center">
-                        <SignalBadge score={s.composite_score} foreignNet7d={s.foreign_net_7d} />
+                        <SignalBadge stock={s} ict={ictMap[s.symbol]} />
                       </td>
                       <td className="p-2 text-right font-mono text-[10px]" style={{
                         color: (s.foreign_net_7d || 0) >= 0 ? '#00ff88' : '#ff3366',
