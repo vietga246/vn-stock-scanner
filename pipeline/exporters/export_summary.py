@@ -90,7 +90,7 @@ def get_vnindex() -> dict:
 # ─── TOP MOVERS ────────────────────────────────────────────────────────────
 
 def get_top_movers(screener_path: str) -> dict:
-    """Lấy top gainers/losers từ screener.json."""
+    """Lấy top gainers/losers từ screener.json, cross-check với price_board."""
     result = {
         "top_gainers": [],
         "top_losers": [],
@@ -98,53 +98,92 @@ def get_top_movers(screener_path: str) -> dict:
         "foreign_buy": [],
         "foreign_sell": [],
     }
-    
+
     try:
         if not os.path.exists(screener_path):
             return result
-        
+
         with open(screener_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        
+
         stocks = data.get("screener", [])
-        
-        # Filter stocks with valid price change data
-        with_change = [s for s in stocks if s.get("price_change_1d") is not None]
-        
-        # Sort by 1D change
+
+        # ── Load price_board để lấy danh sách stocks có giao dịch thực hôm nay ──
+        pb_valid_symbols: set = set()
+        pb_stocks_map: dict = {}
+        pb_path = os.path.join(os.path.dirname(screener_path), "price_board.json")
+        if os.path.exists(pb_path):
+            try:
+                with open(pb_path, "r", encoding="utf-8") as f:
+                    pb_data = json.load(f)
+                for s in pb_data.get("stocks", []):
+                    sym = s.get("symbol")
+                    if sym and (s.get("match_price") or 0) > 0:
+                        pb_valid_symbols.add(sym)
+                        pb_stocks_map[sym] = s
+            except Exception as e:
+                log.warning("Không đọc được price_board.json: %s", e)
+
+        # ── Top gainers / losers — chỉ stocks có giao dịch thực hôm nay ──
+        with_change = [
+            s for s in stocks
+            if s.get("price_change_1d") is not None
+            and (not pb_valid_symbols or s["symbol"] in pb_valid_symbols)
+        ]
+
         sorted_by_change = sorted(with_change, key=lambda x: x.get("price_change_1d", 0), reverse=True)
         result["top_gainers"] = [
-            {"symbol": s["symbol"], "change": s.get("price_change_1d")} 
+            {"symbol": s["symbol"], "change": round(s["price_change_1d"], 2)}
             for s in sorted_by_change[:10]
+            if s.get("price_change_1d", 0) > 0
         ]
         result["top_losers"] = [
-            {"symbol": s["symbol"], "change": s.get("price_change_1d")} 
-            for s in sorted_by_change[-10:][::-1]
+            {"symbol": s["symbol"], "change": round(s["price_change_1d"], 2)}
+            for s in reversed(sorted_by_change[-10:])
+            if s.get("price_change_1d", 0) < 0
         ]
-        
-        # Sort by volume (most active)
-        with_volume = [s for s in stocks if s.get("volume") is not None and s.get("volume", 0) > 0]
-        sorted_by_volume = sorted(with_volume, key=lambda x: x.get("volume", 0), reverse=True)
-        result["most_active"] = [
-            {"symbol": s["symbol"], "volume": s.get("volume")} 
-            for s in sorted_by_volume[:10]
-        ]
-        
-        # Sort by foreign net (buy/sell)
+
+        # ── Most active — từ price_board.total_traded_value (đơn vị: triệu đồng) ──
+        if pb_stocks_map:
+            pb_active = sorted(
+                [s for s in pb_stocks_map.values() if (s.get("total_traded_value") or 0) > 0],
+                key=lambda x: x.get("total_traded_value", 0),
+                reverse=True
+            )
+            result["most_active"] = [
+                {
+                    "symbol": s["symbol"],
+                    # total_traded_value đơn vị triệu đồng → /1000 = tỷ đồng
+                    "value_bn": round(s["total_traded_value"] / 1000, 1),
+                }
+                for s in pb_active[:10]
+            ]
+        else:
+            # Fallback: dùng volume từ screener nếu không có price_board
+            with_volume = [s for s in stocks if (s.get("volume") or 0) > 0]
+            sorted_by_volume = sorted(with_volume, key=lambda x: x.get("volume", 0), reverse=True)
+            result["most_active"] = [
+                {"symbol": s["symbol"], "value_bn": None}
+                for s in sorted_by_volume[:10]
+            ]
+
+        # ── Foreign buy/sell — từ screener foreign_net_7d ──
         with_foreign = [s for s in stocks if s.get("foreign_net_7d") is not None]
         sorted_by_foreign = sorted(with_foreign, key=lambda x: x.get("foreign_net_7d", 0), reverse=True)
         result["foreign_buy"] = [
-            {"symbol": s["symbol"], "net": s.get("foreign_net_7d")} 
-            for s in sorted_by_foreign[:10] if s.get("foreign_net_7d", 0) > 0
+            {"symbol": s["symbol"], "net": round(s["foreign_net_7d"], 1)}
+            for s in sorted_by_foreign[:10]
+            if s.get("foreign_net_7d", 0) > 0
         ]
         result["foreign_sell"] = [
-            {"symbol": s["symbol"], "net": s.get("foreign_net_7d")} 
-            for s in sorted_by_foreign[-10:][::-1] if s.get("foreign_net_7d", 0) < 0
+            {"symbol": s["symbol"], "net": round(s["foreign_net_7d"], 1)}
+            for s in reversed(sorted_by_foreign[-10:])
+            if s.get("foreign_net_7d", 0) < 0
         ]
-        
+
     except Exception as e:
         log.warning("Không lấy được top movers: %s", e)
-    
+
     return result
 
 
