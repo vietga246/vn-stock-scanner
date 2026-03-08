@@ -45,10 +45,10 @@ function TierBadge({ tier }: { tier: string }) {
 }
 
 function PriceChange({ value }: { value?: number }) {
-  if (value === undefined || Math.abs(value) < 0.01) {
+  if (value === undefined || value === null || Math.abs(value) < 0.01) {
     return (
-      <span className="font-mono text-[10px]" style={{ color: '#4a5a6a' }}>
-        0.00%
+      <span className="font-mono text-[10px]" style={{ color: '#2a3642' }}>
+        —
       </span>
     );
   }
@@ -591,10 +591,11 @@ export default function Dashboard() {
                         <SignalBadge stock={s} ict={ictMap[s.symbol]} />
                       </td>
                       <td className="p-2 text-right font-mono text-[10px]" style={{
-                        color: (s.foreign_net_7d || 0) >= 0 ? '#00ff88' : '#ff3366',
-                        textShadow: `0 0 6px ${(s.foreign_net_7d || 0) >= 0 ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,102,0.3)'}`,
+                        color: s.foreign_net_7d == null ? '#2a3642' : s.foreign_net_7d >= 0 ? '#00ff88' : '#ff3366',
                       }}>
-                        {(s.foreign_net_7d || 0) >= 0 ? '+' : ''}{Math.abs(s.foreign_net_7d || 0) >= 1000 ? ((s.foreign_net_7d || 0) / 1000).toFixed(2) + 'TB' : (s.foreign_net_7d || 0).toFixed(1) + 'B'}
+                        {s.foreign_net_7d == null
+                          ? '—'
+                          : `${s.foreign_net_7d >= 0 ? '+' : ''}${Math.abs(s.foreign_net_7d) >= 1000 ? (s.foreign_net_7d / 1000).toFixed(2) + 'T' : s.foreign_net_7d.toFixed(1) + 'B'}`}
                       </td>
                       <td className="p-2 text-right">
                         {s.adx14 != null ? (
