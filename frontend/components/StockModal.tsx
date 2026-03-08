@@ -1134,5 +1134,6 @@ export default function StockModal({
         </div>
       </div>
     </div>
+  </div>
   );
 }
