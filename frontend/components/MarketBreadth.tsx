@@ -383,25 +383,27 @@ export default function MarketBreadth({
             </span>
           </div>
           <div className="flex flex-wrap gap-1">
-            {mostActive.slice(0, 5).map((s) => (
-              <div
-                key={s.symbol}
-                className="flex items-center gap-1 px-1.5 py-0.5 rounded cursor-pointer transition-all"
-                style={{ background: '#00d4ff10', border: '1px solid #00d4ff25' }}
-                onClick={() => onSymbolClick?.(s.symbol)}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00d4ff25'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00d4ff55'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00d4ff10'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00d4ff25'; }}
-              >
-                <span className="font-semibold text-[10px]">{s.symbol}</span>
-                <span className="font-mono text-[9px]" style={{ color: '#00d4ff' }}>
-                  {s.total_traded_value != null
-                    ? s.total_traded_value >= 1e9
-                      ? (s.total_traded_value / 1e9).toFixed(1) + 'T'
-                      : (s.total_traded_value / 1e6).toFixed(0) + 'M'
-                    : '—'}
-                </span>
-              </div>
-            ))}
+            {mostActive.slice(0, 5).map((s) => {
+              // total_traded_value đơn vị: triệu đồng → /1000 = tỷ
+              const tyValue = s.total_traded_value != null ? s.total_traded_value / 1000 : null;
+              const tvLabel = tyValue == null ? '—'
+                : tyValue >= 1000 ? (tyValue / 1000).toFixed(1) + 'nghìn tỷ'
+                : tyValue >= 100  ? Math.round(tyValue) + 'T'
+                : tyValue.toFixed(0) + 'T';
+              return (
+                <div
+                  key={s.symbol}
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded cursor-pointer transition-all"
+                  style={{ background: '#00d4ff10', border: '1px solid #00d4ff25' }}
+                  onClick={() => onSymbolClick?.(s.symbol)}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00d4ff25'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00d4ff55'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#00d4ff10'; (e.currentTarget as HTMLDivElement).style.border = '1px solid #00d4ff25'; }}
+                >
+                  <span className="font-semibold text-[10px]">{s.symbol}</span>
+                  <span className="font-mono text-[9px]" style={{ color: '#00d4ff' }}>{tvLabel}</span>
+                </div>
+              );
+            })}
             {mostActive.length === 0 && (
               <span className="text-[10px]" style={{ color: '#2a3642' }}>
                 —
@@ -446,7 +448,7 @@ export default function MarketBreadth({
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
-            {(summary?.foreign_buy ?? []).slice(0, 2).map((s) => (
+            {(summary?.foreign_buy ?? []).slice(0, 3).map((s) => (
               <div
                 key={s.symbol}
                 className="flex items-center justify-between text-[9px] px-1.5 py-0.5 rounded cursor-pointer transition-all"
@@ -457,11 +459,11 @@ export default function MarketBreadth({
               >
                 <span className="font-semibold">{s.symbol}</span>
                 <span className="font-mono" style={{ color: '#00ff88' }}>
-                  +{s.net.toFixed(1)}B
+                  +{Math.abs(s.net) >= 1000 ? (s.net/1000).toFixed(1)+'T' : s.net.toFixed(0)+'B'}
                 </span>
               </div>
             ))}
-            {(summary?.foreign_sell ?? []).slice(0, 2).map((s) => (
+            {(summary?.foreign_sell ?? []).slice(0, 3).map((s) => (
               <div
                 key={s.symbol}
                 className="flex items-center justify-between text-[9px] px-1.5 py-0.5 rounded cursor-pointer transition-all"
@@ -472,7 +474,7 @@ export default function MarketBreadth({
               >
                 <span className="font-semibold">{s.symbol}</span>
                 <span className="font-mono" style={{ color: '#ff3366' }}>
-                  {s.net.toFixed(1)}B
+                  {Math.abs(s.net) >= 1000 ? (s.net/1000).toFixed(1)+'T' : s.net.toFixed(0)+'B'}
                 </span>
               </div>
             ))}
