@@ -20,7 +20,7 @@ export async function fetchGithubData<T>(
         'User-Agent': 'VN-Stock-Scanner/1.0',
       },
       next: { revalidate: 300 }, // ISR: cache 5 minutes on server
-    });
+    } as RequestInit & { next?: { revalidate?: number } });
 
     if (!response.ok) {
       return NextResponse.json(fallback);
