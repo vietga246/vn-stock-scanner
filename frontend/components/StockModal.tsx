@@ -404,6 +404,12 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
   };
   const colPct = (v: number) => v >= 20 ? '#00ff88' : v >= 10 ? '#00d4ff' : v >= 0 ? '#ffcc00' : '#ff3366';
 
+  if (!detail) return (
+    <div className="flex items-center justify-center py-12 text-[11px]" style={{ color: '#4a5a6a' }}>
+      {detailLoading ? 'Đang tải dữ liệu tài chính...' : 'Không có dữ liệu tài chính'}
+    </div>
+  );
+
   const income = [...detail.income].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6);
   const ratio = [...detail.ratio].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
   const latestR = ratio[0] ?? null;
