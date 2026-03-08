@@ -859,32 +859,21 @@ export default function StockModal({
       .finally(() => setDetailLoading(false));
   }, [stock, activeTab, detail]);
 
-  if (!stock) return null;
-
   const close = () => {
     setVisible(false);
     setTimeout(onClose, 150);
   };
 
-  // Use preloaded AI analysis or generate on-the-fly
-  const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus);
-  // Desk analysis — prop trading style
-  const deskAnalysis = generateDeskAnalysis(stock, ictSignal, sectorStatus);
-  const recDisplay = getRecommendationDisplay(analysis.recommendation);
-  const tierColor = getTierColor(stock.tier);
-  const price = stock.close || stock.price || 0;
-  const change = stock.change_20d || stock.change_5d || 0;
+  const analysis = stock ? (preloadedAnalysis || generateAnalysis(stock, sectorStatus)) : null;
+  const deskAnalysis = stock ? generateDeskAnalysis(stock, ictSignal, sectorStatus) : null;
+  const recDisplay = analysis ? getRecommendationDisplay(analysis.recommendation) : null;
+  const tierColor = stock ? getTierColor(stock.tier) : '#8b99a8';
+  const price = stock ? (stock.close || stock.price || 0) : 0;
+  const tabList = ictSignal
+    ? [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }, { id: 'ict', label: '🧠 ICT', icon: Zap }]
+    : [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }];
 
-  const baseTabs = [
-    { id: 'analysis', label: 'Phân tích', icon: Target },
-    { id: 'scores', label: 'Điểm số', icon: Activity },
-    { id: 'finance', label: 'Tài chính', icon: BarChart3 },
-    { id: 'trading', label: 'Giao dịch', icon: TrendingUp },
-    { id: 'capital', label: 'Vốn', icon: Shield },
-    { id: 'stats', label: 'Thống kê', icon: Activity },
-  ];
-  let tabList = [...baseTabs];
-  if (ictSignal) { tabList = [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Zap }]; }
+  if (!stock || !analysis || !deskAnalysis || !recDisplay) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -954,9 +943,9 @@ export default function StockModal({
               <div className="flex items-center gap-2 mt-1">
                 <span
                   className="font-mono font-semibold text-sm"
-                  style={{ color: change >= 0 ? '#00ff88' : '#ff3366' }}
+                  style={{ color: (stock.change_20d || stock.change_5d || 0) >= 0 ? '#00ff88' : '#ff3366' }}
                 >
-                  {formatPercent(change)}
+                  {formatPercent(stock.change_20d || stock.change_5d || 0)}
                 </span>
                 <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
                   20D
