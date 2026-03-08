@@ -347,16 +347,12 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
           <span className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>conf: {signal.ict_confluence}</span>
         </td>
 
-        {/* acc/dist */}
-        <td className="px-2 pb-2 pt-0 text-right">
-          <span className="text-[8px]" style={{ color: accCol }}>{accLabel}</span>
-        </td>
+        {/* VOL sub: empty — vol_spike already on row1 */}
+        <td className="px-2 pb-2 pt-0 text-right" />
 
-        {/* foreign net */}
+        {/* FLOW sub: acc/dist label */}
         <td className="px-2 pb-2 pt-0 text-center">
-          {signal.foreign_net_7d != null ? (
-            <span className="font-mono text-[9px]" style={{ color: flowCol }}>{fmtBn(signal.foreign_net_7d)}</span>
-          ) : null}
+          <span className="text-[8px]" style={{ color: accCol }}>{accLabel}</span>
         </td>
 
         {/* 5D */}
