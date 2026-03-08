@@ -634,15 +634,15 @@ export default function ICTDashboard() {
       <div className="rounded-xl overflow-hidden" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
         <table style={{ width: '100%', tableLayout: 'fixed' }}>
           <colgroup>
-            <col style={{ width: '32px' }} />       {/* # */}
-            <col />                                  {/* SYMBOL — auto fills remaining */}
-            <col style={{ width: '130px' }} />      {/* SCORE */}
-            <col style={{ width: '110px' }} />      {/* STRUCTURE */}
-            <col style={{ width: '160px' }} />      {/* ICT SIGNALS */}
-            <col style={{ width: '80px' }} />       {/* VOL */}
-            <col style={{ width: '110px' }} />      {/* FLOW */}
-            <col style={{ width: '90px' }} />       {/* 1D/5D */}
-            <col style={{ width: '100px' }} />      {/* ADX/RSI */}
+            <col style={{ width: '32px' }} />
+            <col style={{ width: '20%', minWidth: '150px' }} />
+            <col style={{ width: '13%', minWidth: '110px' }} />
+            <col style={{ width: '10%', minWidth: '90px' }} />
+            <col style={{ width: '15%', minWidth: '130px' }} />
+            <col style={{ width: '7%',  minWidth: '70px' }} />
+            <col style={{ width: '10%', minWidth: '90px' }} />
+            <col style={{ width: '8%',  minWidth: '80px' }} />
+            <col style={{ width: '9%',  minWidth: '90px' }} />
           </colgroup>
           <thead>
             <tr style={{ background: '#0a0f14' }}>
