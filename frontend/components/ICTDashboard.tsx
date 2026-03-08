@@ -254,17 +254,19 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
 
       {/* Alpha score */}
       <td className="p-2 text-right">
-        <div className="font-mono font-bold text-xs" style={{ color: qCol }}>
-          {fmt(signal.alpha_score)}
+        <div className="flex items-center justify-end gap-1.5">
+          <div className="font-mono font-bold text-xs" style={{ color: qCol }}>
+            {fmt(signal.alpha_score)}
+          </div>
+          {signal.signal_breakdown?.rs_sector != null && (
+            <div className="font-mono text-[8px] px-1 rounded" style={{ color: signal.signal_breakdown.rs_sector >= 80 ? '#00ff88' : signal.signal_breakdown.rs_sector >= 65 ? '#00d4ff' : '#4a5a6a', background: '#1e283240' }}>
+              rs{signal.signal_breakdown.rs_sector.toFixed(0)}
+            </div>
+          )}
         </div>
         <div className="font-mono text-[9px]" style={{ color: '#4a5a6a' }}>
           ict {fmt(signal.ict_score)}
         </div>
-        {signal.signal_breakdown?.rs_sector != null && (
-          <div className="font-mono text-[8px]" style={{ color: signal.signal_breakdown.rs_sector >= 70 ? '#00ff88' : '#4a5a6a' }}>
-            rs {signal.signal_breakdown.rs_sector.toFixed(0)}
-          </div>
-        )}
       </td>
 
       {/* Structure */}
@@ -282,21 +284,21 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
       {/* ICT Signals */}
       <td className="p-2">
         <div className="flex gap-1 flex-wrap">
-          {signal.fvg_bull && (
+          {!!signal.fvg_bull && (
             <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}>FVG</span>
           )}
-          {signal.ob_bull && !signal.ob_mitigated && (
+          {!!signal.ob_bull && !signal.ob_mitigated && (
             <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}>
               {signal.ob_price_at ? 'OB🎯' : 'OB'}
             </span>
           )}
-          {signal.sweep_bull && (
+          {!!signal.sweep_bull && (
             <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}>SWP</span>
           )}
-          {signal.stop_hunt_bull && (
+          {!!signal.stop_hunt_bull && (
             <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ff950015', color: '#ff9500', border: '1px solid #ff950030' }}>HUNT</span>
           )}
-          {signal.breakout_imminent && (
+          {!!signal.breakout_imminent && (
             <span className="px-1 py-0.5 rounded text-[8px]" style={{ background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}>BRK</span>
           )}
           {!signal.fvg_bull && !signal.ob_bull && !signal.sweep_bull && !signal.stop_hunt_bull && !signal.breakout_imminent && (
@@ -316,7 +318,7 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
         >
           {fmt(signal.vol_spike, 1)}x
         </div>
-        <div className="text-[8px]" style={{ color: '#4a5a6a' }}>
+        <div className="text-[8px]" style={{ color: signal.accumulation_score >= 65 ? '#00ff88' : signal.distribution_score >= 65 ? '#ff3366' : '#4a5a6a' }}>
           {signal.accumulation_score >= 65 ? 'ACC' : signal.distribution_score >= 65 ? 'DIST' : 'NEU'}
         </div>
       </td>
@@ -335,12 +337,20 @@ function SignalRow({ signal, onClick }: { key?: string; signal: ICTSignal; onCli
 
       {/* Price change */}
       <td className="p-2 text-right">
-        <div className="font-mono text-[10px]" style={{ color: p1d >= 0 ? '#00ff88' : '#ff3366' }}>
-          {pct(p1d)}
-        </div>
-        <div className="font-mono text-[9px]" style={{ color: p5d >= 0 ? '#00ff8888' : '#ff336688' }}>
-          {pct(p5d)}
-        </div>
+        {signal.price_change_1d != null ? (
+          <div className="font-mono text-[10px]" style={{ color: p1d >= 0 ? '#00ff88' : '#ff3366' }}>
+            {pct(p1d)}
+          </div>
+        ) : (
+          <div className="font-mono text-[10px]" style={{ color: '#2a3642' }}>—</div>
+        )}
+        {signal.price_change_5d != null ? (
+          <div className="font-mono text-[9px]" style={{ color: p5d >= 0 ? '#00ff8888' : '#ff336688' }}>
+            {pct(p5d)}
+          </div>
+        ) : (
+          <div className="font-mono text-[9px]" style={{ color: '#2a3642' }}>—</div>
+        )}
       </td>
 
       {/* ADX / RSI */}
