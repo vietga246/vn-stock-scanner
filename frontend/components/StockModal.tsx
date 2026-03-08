@@ -398,105 +398,117 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
 // ─── Finance Tab ─────────────────────────────────────────────────────────────
 function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-  const fmtB = (v: number | null | undefined) => v == null ? '–' : Math.abs(v) >= 1000 ? ((v / 1000).toFixed(1)) + 'T' : (v.toFixed(0)) + 'B';
+  const fmtB = (v: number | null | undefined) => {
+    if (v == null) return '–';
+    return Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'T' : v.toFixed(0) + 'B';
+  };
   const colPct = (v: number) => v >= 20 ? '#00ff88' : v >= 10 ? '#00d4ff' : v >= 0 ? '#ffcc00' : '#ff3366';
-  const cf6 = detail?.cashflow ? [...detail.cashflow].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6) : [];
 
-  if (detailLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải dữ liệu tài chính...</div>
-      </div>
-    );
-  }
-  if (!detail) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu chi tiết</div>
-      </div>
-    );
-  }
-
-  const income = [...detail.income].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 8);
+  const income = [...detail.income].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6);
   const ratio = [...detail.ratio].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
-  const latestR = ratio[0];
-
-  const ratioItems = latestR ? [
-    { label: 'P/E', val: latestR.pe != null ? latestR.pe.toFixed(1) : '–', note: 'x', color: undefined },
-    { label: 'P/B', val: latestR.pb != null ? latestR.pb.toFixed(2) : '–', note: 'x', color: undefined },
-    { label: 'EV/EBITDA', val: latestR.ev_ebitda != null ? latestR.ev_ebitda.toFixed(1) : '–', note: 'x', color: undefined },
-    { label: 'ROE', val: latestR.roe != null ? latestR.roe.toFixed(1) : '–', note: '%', color: colPct(latestR.roe ?? 0) },
-    { label: 'ROA', val: latestR.roa != null ? latestR.roa.toFixed(1) : '–', note: '%', color: colPct(latestR.roa ?? 0) },
-    { label: 'ROIC', val: latestR.roic != null ? latestR.roic.toFixed(1) : '–', note: '%', color: colPct(latestR.roic ?? 0) },
-    { label: 'Gross Margin', val: latestR.gross_margin != null ? latestR.gross_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.gross_margin ?? 0) },
-    { label: 'Net Margin', val: latestR.net_margin != null ? latestR.net_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.net_margin ?? 0) },
-    { label: 'D/E', val: latestR.debt_equity != null ? latestR.debt_equity.toFixed(2) : '–', note: 'x', color: undefined },
-  ] : [];
+  const latestR = ratio[0] ?? null;
+  const cf = [...detail.cashflow].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6);
 
   return (
     <div className="space-y-3">
-      {ratioItems.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {ratioItems.map(({ label, val, note, color }) => (
-            <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-              <div className="text-[8px] mb-1 tracking-wide" style={{ color: '#4a5a6a' }}>{label}</div>
-              <div className="font-mono font-bold text-[13px]" style={{ color: color ?? '#e8edf2' }}>
-                {val}<span className="text-[9px] font-normal ml-0.5" style={{ color: '#4a5a6a' }}>{note}</span>
+      {latestR && (
+        <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+          <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
+            CHỈ SỐ ĐỊNH GIÁ & HIỆU QUẢ
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: 'P/E', val: latestR.pe != null ? latestR.pe.toFixed(1) : '–', note: 'x', color: undefined as string | undefined },
+              { label: 'P/B', val: latestR.pb != null ? latestR.pb.toFixed(2) : '–', note: 'x', color: undefined as string | undefined },
+              { label: 'EV/EBITDA', val: latestR.ev_ebitda != null ? latestR.ev_ebitda.toFixed(1) : '–', note: 'x', color: undefined as string | undefined },
+              { label: 'ROE', val: latestR.roe != null ? latestR.roe.toFixed(1) : '–', note: '%', color: colPct(latestR.roe ?? 0) },
+              { label: 'ROA', val: latestR.roa != null ? latestR.roa.toFixed(1) : '–', note: '%', color: colPct(latestR.roa ?? 0) },
+              { label: 'ROIC', val: latestR.roic != null ? latestR.roic.toFixed(1) : '–', note: '%', color: colPct(latestR.roic ?? 0) },
+              { label: 'Gross Margin', val: latestR.gross_margin != null ? latestR.gross_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.gross_margin ?? 0) },
+              { label: 'Net Margin', val: latestR.net_margin != null ? latestR.net_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.net_margin ?? 0) },
+              { label: 'D/E', val: latestR.debt_equity != null ? latestR.debt_equity.toFixed(2) : '–', note: 'x', color: undefined as string | undefined },
+            ].map(({ label, val, note, color }) => (
+              <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
+                <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+                <div className="font-mono text-xs font-bold" style={{ color: color || '#e2e8f0' }}>
+                  {val}<span className="text-[9px] ml-0.5" style={{ color: '#4a5a6a' }}>{note}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
-      <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-        <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
-          DOANH THU & LỢI NHUẬN (tỷ đồng)
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-[10px]">
-            <thead>
-              <tr style={{ background: '#0f1519' }}>
-                {['Quý', 'Doanh thu', 'LN gộp', 'LN ròng', 'Rev Growth'].map(h => (
-                  <th key={h} className="p-2 text-right font-medium first:text-left" style={{ color: '#4a5a6a' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {income.map((r, i) => (
-                <tr key={i} style={{ borderTop: '1px solid #1e2832' }}>
-                  <td className="p-2 font-mono" style={{ color: '#8b99a8' }}>Q{r.quarter}/{r.year}</td>
-                  <td className="p-2 text-right font-mono" style={{ color: '#e8edf2' }}>{fmtB(r.revenue)}</td>
-                  <td className="p-2 text-right font-mono" style={{ color: '#e8edf2' }}>{fmtB(r.gross_profit)}</td>
-                  <td className="p-2 text-right font-mono" style={{ color: (r.net_profit ?? 0) >= 0 ? '#00ff88' : '#ff3366' }}>{fmtB(r.net_profit)}</td>
-                  <td className="p-2 text-right font-mono" style={{ color: (r.revenue_growth ?? 0) >= 0 ? '#00ff88' : '#ff3366' }}>
-                    {r.revenue_growth != null ? (r.revenue_growth >= 0 ? '+' : '') + r.revenue_growth.toFixed(1) + '%' : '–'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {cf6.length > 0 && (
+      {income.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
           <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
-            DÒNG TIỀN (tỷ đồng)
+            KẾT QUẢ KINH DOANH
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-[10px]">
               <thead>
-                <tr style={{ background: '#0f1519' }}>
-                  {['Quý', 'CFO', 'CFI', 'CFF', 'CAPEX'].map(h => (
-                    <th key={h} className="p-2 text-right font-medium first:text-left" style={{ color: '#4a5a6a' }}>{h}</th>
+                <tr style={{ borderBottom: '1px solid #1e2832' }}>
+                  <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ tiêu</th>
+                  {income.map((r) => (
+                    <th key={r.year + '-' + r.quarter} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>
+                      Q{r.quarter}/{r.year}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {cf6.map((r, i) => (
-                  <tr key={i} style={{ borderTop: '1px solid #1e2832' }}>
-                    <td className="p-2 font-mono" style={{ color: '#8b99a8' }}>Q{r.quarter}/{r.year}</td>
-                    {([r.cfo, r.cfi, r.cff, r.capex]).map((v, j) => (
-                      <td key={j} className="p-2 text-right font-mono" style={{ color: v == null ? '#4a5a6a' : v > 0 ? '#00ff88' : '#ff3366' }}>
-                        {v == null ? '–' : (v > 0 ? '+' : '') + fmtB(v)}
+                {[
+                  { label: 'Doanh thu', key: 'revenue' as const },
+                  { label: 'Lợi nhuận', key: 'net_income' as const },
+                ].map(({ label, key }) => (
+                  <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
+                    <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>{label}</td>
+                    {income.map((r) => (
+                      <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono" style={{ color: '#e2e8f0' }}>{fmtB(r[key])}</td>
+                    ))}
+                  </tr>
+                ))}
+                <tr style={{ borderBottom: '1px solid #0d1520' }}>
+                  <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>Tăng trưởng DT</td>
+                  {income.map((r) => (
+                    <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono" style={{ color: r.revenue_growth != null ? (r.revenue_growth >= 0 ? '#00ff88' : '#ff3366') : '#4a5a6a' }}>
+                      {r.revenue_growth != null ? (r.revenue_growth >= 0 ? '+' : '') + r.revenue_growth.toFixed(1) + '%' : '–'}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      {cf.length > 0 && (
+        <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
+            DÒNG TIỀN
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[10px]">
+              <thead>
+                <tr style={{ borderBottom: '1px solid #1e2832' }}>
+                  <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ tiêu</th>
+                  {cf.map((r) => (
+                    <th key={r.year + '-' + r.quarter} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>
+                      Q{r.quarter}/{r.year}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { label: 'HĐKD', key: 'cfo' as const },
+                  { label: 'HĐĐT', key: 'cfi' as const },
+                  { label: 'HĐTC', key: 'cff' as const },
+                  { label: 'CapEx', key: 'capex' as const },
+                ].map(({ label, key }) => (
+                  <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
+                    <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>{label}</td>
+                    {cf.map((r) => (
+                      <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono" style={{ color: r[key] == null ? '#4a5a6a' : r[key] > 0 ? '#00ff88' : '#ff3366' }}>
+                        {r[key] == null ? '–' : (r[key] > 0 ? '+' : '') + fmtB(r[key])}
                       </td>
                     ))}
                   </tr>
@@ -509,6 +521,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
     </div>
   );
 }
+
 
 // ─── Trading Tab ─────────────────────────────────────────────────────────────
 function TradingTab({ stock }: { stock: Stock }) {
@@ -603,88 +616,95 @@ function TradingTab({ stock }: { stock: Stock }) {
 
 // ─── Capital Tab ─────────────────────────────────────────────────────────────
 function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-  const fmtB = (v: number | null | undefined) => v == null ? '–' : Math.abs(v) >= 1000 ? ((v / 1000).toFixed(1)) + 'T' : (v.toFixed(0)) + 'B';
+  const fmtB = (v: number | null | undefined) => {
+    if (v == null) return '–';
+    return Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'T' : v.toFixed(0) + 'B';
+  };
 
-  if (detailLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải...</div>
-      </div>
-    );
-  }
-  if (!detail) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu</div>
-      </div>
-    );
-  }
-
-  const bal = [...detail.balance].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
-  const annual = bal.filter(b => b.quarter === 4).slice(0, 5).reverse();
-  const latest = bal[0];
-
-  const barItems = latest ? [
-    { label: 'Tổng tài sản', val: latest.total_assets, max: latest.total_assets, color: '#00d4ff' },
-    { label: 'Vốn chủ sở hữu', val: latest.total_equity, max: latest.total_assets, color: '#00ff88' },
-    { label: 'Tổng nợ', val: latest.total_debt, max: latest.total_assets, color: '#ff9500' },
-    { label: 'Nợ ngắn hạn', val: latest.short_term_debt, max: latest.total_assets, color: '#ff3366' },
-    { label: 'Tiền mặt', val: latest.cash, max: latest.total_assets, color: '#a78bfa' },
-  ] : [];
+  const bal = detail ? [...detail.balance].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)) : [];
+  const annual = bal.filter((b) => b.quarter === 4).slice(0, 5).reverse();
+  const latest = bal[0] ?? null;
+  const totalAssets = latest ? (latest.total_assets || 1) : 1;
 
   return (
+    <div>
+      {detailLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải...</div>
+        </div>
+      )}
+      {!detailLoading && !detail && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu</div>
+        </div>
+      )}
+      {!detailLoading && detail && (
     <div className="space-y-3">
       {latest && (
         <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
           <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
             BẢNG CÂN ĐỐI — Q{latest.quarter}/{latest.year}
           </div>
-          {barItems.map(({ label, val, max, color }) => (
+          {[
+            { label: 'Tổng tài sản', val: latest.total_assets, color: '#00d4ff' },
+            { label: 'Vốn chủ sở hữu', val: latest.total_equity, color: '#00ff88' },
+            { label: 'Tổng nợ', val: latest.total_debt, color: '#ff9500' },
+            { label: 'Nợ ngắn hạn', val: latest.short_term_debt, color: '#ff3366' },
+            { label: 'Tiền mặt', val: latest.cash, color: '#a78bfa' },
+          ].map(({ label, val, color }) => (
             <div key={label} className="mb-2">
               <div className="flex justify-between mb-1">
                 <span className="text-[10px]" style={{ color: '#8b99a8' }}>{label}</span>
                 <span className="font-mono text-[10px] font-semibold" style={{ color }}>{fmtB(val)}</span>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
-                <div className="h-full rounded-full" style={{ width: (Math.min((val / max) * 100, 100)) + '%', background: color, boxShadow: '0 0 4px ' + (color) + '60' }} />
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: Math.min((val / totalAssets) * 100, 100) + '%', background: color }}
+                />
               </div>
             </div>
           ))}
           <div className="grid grid-cols-2 gap-2 mt-3">
-            {latest ? [
+            {latest.total_equity > 0 ? [
               { label: 'Đòn bẩy (D/E)', val: (latest.total_debt / latest.total_equity).toFixed(2) + 'x', color: latest.total_debt / latest.total_equity > 2 ? '#ff3366' : '#00d4ff' },
               { label: 'Cash / Equity', val: ((latest.cash / latest.total_equity) * 100).toFixed(1) + '%', color: '#a78bfa' },
             ].map(({ label, val, color }) => (
-              <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
+              <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
                 <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
-                <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
+                <div className="font-mono text-xs font-bold" style={{ color }}>{val}</div>
               </div>
-            ))}
+            )) : null}
           </div>
         </div>
       )}
       {annual.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
           <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
-            TREND THEO NĂM (Q4)
+            XU HƯỚNG VỐN (HÀNG NĂM)
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-[10px]">
               <thead>
-                <tr style={{ background: '#0f1519' }}>
-                  {['Năm', 'Tổng TS', 'Vốn CSH', 'Tổng Nợ', 'Tiền mặt'].map(h => (
-                    <th key={h} className="p-2 text-right font-medium first:text-left" style={{ color: '#4a5a6a' }}>{h}</th>
+                <tr style={{ borderBottom: '1px solid #1e2832' }}>
+                  <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ số</th>
+                  {annual.map((r) => (
+                    <th key={r.year} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>{r.year}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {annual.map((r, i) => (
-                  <tr key={i} style={{ borderTop: '1px solid #1e2832' }}>
-                    <td className="p-2 font-mono font-semibold" style={{ color: '#8b99a8' }}>{r.year}</td>
-                    <td className="p-2 text-right font-mono" style={{ color: '#00d4ff' }}>{fmtB(r.total_assets)}</td>
-                    <td className="p-2 text-right font-mono" style={{ color: '#00ff88' }}>{fmtB(r.total_equity)}</td>
-                    <td className="p-2 text-right font-mono" style={{ color: '#ff9500' }}>{fmtB(r.total_debt)}</td>
-                    <td className="p-2 text-right font-mono" style={{ color: '#a78bfa' }}>{fmtB(r.cash)}</td>
+                {[
+                  { label: 'Tổng TS', key: 'total_assets' as const },
+                  { label: 'VCSH', key: 'total_equity' as const },
+                  { label: 'Tổng nợ', key: 'total_debt' as const },
+                  { label: 'Tiền mặt', key: 'cash' as const },
+                ].map(({ label, key }) => (
+                  <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
+                    <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>{label}</td>
+                    {annual.map((r) => (
+                      <td key={r.year} className="p-2 text-right font-mono" style={{ color: '#e2e8f0' }}>{fmtB(r[key])}</td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
@@ -693,8 +713,11 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
         </div>
       )}
     </div>
+      )}
+    </div>
   );
 }
+
 
 // ─── Stats Tab ────────────────────────────────────────────────────────────────
 function StatsTab({ stock }: { stock: Stock }) {
@@ -860,7 +883,8 @@ export default function StockModal({
     { id: 'capital', label: 'Vốn', icon: Shield },
     { id: 'stats', label: 'Thống kê', icon: Activity },
   ];
-  const tabList = ictSignal ? [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Zap }] : baseTabs;
+  let tabList = [...baseTabs];
+  if (ictSignal) { tabList = [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Zap }]; }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
