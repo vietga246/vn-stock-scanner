@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   TrendingUp,
@@ -859,23 +859,31 @@ export default function StockModal({
       .finally(() => setDetailLoading(false));
   }, [stock, activeTab, detail]);
 
-  const close = useCallback(() => {
+  if (!stock) return null;
+
+  const close = () => {
     setVisible(false);
     setTimeout(onClose, 150);
-  }, [onClose]);
+  };
 
-  const analysis = useMemo(() => stock ? (preloadedAnalysis || generateAnalysis(stock, sectorStatus)) : null, [stock, preloadedAnalysis, sectorStatus]);
-  const deskAnalysis = useMemo(() => stock ? generateDeskAnalysis(stock, ictSignal, sectorStatus) : null, [stock, ictSignal, sectorStatus]);
-  const recDisplay = useMemo(() => analysis ? getRecommendationDisplay(analysis.recommendation) : null, [analysis]);
-  const tierColor = useMemo(() => stock ? getTierColor(stock.tier) : '#8b99a8', [stock]);
-  const price = useMemo(() => stock ? (stock.close || stock.price || 0) : 0, [stock]);
-  const tabList = useMemo(() => ictSignal
-    ? [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }, { id: 'ict', label: '🧠 ICT', icon: Zap }]
-    : [{ id: 'analysis', label: 'Phân tích', icon: Target }, { id: 'scores', label: 'Điểm số', icon: Activity }, { id: 'finance', label: 'Tài chính', icon: BarChart3 }, { id: 'trading', label: 'Giao dịch', icon: TrendingUp }, { id: 'capital', label: 'Vốn', icon: Shield }, { id: 'stats', label: 'Thống kê', icon: Activity }]
-  , [ictSignal]);
+  const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus);
+  const deskAnalysis = generateDeskAnalysis(stock, ictSignal, sectorStatus);
+  const recDisplay = getRecommendationDisplay(analysis.recommendation);
+  const tierColor = getTierColor(stock.tier);
+  const price = stock.close || stock.price || 0;
+  const change = stock.change_20d || stock.change_5d || 0;
+  const tabs = [
+    { id: 'analysis', label: 'Phân tích', icon: Target },
+    { id: 'scores',   label: 'Điểm số',   icon: Activity },
+    { id: 'finance',  label: 'Tài chính',  icon: BarChart3 },
+    { id: 'trading',  label: 'Giao dịch',  icon: TrendingUp },
+    { id: 'capital',  label: 'Vốn',        icon: Shield },
+    { id: 'stats',    label: 'Thống kê',   icon: Activity },
+    ...(ictSignal ? [{ id: 'ict', label: '🧠 ICT', icon: Zap }] : []),
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ display: (!stock || !analysis || !deskAnalysis || !recDisplay) ? 'none' : undefined }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 transition-opacity duration-200"
@@ -942,9 +950,9 @@ export default function StockModal({
               <div className="flex items-center gap-2 mt-1">
                 <span
                   className="font-mono font-semibold text-sm"
-                  style={{ color: (stock.change_20d || stock.change_5d || 0) >= 0 ? '#00ff88' : '#ff3366' }}
+                  style={{ color: change >= 0 ? '#00ff88' : '#ff3366' }}
                 >
-                  {formatPercent(stock.change_20d || stock.change_5d || 0)}
+                  {formatPercent(change)}
                 </span>
                 <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
                   20D
@@ -978,7 +986,7 @@ export default function StockModal({
 
         {/* Tabs */}
         <div className="flex border-b" style={{ borderColor: '#1e2832' }}>
-          {tabList.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
