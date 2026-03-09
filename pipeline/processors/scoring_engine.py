@@ -6,12 +6,23 @@ Tính điểm tổng hợp (0–100) cho từng cổ phiếu dựa trên 4 trụ
   A. Fundamental Score  (35%): PE, ROE, ROA, revenue growth, net margin, D/E
   B. Smart Money Score  (30%): Net foreign flow 7d + 30d
                                (prop trading và insider deals không có data từ VCI source)
-  C. Momentum Score     (20%): Price momentum 5d/20d, volume surge, RS vs market
-  D. Technical Score    (15%): RSI, MACD signal, Bollinger position, trend
+  C. Momentum Score     (15%): Price momentum 5d/20d, volume surge, RS vs market
+                               [Giảm từ 20% → 15%: backtest cho thấy momentum cao có
+                                edge âm (-0.88%) do đặc tính mean reversion của VNSTOCK]
+  D. Technical Score    (20%): RSI oversold/trend/ADX — tăng từ 15% vì backtest xác nhận
+                               RSI<35 edge +1.02%, Trend+ADX>30 edge +1.54%
 
 Scoring method: percentile rank trong universe (loại bỏ outliers)
   → Mỗi chỉ số được rank từ 0–100 theo phân phối thực tế của thị trường
   → Tránh bị lệch vì outliers (HGM ROE=116% sẽ không kéo toàn bộ thang điểm)
+
+Backtest findings (33,055 observations, Aug 2025–Mar 2026, walk-forward):
+  ✅ RSI < 35 oversold:            edge +1.02% fwd20D, p=0.0001
+  ✅ Trend UP (P>MA20>MA50):       edge +0.77% fwd20D, p=0.0000
+  ✅ Combo Trend+ADX>30+RSI<70:    edge +1.54% fwd20D, p=0.0000
+  ✅ ADX Very Strong (>50):        edge +0.62% fwd20D, p=0.021
+  ❌ MACD Histogram Positive:      edge -0.67% fwd20D (CONTRARIAN)
+  ❌ Momentum Strong (>10% 20D):   edge -0.88% fwd20D (mean reversion)
 
 Output:
   - Table `stock_scores` trong stock.db
@@ -35,11 +46,13 @@ from trading_calendar import trading_date_cutoff, get_trading_date_list_sql
 DB_PATH = os.getenv("DB_PATH", "data/db/stock.db")
 
 # Trọng số các trụ cột
+# v2: Momentum giảm 20→15%, Technical tăng 15→20%
+# Lý do: backtest 33k obs — momentum cao có edge âm (-0.88%), RSI/Trend có edge dương mạnh
 WEIGHTS = {
     "fundamental": 0.35,
     "smart_money": 0.30,
-    "momentum":    0.20,
-    "technical":   0.15,
+    "momentum":    0.15,   # ↓ từ 0.20 — momentum mạnh có edge âm trên VNSTOCK
+    "technical":   0.20,   # ↑ từ 0.15 — RSI oversold & trend có edge dương có ý nghĩa
 }
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -72,16 +85,23 @@ SMART_MONEY_WEIGHTS = {
 }
 
 MOMENTUM_WEIGHTS = {
-    "price_5d_score":    0.30,
-    "price_20d_score":   0.35,
-    "vol_surge_score":   0.20,
-    "rs_vs_market_score": 0.15,
+    # v2: giảm trọng số price_20d vì momentum mạnh (>10%) có edge âm (-0.88%)
+    # RS vs market giữ nguyên — relative strength có giá trị hơn absolute momentum
+    "price_5d_score":     0.25,   # ↓ từ 0.30
+    "price_20d_score":    0.25,   # ↓ từ 0.35 — cẩn thận momentum kéo dài
+    "vol_surge_score":    0.25,   # ↑ từ 0.20 — volume confirmation quan trọng hơn
+    "rs_vs_market_score": 0.25,   # ↑ từ 0.15 — relative strength tốt hơn absolute
 }
 
 TECHNICAL_WEIGHTS = {
-    "rsi_score":     0.35,
-    "macd_score":    0.35,
-    "trend_score":   0.30,
+    # v2: Bỏ MACD (edge -0.67%), thêm ADX bucket score
+    # RSI oversold edge +1.02% (p=0.0001) → tăng trọng số
+    # Trend UP edge +0.77% (p=0.0000) → giữ nguyên cao
+    # ADX >50 edge +0.62% (p=0.021) → thêm mới
+    "rsi_score":   0.40,   # ↑ từ 0.35 — RSI oversold là signal tốt nhất
+    "trend_score": 0.35,   # ↑ từ 0.30 — Trend UP có ý nghĩa thống kê mạnh
+    "adx_score":   0.25,   # NEW — thay MACD (0.35 → 0): ADX >50 edge +0.62%
+    # macd_score: LOẠI BỎ — edge -0.67% fwd20D, contrarian signal trên VNSTOCK
 }
 
 logging.basicConfig(
@@ -129,7 +149,8 @@ def init_db(conn):
             vol_surge_score     REAL,
             rs_vs_market_score  REAL,
             rsi_score           REAL,
-            macd_score          REAL,
+            macd_score          REAL,   -- deprecated: weight=0, kept for backward compat
+            adx_score           REAL,   -- NEW v2: bucket score ADX >50 edge +0.62%
             trend_score         REAL,
 
             -- Fundamental raw values
@@ -228,6 +249,7 @@ def _migrate_stock_scores(conn):
         ("fvg_bear_age",    "INTEGER"),
         ("fvg_bull_fill",   "REAL"),
         ("fvg_bear_fill",   "REAL"),
+        ("adx_score",       "REAL"),   # v2: NEW — thay MACD trong technical score
     ]
 
     added = []
@@ -441,11 +463,20 @@ def score_smart_money(df: pd.DataFrame, smart_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.DataFrame:
-    """Merge và tính Momentum + Technical Score."""
+    """Merge và tính Momentum + Technical Score.
+
+    v2 changes (backtest-driven):
+    - Momentum: penalize extreme momentum (>15% 20D) — mean reversion trên VNSTOCK
+    - RSI: tăng điểm mạnh hơn cho oversold zone (< 35), curve theo backtest buckets
+    - MACD: LOẠI BỎ — edge -0.67% fwd20D, bị thay bằng ADX score
+    - ADX: thêm mới — chỉ bucket >50 mới thực sự có edge (+0.62%)
+    - Combo bonus: Trend+ADX>30+RSI<70 — edge +1.54% fwd20D
+    """
     if tech_df.empty:
         for col in ["momentum_score", "technical_score",
                     "price_5d_score", "price_20d_score", "vol_surge_score",
-                    "rs_vs_market_score", "rsi_score", "macd_score", "trend_score"]:
+                    "rs_vs_market_score", "rsi_score", "macd_score", "trend_score",
+                    "adx_score"]:
             df[col] = 50.0  # neutral
         for col in ["price_change_1d", "price_change_5d", "price_change_20d", "vol_ratio",
                     "rsi14", "macd_hist", "trend_short"]:
@@ -467,9 +498,22 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
     merge_cols = [c for c in passthrough_cols if c in tech_df.columns]
     df = df.merge(tech_df[merge_cols], on="symbol", how="left")
 
-    # Momentum sub-scores
-    df["price_5d_score"]     = percentile_rank(df["price_change_5d"])
-    df["price_20d_score"]    = percentile_rank(df["price_change_20d"])
+    # ── MOMENTUM SUB-SCORES ──────────────────────────────────────────────────
+    # price_5d: percentile rank bình thường
+    df["price_5d_score"] = percentile_rank(df["price_change_5d"])
+
+    # price_20d: v2 — penalize extreme momentum (>15%) vì mean reversion VNSTOCK
+    # Backtest: mom >10% → edge -0.88%; mom <-20% → bounce +2.73% (short-term)
+    p20d = df["price_change_20d"].fillna(0)
+    p20d_base = percentile_rank(df["price_change_20d"])
+    # Capping: cổ phiếu tăng >15% trong 20D bị cap điểm tối đa ở 60 (không thưởng thêm)
+    # Cổ phiếu tăng >25% bị penalize xuống 40 (mean reversion risk cao)
+    p20d_score = p20d_base.copy()
+    p20d_score = np.where(p20d > 25, p20d_base.clip(0, 40),   # extreme momentum → penalty
+                 np.where(p20d > 15, p20d_base.clip(0, 60),   # strong momentum → cap
+                 p20d_score))
+    df["price_20d_score"] = pd.Series(p20d_score, index=df.index).clip(0, 100)
+
     df["vol_surge_score"]    = percentile_rank(df["vol_ratio"])
     df["rs_vs_market_score"] = percentile_rank(df.get("rs_vs_market", pd.Series()))
 
@@ -480,35 +524,68 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
         df["rs_vs_market_score"] * MOMENTUM_WEIGHTS["rs_vs_market_score"]
     )
 
-    # Technical sub-scores
-    # RSI: optimal range 40–65 (không overbought/oversold)
+    # ── TECHNICAL SUB-SCORES ─────────────────────────────────────────────────
+
+    # RSI SCORE v2 — calibrated theo backtest buckets:
+    # RSI 0-25:  +2.26% fwd20D → điểm 90–100 (strong buy signal)
+    # RSI 25-35: +0.71% fwd20D → điểm 75–90
+    # RSI 35-45: -0.18% fwd20D → điểm 55–70
+    # RSI 45-65: neutral       → điểm 40–55
+    # RSI 65-75: +0.11% fwd20D → điểm 30–40 (overbought, nhẹ thôi)
+    # RSI 75+:   -0.53% fwd20D → điểm 10–30 (overbought penalty)
     rsi = df["rsi14"].fillna(50)
-    rsi_score = pd.Series(100.0, index=df.index)
-    # RSI < 30: oversold (rủi ro tiếp tục giảm) → 20–50 points
-    rsi_score = np.where(rsi < 30, 20 + rsi * 1.0,
-                # RSI 30-40: recovering → 50-70
-                np.where(rsi < 40, 50 + (rsi - 30) * 2.0,
-                # RSI 40-65: healthy zone → 70-100
-                np.where(rsi < 65, 70 + (rsi - 40) * 1.2,
-                # RSI 65-80: caution → 70-40
-                np.where(rsi < 80, 70 - (rsi - 65) * 2.0,
-                # RSI >= 80: overbought → 0-40
-                20.0))))
+    rsi_score = np.where(rsi < 25,  90 + (25 - rsi) * 0.4,          # 0–25:  90–100
+                np.where(rsi < 35,  75 + (35 - rsi) * 1.5,          # 25–35: 75–90
+                np.where(rsi < 45,  55 + (45 - rsi) * 2.0,          # 35–45: 55–75
+                np.where(rsi < 65,  40 + (65 - rsi) * 0.75,         # 45–65: 40–55
+                np.where(rsi < 75,  30 - (rsi - 65) * 1.0,          # 65–75: 20–30
+                         10.0)))))                                    # 75+:   10
     df["rsi_score"] = pd.Series(rsi_score, index=df.index).clip(0, 100)
 
-    # MACD: histogram dương và tăng = tốt
+    # MACD SCORE: giữ lại field để backward-compat với DB/export nhưng weight=0
+    # Không dùng trong technical_score nữa (edge -0.67%)
     macd_hist = df.get("macd_hist", pd.Series(0.0, index=df.index)).fillna(0)
-    df["macd_score"] = percentile_rank(macd_hist)
+    df["macd_score"] = percentile_rank(macd_hist)  # vẫn tính nhưng không dùng trong formula
 
-    # Trend: -1/0/1 → 10/50/90
+    # TREND SCORE: P>MA20>MA50 — edge +0.77% (p=0.0000)
+    # v2: tăng spread giữa trend=1 và trend=-1 để phân biệt rõ hơn
     trend = df.get("trend_short", pd.Series(0, index=df.index)).fillna(0)
-    df["trend_score"] = trend.map({1: 80.0, 0: 50.0, -1: 20.0}).fillna(50.0)
+    df["trend_score"] = trend.map({1: 85.0, 0: 50.0, -1: 15.0}).fillna(50.0)
 
+    # ADX SCORE v2 (NEW — thay MACD):
+    # Backtest: ADX >50 edge +0.62% (p=0.021); ADX <20 no edge; ADX linear IC ≈ 0
+    # → Dùng bucket scoring thay vì linear percentile rank
+    # ADX 0-15:   weak trend    → 30
+    # ADX 15-25:  developing    → 45
+    # ADX 25-35:  moderate      → 60
+    # ADX 35-50:  strong        → 70
+    # ADX >50:    very strong   → 90  ← có ý nghĩa thống kê p=0.021
+    adx = df.get("adx14", pd.Series(np.nan, index=df.index)).fillna(20)
+    adx_score = np.where(adx > 50, 90.0,
+                np.where(adx > 35, 70.0,
+                np.where(adx > 25, 60.0,
+                np.where(adx > 15, 45.0,
+                         30.0))))
+    df["adx_score"] = pd.Series(adx_score, index=df.index)
+
+    # TECHNICAL SCORE (không có MACD)
     df["technical_score"] = (
         df["rsi_score"]   * TECHNICAL_WEIGHTS["rsi_score"] +
-        df["macd_score"]  * TECHNICAL_WEIGHTS["macd_score"] +
-        df["trend_score"] * TECHNICAL_WEIGHTS["trend_score"]
+        df["trend_score"] * TECHNICAL_WEIGHTS["trend_score"] +
+        df["adx_score"]   * TECHNICAL_WEIGHTS["adx_score"]
     )
+
+    # ── COMBO BONUS ──────────────────────────────────────────────────────────
+    # Backtest: Trend+ADX>30+RSI<70 → edge +1.54% fwd20D (p=0.0000, n=1,433)
+    # Thêm bonus +5 điểm vào technical_score khi đủ 3 điều kiện
+    combo_mask = (
+        (trend == 1) &                    # Trend UP: P > MA20 > MA50
+        (adx > 30) &                      # ADX đủ mạnh
+        (rsi < 70)                        # RSI chưa overbought
+    )
+    df.loc[combo_mask, "technical_score"] = (
+        df.loc[combo_mask, "technical_score"] + 5.0
+    ).clip(0, 100)
 
     return df
 
@@ -660,7 +737,7 @@ OUTPUT_COLS = [
     "pe_score", "debt_equity_score",
     "foreign_net_7d_score", "foreign_net_30d_score",
     "price_5d_score", "price_20d_score", "vol_surge_score", "rs_vs_market_score",
-    "rsi_score", "macd_score", "trend_score",
+    "rsi_score", "macd_score", "adx_score", "trend_score",
     # Fundamental raw values
     "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
     # Price momentum
