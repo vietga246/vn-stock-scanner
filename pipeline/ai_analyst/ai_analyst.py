@@ -21,13 +21,10 @@ from typing import Optional, Dict, List, Any
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────
 
-EXPORT_DIR        = os.getenv("EXPORT_DIR",       "data/exports")
-OPENAI_API_KEY    = os.getenv("OPENAI_API_KEY",    "")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-AI_PROVIDER       = os.getenv("AI_PROVIDER",       "anthropic")
-TOP_N_STOCKS      = int(os.getenv("TOP_N_STOCKS",  "50"))
-MAX_TOKENS        = int(os.getenv("MAX_TOKENS",    "2000"))
-AI_TOP_N          = int(os.getenv("AI_TOP_N",      "50"))
+EXPORT_DIR     = os.getenv("EXPORT_DIR",    "data/exports")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+TOP_N_STOCKS   = int(os.getenv("TOP_N_STOCKS", "10"))   # chỉ phân tích top 10
+MAX_TOKENS     = int(os.getenv("MAX_TOKENS",   "2000"))
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
 
@@ -345,38 +342,33 @@ def build_prompt(symbol, screener, ict, sector, regime, market_stats, total_symb
 # ─── AI CALLER ─────────────────────────────────────────────────────────────
 
 def call_ai(prompt: str) -> Optional[str]:
-    if AI_PROVIDER == "anthropic" and ANTHROPIC_API_KEY:
-        try:
-            import anthropic
-            client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=MAX_TOKENS,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return response.content[0].text
-        except Exception as e:
-            log.error("Anthropic error: %s", e)
+    """Gọi OpenAI GPT-4o. Log warning rõ nếu không chạy được."""
 
-    if OPENAI_API_KEY:
-        try:
-            import openai
-            client = openai.OpenAI(api_key=OPENAI_API_KEY)
-            response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user",   "content": prompt},
-                ],
-                max_tokens=MAX_TOKENS,
-                response_format={"type": "json_object"},
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            log.error("OpenAI error: %s", e)
+    if not OPENAI_API_KEY:
+        log.warning("⚠️  OPENAI_API_KEY chưa được cấu hình — bỏ qua AI, dùng rule-based")
+        return None
 
-    return None
+    try:
+        import openai
+    except ImportError:
+        log.warning("⚠️  Package 'openai' chưa được cài — chạy: pip install openai")
+        return None
+
+    try:
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=MAX_TOKENS,
+            response_format={"type": "json_object"},
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        log.warning("⚠️  OpenAI API lỗi: %s — fallback sang rule-based", e)
+        return None
 
 
 def parse_ai_response(response: str) -> Optional[Dict]:
@@ -571,10 +563,13 @@ def run() -> None:
              regime.get("regime","?"), (regime.get("bull_weight") or 0) * 100)
 
     top_syms  = get_top_symbols(screener_map, ict_map, TOP_N_STOCKS)
-    use_ai    = bool(OPENAI_API_KEY or ANTHROPIC_API_KEY)
-    model_str = f"ai-{AI_PROVIDER}" if use_ai else "rule-based-v3"
+    use_ai    = bool(OPENAI_API_KEY)
+    model_str = "gpt-4o" if use_ai else "rule-based-v3"
 
-    log.info("🔍 Analyzing %d stocks | Mode: %s", len(top_syms), model_str)
+    if use_ai:
+        log.info("🤖 OpenAI GPT-4o | phân tích %d stocks", len(top_syms))
+    else:
+        log.warning("⚠️  Không có OPENAI_API_KEY — toàn bộ %d stocks dùng rule-based", len(top_syms))
 
     analyses: Dict[str, Dict] = {}
     ai_ok = rb_ok = 0
@@ -586,7 +581,7 @@ def run() -> None:
 
         result = None
 
-        if use_ai and i < AI_TOP_N:
+        if use_ai:
             try:
                 prompt = build_prompt(sym, s, ic, sc, regime, mstats, total)
                 raw = call_ai(prompt)
@@ -596,8 +591,12 @@ def run() -> None:
                         parsed["symbol"] = sym
                         result = parsed
                         ai_ok += 1
+                    else:
+                        log.warning("⚠️  %s: parse JSON thất bại — fallback rule-based", sym)
+                else:
+                    log.warning("⚠️  %s: AI không trả về kết quả — fallback rule-based", sym)
             except Exception as e:
-                log.warning("AI failed for %s: %s", sym, e)
+                log.warning("⚠️  %s: AI exception [%s] — fallback rule-based", sym, e)
 
         if result is None:
             result = generate_rule_based(sym, s, ic, sc, regime)
