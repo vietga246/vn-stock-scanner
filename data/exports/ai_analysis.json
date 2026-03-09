@@ -1,445 +1,434 @@
 {
-  "generated_at": "2026-03-08T13:02:59.456322Z",
-  "model": "ai-",
+  "generated_at": "2026-03-09T03:28:07.124107Z",
+  "model": "gpt-4o",
   "total_analyzed": 15,
   "summary": {
     "STRONG_BUY": 0,
-    "BUY": 5,
-    "HOLD": 10,
+    "BUY": 0,
+    "HOLD": 15,
     "SELL": 0,
     "STRONG_SELL": 0
   },
   "analyses": {
     "DCM": {
       "recommendation": "HOLD",
-      "summary": "DCM hiện đang cho thấy sự tăng trưởng mạnh về giá nhưng cơ bản tài chính yếu.",
+      "summary": "Cổ phiếu DCM đang có xu hướng tăng trưởng mạnh nhờ vào cấu trúc thị trường bullish và lực dòng tiền thông minh mạnh mẽ. Tuy nhiên, cần thận trọng do thị trường hiện trong bối cảnh BEAR và áp lực bán có thể gia tăng.",
       "highlights": [
         {
-          "text": "Composite Score và Technical Score ở mức cao, phản ánh sự quan tâm mạnh mẽ từ thị trường và tín hiệu kỹ thuật tích cực.",
+          "text": "Smart Money score đạt 100%, cho thấy sự quan tâm từ tổ chức lớn.",
           "type": "positive"
         },
         {
-          "text": "Dòng tiền từ khối ngoại đang chảy mạnh vào, thể hiện sự tin tưởng và quan tâm từ nhà đầu tư nước ngoài.",
+          "text": "DCM có RS vs sector cao (+15.8%), vượt trội so với các cổ phiếu cùng ngành.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Fundamental Score thấp, chỉ ra rằng cơ bản công ty còn yếu.",
+          "text": "Thị trường chung trong giai đoạn BEAR với chỉ số VN-Index giảm mạnh.",
           "type": "negative"
         },
         {
-          "text": "ROE và ROA cực thấp, phản ánh hiệu quả sử dụng vốn không cao.",
+          "text": "Mặc dù có đà tăng tốt, FVG chỉ ở mức trung bình và chưa hoàn toàn lấp đầy.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản yếu với ROE và ROA thấp.",
-      "technical_view": "Tín hiệu kỹ thuật mạnh với xu hướng tăng và RSI cao.",
-      "flow_view": "Dòng tiền khối ngoại mạnh, phản ánh sự lạc quan.",
+      "fundamental_view": "Doanh nghiệp có P/E hợp lý nhưng tăng trưởng doanh thu không cao và lợi nhuận biên thấp.",
+      "technical_view": "Cấu trúc thị trường bullish (HH+HL) kết hợp với BOS bullish, nhưng thiếu dấu hiệu Breakout và FVG chỉ ở mức trung bình.",
+      "flow_view": "Dòng tiền tổ chức có xu hướng trung tính với áp lực bán trung bình, trong khi dòng tiền ngoại gần đây có dấu hiệu tích cực.",
       "symbol": "DCM"
     },
     "PVT": {
       "recommendation": "HOLD",
-      "summary": "PVT cho thấy chỉ số kỹ thuật mạnh mẽ nhưng cơ bản tài chính yếu, cùng với rủi ro từ đánh giá quá mua (RSI cao).",
+      "summary": "PVT hiện đang có động lượng mạnh với sự hỗ trợ tích cực từ dòng tiền tổ chức, nhưng chưa có setup ICT rõ ràng để xác định xu hướng tăng hoặc giảm mạnh trong thị trường BEAR.",
       "highlights": [
         {
-          "text": "Smart Money Score và Momentum Score cao, phản ánh xu hướng tăng và sự quan tâm từ nhà đầu tư thông minh.",
+          "text": "Dòng tiền thông minh (Smart Money) và áp lực mua rất mạnh với Buy Pressure đạt 100%",
           "type": "positive"
         },
         {
-          "text": "Khối ngoại mua ròng mạnh mẽ trong 30 ngày qua, cho thấy dòng tiền tích cực từ nhà đầu tư nước ngoài.",
+          "text": "PVT có RS Sector cao so với ngành, thể hiện sự vượt trội so với các cổ phiếu khác trong cùng ngành.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "RSI ở mức 82, nằm trong vùng quá mua, có thể gây áp lực giảm giá.",
+          "text": "Thị trường chung vẫn trong giai đoạn BEAR, có thể tạo áp lực giảm giá cho PVT.",
           "type": "negative"
         },
         {
-          "text": "Các chỉ số cơ bản như ROE, ROA và Tăng trưởng doanh thu thấp, phản ánh sức khỏe tài chính kém.",
+          "text": "Vùng FVG chỉ mới xuất hiện gần đây và chưa hoàn toàn được lấp đầy, có thể chưa đủ mạnh để duy trì xu hướng.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản tài chính yếu với ROE và ROA rất thấp, cần cẩn trọng.",
-      "technical_view": "Xu hướng tăng mạnh trong ngắn hạn nhưng RSI cao cảnh báo rủi ro giảm giá.",
-      "flow_view": "Dòng tiền từ khối ngoại mạnh mẽ, ủng hộ xu hướng tăng.",
+      "fundamental_view": "PVT có triển vọng cơ bản trung bình, với ROE và ROA rất thấp, dù tỷ lệ P/E khá hấp dẫn.",
+      "technical_view": "Giá PVT vẫn trong cấu trúc trung tính (Neutral), với FVG Bull nhưng chưa có hành động cụ thể tại Order Block Bull.",
+      "flow_view": "Dòng tiền đang có xu hướng tích lũy mạnh mẽ, với Foreign Flow tích cực và Inst Flow Score cao.",
       "symbol": "PVT"
     },
     "VVS": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu VVS cho thấy sức hút mạnh mẽ từ giới đầu tư với mức tăng giá đáng chú ý, tuy nhiên chỉ số tài chính cơ bản yếu kém cần được cân nhắc kỹ lưỡng.",
+      "summary": "Cổ phiếu VVS có cấu trúc bullish với các tín hiệu tích cực từ dòng tiền tổ chức và thương mại thông minh. Tuy nhiên, trong chế độ thị trường bear, rủi ro vẫn hiển hiện nên nên thận trọng khi đầu tư.",
       "highlights": [
         {
-          "text": "Momentum Score và Technical Score cao, phản ánh sự quan tâm lớn và xu hướng tích cực từ thị trường",
+          "text": "Cấu trúc thị trường Bullish với Higher Highs và Higher Lows đã được xác nhận.",
           "type": "positive"
         },
         {
-          "text": "Lượng dòng tiền mạnh từ khối ngoại, cho thấy sự tin tưởng từ nhà đầu tư quốc tế",
+          "text": "Smart Money Confluence thể hiện áp lực mua mạnh từ dòng tiền thông minh cùng với dòng vốn nước ngoài đang tăng.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "ROE và ROA thấp, cho thấy hiệu suất kinh doanh kém",
+          "text": "Thị trường chung trong chế độ BEAR với trọng số 70% ảnh hưởng tiêu cực.",
           "type": "negative"
         },
         {
-          "text": "RSI cao ở mức 80, cảnh báo khả năng quá mua",
+          "text": "RSI nằm trong vùng quá mua có thể gây ra điều chỉnh ngắn hạn.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản yếu với chỉ số ROE, ROA thấp và tỷ suất sinh lời hạn chế.",
-      "technical_view": "Cổ phiếu đang trong xu hướng tăng, nhưng RSI cao nguy cơ quá mua.",
-      "flow_view": "Dòng tiền từ khối ngoại mạnh mẽ, hỗ trợ tích cực cho xu hướng hiện tại.",
+      "fundamental_view": "Cơ bản của VVS ổn định nhưng không nổi bật với ROE và Net Margin thấp.",
+      "technical_view": "Thị trường thể hiện cấu trúc bullish với Bullish Order Block đã được tiết lộ và tồn tại Fair Value Gap chưa được lấp.",
+      "flow_view": "Dòng tiền tổ chức mạnh mẽ với áp lực mua hoàn toàn và dòng vốn nước ngoài tích cực trong 7 ngày qua.",
       "symbol": "VVS"
     },
     "DGC": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu DGC hiện tại phản ánh một tiềm năng tăng trưởng hạn chế với các chỉ số tài chính và kỹ thuật không mạnh.",
+      "summary": "DGC hiện có setup trung lập với một số yếu tố hỗ trợ từ dòng tiền tổ chức và đà hồi phục ngắn hạn. Tuy nhiên, trong bối cảnh thị trường BEAR, không có tín hiệu mạnh mẽ để hành động ngay.",
       "highlights": [
         {
-          "text": "Composite Score và Technical Score cao, cho thấy khả năng thu hút dòng tiền thông minh và sức mạnh của xu hướng.",
+          "text": "Dòng tiền thông minh và áp lực mua từ tổ chức đang tăng mạnh.",
           "type": "positive"
         },
         {
-          "text": "Debt/Equity thấp (0.27) chỉ ra rằng công ty không có nhiều rủi ro về nợ.",
+          "text": "Giá cổ phiếu có sự phục hồi ngắn hạn với xu hướng tăng.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Momentum Score và Fundamental Score thấp, phản ánh rủi ro về triển vọng tài chính và tăng trưởng.",
+          "text": "Thị trường chung đang trong giai đoạn giảm mạnh, có thể ảnh hưởng tiêu cực đến cổ phiếu.",
           "type": "negative"
         },
         {
-          "text": "Tăng trưởng doanh thu và lợi nhuận rất hạn chế, gây lo ngại về khả năng tạo ra lợi nhuận trong tương lai.",
+          "text": "Thiếu tín hiệu ICT quyết định để tạo động lực tăng mạnh tiếp theo.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Khả năng tăng trưởng cơ bản của DGC có vẻ hạn chế, phản ánh qua chỉ số Fundamental Score không mạnh.",
-      "technical_view": "Chỉ số kỹ thuật mạnh mẽ với Technical Score cao và RSI ở mức trung lập, đặc biệt là xu hướng tăng ngắn hạn.",
-      "flow_view": "Sự quan tâm mạnh mẽ từ khối ngoại gần đây cho thấy tín hiệu tích cực về dòng tiền vào.",
+      "fundamental_view": "DGC có các chỉ số cơ bản ổn định nhưng không quá nổi bật trong ngành.",
+      "technical_view": "Thị trường chỉ ra cấu trúc trung lập, không có Breakout hoặc Fair Value Gap hiện hữu, một số tín hiệu ICT không khẳng định xu hướng rõ ràng.",
+      "flow_view": "Dòng tiền nước ngoài và tổ chức đang diễn ra mạnh mẽ, hỗ trợ giá tăng trong ngắn hạn nhưng cần theo dõi thêm.",
       "symbol": "DGC"
     },
     "BSR": {
       "recommendation": "HOLD",
-      "summary": "BSR cho thấy một sự tăng trưởng mạnh mẽ về giá cổ phiếu trong ngắn hạn, nhưng yếu kém về cơ bản tài chính.",
+      "summary": "Cổ phiếu BSR đang duy trì cấu trúc bullish với nhiều tín hiệu tích cực từ momentum và dòng tiền thông minh. Tuy nhiên, với thị trường đang trong chế độ BEAR, cần thận trọng khi tham gia ở mức giá cao.",
       "highlights": [
         {
-          "text": "Smart Money Score đạt mức tối đa, cho thấy sự quan tâm mạnh mẽ từ các nhà đầu tư thông minh.",
+          "text": "Bullish structure với Higher Highs và Higher Lows",
           "type": "positive"
         },
         {
-          "text": "Momentum Score và Technical Score cao, thể hiện xu hướng tăng và sức mạnh kỹ thuật tốt.",
+          "text": "Chỉ số ADX cao, cho thấy xu hướng tăng mạnh",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Fundamental Score thấp, phản ánh bức tranh tài chính yếu kém.",
+          "text": "P/E cao 32.2x phản ánh kỳ vọng lợi nhuận tương lai đã phần nào được giá trong",
           "type": "negative"
         },
         {
-          "text": "RSI ở mức 80, cho thấy cổ phiếu có thể đang ở trong trạng thái quá mua.",
+          "text": "Trong chế độ BEAR market, các tín hiệu tích cực có thể không kéo dài",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản yếu với ROE và ROA thấp, cũng như P/E cao.",
-      "technical_view": "Kỹ thuật mạnh với xu hướng tăng giá ngắn hạn và RSI cao.",
-      "flow_view": "Dòng tiền từ khối ngoại mạnh mẽ trong thời gian qua.",
+      "fundamental_view": "Cổ phiếu có tỷ suất lợi nhuận thấp với chỉ số ROE và ROA đáng lo ngại.",
+      "technical_view": "Market structure vẫn BULLISH với tín hiệu Bullish từ Fair Value Gap và Liquidation Sweep.",
+      "flow_view": "Dòng tiền tổ chức mạnh mẽ, tuy nhiên dòng tiền ngoại bán ròng, điều này cần được giám sát.",
       "symbol": "BSR"
     },
     "FDC": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu FDC của CTCP Ngoại thương và Phát triển Đầu tư Thành phố Hồ Chí Minh hiện nằm ở mức đánh giá cao về mặt cơ bản nhưng đang gặp khó khăn trên thị trường và ghi nhận sự thận trọng từ nhà đầu tư nước ngoài.",
+      "summary": "Trong bối cảnh thị trường suy thoái, FDC thể hiện khả năng tích lũy tốt với cấu trúc giá vẫn duy trì tính bullish. Tuy nhiên, chưa có tín hiệu ICT đủ để đề xuất mua mạnh.",
       "highlights": [
         {
-          "text": "Fundamental Score cao, cho thấy cơ bản doanh nghiệp mạnh mẽ",
+          "text": "Cấu trúc giá bullish với cấu hình Higher Highs và Higher Lows.",
           "type": "positive"
         },
         {
-          "text": "P/E thấp so với ngành, có khả năng định giá hấp dẫn",
+          "text": "FDC có lợi thế so với ngành với ROE và P/E vượt trội.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Ngành Bất động sản đang bị phân phối, có thể ảnh hưởng tiêu cực đến giá cổ phiếu",
+          "text": "Thị trường chung trong chế độ bearish, tác động xấu đến tâm lý đầu tư.",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền nước ngoài rút ra mạnh trong thời gian gần đây, cảnh báo về sự quan tâm giảm từ nhà đầu tư quốc tế",
+          "text": "Khối ngoại bán ròng toàn thị trường và ngành bất động sản trong 7 ngày gần đây.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Với Fundamental Score cao và P/E thấp, cơ bản doanh nghiệp FDC được đánh giá tốt.",
-      "technical_view": "Trend tăng ngắn hạn nhưng Momentum Score thấp cho thấy biến động có thể không mạnh.",
-      "flow_view": "Rút tiền mạnh từ khối ngoại, dòng tiền chảy ra có thể làm giảm sức hấp dẫn của cổ phiếu.",
+      "fundamental_view": "Các chỉ số tài chính của FDC tốt hơn mặt bằng ngành, nhưng tăng trưởng doanh thu và biên lợi nhuận chưa đủ mạnh.",
+      "technical_view": "Mặc dù có breakout sắp tới, nhưng chưa đủ dấu hiệu từ Fair Value Gap hay Order Block để kích hoạt giao dịch.",
+      "flow_view": "Dòng tiền tổ chức duy trì tích cực nhưng dòng tiền khối ngoại không đóng góp nhiều cho giao dịch của FDC.",
       "symbol": "FDC"
     },
     "PVD": {
       "recommendation": "HOLD",
-      "summary": "PVD hiện tại phản ánh phần lớn những dữ liệu tích cực chủ yếu qua mặt kỹ thuật và dòng tiền, bất chấp yếu tố cơ bản kém.",
+      "summary": "PVD đang có cấu trúc kỹ thuật bullish, tuy nhiên thị trường chung vẫn còn trong chế độ BEAR không thuận lợi. Sự hiện diện của dòng tiền thông minh và vị thế tích cực so với ngành cung cấp một số hỗ trợ cho cổ phiếu.",
       "highlights": [
         {
-          "text": "Composite Score đạt Tier A, phản ánh sự ủng hộ mạnh mẽ từ Smart Money",
+          "text": "Cấu trúc bullish với Bulls Order Block và Fair Value Gap chưa bị lấp đầy.",
           "type": "positive"
         },
         {
-          "text": "Tăng trưởng giá cổ phiếu mạnh mẽ trong ngắn hạn",
+          "text": "Dòng tiền thông minh và áp lực mua vào cao.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Chỉ số ROE và ROA thấp, phản ánh hiệu quả hoạt động yếu",
+          "text": "Thị trường rộng hơn đang trong chế độ BEAR mạnh.",
           "type": "negative"
         },
         {
-          "text": "RSI cao cho thấy rủi ro về việc mua vào quá mức",
+          "text": "Tăng trưởng doanh thu và biên lợi nhuận thấp.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Yếu kém về phần cơ bản, với chỉ số ROE và ROA đều rất thấp.",
-      "technical_view": "Sự tăng trưởng mạnh mẽ về giá cổ phiếu và chỉ số kỹ thuật cho thấy sự lạc quan.",
-      "flow_view": "Dòng tiền từ khối ngoại ấn tượng trong ngắn và trung hạn.",
+      "fundamental_view": "PVD có điểm cơ bản kém với biên lợi nhuận và ROE thấp.",
+      "technical_view": "Cấu trúc thị trường bullish với Fair Value Gap bull không bị lấp đầy và Order Block bull đã được khắc phục.",
+      "flow_view": "Dòng tiền từ nước ngoài và tổ chức đang tăng cường tích cực vào PVD.",
       "symbol": "PVD"
     },
     "QST": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu QST hiện nằm ở mức đánh giá trung bình với sự phát triển chậm rãi trong ngành công nghệ và thông tin, bật lên nhờ khía cạnh kỹ thuật.",
+      "summary": "Cổ phiếu QST đang trong tình trạng tích cực về mặt kỹ thuật nhưng chưa có setup rõ ràng để hành động trong thị trường BEAR. Cấu trúc thị trường NEUTRAL và dòng tiền tổ chức chưa đủ mạnh để tạo đà tăng bền vững.",
       "highlights": [
         {
-          "text": "Momentum và Technical Score rất cao, cho thấy sự quan tâm mạnh mẽ từ phía thị trường.",
+          "text": "Chỉ số kỹ thuật độ mạnh xu hướng (ADX) ở mức 33 cho thấy xu hướng hiện tại vẫn khá mạnh.",
           "type": "positive"
         },
         {
-          "text": "P/E thấp cho thấy cổ phiếu có tiềm năng tăng giá từ góc độ định giá.",
+          "text": "FVG Bull với kích thước 19.79% và chưa được lấp đầy tạo tiềm năng tăng giá.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Chỉ số ROE và ROA thấp, phản ánh quản lý và hiệu quả hoạt động kém.",
+          "text": "Thị trường chung đang trong xu hướng giảm mạnh, gây áp lực cho cổ phiếu.",
           "type": "negative"
         },
         {
-          "text": "Sức tăng trưởng doanh thu và biên lãi ròng cực kỳ thấp, hiển thị sự trì trệ về mặt kinh doanh.",
+          "text": "Flow tiền tổ chức và nước ngoài chưa hỗ trợ tích cực cho cổ phiếu.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản yếu kém với chỉ số ROE, ROA, và sự tăng trưởng doanh thu thấp.",
-      "technical_view": "Kỹ thuật mạnh mẽ với xu hướng tăng và RSI trong vùng tích cực.",
-      "flow_view": "Dòng tiền không thay đổi từ khối ngoại, cho thấy thiếu sự quan tâm đầu tư quốc tế.",
+      "fundamental_view": "DOANH NGHIỆP CÓ CHỈ SỐ SUY GIẢM, nhưng chỉ số P/E khá hấp dẫn ở mức 8.4x.",
+      "technical_view": "Cấu trúc thị trường NEUTRAL với tín hiệu FVG Bull chưa lấp đầy, gợi ý tiềm năng phục hồi nhưng chưa đủ bằng chứng cho sự tăng mạnh.",
+      "flow_view": "Dòng tiền tổ chức yếu với Inst Flow Score 30/100 và không có dòng vốn từ khối ngoại.",
       "symbol": "QST"
     },
     "VCI": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu VCI có một số yếu tố tích cực từ góc độ kỹ thuật và sự quan tâm mạnh mẽ từ khối ngoại, tuy nhiên cơ bản doanh nghiệp và tình hình ngành đang yếu.",
+      "summary": "VCI hiện có tín hiệu tích cực từ dòng tiền thông minh và một số tín hiệu kỹ thuật mạnh, nhưng thị trường đang trong chế độ BEAR và setup ICT không actionable. Cần theo dõi thêm trước khi đưa ra quyết định đầu tư mạnh mẽ.",
       "highlights": [
         {
-          "text": "Technical Score cao với 81.0, cho thấy mạnh về mặt kỹ thuật",
+          "text": "Dòng tiền thông minh đang tập trung mạnh vào VCI, với điểm Smart Money đạt 100/100.",
           "type": "positive"
         },
         {
-          "text": "Sự quan tâm đáng kể từ phía khối ngoại với dòng tiền vào mạnh trong 30 ngày gần nhất",
+          "text": "Xu hướng ngắn hạn đang ở chiều tăng, với sức mạnh xu hướng đạt 66.8%.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Fundamental Score thấp chỉ 44.4, phản ánh cơ bản doanh nghiệp yếu",
+          "text": "Thị trường chung đang trong chế độ BEAR, có khả năng ảnh hưởng tiêu cực đến đà tăng của VCI.",
           "type": "negative"
         },
         {
-          "text": "Ngành Chứng khoán đang bị phân phối, có thể ảnh hưởng tiêu cực tới VCI",
+          "text": "Có tín hiệu bearish sweep của Equal Highs, cần thận trọng với các đợt điều chỉnh.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Với Fundamental Score thấp, cơ bản doanh nghiệp của VCI hiện yếu.",
-      "technical_view": "Trend ngắn hạn tăng và Technical Score cao cho thấy khả năng tiếp tục tăng trong ngắn hạn.",
-      "flow_view": "Dòng tiền từ khối ngoại mạnh, báo hiệu sự quan tâm và yếu tố tích cực.",
+      "fundamental_view": "Cổ phiếu VCI có hiệu quả tài chính thấp với ROE và ROA rất hạn chế.",
+      "technical_view": "Cấu trúc thị trường ở trạng thái trung lập, với sự hiện diện của Fair Value Gap và Order Block tích cực nhưng chưa được giá đến.",
+      "flow_view": "Dòng tiền tổ chức mạnh với điểm Inst Flow Score là 94/100, nhưng dòng tiền nước ngoài tổng ngành vẫn đang âm lớn.",
       "symbol": "VCI"
     },
     "DPM": {
       "recommendation": "HOLD",
-      "summary": "DPM thể hiện sức mạnh ổn định trên thị trường, nhưng biến động tài chính cơ bản cho thấy những hạn chế cần lưu ý. Mức tăng giá gần đây cần được cân nhắc kỹ.",
+      "summary": "Cổ phiếu DPM đang có xu hướng tích cực trong ngắn hạn với dòng tiền thông minh hỗ trợ, tuy nhiên trong bối cảnh thị trường chung vẫn thuộc chế độ BEAR và setup ICT không rõ ràng.",
       "highlights": [
         {
-          "text": "Smart Money Score cao, cho thấy niềm tin mạnh mẽ từ nhà đầu tư thông minh",
+          "text": "Cổ phiếu DPM có xu hướng ngắn hạn tăng mạnh với mức tăng 30.06% trong 20 ngày.",
           "type": "positive"
         },
         {
-          "text": "Momentum và Technical Score thể hiện sức mạnh kỹ thuật và động lượng tăng trưởng",
+          "text": "Chỉ số Smart Money điểm cao cho thấy dòng tiền thông minh đang hỗ trợ cổ phiếu.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Fundamental Score thấp, phản ánh rủi ro từ tình hình tài chính cơ bản",
+          "text": "Bối cảnh thị trường BEAR với 23/25 ngành đang chịu áp lực giảm giá.",
           "type": "negative"
         },
         {
-          "text": "ROE và ROA rất thấp, cảnh báo hiệu suất tài chính kém",
+          "text": "Fair Value Gap chưa được lấp, có khả năng giá điều chỉnh để lấp khoảng trống này.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản của DPM có phần nền tảng yếu, yêu cầu cẩn trọng khi đánh giá.",
-      "technical_view": "Biểu đồ kỹ thuật cho thấy xu hướng tăng nhưng cần thận trọng với RSI cao.",
-      "flow_view": "Dòng tiền khối ngoại mạnh mẽ trong ngắn hạn, điều này cho thấy sự quan tâm tiếp tục.",
+      "fundamental_view": "Các chỉ tiêu cơ bản của DPM ở mức trung bình với ROE và ROA thấp, và tỷ lệ P/E khá cao so với ngành.",
+      "technical_view": "Cấu trúc thị trường hiện tại là NEUTRAL với các tín hiệu ICT chưa rõ ràng, mặc dù có một số dấu hiệu FVG và BOS Bull.",
+      "flow_view": "Dòng tiền tổ chức đang ở mức trung lập với áp lực mua thấp, mặc dù có một chút dòng vốn ngoại tích cực trong 7 ngày qua.",
       "symbol": "DPM"
     },
     "AST": {
-      "symbol": "AST",
-      "recommendation": "BUY",
-      "summary": "AST có điểm số tốt (66.6) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "recommendation": "HOLD",
+      "summary": "Cổ phiếu AST hiện đang ở ngưỡng giữ do hiện diện của Order Block và Equal Highs/Equal Lows mang tính chất trung tính trong bối cảnh thị trường BEAR. Dòng tiền tổ chức và tín hiệu kỹ thuật đều chưa tạo ra một setup rõ ràng để hành động.",
       "highlights": [
         {
-          "text": "Điểm cơ bản 73/100 - Tài chính ổn định",
-          "type": "neutral"
-        },
-        {
-          "text": "Khối ngoại mua ròng +179760000.0B trong 7 ngày",
+          "text": "Order Block Bull đã được hình thành và hiện giá đang ở trong vùng Order Block.",
           "type": "positive"
         },
         {
-          "text": "Tín hiệu kỹ thuật tích cực",
-          "type": "positive"
-        },
-        {
-          "text": "RSI 54 - Vùng tăng bền vững",
-          "type": "positive"
-        },
-        {
-          "text": "Ngành Vận tải - kho bãi đang được tích lũy",
+          "text": "Dòng tiền tổ chức đang có xu hướng tăng với áp lực mua ở mức 75.0%.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Momentum yếu - Đà tăng suy giảm",
+          "text": "Xu hướng thị trường BEAR mạnh có thể gây áp lực giảm giá thêm cho AST.",
           "type": "negative"
+        },
+        {
+          "text": "Tín hiệu Bearish sweep of Equal Highs có thể tạo áp lực bán ngắn hạn.",
+          "type": "warning"
         }
       ],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục."
+      "fundamental_view": "AST có chỉ số P/E hấp dẫn tại 13.4x nhưng tỷ suất lợi nhuận thuần và tăng trưởng doanh thu thấp cho thấy áp lực trong việc cải thiện hiệu quả kinh doanh.",
+      "technical_view": "Thị trường đang trong trạng thái Neutral; có Order Block Bull đã mitigated nhưng thiếu tín hiệu Breakout.",
+      "flow_view": "Dòng vốn ngoại tiếp tục đổ vào mặc dù số lượng không lớn, trong khi dòng tiền tổ chức có xu hướng tăng đạt Inst Flow Score 70/100.",
+      "symbol": "AST"
     },
     "SVT": {
-      "symbol": "SVT",
-      "recommendation": "BUY",
-      "summary": "SVT có điểm số tốt (66.5) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "recommendation": "HOLD",
+      "summary": "Cổ phiếu SVT hiện không có setup rõ ràng để hành động trong bối cảnh thị trường BEAR. Các tín hiệu kỹ thuật và dòng tiền đang ở trạng thái trung tính, trong khi sức mạnh nội tại vẫn tương đối ổn định.",
       "highlights": [
         {
-          "text": "Điểm cơ bản 75/100 - Tài chính ổn định",
-          "type": "neutral"
-        },
-        {
-          "text": "Tín hiệu kỹ thuật tích cực",
+          "text": "SVT có vị trí tốt trong ngành SX Phụ trợ, đứng top #12 trên toàn thị trường.",
           "type": "positive"
         },
         {
-          "text": "RSI 54 - Vùng tăng bền vững",
+          "text": "Phân tích kỹ thuật cho thấy xu hướng ngắn hạn đang tăng mặc dù không mạnh.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Momentum yếu - Đà tăng suy giảm",
+          "text": "Thị trường tổng thể vẫn chịu áp lực giảm giá, ảnh hưởng đến tất cả các cổ phiếu.",
           "type": "negative"
+        },
+        {
+          "text": "Không có setup hành động rõ ràng từ phân tích kỹ thuật ICT.",
+          "type": "warning"
         }
       ],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
+      "fundamental_view": "SVT có chỉ số P/E hấp dẫn vào khoảng 7.3x với mức nợ thấp, nhưng tỷ suất sinh lời thấp.",
+      "technical_view": "Thị trường đang trong trạng thái trung tính với cấu trúc không rõ ràng, không có tín hiệu FVG hay Order Block đáng chú ý.",
+      "flow_view": "Dòng tiền từ tổ chức và khối ngoại đang trung tính với sự tích lũy nhẹ, không có sự thay đổi đáng kể.",
+      "symbol": "SVT"
     },
     "DNC": {
-      "symbol": "DNC",
-      "recommendation": "BUY",
-      "summary": "DNC có điểm số tốt (66.4) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "recommendation": "HOLD",
+      "summary": "Cổ phiếu DNC đang có cấu trúc BULLISH với một số tín hiệu ICT tích cực, tuy nhiên thiếu setup hành động rõ ràng và thị trường chung trong trạng thái BEAR khiến việc mua vào cần thận trọng.",
       "highlights": [
         {
-          "text": "Điểm cơ bản 68/100 - Tài chính ổn định",
-          "type": "neutral"
-        },
-        {
-          "text": "Tín hiệu kỹ thuật tích cực",
+          "text": "Cấu trúc thị trường hiện tại là BULLISH với mức BOS Bullish rõ ràng.",
           "type": "positive"
         },
         {
-          "text": "RSI 58 - Vùng tăng bền vững",
-          "type": "positive"
-        },
-        {
-          "text": "Ngành Tiện ích đang được tích lũy",
+          "text": "Có Fair Value Gap Bullish và sự hiện diện của Order Block Bullish đã được giảm thiểu.",
           "type": "positive"
         }
       ],
-      "risks": [],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
+      "risks": [
+        {
+          "text": "Không có setup hành động rõ ràng từ các tín hiệu ICT bất chấp tín hiệu thị trường BULLISH.",
+          "type": "negative"
+        },
+        {
+          "text": "Thị trường chung ở trong trạng thái BEAR với lực cầu yếu.",
+          "type": "warning"
+        }
+      ],
+      "fundamental_view": "Cổ phiếu DNC có sức mạnh cơ bản vừa phải với P/E hấp dẫn và ROE thấp, phản ánh mức độ tăng trưởng hạn chế.",
+      "technical_view": "DNC có cấu trúc BULLISH với Fair Value Gap và Order Block Bullish xác định, tuy không hành động được ngay.",
+      "flow_view": "Dòng tiền tổ chức có xu hướng vào nhưng chưa đủ mạnh, không có dòng tiền từ nhà đầu tư nước ngoài.",
+      "symbol": "DNC"
     },
     "VPX": {
-      "symbol": "VPX",
-      "recommendation": "BUY",
-      "summary": "VPX có điểm số tốt (66.3) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "recommendation": "HOLD",
+      "summary": "Mặc dù có một số tín hiệu tích cực từ dòng tiền thông minh và sự gia tăng áp lực mua, nhưng trong bối cảnh thị trường BEAR, VPX vẫn chưa có setup mạnh mẽ để tăng giá đáng kể.",
       "highlights": [
         {
-          "text": "Điểm cơ bản 60/100 - Tài chính ổn định",
-          "type": "neutral"
-        },
-        {
-          "text": "Khối ngoại mua ròng +8709390000.0B trong 7 ngày",
+          "text": "Smart money confluence với áp lực mua gia tăng và dòng ngoại tăng tốc.",
           "type": "positive"
         },
         {
-          "text": "Tín hiệu kỹ thuật tích cực",
-          "type": "positive"
-        },
-        {
-          "text": "RSI 55 - Vùng tăng bền vững",
+          "text": "Cấu trúc xu hướng ngắn hạn là tăng với tín hiệu bullish từ Order Block.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Ngành Chứng khoán đang bị phân phối",
+          "text": "Chỉ số ROE và ROA thấp, cho thấy hiệu quả sử dụng vốn kém.",
           "type": "negative"
+        },
+        {
+          "text": "Cổ phiếu có thể gặp kháng cự do các điểm cân bằng cao tạo kho bão xoáy thanh khoản.",
+          "type": "warning"
         }
       ],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục."
+      "fundamental_view": "VPX có chỉ số cơ bản không mạnh với ROE và ROA thấp, có thể gây áp lực giảm giá cổ phiếu dài hạn.",
+      "technical_view": "Cấu trúc thị trường đúng xu hướng bullish với Order Block đã được mitigate, nhưng chưa có dấu hiệu Breakout mạnh.",
+      "flow_view": "Dòng tiền thông minh và ngoại đang tăng cường hỗ trợ, tạo áp lực mua mạnh trong ngắn hạn.",
+      "symbol": "VPX"
     },
     "SZB": {
-      "symbol": "SZB",
-      "recommendation": "BUY",
-      "summary": "SZB có điểm số tốt (66.2) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ.",
+      "recommendation": "HOLD",
+      "summary": "SZB hiện không có setup ICT rõ ràng, mặc dù có một số điểm tích cực như tăng trưởng giá trong 20 ngày gần đây và dấu hiệu dòng tiền tổ chức ở mức cao. Tuy nhiên, môi trường thị trường BEAR yêu cầu thêm sự thận trọng.",
       "highlights": [
         {
-          "text": "Điểm cơ bản 62/100 - Tài chính ổn định",
-          "type": "neutral"
-        },
-        {
-          "text": "Tín hiệu kỹ thuật tích cực",
+          "text": "Cấu trúc thị trường BULLISH với tín hiệu quét thanh khoản tăng giá gần đây.",
           "type": "positive"
         },
         {
-          "text": "RSI 59 - Vùng tăng bền vững",
+          "text": "Khối lượng giao dịch cao gấp nhiều lần so với trung bình, cho thấy động thái mạnh từ thị trường.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Ngành Bất động sản đang bị phân phối",
+          "text": "Thị trường là môi trường BEAR với sức mua yếu và dòng tiền nước ngoài tiếp tục rút ra.",
           "type": "negative"
+        },
+        {
+          "text": "Tín hiệu quét thanh khoản giảm giá vẫn cảnh báo về khả năng bị bán mạnh.",
+          "type": "warning"
         }
       ],
-      "fundamental_view": "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được.",
-      "technical_view": "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng.",
-      "flow_view": "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
+      "fundamental_view": "Cổ phiếu SZB có định giá hợp lý với P/E thấp, tuy nhiên hiệu quả tài chính và tăng trưởng doanh thu vẫn khá yếu.",
+      "technical_view": "ICT cho thấy cấu trúc tăng giá với quét thanh khoản tăng gần đây, nhưng thiếu các tín hiệu Order Block hoặc Fair Value Gap rõ ràng.",
+      "flow_view": "Dòng tiền từ tổ chức cho thấy sự gia tăng tích cực, nhưng dòng vốn ngoại và dòng tiền tổ chức vẫn chưa ổn định.",
+      "symbol": "SZB"
     }
   }
 }
