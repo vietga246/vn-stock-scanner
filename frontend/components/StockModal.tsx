@@ -19,6 +19,7 @@ import {
   Info,
 } from 'lucide-react';
 import type { Stock, AIAnalysis, ICTSignal, StockDetail, IncomeRecord, BalanceRecord, CashflowRecord, RatioRecord } from '@/lib/types';
+import { getStockSignal } from '@/lib/signals';
 import { generateAnalysis, getRecommendationDisplay } from '@/lib/analysis';
 import { generateDeskAnalysis } from '@/lib/desk_analysis';
 import type { DeskAnalysis, SignalGroup, SignalItem, TradeSetup, TradeAction } from '@/lib/types';
@@ -159,10 +160,12 @@ function AnalysisTab({
     warning:  { color: '#ff9500', bg: '#ff950010', border: '#ff950028' },
   };
 
-  // Determine display recommendation — prefer AI if available
-  const rec = ai?.recommendation ?? d.setup.action;
+  // Signal từ computeSignal — SINGLE SOURCE OF TRUTH (đồng bộ với Dashboard)
+  // AI recommendation chỉ dùng cho narrative/text, KHÔNG override action
+  const sig = getStockSignal(stock, ictSignal, d.signal_groups);
+  const rec = sig.action;
   const ac = actionCfg[rec] ?? actionCfg.HOLD;
-  const cc = convCfg[d.setup.conviction] ?? convCfg.LOW;
+  const cc = convCfg[sig.conviction] ?? convCfg.LOW;
 
   // AI sections
   const aiSections = ai?.sections as Record<string, string> | undefined;
@@ -1493,7 +1496,7 @@ function ModalInner({
         {/* Content */}
         <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 220px)' }}>
           {/* Analysis Tab */}
-          {activeTab === 'analysis' && <AnalysisTab stock={stock} deskAnalysis={deskAnalysis} aiAnalysis={preloadedAnalysis} />}
+          {activeTab === 'analysis' && <AnalysisTab stock={stock} deskAnalysis={deskAnalysis} aiAnalysis={preloadedAnalysis} ictSignal={ictSignal} />}
 
           {/* Strategy Tab */}
           {activeTab === 'strategy' && (
