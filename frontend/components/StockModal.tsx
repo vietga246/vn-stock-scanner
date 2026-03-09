@@ -31,6 +31,7 @@ interface StockModalProps {
   sectorStatus?: 'accumulating' | 'distributing' | 'neutral';
   preloadedAnalysis?: AIAnalysis;
   ictSignal?: ICTSignal;
+  regimeBullWeight?: number;
   onClose: () => void;
 }
 
@@ -960,6 +961,7 @@ function ModalInner({
   sectorStatus,
   preloadedAnalysis,
   ictSignal,
+  regimeBullWeight,
   detail,
   detailLoading,
   visible,
@@ -971,6 +973,7 @@ function ModalInner({
   sectorStatus?: 'accumulating' | 'distributing' | 'neutral';
   preloadedAnalysis?: AIAnalysis;
   ictSignal?: ICTSignal;
+  regimeBullWeight?: number;
   detail: StockDetail | null;
   detailLoading: boolean;
   visible: boolean;
@@ -982,8 +985,13 @@ function ModalInner({
     onClose();
   };
 
-  const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus);
+  // bull_weight: ictSignal (stock-level) > regimeBullWeight (market-level) > 0.5 (neutral fallback)
+  // Tránh race condition: nếu ICT chưa load, dùng regime bull_weight thay vì hardcode 0.5
+  const bullWeight = ictSignal?.bull_weight ?? regimeBullWeight;
+  const analysis = preloadedAnalysis || generateAnalysis(stock, sectorStatus, bullWeight);
   const deskAnalysis = generateDeskAnalysis(stock, ictSignal, sectorStatus);
+  // recDisplay: dùng analysis.recommendation (= AI khi có, rule-based khi không)
+  // Đảm bảo nhất quán với AnalysisTab bên dưới
   const recDisplay = getRecommendationDisplay(analysis.recommendation);
   const tierColor = getTierColor(stock.tier);
   const price = stock.close || stock.price || 0;
@@ -1261,6 +1269,7 @@ export default function StockModal({
   sectorStatus,
   preloadedAnalysis,
   ictSignal,
+  regimeBullWeight,
   onClose,
 }: StockModalProps) {
   const [visible, setVisible] = useState(false);
@@ -1298,6 +1307,7 @@ export default function StockModal({
       sectorStatus={sectorStatus}
       preloadedAnalysis={preloadedAnalysis}
       ictSignal={ictSignal}
+      regimeBullWeight={regimeBullWeight}
       detail={detail}
       detailLoading={detailLoading}
       visible={visible}
