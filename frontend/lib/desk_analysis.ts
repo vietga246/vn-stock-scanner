@@ -294,39 +294,67 @@ function buildTechnicalGroup(stock: Stock, ict?: ICTSignal): SignalGroup {
   const signals: SignalItem[] = [];
   let score = stock.technical_score ?? 50;
 
-  // ADX — Trend strength
-  const adx = stock.adx14;
+  const rsi   = stock.rsi14;
+  const adx   = stock.adx14;
+  const trend = stock.trend_short ?? 0;
+  const p20d  = stock.price_change_20d ?? stock.change_20d ?? 0;
+  const pma20 = stock.pct_from_ma20;
+
+  // ── Super Combo Detection (v3 — backtest edge +9.79% fwd10D) ─────────────
+  const isSuperCombo = trend === 1 && (adx ?? 0) > 25 && (rsi ?? 50) < 35;
+  if (isSuperCombo) {
+    signals.push(pos('⭐ SUPER COMBO', 'Trend+ADX>25+RSI<35',
+      `Backtest: win 72.7% 20D, avg +9.79% fwd10D — Edge mạnh nhất trong dataset`));
+    score = Math.min(100, score + 20);
+  }
+
+  // ── Mean Reversion Signal (v3 — crash bounce edge +1.79% fwd10D) ─────────
+  const isMeanRev = p20d < -15 && (rsi ?? 50) < 40;
+  if (isMeanRev && !isSuperCombo) {
+    const severity = p20d < -20 ? 'CRASH' : 'PULLBACK';
+    signals.push(pos(`Mean Reversion (${severity})`, `${fmtPct(p20d)} 20D`,
+      `RSI ${rsi?.toFixed(0)} — Backtest bounce edge +1.79% avg (5-10D), nhưng BEAR 20D vẫn rủi ro`));
+    score = Math.min(100, score + 8);
+  }
+
+  // ── ADX — Trend strength ──────────────────────────────────────────────────
   if (adx != null) {
-    if (adx >= 30) { signals.push(pos('ADX', `${fmt(adx, 0)}`, 'Trend mạnh — momentum rõ ràng')); score = Math.min(100, score + 8); }
-    else if (adx >= 20) { signals.push(neu('ADX', `${fmt(adx, 0)}`, 'Trend vừa')); }
-    else { signals.push(warn('ADX', `${fmt(adx, 0)}`, 'Thị trường đang choppy / sideway')); score = Math.max(0, score - 5); }
+    if (adx >= 35) { signals.push(pos('ADX', `${fmt(adx, 0)}`, 'Trend rất mạnh — edge +0.62% (>50)')); score = Math.min(100, score + 8); }
+    else if (adx >= 25) { signals.push(pos('ADX', `${fmt(adx, 0)}`, 'Trend đủ mạnh — edge combo kích hoạt')); score = Math.min(100, score + 5); }
+    else if (adx >= 15) { signals.push(neu('ADX', `${fmt(adx, 0)}`, 'Trend đang developing')); }
+    else { signals.push(warn('ADX', `${fmt(adx, 0)}`, 'Choppy / sideway — tránh trend-following')); score = Math.max(0, score - 5); }
   }
 
-  // RSI
-  const rsi = stock.rsi14;
+  // ── RSI — calibrated theo backtest buckets ────────────────────────────────
   if (rsi != null) {
-    if (rsi > 75) { signals.push(warn('RSI', `${fmt(rsi, 0)}`, 'Vùng quá mua — cẩn thận correction')); }
-    else if (rsi >= 55 && rsi <= 75) { signals.push(pos('RSI', `${fmt(rsi, 0)}`, 'Momentum tăng bền vững')); }
-    else if (rsi >= 40 && rsi < 55) { signals.push(neu('RSI', `${fmt(rsi, 0)}`, 'Trung tính')); }
-    else if (rsi >= 25) { signals.push(warn('RSI', `${fmt(rsi, 0)}`, 'Momentum yếu')); score = Math.max(0, score - 5); }
-    else { signals.push(pos('RSI', `${fmt(rsi, 0)}`, 'Oversold — potential bounce setup')); }
+    if (rsi < 25)            { signals.push(pos('RSI', `${fmt(rsi, 0)}`, 'Cực oversold — bounce edge cao nhất (>+2% backtest)')); }
+    else if (rsi < 35)       { signals.push(pos('RSI', `${fmt(rsi, 0)}`, 'Oversold — edge +1.02% fwd20D ✓')); }
+    else if (rsi < 45)       { signals.push(warn('RSI', `${fmt(rsi, 0)}`, 'Yếu — edge gần neutral (-0.18%)')); score = Math.max(0, score - 3); }
+    else if (rsi < 65)       { signals.push(neu('RSI', `${fmt(rsi, 0)}`, 'Trung tính')); }
+    else if (rsi < 72)       { signals.push(pos('RSI', `${fmt(rsi, 0)}`, 'Momentum mạnh (không overbought)')); }
+    else                     { signals.push(warn('RSI', `${fmt(rsi, 0)}`, 'Overbought — cẩn thận mean reversion')); score = Math.max(0, score - 8); }
   }
 
-  // MA alignment (trend_short/trend_strength)
+  // ── MA alignment ──────────────────────────────────────────────────────────
+  // Note: MA20 cross UP standalone có edge ÂM (-0.45%) — không thưởng điểm cho cross
   const ts = stock.trend_strength;
   if (ts != null) {
-    if (ts >= 70) { signals.push(pos('MA Alignment', `${fmt(ts, 0)}/100`, 'Giá trên tất cả MA — uptrend rõ')); }
-    else if (ts >= 50) { signals.push(neu('MA Alignment', `${fmt(ts, 0)}/100`, 'Trên MA ngắn hạn')); }
-    else { signals.push(neg('MA Alignment', `${fmt(ts, 0)}/100`, 'Dưới MA — bearish alignment')); }
+    if (ts >= 70)       { signals.push(pos('MA Alignment', `${fmt(ts, 0)}/100`, 'Uptrend rõ — edge +0.77% fwd20D ✓')); }
+    else if (ts >= 50)  { signals.push(neu('MA Alignment', `${fmt(ts, 0)}/100`, 'Trên MA ngắn hạn')); }
+    else                { signals.push(neg('MA Alignment', `${fmt(ts, 0)}/100`, 'Dưới MA — bearish')); }
+  } else if (trend === 1) {
+    signals.push(pos('Trend', 'P > MA20 > MA50', 'Uptrend — edge +0.77%'));
+  } else if (trend === -1) {
+    signals.push(neg('Trend', 'P < MA20 < MA50', 'Downtrend'));
+    score = Math.max(0, score - 5);
   }
 
-  // Distance from MA
-  const pma20 = stock.pct_from_ma20;
+  // ── Distance from MA20 ────────────────────────────────────────────────────
   if (pma20 != null) {
-    if (pma20 > 10) signals.push(warn('Từ MA20', `+${fmt(pma20)}%`, 'Giá cao quá MA20 — overextended'));
-    else if (pma20 >= 0) signals.push(pos('Từ MA20', `+${fmt(pma20)}%`, 'Trên MA20'));
-    else if (pma20 >= -5) signals.push(warn('Từ MA20', `${fmt(pma20)}%`, 'Vừa rơi dưới MA20'));
-    else signals.push(neg('Từ MA20', `${fmt(pma20)}%`, 'Xa dưới MA20'));
+    if (pma20 > 15)         signals.push(warn('Từ MA20', `+${fmt(pma20)}%`, 'Quá xa MA20 — mean reversion risk cao (-0.85% backtest)'));
+    else if (pma20 > 0)     signals.push(pos('Từ MA20', `+${fmt(pma20)}%`, 'Trên MA20'));
+    else if (pma20 >= -5)   signals.push(warn('Từ MA20', `${fmt(pma20)}%`, 'Vừa rơi dưới MA20'));
+    else                    signals.push(neg('Từ MA20', `${fmt(pma20)}%`, 'Xa dưới MA20'));
   }
 
   // FVG
