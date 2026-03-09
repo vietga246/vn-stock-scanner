@@ -25,7 +25,10 @@ import numpy as np
 import logging
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, date
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
+from trading_calendar import trading_date_cutoff, get_trading_date_list_sql
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────
 
@@ -269,26 +272,33 @@ def load_fundamentals(conn) -> pd.DataFrame:
 def load_smart_money(conn) -> pd.DataFrame:
     """
     Tổng hợp dòng tiền nước ngoài (foreign flow).
-    
-    Lưu ý: prop_trading và insider_deals không có data từ VCI source →
-    đã loại bỏ khỏi Smart Money Score. Chỉ dùng foreign flow.
+
+    Dùng trading_calendar để chỉ tính ngày giao dịch thực tế:
+    7D = 7 phiên GD gần nhất, 30D = 30 phiên GD gần nhất.
+    Loại trừ T7, CN và ngày lễ VN → kết quả chính xác hơn.
     """
-    # Foreign flow 7 ngày
-    foreign_7d = pd.read_sql("""
+    today = date.today()
+    cutoff_7d  = trading_date_cutoff(7,  today)
+    cutoff_30d = trading_date_cutoff(30, today)
+
+    log.info("Foreign flow cutoffs: 7D=%s | 30D=%s", cutoff_7d, cutoff_30d)
+
+    # Foreign flow 7 phiên GD
+    foreign_7d = pd.read_sql(f"""
         SELECT symbol,
                SUM(net_value) AS foreign_net_7d,
                SUM(buy_value) AS foreign_buy_7d,
                SUM(sell_value) AS foreign_sell_7d
         FROM foreign_trading
-        WHERE date >= date('now', '-7 days')
+        WHERE date >= '{cutoff_7d}'
         GROUP BY symbol
     """, conn)
 
-    # Foreign flow 30 ngày
-    foreign_30d = pd.read_sql("""
+    # Foreign flow 30 phiên GD
+    foreign_30d = pd.read_sql(f"""
         SELECT symbol, SUM(net_value) AS foreign_net_30d
         FROM foreign_trading
-        WHERE date >= date('now', '-30 days')
+        WHERE date >= '{cutoff_30d}'
         GROUP BY symbol
     """, conn)
 
