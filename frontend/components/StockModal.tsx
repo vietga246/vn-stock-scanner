@@ -122,10 +122,12 @@ function AnalysisTab({
   stock,
   deskAnalysis,
   aiAnalysis,
+  ictSignal,
 }: {
   stock: Stock;
   deskAnalysis: DeskAnalysis;
   aiAnalysis?: AIAnalysis;
+  ictSignal?: ICTSignal;
 }) {
   const d = deskAnalysis;
   const ai = aiAnalysis;
