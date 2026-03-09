@@ -61,50 +61,102 @@ export const SIGNAL_CONFIG: Record<TradeAction, Omit<SignalConfig, 'action' | 'c
 
 /**
  * Tính signal từ stock + optional ICT data.
- * Đây là hàm duy nhất quyết định action — tất cả UI import từ đây.
+ * v3: Dynamic thresholds theo bull_weight + Super Combo path + Mean Reversion path
  *
- * @param composite   composite_score của stock (0-100)
- * @param bullWeight  bull_weight từ ICT regime (0-1). Default 0.5 nếu không có ICT.
- * @param groups      SignalGroup[] từ desk_analysis (optional — dùng để tính avgScore)
- * @param foreignNet7d  foreign_net_7d tính bằng tỷ VNĐ (optional — dùng cho boost rule)
+ * Backtest findings baked in:
+ *   - Trend+ADX>25+RSI<35: win 72.7% 20D, avg +9.79% → STRONG_BUY path riêng
+ *   - Crash -15%/20D: bounce avg +1.79% 10D → Mean Reversion override (SHORT TERM)
+ *   - MA20 cross standalone: -0.45% 20D → không được thưởng điểm
+ *   - BEAR regime: tăng thresholds để khó đạt BUY hơn
  */
 export function computeSignal(
   composite: number,
   bullWeight: number = 0.5,
   groups?: SignalGroup[],
   foreignNet7d?: number,
+  stock?: Stock,              // v3: cần thêm raw indicators cho special paths
 ): SignalConfig {
 
   // Effective score: blend group analysis + composite, weighted by market regime
   const avgScore = groups && groups.length > 0
     ? groups.reduce((s, g) => s + g.score, 0) / groups.length
-    : composite; // fallback: chỉ dùng composite khi không có groups
+    : composite;
 
   const effectiveScore = avgScore * bullWeight + composite * (1 - bullWeight);
 
-  // Action decision
+  // ── v3: Dynamic thresholds theo regime ────────────────────────────────────
+  // BEAR (bw≤0.3): tăng threshold BUY +5 để khó đạt hơn (market không ủng hộ)
+  // BULL (bw≥0.65): giảm threshold BUY -3 để dễ trigger hơn
+  const regimeShift = bullWeight <= 0.3 ? 5 : bullWeight >= 0.65 ? -3 : 0;
+  const T = {
+    STRONG_BUY:  THRESHOLDS.STRONG_BUY  + regimeShift,
+    BUY:         THRESHOLDS.BUY         + regimeShift,
+    ACCUMULATE:  THRESHOLDS.ACCUMULATE  + regimeShift,
+    HOLD:        THRESHOLDS.HOLD,       // HOLD threshold không thay đổi
+    REDUCE:      THRESHOLDS.REDUCE,
+  };
+
+  // ── v3: Super Combo path — Trend+ADX>25+RSI<35 ───────────────────────────
+  // Backtest: win 72.7% 20D, avg +9.79% fwd10D (strongest edge in dataset)
+  // Chỉ kích hoạt khi KHÔNG phải BEAR extreme (bullWeight > 0.25)
+  if (stock && bullWeight > 0.25) {
+    const rsi   = stock.rsi14 ?? 50;
+    const adx   = stock.adx14 ?? 0;
+    const trend = stock.trend_short ?? 0;
+    if (trend === 1 && adx > 25 && rsi < 35) {
+      const conviction: ConvictionLevel = adx > 35 && rsi < 30 ? 'HIGH' : 'MEDIUM';
+      if (bullWeight >= 0.5) {
+        const cfg = SIGNAL_CONFIG['STRONG_BUY'];
+        return { ...cfg, action: 'STRONG_BUY', conviction };
+      } else {
+        // BEAR-ish but not extreme: BUY with lower conviction
+        const cfg = SIGNAL_CONFIG['BUY'];
+        return { ...cfg, action: 'BUY', conviction: 'LOW' };
+      }
+    }
+  }
+
+  // ── v3: Mean Reversion path — crash bounce (SHORT TERM) ──────────────────
+  // Backtest: crash -15%/20D → bounce avg +1.79% 10D, +8% vs bench (5-10D)
+  // Override chỉ cho SHORT TERM signal — không dùng cho position sizing
+  // Không override nếu đang ở BEAR extreme (sẽ tiếp tục giảm 20D)
+  if (stock && bullWeight > 0.3) {
+    const p20d = stock.price_change_20d ?? stock.change_20d ?? 0;
+    const rsi  = stock.rsi14 ?? 50;
+    if (p20d < -15 && rsi < 40) {
+      const cfg = SIGNAL_CONFIG['ACCUMULATE'];
+      return {
+        ...cfg,
+        action: 'ACCUMULATE',
+        conviction: p20d < -20 && rsi < 35 ? 'MEDIUM' : 'LOW',
+        label: 'ACCUMULATE',
+      };
+    }
+  }
+
+  // ── Standard path ─────────────────────────────────────────────────────────
   let action: TradeAction;
   let conviction: ConvictionLevel;
 
   if (bullWeight <= 0.3) {
-    // BEAR market — phân loại rõ hơn thay vì chỉ HOLD/AVOID
-    if (effectiveScore >= THRESHOLDS.BUY) {
-      action = 'HOLD';          // composite tốt nhưng không mua trong BEAR
-    } else if (effectiveScore >= THRESHOLDS.HOLD) {
-      action = 'REDUCE';        // dưới ngưỡng mua → giảm vị thế
+    // BEAR market: tất cả signals đều bị giảm bậc
+    if (effectiveScore >= T.BUY) {
+      action = 'HOLD';
+    } else if (effectiveScore >= T.HOLD) {
+      action = 'REDUCE';
     } else {
-      action = 'SELL';          // yếu + BEAR market → thoát
+      action = 'SELL';
     }
     conviction = 'LOW';
-  } else if (effectiveScore >= THRESHOLDS.STRONG_BUY) {
+  } else if (effectiveScore >= T.STRONG_BUY) {
     action = 'STRONG_BUY'; conviction = 'HIGH';
-  } else if (effectiveScore >= THRESHOLDS.BUY) {
+  } else if (effectiveScore >= T.BUY) {
     action = 'BUY'; conviction = 'HIGH';
-  } else if (effectiveScore >= THRESHOLDS.ACCUMULATE) {
+  } else if (effectiveScore >= T.ACCUMULATE) {
     action = 'ACCUMULATE'; conviction = 'MEDIUM';
-  } else if (effectiveScore >= THRESHOLDS.HOLD) {
+  } else if (effectiveScore >= T.HOLD) {
     action = 'HOLD'; conviction = 'LOW';
-  } else if (effectiveScore >= THRESHOLDS.REDUCE) {
+  } else if (effectiveScore >= T.REDUCE) {
     action = 'REDUCE'; conviction = 'MEDIUM';
   } else {
     action = 'SELL'; conviction = 'HIGH';
@@ -135,7 +187,7 @@ export function getStockSignal(
   const composite = stock.composite_score ?? 50;
   const bullWeight = ict?.bull_weight ?? 0.5;
   const foreignNet7d = stock.foreign_net_7d;
-  return computeSignal(composite, bullWeight, groups, foreignNet7d);
+  return computeSignal(composite, bullWeight, groups, foreignNet7d, stock);
 }
 
 /**
