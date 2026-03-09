@@ -978,6 +978,339 @@ function StatsTab({ stock }: { stock: Stock }) {
 }
 
 
+// ─── Trading Strategy Tab ─────────────────────────────────────────────────────
+function TradingStrategyTab({
+  stock,
+  deskAnalysis,
+  aiAnalysis,
+  ictSignal,
+}: {
+  stock: Stock;
+  deskAnalysis: DeskAnalysis;
+  aiAnalysis?: AIAnalysis;
+  ictSignal?: ICTSignal;
+}) {
+  const d = deskAnalysis;
+  const s = d.setup;
+  const price = stock.close || stock.price || 0;
+  const atr = stock.atr14 ?? 0;
+  const atrPct = stock.atr_pct ?? 0;
+  const rsi = stock.rsi14 ?? 50;
+  const adx = stock.adx14 ?? 0;
+  const bullWeight = ictSignal?.bull_weight ?? 0.5;
+  const isBear = bullWeight < 0.40;
+  const isBull = bullWeight >= 0.65;
+
+  // ── Derive regime-aware strategy type ────────────────────────────────────
+  const trend = stock.trend_short ?? 0;         // 1=up, 0=flat, -1=down
+  const mom20 = stock.price_change_20d ?? stock.change_20d ?? 0;
+  const pctMa20 = stock.pct_from_ma20 ?? 0;
+
+  // Backtest findings baked in:
+  // RSI<35 oversold edge +1.02%, trend+ADX>30 combo +1.54%, crash recovery +2.76% (5D)
+  const isOversold   = rsi < 35;
+  const isCombo      = trend === 1 && adx > 30 && rsi < 70;
+  const isCrash      = mom20 < -20;
+  const isMomentumOB = mom20 > 15;             // edge âm -0.88% — mean reversion risk
+  const isOverbought = rsi > 72;
+
+  type StrategyKey = 'mean_reversion' | 'trend_follow' | 'crash_recovery' | 'overbought_risk' | 'neutral';
+
+  type StrategyDef = {
+    key: StrategyKey;
+    label: string;
+    icon: string;
+    color: string;
+    bg: string;
+    border: string;
+    tagline: string;
+    desc: string;
+    edge: string;
+  };
+
+  const strategies: Record<StrategyKey, StrategyDef> = {
+    mean_reversion: {
+      key: 'mean_reversion',
+      label: 'MEAN REVERSION',
+      icon: '🔄',
+      color: '#00ff88',
+      bg: '#00ff8810',
+      border: '#00ff8835',
+      tagline: 'RSI Oversold — Backtest edge +1.02% (20D)',
+      desc: 'Cổ phiếu bị bán quá mức. VNSTOCK có đặc tính mean reversion mạnh — RSI<35 đem lại edge thống kê đáng kể. Thích hợp mua dần vào vùng thấp, cắt lỗ nếu tiếp tục xác nhận downtrend.',
+      edge: '+1.02%',
+    },
+    trend_follow: {
+      key: 'trend_follow',
+      label: 'TREND FOLLOWING',
+      icon: '📈',
+      color: '#00d4ff',
+      bg: '#00d4ff10',
+      border: '#00d4ff35',
+      tagline: 'Trend + ADX>30 Combo — Backtest edge +1.54% (20D)',
+      desc: 'Setup lý tưởng nhất trên VNSTOCK: giá trên MA20 & MA50, ADX xác nhận trend mạnh, RSI chưa overbought. Đây là combo có edge dương cao nhất từ backtest 33k observations.',
+      edge: '+1.54%',
+    },
+    crash_recovery: {
+      key: 'crash_recovery',
+      label: 'CRASH RECOVERY',
+      icon: '💥',
+      color: '#ff9500',
+      bg: '#ff950010',
+      border: '#ff950035',
+      tagline: 'Bounce sau crash — Backtest edge +2.76% (5D)',
+      desc: 'Cổ phiếu đã giảm >20% trong 20 phiên. Backtest cho thấy bounce rate 49.9% trong 5 phiên tiếp theo. Chỉ nên trade ngắn hạn (5–7 phiên), không phải long position.',
+      edge: '+2.76% (5D)',
+    },
+    overbought_risk: {
+      key: 'overbought_risk',
+      label: 'OVERBOUGHT — THẬN TRỌNG',
+      icon: '⚠️',
+      color: '#ff3366',
+      bg: '#ff336610',
+      border: '#ff336635',
+      tagline: 'Momentum >15% — Backtest edge -0.88% (20D)',
+      desc: 'Cổ phiếu đã tăng mạnh. Backtest xác nhận momentum cao trên VNSTOCK thường dẫn đến mean reversion. Tránh mua đuổi. Nếu đang giữ, cân nhắc chốt lời một phần.',
+      edge: '-0.88%',
+    },
+    neutral: {
+      key: 'neutral',
+      label: 'WATCH & WAIT',
+      icon: '👁',
+      color: '#8b99a8',
+      bg: '#8b99a808',
+      border: '#8b99a825',
+      tagline: 'Chưa có signal rõ — Theo dõi thêm',
+      desc: 'Chưa có tín hiệu kỹ thuật rõ ràng. Nên chờ RSI về vùng oversold (<35) hoặc cổ phiếu tạo Trend+ADX>30 trước khi vào lệnh.',
+      edge: '~0%',
+    },
+  };
+
+  const activeStrategy: StrategyKey =
+    isCrash        ? 'crash_recovery' :
+    isOversold     ? 'mean_reversion' :
+    isCombo        ? 'trend_follow' :
+    (isMomentumOB || isOverbought) ? 'overbought_risk' :
+    'neutral';
+
+  const strat = strategies[activeStrategy];
+
+  // ── Position sizing via ATR ───────────────────────────────────────────────
+  const portfolioVal = 100_000_000; // 100M VND reference
+  const riskPerTrade = isBear ? 0.01 : 0.02; // 1% bear, 2% bull
+  const atrStop = atr > 0 ? atr * 1.5 : price * 0.04;
+  const positionShares = atrStop > 0 ? Math.floor((portfolioVal * riskPerTrade) / atrStop / 100) * 100 : 0;
+  const positionValue = positionShares * price;
+  const positionPct = portfolioVal > 0 ? (positionValue / portfolioVal * 100) : 0;
+
+  // ── Regime position size multiplier ──────────────────────────────────────
+  const sizeMultiplier = isBear ? 0.5 : isBull ? 1.0 : 0.75;
+  const adjShares = Math.floor(positionShares * sizeMultiplier / 100) * 100;
+  const adjValue  = adjShares * price;
+
+  // ── Checklist items ───────────────────────────────────────────────────────
+  type ChecklistItem = { label: string; pass: boolean; note: string };
+  const checklist: ChecklistItem[] = [
+    {
+      label: 'Trend UP (P>MA20>MA50)',
+      pass: trend === 1,
+      note: trend === 1 ? `Giá trên cả 2 MA — Trend score tốt` : `Giá chưa trên MA — edge giảm`,
+    },
+    {
+      label: 'RSI không overbought (<72)',
+      pass: rsi < 72,
+      note: rsi < 72 ? `RSI ${rsi.toFixed(0)} — vùng an toàn` : `RSI ${rsi.toFixed(0)} — overbought, edge âm`,
+    },
+    {
+      label: 'ADX xác nhận trend (>25)',
+      pass: adx > 25,
+      note: adx > 25 ? `ADX ${adx.toFixed(0)} — trend đủ mạnh` : `ADX ${adx.toFixed(0)} — trend yếu, cẩn thận`,
+    },
+    {
+      label: 'Không overbought momentum',
+      pass: mom20 < 15,
+      note: mom20 < 15 ? `Tăng ${mom20.toFixed(1)}% 20D — chưa overextended` : `Tăng ${mom20.toFixed(1)}% 20D — mean reversion risk cao`,
+    },
+    {
+      label: 'Market regime phù hợp',
+      pass: !isBear,
+      note: isBear ? `BEAR (bull_weight ${(bullWeight*100).toFixed(0)}%) — hạn chế long` : `Bull weight ${(bullWeight*100).toFixed(0)}% — regime OK`,
+    },
+    {
+      label: 'RSI oversold bonus (<35)',
+      pass: isOversold,
+      note: isOversold ? `RSI ${rsi.toFixed(0)} — mean reversion edge +1.02%` : `RSI ${rsi.toFixed(0)} — chưa oversold`,
+    },
+  ];
+
+  const passCount = checklist.filter(c => c.pass).length;
+  const comboActive = isCombo;
+
+  return (
+    <div className="space-y-3">
+
+      {/* ── 1. Strategy Badge ─────────────────────────────────────────── */}
+      <div className="rounded-xl p-3" style={{ background: strat.bg, border: '1px solid ' + strat.border }}>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">{strat.icon}</span>
+              <span className="font-black text-sm tracking-widest" style={{ color: strat.color }}>
+                {strat.label}
+              </span>
+              {comboActive && (
+                <span className="px-1.5 py-0.5 rounded text-[8px] font-bold tracking-widest"
+                  style={{ background: '#00d4ff20', color: '#00d4ff', border: '1px solid #00d4ff40' }}>
+                  COMBO BONUS
+                </span>
+              )}
+            </div>
+            <div className="text-[10px] mb-2" style={{ color: '#8b99a8' }}>{strat.tagline}</div>
+            <p className="text-[10px] leading-relaxed" style={{ color: '#c8d4e0' }}>{strat.desc}</p>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-[8px] tracking-widest mb-1" style={{ color: '#4a5a6a' }}>BACKTEST EDGE</div>
+            <div className="font-mono font-black text-base" style={{ color: strat.color }}>{strat.edge}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 2. Entry / Exit Setup ─────────────────────────────────────── */}
+      {(s.entry_zone || s.stop_loss || s.target_1) && (
+        <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+          <div className="text-[9px] font-semibold tracking-widest mb-2.5" style={{ color: '#4a5a6a' }}>
+            📍 ENTRY / EXIT PLAN
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { label: '🟢 Vùng vào lệnh',   val: s.entry_zone,   col: '#00ff88' },
+              { label: '🛑 Cắt lỗ (Stop)',    val: s.stop_loss,    col: '#ff3366' },
+              { label: '🎯 Mục tiêu 1 (T1)',  val: s.target_1,     col: '#00d4ff' },
+              { label: '🚀 Mục tiêu 2 (T2)',  val: s.target_2,     col: '#a78bfa' },
+              { label: '⚖️ Risk / Reward',    val: s.risk_reward,  col: '#ffcc00' },
+              { label: '⏱ Thời gian giữ',    val: s.time_horizon, col: '#8b99a8' },
+            ].filter(r => r.val).map(({ label, val, col }) => (
+              <div key={label} className="p-2 rounded-lg"
+                style={{ background: '#0d1520', border: '1px solid ' + col + '20' }}>
+                <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+                <div className="font-mono text-[10px] font-semibold leading-snug" style={{ color: col }}>
+                  {val}
+                </div>
+              </div>
+            ))}
+          </div>
+          {s.invalidation && (
+            <div className="mt-2 px-2.5 py-2 rounded-lg text-[10px]"
+              style={{ background: '#ff336610', border: '1px solid #ff336630' }}>
+              <span style={{ color: '#ff3366' }}>⚡ Invalidation: </span>
+              <span style={{ color: '#c8d4e0' }}>{s.invalidation}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── 3. Position Sizing (ATR-based) ───────────────────────────── */}
+      <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
+            📐 POSITION SIZING — ATR-BASED (ref: 100M VND)
+          </div>
+          <div className="text-[8px] px-1.5 py-0.5 rounded"
+            style={{ background: isBear ? '#ff336615' : isBull ? '#00ff8815' : '#ffcc0015',
+                     color: isBear ? '#ff3366' : isBull ? '#00ff88' : '#ffcc00',
+                     border: '1px solid ' + (isBear ? '#ff336630' : isBull ? '#00ff8830' : '#ffcc0030') }}>
+            {isBear ? 'BEAR × 0.5' : isBull ? 'BULL × 1.0' : 'RANGE × 0.75'}
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2 mb-2">
+          {[
+            { label: 'ATR Stop (1.5×)',  val: atr > 0 ? `${(atrStop).toFixed(2)}đ` : '–',                           col: '#ffcc00' },
+            { label: 'Số CP gợi ý',      val: adjShares > 0 ? adjShares.toLocaleString('vi-VN') + ' CP' : '–',       col: '#00d4ff' },
+            { label: 'Giá trị vị thế',   val: adjValue > 0 ? (adjValue/1_000_000).toFixed(1) + 'M' : '–',            col: '#00ff88' },
+          ].map(({ label, val, col }) => (
+            <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
+              <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+              <div className="font-mono font-bold text-xs" style={{ color: col }}>{val}</div>
+            </div>
+          ))}
+        </div>
+        <div className="text-[9px] leading-relaxed" style={{ color: '#4a5a6a' }}>
+          Rủi ro mỗi lệnh: {isBear ? '1%' : '2%'} portfolio · ATR ({atrPct > 0 ? atrPct.toFixed(1) + '% volatility' : 'N/A'}) · Chỉ mang tính tham khảo
+        </div>
+        {/* Portfolio bar */}
+        {adjValue > 0 && (
+          <div className="mt-2">
+            <div className="flex justify-between text-[9px] mb-1" style={{ color: '#4a5a6a' }}>
+              <span>% Portfolio</span>
+              <span style={{ color: '#00d4ff' }}>{Math.min(positionPct * sizeMultiplier, 100).toFixed(1)}%</span>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
+              <div className="h-full rounded-full"
+                style={{ width: Math.min(positionPct * sizeMultiplier, 100) + '%', background: '#00d4ff',
+                         boxShadow: '0 0 6px #00d4ff60' }} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── 4. Entry Checklist ────────────────────────────────────────── */}
+      <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
+            ✅ ENTRY CHECKLIST — BACKTEST CRITERIA
+          </div>
+          <div className="font-mono text-[10px] font-bold"
+            style={{ color: passCount >= 4 ? '#00ff88' : passCount >= 3 ? '#ffcc00' : '#ff3366' }}>
+            {passCount} / {checklist.length}
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          {checklist.map(({ label, pass, note }) => (
+            <div key={label} className="flex items-start gap-2 px-2 py-1.5 rounded-lg"
+              style={{ background: pass ? '#00ff8808' : '#ff336808',
+                       border: '1px solid ' + (pass ? '#00ff8825' : '#ff336825') }}>
+              <span className="text-[11px] mt-0.5 shrink-0" style={{ color: pass ? '#00ff88' : '#ff3366' }}>
+                {pass ? '✓' : '✗'}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-medium" style={{ color: pass ? '#c8d4e0' : '#8b99a8' }}>
+                  {label}
+                </div>
+                <div className="text-[9px] mt-0.5" style={{ color: '#4a5a6a' }}>{note}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Summary verdict */}
+        <div className="mt-2.5 px-2.5 py-2 rounded-lg text-[10px]"
+          style={{ background: passCount >= 4 ? '#00ff8808' : passCount >= 3 ? '#ffcc0008' : '#ff336808',
+                   border: '1px solid ' + (passCount >= 4 ? '#00ff8828' : passCount >= 3 ? '#ffcc0028' : '#ff336828') }}>
+          <span style={{ color: passCount >= 4 ? '#00ff88' : passCount >= 3 ? '#ffcc00' : '#ff3366', fontWeight: 700 }}>
+            {passCount >= 5 ? '★ Setup tối ưu — Đủ điều kiện vào lệnh' :
+             passCount >= 4 ? '◆ Setup tốt — Có thể vào lệnh, manage risk chặt' :
+             passCount >= 3 ? '◇ Setup trung bình — Chờ thêm confirmation' :
+             '✗ Setup yếu — Chưa đủ điều kiện, tiếp tục theo dõi'}
+          </span>
+        </div>
+      </div>
+
+      {/* ── 5. AI Strategy Note (nếu có) ─────────────────────────────── */}
+      {aiAnalysis?.sections && (aiAnalysis.sections as Record<string,string>).ict_analysis && (
+        <div className="rounded-xl p-3" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
+          <div className="text-[9px] font-semibold tracking-widest mb-1.5" style={{ color: '#a78bfa' }}>
+            🤖 AI — ICT ANALYSIS
+          </div>
+          <p className="text-[10px] leading-relaxed" style={{ color: '#a8b8c8' }}>
+            {(aiAnalysis.sections as Record<string,string>).ict_analysis}
+          </p>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+
 // ============ Main Component ============
 
 // ─── Inner Modal (no hooks - pure render) ────────────────────────────────────
@@ -1022,14 +1355,15 @@ function ModalInner({
   const price = stock.close || stock.price || 0;
   const change = stock.change_20d || stock.change_5d || 0;
   const baseTabs = [
-    { id: 'analysis', label: 'Phân tích', icon: Target },
-    { id: 'scores',   label: 'Điểm số',   icon: Activity },
-    { id: 'finance',  label: 'Tài chính',  icon: BarChart3 },
-    { id: 'trading',  label: 'Giao dịch',  icon: TrendingUp },
-    { id: 'capital',  label: 'Vốn',        icon: Shield },
-    { id: 'stats',    label: 'Thống kê',   icon: Activity },
+    { id: 'analysis',  label: 'Phân tích',  icon: Target },
+    { id: 'strategy',  label: 'Chiến lược', icon: Zap },
+    { id: 'scores',    label: 'Điểm số',    icon: Activity },
+    { id: 'finance',   label: 'Tài chính',  icon: BarChart3 },
+    { id: 'trading',   label: 'Giao dịch',  icon: TrendingUp },
+    { id: 'capital',   label: 'Vốn',        icon: Shield },
+    { id: 'stats',     label: 'Thống kê',   icon: Activity },
   ];
-  const tabs = ictSignal ? [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Zap }] : baseTabs;
+  const tabs = ictSignal ? [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Info }] : baseTabs;
 
 
   return (
@@ -1160,6 +1494,16 @@ function ModalInner({
         <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 220px)' }}>
           {/* Analysis Tab */}
           {activeTab === 'analysis' && <AnalysisTab stock={stock} deskAnalysis={deskAnalysis} aiAnalysis={preloadedAnalysis} />}
+
+          {/* Strategy Tab */}
+          {activeTab === 'strategy' && (
+            <TradingStrategyTab
+              stock={stock}
+              deskAnalysis={deskAnalysis}
+              aiAnalysis={preloadedAnalysis}
+              ictSignal={ictSignal}
+            />
+          )}
 
           {/* Scores Tab */}
           {activeTab === 'scores' && (
