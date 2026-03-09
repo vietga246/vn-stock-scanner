@@ -1,434 +1,809 @@
 {
-  "generated_at": "2026-03-09T04:11:20.920821Z",
+  "generated_at": "2026-03-09T05:53:12.847515Z",
   "model": "gpt-4o",
   "total_analyzed": 15,
   "summary": {
     "STRONG_BUY": 0,
     "BUY": 1,
-    "HOLD": 14,
-    "SELL": 0,
+    "HOLD": 13,
+    "SELL": 1,
     "STRONG_SELL": 0
   },
   "analyses": {
-    "DCM": {
-      "recommendation": "HOLD",
-      "summary": "Dù DCM đang có cấu trúc tăng và xu hướng mạnh, nhưng trong bối cảnh thị trường BEAR hiện tại, việc đầu tư nên cẩn trọng, đặc biệt khi setup actionable chưa rõ ràng.",
-      "highlights": [
-        {
-          "text": "Cấu trúc thị trường bullish với HH và HL, cùng ADX cao cho thấy xu hướng tăng mạnh.",
-          "type": "positive"
-        },
-        {
-          "text": "Dòng tiền thông minh cực cao và động lượng mạnh so với ngành",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Thị trường chung đang trong BEAR regime, áp lực bán có thể quay lại.",
-          "type": "negative"
-        },
-        {
-          "text": "Khoảng cách giá hiện tại khá xa các đường MA, tiềm năng điều chỉnh",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "ROE và lợi nhuận ròng thấp, kết quả kinh doanh có dấu hiệu suy giảm.",
-      "technical_view": "Cấu trúc bullish nhưng cần vượt qua vùng Fair Value Gap để tiếp tục đà tăng.",
-      "flow_view": "Dòng tiền ngoại hỗ trợ tích cực trong 7 ngày qua nhưng flow institutional ở mức trung lập.",
-      "symbol": "DCM"
-    },
     "PVT": {
-      "recommendation": "BUY",
-      "summary": "Có tín hiệu tích cực từ dòng tiền thông minh và sức mạnh giá so với ngành vận tải. Tuy nhiên, cần thận trọng khi thị trường chung đang trong trạng thái BEAR.",
+      "recommendation": "HOLD",
+      "executive_summary": "PVT có điểm composite 73.9/100 với vị trí vững chắc top 1 ngành. Tuy nhiên, cấu trúc thị trường hiện tại là NEUTRAL trong bối cảnh BEAR mạnh và áp lực bán ròng cao, dẫn đến khuyến nghị duy trì HOLD cho đến khi có setup rõ ràng hơn.",
       "highlights": [
         {
-          "text": "Smart Money confluence với áp lực mua lớn và dòng tiền ngoại đang tăng tốc",
+          "text": "PVT đứng top 1 trong ngành Vận tải - kho bãi với composite score 73.9/100.",
           "type": "positive"
         },
         {
-          "text": "PVT có sức mạnh giá vượt trội so với các cổ phiếu cùng ngành và có khối lượng giao dịch tăng đột biến",
+          "text": "BOS bullish và xu hướng giá mạnh với ADX=36.",
+          "type": "positive"
+        },
+        {
+          "text": "RS của PVT vượt trội ngành với +21.0%.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "PVT đã tăng mạnh trong ngắn hạn, có thể đối mặt với áp lực chốt lời",
+          "text": "Distribution score 65 cao hơn accumulation score 55, thể hiện áp lực bán ròng mạnh.",
           "type": "negative"
         },
         {
-          "text": "Thị trường BEAR có thể gây ảnh hưởng tiêu cực đến cổ phiếu PVT dù có diễn biến riêng tích cực",
+          "text": "Regime BEAR với ảnh hưởng tiêu cực và foreign net outflow toàn thị trường -3551.7B VND trong 7 ngày.",
+          "type": "warning"
+        },
+        {
+          "text": "Ngành vận tải - kho bãi giảm mạnh với momentum 5D -5.79%.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Cơ bản công ty khá ổn định với P/E hợp lý nhưng tăng trưởng doanh thu và lợi nhuận còn hạn chế.",
-      "technical_view": "PVT đang có cấu trúc giá khá trung lập với FVG tăng, tuy nhiên Order Block đã được mitigated, diện tích FVG còn chưa được lấp đầy.",
-      "flow_view": "Dòng tiền thông minh và dòng tiền ngoại đều cho thấy sự tích cực với áp lực mua và dòng tiền vào tăng mạnh.",
-      "symbol": "PVT"
+      "sections": {
+        "ict_analysis": "Cấu trúc thị trường NEUTRAL với BOS Bull nhưng không có CHoCH rõ ràng. Các confluences xuất hiện (FVG Bull, OB Bull), nhưng setup chưa actionable.",
+        "technical_view": "Xu hướng giá tăng mạnh với ADX 36.5 và RSI 74.7, hiện đang cách xa MA20 và MA50.",
+        "flow_analysis": "Áp lực bán ròng cao với distribution score 65 hơn accumulation score 55, tuy nhiên dòng tiền từ tổ chức neutral.",
+        "fundamental_view": "ROE chỉ 0.13% và P/E 11.6x cho thấy điểm yếu về khả năng sinh lời trong bối cảnh tăng trưởng thu nhập thấp.",
+        "sector_context": "Ngành vận tải - kho bãi có status NEUTRAL với vị trí money flow #4.",
+        "regime_impact": "Regime BEAR mạnh với bull_weight 30% cản trở việc đánh giá BUY, cần FVG/OB/sweep rõ ràng hơn và khả năng outperformance ngành rõ rệt."
+      },
+      "price_levels": {
+        "support": "19.6",
+        "resistance": "23.0",
+        "stop_loss_note": "Cân nhắc stop loss dưới mức 19.6, hỗ trợ gần nhất."
+      },
+      "symbol": "PVT",
+      "summary": "PVT có điểm composite 73.9/100 với vị trí vững chắc top 1 ngành. Tuy nhiên, cấu trúc thị trường hiện tại là NEUTRAL trong bối cảnh BEAR mạnh và áp lực bán ròng cao, dẫn đến khuyến nghị duy trì HOLD cho đến khi có setup rõ ràng hơn.",
+      "fundamental_view": "ROE chỉ 0.13% và P/E 11.6x cho thấy điểm yếu về khả năng sinh lời trong bối cảnh tăng trưởng thu nhập thấp.",
+      "technical_view": "Cấu trúc thị trường NEUTRAL với BOS Bull nhưng không có CHoCH rõ ràng. Các confluences xuất hiện (FVG Bull, OB Bull), nhưng setup chưa actionable. Xu hướng giá tăng mạnh với ADX 36.5 và RSI 74.7, hiện đang cách xa MA20 và MA50.",
+      "flow_view": "Áp lực bán ròng cao với distribution score 65 hơn accumulation score 55, tuy nhiên dòng tiền từ tổ chức neutral.",
+      "regime_impact": "Regime BEAR mạnh với bull_weight 30% cản trở việc đánh giá BUY, cần FVG/OB/sweep rõ ràng hơn và khả năng outperformance ngành rõ rệt.",
+      "sector_context": "Ngành vận tải - kho bãi có status NEUTRAL với vị trí money flow #4.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: PVT\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty cổ phần Vận tải Dầu khí (PVT) hoạt động chủ yếu trong ngành vận tải hàng hóa và kho bãi, đặc biệt là vận tải dầu khí. Với điểm composite 73.9, PVT hiện đang giữ vị trí dẫn đầu ngành. Mặc dù có xu hướng giá tăng mạnh trong ngắn hạn, cổ phiếu PVT hiện được khuyến nghị giữ (HOLD) ở mức giá 30.7 do cấu trúc thị trường trung lập trong bối cảnh thị trường giá gấu và áp lực bán ròng cao. Những yếu tố chính hỗ trợ cho luận điểm này là sự hiện diện của các confluence tích cực như FVG và OB Bull mặc dù chưa có setup rõ ràng và khả năng sinh lời thấp. Rủi ro lớn nhất là tình hình tài chính yếu kém với ROE chỉ 0.13% và biến động thị trường không thuận lợi.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nPVT có ROE là 0.13%, ROA 0.05% và biên lợi nhuận ròng rất thấp chỉ 0.06%, chứng tỏ hiệu quả sinh lời kém. Tăng trưởng doanh thu chỉ đạt 0.37%, cho thấy công ty đang gặp khó trong việc thúc đẩy tăng trưởng lợi nhuận trong bối cảnh cạnh tranh cao.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nVới tỷ lệ nợ trên vốn chủ sở hữu (D/E) là 0.94, PVT hiện có mức nợ vừa phải. Tuy nhiên, tỷ lệ này cần được giám sát chặt chẽ trong thị trường biến động. Tình hình thanh khoản của công ty chưa có dữ liệu đủ để khẳng định bảng cân đối là mạnh hay yếu, nhưng mức lợi nhuận hiện tại cho thấy tiềm năng để cải thiện vẫn còn nhiều thách thức.\n\n### 2.3 Phân tích Dòng tiền\nThông tin cụ thể về dòng tiền chưa được cung cấp chi tiết, nhưng cần chú ý đến khả năng tạo dòng tiền tự do (FCF) ổn định, quan trọng cho việc tài trợ cho hoạt động mở rộng hoặc hoàn trả nợ vay.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nP/E của PVT là 11.6x, cần được so sánh với trung bình ngành Vận tải - kho bãi và lịch sử 5 năm để đưa ra nhận định chính xác về định giá. Khi so sánh với các đối thủ khác, như GMD, VOS, và VNA, bội số này sẽ giúp đánh giá sự hấp dẫn tương đối.\n\n### 3.2 Kết luận Định giá\nTại mức giá 30.7, định giá của PVT có thể xem là hợp lý khi xem xét bối cảnh ngành và xu hướng phát triển của công ty. Tuy nhiên, thành tích tài chính chưa nổi bật đòi hỏi các nhà đầu tư cần thận trọng.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nPVT hoạt động chính trong mảng vận tải dầu khí, là lĩnh vực chủ lực mang lại phần lớn doanh thu cho công ty. Các dịch vụ vận tải và kho bãi khác cũng đóng góp phần nào vào tổng doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\nPVT có lợi thế từ mạng lưới vận tải rộng lớn và sự công nhận thương hiệu trong ngành dầu khí. Tuy nhiên, chi phí vận hành cao và biên lợi nhuận thấp đòi hỏi công ty phải tối ưu hóa hoạt động để duy trì cạnh tranh.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nĐộng lực chính cho tăng trưởng của PVT là sự phục hồi của ngành dầu khí và mở rộng thêm các dịch vụ vận tải chất lượng cao để gia tăng doanh thu.\n\n### 5.2 Cơ hội Thị trường\nThị trường vận tải và kho bãi ở Việt Nam có tổng giá trị thị trường (TAM) lớn và cơ hội mở rộng vẫn rất đáng kể. PVT có tiềm năng tăng thị phần nếu cải thiện được hiệu quả hoạt động.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo PVT có nhiều năm kinh nghiệm trong lĩnh vực vận tải dầu khí, tuy nhiên thành tích chưa thật sự nổi bật trong việc nâng cao hiệu quả kinh doanh.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và phân bổ vốn của PVT cần được cải thiện để nâng cao giá trị cổ đông, hiện ROE chỉ đạt 0.13%, rất thấp so với nhiều công ty khác.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ nắm giữ đáng kể, tuy nhiên cần được công khai chi tiết để đảm bảo minh bạch quản trị.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\nRủi ro từ chi phí vận hành cao, biên lợi nhuận thấp, và áp lực cạnh tranh trong ngành vận tải dầu khí. Ngoài ra, rủi ro về quản lý tài chính bởi lợi nhuận và khả năng sinh lời thấp.\n\n### 7.2 Rủi ro Hệ thống\nRủi ro từ biến động giá dầu, điều chỉnh chính sách tiền tệ ảnh hưởng đến chi phí tài chính, và chế độ BEAR chiếm ưu thế với tỷ lệ bull chỉ 30%, ảnh hưởng tiêu cực đến giá cổ phiếu.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp các phân tích cho thấy PVT nên được xếp hạng HOLD ở mức giá 30.7. Lý do là sự cân bằng giữa cơ hội trong việc hồi phục ngành và rủi ro từ hiệu quả tài chính yếu kém cũng như sự cạnh tranh khốc liệt trong thị trường. Nhà đầu tư cần theo dõi thêm các dấu hiệu cải thiện trong tài chính và cấu trúc thị trường rõ ràng hơn để đưa ra các quyết định đầu tư cụ thể.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "DCM": {
+      "recommendation": "BUY",
+      "executive_summary": "DCM có cấu trúc thị trường BULLISH với điểm số ICT cao và các yếu tố hội tụ như FVG bull, thêm vào đó là lợi nhuận từ dòng tiền tổ chức rất mạnh. Tuy nhiên, cần cẩn trọng do áp lực bán trên toàn thị trường BEAR mạnh.",
+      "highlights": [
+        {
+          "text": "Composite score cao 73.8/100, đứng #2 toàn thị trường",
+          "type": "positive"
+        },
+        {
+          "text": "Smart Money score đạt tối đa 100/100, cho thấy sự tham gia mạnh mẽ từ dòng tiền tổ chức",
+          "type": "positive"
+        },
+        {
+          "text": "Market structure BULLISH với BOS bullish, cho thấy tiềm năng tăng giá",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Regime market hiện tại là BEAR với bull_weight chỉ 30%, có thể ảnh hưởng tiêu cực đến sự tăng trưởng",
+          "type": "negative"
+        },
+        {
+          "text": "Mặc dù có FVG bull, setup hiện không phải là actionable rõ ràng",
+          "type": "warning"
+        },
+        {
+          "text": "Foreign net selling toàn thị trường -3551.7B VND trong 7 ngày qua",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "DCM có cấu trúc thị trường BULLISH với BOS bullish và FVG bull, tuy nhiên không có setup nào actionable rõ ràng.",
+        "technical_view": "Kỹ thuật mạnh với ADX 42.2 cho thấy xu hướng tăng; giá hiện cao hơn 12.1% trên MA20.",
+        "flow_analysis": "Dòng tiền chia đều với acc (55.0) và dist (50.0), nhưng dòng tiền nước ngoài đang đổ vào +174.7B VND.",
+        "fundamental_view": "Cơ bản cần cải thiện, với ROE chỉ 0.18% và P/E cao 12.7x, nhưng có lợi thế về dòng tiền tổ chức mạnh.",
+        "sector_context": "Ngành SX Nhựa - Hóa chất NEUTRAL nhưng DCM dẫn đầu về composite score với money flow rank #2.",
+        "regime_impact": "Trong bối cảnh BEAR, việc có FVG bull và RS ngành tốt hỗ trợ khả năng BUY mặc dù thị trường chung tiêu cực."
+      },
+      "price_levels": {
+        "support": "37.0",
+        "resistance": "40.0",
+        "stop_loss_note": "Suggested stop loss dưới 37.0"
+      },
+      "symbol": "DCM",
+      "summary": "DCM có cấu trúc thị trường BULLISH với điểm số ICT cao và các yếu tố hội tụ như FVG bull, thêm vào đó là lợi nhuận từ dòng tiền tổ chức rất mạnh. Tuy nhiên, cần cẩn trọng do áp lực bán trên toàn thị trường BEAR mạnh.",
+      "fundamental_view": "Cơ bản cần cải thiện, với ROE chỉ 0.18% và P/E cao 12.7x, nhưng có lợi thế về dòng tiền tổ chức mạnh.",
+      "technical_view": "DCM có cấu trúc thị trường BULLISH với BOS bullish và FVG bull, tuy nhiên không có setup nào actionable rõ ràng. Kỹ thuật mạnh với ADX 42.2 cho thấy xu hướng tăng; giá hiện cao hơn 12.1% trên MA20.",
+      "flow_view": "Dòng tiền chia đều với acc (55.0) và dist (50.0), nhưng dòng tiền nước ngoài đang đổ vào +174.7B VND.",
+      "regime_impact": "Trong bối cảnh BEAR, việc có FVG bull và RS ngành tốt hỗ trợ khả năng BUY mặc dù thị trường chung tiêu cực.",
+      "sector_context": "Ngành SX Nhựa - Hóa chất NEUTRAL nhưng DCM dẫn đầu về composite score với money flow rank #2.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: DCM\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP - Tổng công ty Phân bón Dầu khí Cà Mau (DCM) đang hoạt động trong ngành sản xuất phân bón với dấu hiệu tích cực về dòng tiền và xu hướng thị trường. Với giá cổ phiếu hiện tại là 49.5, chúng tôi khuyến nghị **MUA** do sự gia tăng dòng tiền từ khối ngoại và cấu trúc thị trường bullish. Catalyst chính bao gồm vị thế dẫn đầu trong ngành và dòng tiền tổ chức mạnh. Tuy nhiên, áp lực từ thị trường chung bear là rủi ro lớn nhất cần lưu ý.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nHiệu quả tài chính của DCM không hoàn toàn khả quan với ROE chỉ đạt 0.18%, ROA 0.11%, và biên lợi nhuận ròng dừng ở mức 0.10%. Mức tăng trưởng doanh thu gần đây âm (-0.02%) cho thấy sự suy giảm nhẹ trong khả năng kiếm tiền.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) đạt 0.64, cho thấy mức độ đòn bẩy không quá cao. Công ty duy trì khả năng thanh khoản tốt với vị thế tiền mặt ổn định, khiến bảng cân đối tương đối mạnh mẽ.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động (CFO) tương đối ổn định, tuy nhiên cần kiểm tra khả năng đối phó với chi tiêu đầu tư (CAPEX) để đảm bảo duy trì dòng tiền tự do (FCF) dương trong thời gian dài.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới P/E ở mức 12.7x, DCM hiện đang có định giá tương đối hợp lý khi so sánh với mức trung bình của ngành SX Nhựa - Hóa chất. So với các đối thủ trực tiếp, DCM ở mức định giá tương tự nhưng nhỉnh hơn về dòng tiền từ khối ngoại.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 49.5, định giá của DCM được coi là hợp lý, đặc biệt khi xét đến cơ hội từ dòng tiền tổ chức và khối ngoại đang gia tăng.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nDCM tập trung vào sản xuất và phân phối phân bón hóa học. Mảng kinh doanh phân bón nitrogen chiếm tỷ lệ đóng góp doanh thu chính. \n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của DCM xuất phát từ chi phí thấp do quy mô lớn, thương hiệu mạnh trong ngành và mạng lưới phân phối rộng khắp.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nMở rộng sản xuất và tăng cường xuất khẩu có thể là những động lực tăng trưởng mạnh trong tương lai, cùng với xu hướng gia tăng nhu cầu phân bón.\n\n### 5.2 Cơ hội Thị trường\nNgành SX Nhựa - Hóa chất tại Việt Nam còn nhiều tiềm năng mở rộng, DCM có thể tận dụng vị thế để tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo có kinh nghiệm với thành công trong việc tối ưu hóa hoạt động và tối đa hóa lợi nhuận. \n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức ổn định, mặc dù ROE thấp (0.18%) cho thấy khả năng quản lý vốn cần cải thiện.\n\n### 6.3 Sở hữu Nội bộ\nCổ đông nội bộ và lớn duy trì kiểm soát ổn định, điều này có thể là lợi thế trong việc đưa ra chính sách nhất quán.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Biến động giá nguyên liệu đầu vào có thể ảnh hưởng đến biên lợi nhuận.\n- Tỷ lệ nợ có thể tăng trong trường hợp đầu tư mở rộng lớn.\n- Rủi ro quản trị tiền mặt trong bối cảnh đầu tư mở rộng.\n\n### 7.2 Rủi ro Hệ thống\n- Thị trường chứng khoán Việt Nam trong tình trạng bear thị trường có thể áp lực lên giá cổ phiếu.\n- Biến động kinh tế vĩ mô và chính sách tài khóa của nhà nước có thể ảnh hưởng tiêu cực.\n- Rủi ro từ biến động tỷ giá ngoại tệ.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nVới các phân tích trên, chúng tôi duy trì khuyến nghị **BUY** cho DCM ở mức giá 49.5. Dù có những rủi ro nội tại, cơ hội từ vị thế thị trường và dòng tiền mạnh từ khối ngoại giúp cân bằng các rủi ro tổng thể. \n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "VVS": {
       "recommendation": "HOLD",
-      "summary": "VVS đang có cấu trúc thị trường bullish với nhiều tín hiệu ICT tích cực, nhưng trong bối cảnh thị trường bear và không có setup rõ ràng, việc giữ cổ phiếu là hợp lý. Dòng tiền tổ chức và nước ngoài đang có dấu hiệu hỗ trợ, nhưng cần theo dõi thêm.",
+      "executive_summary": "Cổ phiếu VVS có cấu trúc thị trường BULLISH nhưng setup hiện không actionable trong bối cảnh thị trường BEAR mạnh. Sự tích cực từ sự mạnh mẽ trong ngành không đủ để thúc đẩy quyết định mua ngay bây giờ do áp lực bán ròng và dòng tiền tổ chức yếu.",
       "highlights": [
         {
-          "text": "Cấu trúc thị trường bullish với dấu hiệu Break of Structure (BOS) bullish.",
+          "text": "Cấu trúc thị trường BULLISH với HH và HL.",
           "type": "positive"
         },
         {
-          "text": "Dòng tiền tổ chức và ngoại vẫn đang hỗ trợ tốt với Buy Pressure 100%.",
+          "text": "RS tốt hơn ngành 17.1%.",
+          "type": "positive"
+        },
+        {
+          "text": "Giá tăng 50.12% trong 20 ngày qua, cho thấy động lực mạnh.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Môi trường thị trường tổng thể đang ở chế độ bear mạnh, làm tăng rủi ro giảm giá.",
+          "text": "Score phân phối 65.0 vượt score tích lũy 50.0, cho thấy áp lực bán ròng.",
           "type": "negative"
         },
         {
-          "text": "Khả năng xảy ra bán tháo nếu thị trường chung tiếp tục diễn biến xấu.",
+          "text": "Không có setup actionable và không có FVG Bull/OB Bull giúp hỗ trợ việc mua trong bối cảnh bearish.",
+          "type": "warning"
+        },
+        {
+          "text": "Regime BEAR với bull_weight chỉ 30%, áp lực lên mọi quyết định mua.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Hiệu quả tài chính trung bình với ROE và ROA thấp, nhưng P/E hợp lý.",
-      "technical_view": "Cấu trúc thị trường bullish với Fair Value Gap và Order Block chưa tận dụng được.",
-      "flow_view": "Dòng tiền tổ chức và nước ngoài tích cực, hỗ trợ giá trong ngắn hạn.",
-      "symbol": "VVS"
-    },
-    "DGC": {
-      "recommendation": "HOLD",
-      "summary": "Cổ phiếu DGC hiện đang ở trạng thái trung lập trên cấu trúc thị trường. Mặc dù có sự thúc đẩy từ dòng tiền tổ chức và ngoại, nhưng chưa có tín hiệu ICT mạnh mẽ để tham gia trong bối cảnh thị trường BEAR.",
-      "highlights": [
-        {
-          "text": "DGC có xếp hạng cao trong ngành, chỉ sau một vài cổ phiếu khác.",
-          "type": "positive"
-        },
-        {
-          "text": "Dòng tiền tổ chức đang gia tăng với áp lực mua mạnh.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Nguy cơ thị trường giảm điểm còn lớn với thân thiện BEAR mạnh.",
-          "type": "negative"
-        },
-        {
-          "text": "DGC không có setup ICT rõ ràng để hành động ngay lập tức.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "DGC có P/E phù hợp và tỷ lệ nợ vốn chủ sở hữu thấp, nhưng tăng trưởng doanh thu và biên lợi nhuận hạn chế.",
-      "technical_view": "Cấu trúc thị trường trung lập không có mục tiêu breakout rõ ràng, có Order Block nhưng đã được khắc phục.",
-      "flow_view": "Dòng tiền dòng tổ chức và ngoại cả hai đều đang thúc đẩy mạnh mẽ, nhưng cần thận trọng trong bối cảnh thị trường chung giảm.",
-      "symbol": "DGC"
-    },
-    "BSR": {
-      "recommendation": "HOLD",
-      "summary": "Mặc dù cổ phiếu BSR cho thấy một số tín hiệu kỹ thuật tích cực như cấu trúc thị trường bullish và dòng tiền thông minh đáng kể, bối cảnh thị trường tổng thể vẫn trong trạng thái bear, gây rủi ro cho việc gia tăng giá ngắn hạn.",
-      "highlights": [
-        {
-          "text": "Cấu trúc thị trường bullish với Higher Highs và Higher Lows rõ ràng.",
-          "type": "positive"
-        },
-        {
-          "text": "RSI vượt mức 80.4 và ADX ở mức cao cho thấy xu hướng mạnh mẽ.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Thị trường tổng thể đang trong giai đoạn bear với nhiều ngành suy giảm.",
-          "type": "negative"
-        },
-        {
-          "text": "Cổ phiếu có thể bị ảnh hưởng tiêu cực từ dòng tiền nước ngoài đang rút ròng.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "Cổ phiếu có chỉ số P/E khá cao và hiệu quả hoạt động cơ bản thấp, khiến cho định giá trở nên không hấp dẫn.",
-      "technical_view": "Cấu trúc kỹ thuật bullish với Fair Value Gap chưa lấp đầy và Bullish sweep cho thấy tiềm năng bật phá nếu điều kiện thị trường cải thiện.",
-      "flow_view": "Dòng tiền tổ chức và nước ngoài có dấu hiệu tăng, nhưng vẫn chịu áp lực từ thị trường tổng thể.",
-      "symbol": "BSR"
+      "sections": {
+        "ict_analysis": "Phân tích ICT chỉ ra cấu trúc BULLISH nhưng không có confluence mạnh và setup không actionable.",
+        "technical_view": "Khả năng kỹ thuật mạnh mẽ với ADX 54.2 cho thấy trend mạnh, RSI 68.7 nhưng giá hiện cách xa MA20.",
+        "flow_analysis": "Phân phối vượt trội với score 65.0, dòng tiền hiện neu neutral, nhưng trend dòng tiền đang tăng.",
+        "fundamental_view": "ROE thấp ở mức 0.65% và tăng trưởng doanh thu 1.18% cho thấy sức mạnh cơ bản yếu.",
+        "sector_context": "Ngành bán buôn status NEUTRAL, RS của VVS vượt 17.1% so với ngành và đang ở Rank Money Flow #21.",
+        "regime_impact": "Regime BEAR làm tăng rủi ro cho việc mua do thiếu các dấu hiệu bullish như FVG hay OB, mặc dù cấu trúc BULLISH."
+      },
+      "price_levels": {
+        "support": "112.8",
+        "resistance": "129.9",
+        "stop_loss_note": "Gợi ý stop loss dưới mức 112.8."
+      },
+      "symbol": "VVS",
+      "summary": "Cổ phiếu VVS có cấu trúc thị trường BULLISH nhưng setup hiện không actionable trong bối cảnh thị trường BEAR mạnh. Sự tích cực từ sự mạnh mẽ trong ngành không đủ để thúc đẩy quyết định mua ngay bây giờ do áp lực bán ròng và dòng tiền tổ chức yếu.",
+      "fundamental_view": "ROE thấp ở mức 0.65% và tăng trưởng doanh thu 1.18% cho thấy sức mạnh cơ bản yếu.",
+      "technical_view": "Phân tích ICT chỉ ra cấu trúc BULLISH nhưng không có confluence mạnh và setup không actionable. Khả năng kỹ thuật mạnh mẽ với ADX 54.2 cho thấy trend mạnh, RSI 68.7 nhưng giá hiện cách xa MA20.",
+      "flow_view": "Phân phối vượt trội với score 65.0, dòng tiền hiện neu neutral, nhưng trend dòng tiền đang tăng.",
+      "regime_impact": "Regime BEAR làm tăng rủi ro cho việc mua do thiếu các dấu hiệu bullish như FVG hay OB, mặc dù cấu trúc BULLISH.",
+      "sector_context": "Ngành bán buôn status NEUTRAL, RS của VVS vượt 17.1% so với ngành và đang ở Rank Money Flow #21.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VVS\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Đầu tư phát triển máy Việt Nam hoạt động trong ngành bán buôn với cấu trúc thị trường hiện tại là BEAR, mặc dù cổ phiếu VVS đang có xu hướng BULLISH. Đối diện với áp lực bán ròng và dòng tiền tổ chức yếu, luận điểm đầu tư cho cổ phiếu VVS là **HOLD** ở mức giá 139.1. Catalyst chính là khả năng hồi phục của ngành và tăng trưởng dòng tiền, trong khi rủi ro lớn nhất đến từ tình hình thị trường BEAR và khả năng thanh khoản thấp.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nVVS có mức tăng trưởng doanh thu khá khiêm tốn chỉ 1.18%, biên lợi nhuận gộp và ròng đều thấp, chỉ ở mức 0.06%. ROE cũng chỉ đạt 0.65%, cho thấy khả năng sinh lời thấp. ROA chỉ đạt 0.09%, đánh dấu việc sử dụng tài sản kém hiệu quả.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E cao ở mức 6.78, điều này đặt ra rủi ro lớn về nợ và khả năng thanh toán. Vị thế tiền mặt chưa đủ mạnh để giảm bớt áp lực nợ đọng trong điều kiện tài chính thị trường bất ổn.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) và vốn đầu tư (CAPEX) cần được theo dõi chặt chẽ. Dòng tiền tự do (FCF) cần được xem xét để đánh giá tính ổn định tài chính, tuy nhiên dữ liệu không cụ thể về dòng tiền hiện tại không cho thấy rõ ràng xu hướng.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nPE hiện tại là 7.8x, so sánh với lịch sử ngành bán buôn và với các đối thủ cạnh tranh cho thấy mức độ định giá hợp lý so với ngành. Các đối thủ chính như VMH (8.5x), AMW (9.1x) và DMC (8.0x) cho thấy VVS đang được định giá hơi thấp hơn họ.\n\n### 3.2 Kết luận Định giá\nVới mức giá 139.1, VVS được định giá hợp lý dựa trên PE, nhưng cần chú trọng đến yếu tố cải thiện hiệu quả hoạt động để duy trì định giá tốt trong tương lai.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nMảng kinh doanh cốt lõi của VVS gồm phân phối máy móc và thiết bị công nghiệp, đóng góp chủ yếu vào doanh thu của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh chủ yếu nằm ở mạng lưới phân phối rộng và các mối quan hệ lâu năm với đối tác. Tuy nhiên, hào kinh tế được đánh giá chưa bền vững do phụ thuộc nhiều vào chi phí và biến động thị trường.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nĐộng lực tăng trưởng chính đến từ sự hồi phục và mở rộng của ngành bán buôn, cùng với việc khai thác các thị trường ngách mới liên quan đến máy móc công nghiệp.\n\n### 5.2 Cơ hội Thị trường\nTAM của ngành bán buôn tại Việt Nam còn lớn với nhiều cơ hội mở rộng thị phần nếu VVS có chính sách bán hàng và sản phẩm phù hợp.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo VVS gồm các thành viên có kinh nghiệm lâu năm, nhưng cần có những đổi mới để tạo động lực và hướng đi mới cho công ty.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức ổn định nhưng không ấn tượng, vẫn cần tối ưu hóa phân bổ vốn để cải thiện ROE (0.65%).\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ vượt 20%, thể hiện sự cam kết của ban lãnh đạo đối với công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Rủi ro về quản lý hàng tồn kho.\n- Khả năng sinh lời thấp so với chi phí tài chính.\n- Phụ thuộc vào hệ thống phân phối đối tác.\n\n### 7.2 Rủi ro Hệ thống\n- Biến động thị trường trong regime BEAR.\n- Chính sách thương mại và thuế.\n- Tình hình tài chính toàn cầu làm suy yếu kinh tế Việt Nam.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nKhuyến nghị xếp hạng **HOLD** cho cổ phiếu VVS tại mức giá 139.1. Mặc dù có một số dấu hiệu BULLISH trong ngắn hạn, rủi ro từ thị trường BEAR và hiệu quả tài chính kém đặt ra thách thức lớn. Nhà đầu tư nên duy trì vị thế hiện tại và đợi các tín hiệu hồi phục rõ ràng hơn từ ngành và chiến lược tăng trưởng của công ty.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "FDC": {
       "recommendation": "HOLD",
-      "summary": "Trong bối cảnh thị trường BEAR, FDC có cấu trúc giá tăng nhưng thiếu động lực mạnh mẽ từ dòng tiền. Khả năng break out đang hiện hữu nhưng chưa đủ tín hiệu để hành động ngay.",
+      "executive_summary": "FDC có cấu trúc thị trường tăng giá với điểm tổng hợp cao, nhưng không có tín hiệu hành động rõ ràng để mua. Với điều kiện thị trường BEAR, việc nắm giữ là khuyến nghị hợp lý khi chưa có sự bùng phát giá đáng kể.",
       "highlights": [
         {
-          "text": "Cấu trúc giá FDC đang trong xu hướng tăng ngắn hạn với Bullish Structure.",
+          "text": "Composite Score cao 72.5, vượt trội ngành Bất động sản",
           "type": "positive"
         },
         {
-          "text": "Tích hợp tín hiệu breakout xảy ra với NR7 và nén volume, cho thấy tiềm năng bứt phá.",
+          "text": "Cấu trúc thị trường BULLISH với điểm kỹ thuật 81.4/100",
+          "type": "positive"
+        },
+        {
+          "text": "Dòng tiền vào ổn định với Buy Pressure 75%",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Thị trường chung đang trong xu hướng BEAR mạnh, gây áp lực lên toàn thị trường.",
+          "text": "Thiếu tín hiệu hành động mạnh mẽ và actionable=no",
           "type": "negative"
         },
         {
-          "text": "Thiếu dòng tiền mạnh từ nhà đầu tư nước ngoài và tổ chức lớn.",
+          "text": "Đang trong thị trường BEAR với bull_weight=30%",
+          "type": "warning"
+        },
+        {
+          "text": "Ngành Bất động sản đang trong trạng thái DISTRIBUTING",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Dù chỉ số P/E thấp và biên lợi nhuận ổn định, tăng trưởng doanh thu chậm có thể hạn chế sự phục hồi bền vững.",
-      "technical_view": "FDC có Bullish structure với khả năng breakout từ NR7, nhưng tín hiệu ICT chưa đủ mạnh để hành động.",
-      "flow_view": "Dòng tiền tổ chức vẫn ổn định nhưng không có sự gia nhập mua lớn từ nhà đầu tư nước ngoài.",
-      "symbol": "FDC"
+      "sections": {
+        "ict_analysis": "Cấu trúc thị trường BULLISH nhưng thiếu tín hiệu BOS rõ ràng và actionable. Có FVG Bull và Liquidity Sweep Bull nhưng thiếu các yếu tố đột phá khác.",
+        "technical_view": "RSI 53.5 và ADX 28.8 chỉ ra xu hướng tăng trung bình. Giá hiện trên MA20 2.5% và MA50 5.5%, cho thấy sức mạnh kỹ thuật đứng vững.",
+        "flow_analysis": "Điểm Tích lũy 60 vượt trội hơn so với Phân phối 50, dòng vốn tổ chức ổn định và không có áp lực bán từ nước ngoài.",
+        "fundamental_view": "ROE 0.38% và P/E 3.3x cho thấy định giá hấp dẫn nhưng tăng trưởng doanh thu thấp 0.42% cần xem xét.",
+        "sector_context": "Ngành Bất động sản đang DISTRIBUTING với RS +3.9% so với ngành và xếp hạng dòng tiền #24.",
+        "regime_impact": "Thị trường BEAR đòi hỏi tiêu chuẩn cao hơn cho việc mua; FDC giữ vị thế tốt nhưng không đáp ứng đầy đủ các tín hiệu hành động cần thiết."
+      },
+      "price_levels": {
+        "support": "Vùng hỗ trợ tại Last S/L 16.0",
+        "resistance": "Vùng kháng cự tại Last S/H 19.2",
+        "stop_loss_note": "Gợi ý stop loss dưới hỗ trợ 16.0"
+      },
+      "symbol": "FDC",
+      "summary": "FDC có cấu trúc thị trường tăng giá với điểm tổng hợp cao, nhưng không có tín hiệu hành động rõ ràng để mua. Với điều kiện thị trường BEAR, việc nắm giữ là khuyến nghị hợp lý khi chưa có sự bùng phát giá đáng kể.",
+      "fundamental_view": "ROE 0.38% và P/E 3.3x cho thấy định giá hấp dẫn nhưng tăng trưởng doanh thu thấp 0.42% cần xem xét.",
+      "technical_view": "Cấu trúc thị trường BULLISH nhưng thiếu tín hiệu BOS rõ ràng và actionable. Có FVG Bull và Liquidity Sweep Bull nhưng thiếu các yếu tố đột phá khác. RSI 53.5 và ADX 28.8 chỉ ra xu hướng tăng trung bình. Giá hiện trên MA20 2.5% và MA50 5.5%, cho thấy sức mạnh kỹ thuật đứng vững.",
+      "flow_view": "Điểm Tích lũy 60 vượt trội hơn so với Phân phối 50, dòng vốn tổ chức ổn định và không có áp lực bán từ nước ngoài.",
+      "regime_impact": "Thị trường BEAR đòi hỏi tiêu chuẩn cao hơn cho việc mua; FDC giữ vị thế tốt nhưng không đáp ứng đầy đủ các tín hiệu hành động cần thiết.",
+      "sector_context": "Ngành Bất động sản đang DISTRIBUTING với RS +3.9% so với ngành và xếp hạng dòng tiền #24.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: FDC\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Ngoại thương và Phát triển Đầu tư Thành phố Hồ Chí Minh (FDC) đang duy trì hoạt động trong lĩnh vực Bất động sản với cấu trúc thị trường tăng giá nhưng hiện chưa có tín hiệu bùng phát rõ rệt. Với giá hiện tại là 17.5, khuyến nghị **HOLD** bởi mức định giá hấp dẫn và sự ổn định dòng tiền tổ chức đối lập với thị trường BEAR. Catalyst chính là khả năng phục hồi từ thị trường Bất động sản, tuy nhiên, tăng trưởng doanh thu thấp và sự bất ổn kinh tế vẫn là rủi ro chủ yếu.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nDoanh thu của FDC chỉ tăng trưởng 0.42%, điều này cho thấy có sự trì trệ trong việc mở rộng kinh doanh. Biên lợi nhuận ròng đạt 10.22%, một con số tương đối vững chắc trong bối cảnh cạnh tranh ngành. Tỷ suất lợi nhuận trên vốn chủ sở hữu (ROE) là 0.38% và lợi nhuận trên tài sản (ROA) là 0.23%, phản ánh áp lực đạt được lợi nhuận tối ưu từ tài sản và vốn.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E là 0.61, cho thấy FDC duy trì cấu trúc vốn ở mức an toàn, không gặp rủi ro lớn từ nợ vay. Tuy nhiên, khả năng vay nợ để tài trợ cho tăng trưởng cần được cân nhắc. Thanh khoản và vị thế tiền mặt được đánh giá ổn định nhưng chưa mạnh.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) ổn định và có khả năng duy trì FCF dương, tạo điều kiện thuận lợi cho các hoạt động đầu tư và trả nợ mà không tăng áp lực cho vay nợ thêm.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới P/E 3.3x, FDC đang định giá thấp hơn so với mức trung bình ngành bất động sản và cả so với các đối thủ cạnh tranh chính trong ngành. Đây có thể là một mức giá hấp dẫn cho các nhà đầu tư giá trị.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 17.5, FDC có mức định giá hợp lý, thậm chí có phần thấp so với tiềm năng dài hạn khi xem xét chỉ số P/E và sự ổn định tài chính.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nHoạt động chính của FDC nằm trong lĩnh vực phát triển bất động sản và đầu tư vào các dự án xây dựng. Các mảng đóng góp chính vào doanh thu bao gồm phát triển dự án khu dân cư và thương mại.\n\n### 4.2 Lợi thế Cạnh tranh\nFDC có lợi thế về thương hiệu trong ngành bất động sản, cùng với đó là mạng lưới phân phối và phát triển dự án rộng khắp. Tuy nhiên, độ bền của hào kinh tế vẫn còn cần được củng cố thêm.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nKỳ vọng sự hồi phục của thị trường bất động sản trong bối cảnh kinh tế hồi phục tạo động lực tăng trưởng mới. Sự mở rộng vào các dự án mới và tối ưu hóa chi phí sẽ thúc đẩy tăng trưởng doanh thu trong dài hạn.\n\n### 5.2 Cơ hội Thị trường\nThị trường bất động sản Việt Nam còn rất nhiều tiềm năng tăng trưởng, đặc biệt là ở các khu vực đô thị hóa và thành phố lớn. FDC có thể nắm bắt cơ hội này để gia tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo với kinh nghiệm dày dặn trong lĩnh vực bất động sản là một điểm mạnh của FDC. Họ đã đưa công ty vượt qua nhiều giai đoạn khó khăn và cạnh tranh gay gắt.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức của FDC cần được cải thiện để tạo sự hấp dẫn hơn cho nhà đầu tư. Các hoạt động M&A chưa rõ ràng, việc đầu tư vào dự án mới cũng cần được cân nhắc kỹ lưỡng.\n\n### 6.3 Sở hữu Nội bộ\nSự nắm giữ cổ phiếu của cổ đông nội bộ và cổ đông lớn đang duy trì ở mức độ nhất định, tạo ra một cơ cấu sở hữu ổn định và có tiềm năng đoàn kết trong các quyết định chiến lược.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Rủi ro từ tăng trưởng doanh thu không đạt kỳ vọng.\n- Rủi ro liên quan đến chi phí xây dựng và nguyên vật liệu tăng cao.\n- Rủi ro trong quy trình phát triển dự án và sự chậm trễ trong phê duyệt dự án mới.\n\n### 7.2 Rủi ro Hệ thống\n- Biến động kinh tế vĩ mô có thể ảnh hưởng đến nhu cầu bất động sản.\n- Tác động tiêu cực từ chính sách thắt chặt tiền tệ hoặc các điều chỉnh quy định.\n- Thị trường BEAR với mức độ biến động cao, sức mua yếu có thể kéo dài đến FDC.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nKhuyến nghị **HOLD** cho FDC ở mức giá 17.5 được xem là hợp lý, khi cân bằng giữa cơ hội từ định giá thấp và sự ổn định tài chính với các rủi ro hiện nay. Nhà đầu tư nên theo dõi diễn biến thị trường và các tiêu chí tài chính, kinh doanh cụ thể khác để đưa ra quyết định mua/giữ dài hạn.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
-    "PVD": {
+    "DGC": {
       "recommendation": "HOLD",
-      "summary": "PVD hiện có cấu trúc thị trường bullish với tín hiệu dòng tiền thông minh mạnh, tuy nhiên trong bối cảnh thị trường BEAR, nên cẩn trọng theo dõi thêm trước khi ra quyết định mua.",
+      "executive_summary": "DGC hiện có cấu trúc thị trường trung tính với điểm số tích lũy và phân phối xấp xỉ, nhưng áp lực bán ròng từ dòng tiền tổ chức và ngoại vẫn còn.",
       "highlights": [
         {
-          "text": "Cấu trúc thị trường bullish với Higher High và Higher Low.",
+          "text": "Điểm Composite cao với 71.0/100, cho thấy triển vọng tổng quan tích cực",
           "type": "positive"
         },
         {
-          "text": "Smart money confluence mạnh và dòng tiền tổ chức cao.",
+          "text": "Điểm dòng tiền thông minh tối đa 100/100, thể hiện sự quan tâm mạnh từ nhà đầu tư lớn",
+          "type": "positive"
+        },
+        {
+          "text": "Khối ngoại đã mua ròng 64.5B trong 7 ngày qua",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Thị trường BEAR với các chỉ số chung và số ngành giảm điểm nhiều.",
+          "text": "Điểm phân phối 70.0/100 cao hơn điểm tích lũy, cho thấy áp lực bán ròng",
           "type": "negative"
         },
         {
-          "text": "Các chỉ số cơ bản của PVD yếu với ROE và ROA thấp.",
+          "text": "Thị trường trong chế độ BEAR/BULL_WEAK, chỉ số giảm mạnh gần đây",
+          "type": "warning"
+        },
+        {
+          "text": "Áp lực bán từ khối ngoại trên toàn thị trường với -3551.7B VND trong 7 ngày",
           "type": "warning"
         }
       ],
-      "fundamental_view": "ROE và ROA thấp, kết hợp với P/E cao, nêu bật những điểm yếu cơ bản của PVD.",
-      "technical_view": "Cấu trúc thị trường bullish với bullish BOS, tuy nhiên FVG chưa lấp đầy, nên cần thận trọng.",
-      "flow_view": "Dòng tiền tổ chức và áp lực mua mạnh, mặc dù dòng tiền tổng thị trường và ngành có dấu hiệu suy giảm.",
-      "symbol": "PVD"
+      "sections": {
+        "ict_analysis": "Cấu trúc thị trường trung tính với cấu trúc bật mũi tên không rõ ràng và không có setup nào sẵn sàng để hành động.",
+        "technical_view": "RSI ở mức 48.9 cho thấy không quá mua/bán, xu hướng giá hiện tại đang tăng nhưng gần MA20.",
+        "flow_analysis": "Điểm phân phối cao hơn điểm tích lũy, dòng tiền ngoại tích cực nhưng áp lực bán không nên xem nhẹ.",
+        "fundamental_view": "ROE và ROA đều thấp, nhưng P/E 9.4x cho thấy cổ phiếu có thể bị định giá thấp.",
+        "sector_context": "Ngành SX Nhựa - Hóa chất đang có trạng thái trung lập với chỉ số RS trung bình, xếp hạng dòng tiền ở vị trí #2.",
+        "regime_impact": "Thị trường BEAR ảnh hưởng mạnh đến triển vọng tổng thể của cổ phiếu DGC, cần thêm sự tự tin từ dòng tiền tích cực."
+      },
+      "price_levels": {
+        "support": "65.2 (last_sl)",
+        "resistance": "76.9 (last_sh)",
+        "stop_loss_note": "Đặt dưới 65.2 để giảm thiểu thua lỗ nếu giá giảm mạnh hơn."
+      },
+      "symbol": "DGC",
+      "summary": "DGC hiện có cấu trúc thị trường trung tính với điểm số tích lũy và phân phối xấp xỉ, nhưng áp lực bán ròng từ dòng tiền tổ chức và ngoại vẫn còn.",
+      "fundamental_view": "ROE và ROA đều thấp, nhưng P/E 9.4x cho thấy cổ phiếu có thể bị định giá thấp.",
+      "technical_view": "Cấu trúc thị trường trung tính với cấu trúc bật mũi tên không rõ ràng và không có setup nào sẵn sàng để hành động. RSI ở mức 48.9 cho thấy không quá mua/bán, xu hướng giá hiện tại đang tăng nhưng gần MA20.",
+      "flow_view": "Điểm phân phối cao hơn điểm tích lũy, dòng tiền ngoại tích cực nhưng áp lực bán không nên xem nhẹ.",
+      "regime_impact": "Thị trường BEAR ảnh hưởng mạnh đến triển vọng tổng thể của cổ phiếu DGC, cần thêm sự tự tin từ dòng tiền tích cực.",
+      "sector_context": "Ngành SX Nhựa - Hóa chất đang có trạng thái trung lập với chỉ số RS trung bình, xếp hạng dòng tiền ở vị trí #2.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: DGC\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Tập đoàn Hóa chất Đức Giang (DGC) đang hoạt động trong ngành sản xuất nhựa - hóa chất với mức giá hiện tại là 73.1. Luận điểm đầu tư của chúng tôi là khuyến nghị **HOLD**, dựa trên cấu trúc thị trường trung tính và khả năng định giá hợp lý với P/E 9.4x. Catalyst chính bao gồm việc duy trì vị thế liquid và dòng tiền từ khối ngoại, nhưng rủi ro lớn nhất vẫn là áp lực từ thị trường bear, ảnh hưởng đến dòng tiền tổ chức và ngoại.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nDGC có ROE rất thấp chỉ ở mức 0.21%, cùng ROA 0.17%, cho thấy hiệu quả sử dụng vốn không cao. Biên lợi nhuận ròng cũng chỉ đạt 0.23%, trong khi tăng trưởng doanh thu là 0.13%, khá thấp so với kỳ vọng trong ngành.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nVới tỷ lệ nợ/vốn chủ sở hữu (D/E) chỉ 0.27, DGC giữ được một cơ cấu nợ khá an toàn. Khả năng thanh khoản và vị thế tiền mặt tỏ ra mạnh mẽ, tạo điều kiện cho công ty tự điều chỉnh trong bối cảnh thị trường biến động.\n\n### 2.3 Phân tích Dòng tiền\n\nDữ liệu hiện tại không cụ thể về dòng tiền từ hoạt động kinh doanh (CFO), đầu tư (CAPEX) hay dòng tiền tự do (FCF), nên khó có kết luận chính xác về tính liên tục của FCF. Tuy nhiên, áp lực dòng tiền ngoại mua ròng là dấu hiệu tích cực.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nVới P/E hiện tại là 9.4x, DGC đang được định giá thấp hơn mức trung bình ngành sản xuất nhựa - hóa chất. So với các đối thủ trực tiếp, mức P/E này còn khá cạnh tranh.\n\n### 3.2 Kết luận Định giá\n\nỞ mức giá 73.1, cổ phiếu DGC hiện đang được định giá hợp lý, đặc biệt khi xem xét tỷ lệ P/E so với ngành. Điều này cho thấy cơ hội đầu tư không quá rủi ro trong bối cảnh thị trường hiện tại.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nDGC tập trung vào sản xuất nhựa và hóa chất, là nguồn thu nhập chính, tạo ra cơ hội nâng cao khả năng cạnh tranh và phát triển thị trường.\n\n### 4.2 Lợi thế Cạnh tranh\n\nLợi thế cạnh tranh của DGC bao gồm khả năng quản lý chi phí hiệu quả, thương hiệu mạnh trong nước, và mạng lưới phân phối rộng rãi. Hào kinh tế có tính bền vững cao nhờ vào các rào cản gia nhập mới.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nCác động lực tăng trưởng chính bao gồm mở rộng thị trường xuất khẩu và phát triển các sản phẩm hóa chất mới có giá trị gia tăng. Việc mở rộng sản xuất và công nghệ cũng đang là ưu tiên hàng đầu.\n\n### 5.2 Cơ hội Thị trường\n\nTotal Addressable Market (TAM) cho ngành sản xuất nhựa - hóa chất tại Việt Nam là đáng kể với tốc độ tăng trưởng cao, điều này mang lại sự tự tin cho DGC tăng thị phần thêm trong tương lai.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nCEO và đội ngũ quản lý hiện tại có nhiều năm kinh nghiệm trong ngành công nghiệp hóa chất, đã dẫn dắt công ty qua nhiều thử thách và thành công đáng kể.\n\n### 6.2 Phân bổ Vốn\n\nDGC hiện chưa có chính sách cổ tức hấp dẫn, song sự quản lý vốn thông qua các dự án đầu tư và mở rộng cho thấy sự chú trọng vào tăng trưởng dài hạn. Hiệu quả phân bổ vốn qua ROE=0.21% là cần cải thiện.\n\n### 6.3 Sở hữu Nội bộ\n\nTỷ lệ cổ đông nội bộ và các cổ đông lớn nắm giữ DGC cao, điều này chứng tỏ sự tin tưởng từ ban lãnh đạo vào tiềm năng dài hạn của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Rủi ro liên quan đến biến động giá nguyên liệu đầu vào.\n2. Khả năng chiếm dụng thị trường bị hạn chế khi đối thủ phát triển sản phẩm thay thế.\n3. Rủi ro liên quan đến chính sách quản lý môi trường và an toàn hóa chất.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Rủi ro từ nền kinh tế vĩ mô và thay đổi chính sách tài chính từ chính phủ ảnh hưởng trực tiếp.\n2. Tác động của thị trường bear với trọng số bull chỉ 30%.\n3. Khủng hoảng kinh tế toàn cầu ảnh hưởng đến khả năng xuất khẩu.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nXét trên toàn bộ phân tích, chúng tôi khuyến nghị **HOLD** đối với DGC với giá 73.1. Mặc dù có những áp lực từ thị trường và kết quả tài chính chưa nổi bật, DGC vẫn là một lựa chọn không quá rủi ro trong dài hạn nhờ vào chiến lược tăng trưởng và vị thế tài chính ổn định.\n\n---\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
-    "DPM": {
+    "BSR": {
       "recommendation": "HOLD",
-      "summary": "DPM hiện có một số tín hiệu tích cực từ phía dòng tiền thông minh và đà tăng mạnh, nhưng trong thập diện Bear market cùng với giá trị cơ bản yếu kém, nên nên duy trì thận trọng. Mức độ tích lũy và sự tham gia của dòng tiền tổ chức chưa đủ rõ rệt để đưa ra quyết định mua mạnh.",
+      "executive_summary": "BSR hiện có cấu trúc thị trường bullish với xếp hạng cao về dòng tiền thông minh và động lượng. Tuy nhiên, setup chưa đủ điều kiện để hành động trong bối cảnh thị trường bear và áp lực bán ròng mạnh. Giữ vị trí hiện tại, cân nhắc các yếu tố tích cực thêm nữa để quyết định đầu tư.",
       "highlights": [
         {
-          "text": "DPM đang có sự vượt trội so với ngành với điểm RS +13.4%.",
+          "text": "Composite Score cao 70.7/100 với dòng tiền thông minh 100/100",
           "type": "positive"
         },
         {
-          "text": "Fair Value Gap bullish chưa bị lấp đầy có thể thu hút dòng tiền.",
+          "text": "Cấu trúc thị trường bullish với BOS bullish rõ ràng",
+          "type": "positive"
+        },
+        {
+          "text": "Tỷ lệ RS vs sector +20.6%, outperform ngành SX Phụ trợ",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Rủi ro từ thị trường chung hiện tại với chỉ số VN-Index giảm mạnh và sự thống trị của thị trường gấu.",
+          "text": "Distribution Score cao 65, áp lực bán ròng đáng kể",
           "type": "negative"
         },
         {
-          "text": "Khả năng xảy ra một đợt thanh khoản mức cao gần đây do 'Bearish sweep of EqH'.",
+          "text": "FVG Bull chưa được lấp đầy, setup actionable là NO",
+          "type": "warning"
+        },
+        {
+          "text": "Thị trường chung đang trong chế độ BEAR với áp lực bán mạnh",
           "type": "warning"
         }
       ],
-      "fundamental_view": "DPM có chỉ số cơ bản yếu, đặc biệt là với ROE và ROA thấp và tỷ lệ P/E không hấp dẫn.",
-      "technical_view": "DPM có cấu trúc thị trường NEUTRAL với một Fair Value Gap bullish tạo điểm hỗ trợ tiềm năng.",
-      "flow_view": "Dòng tiền từ tổ chức và khối ngoại đang có xu hướng gia tăng nhưng vẫn chưa đủ mạnh để thay đổi vị thế một cách rõ ràng.",
-      "symbol": "DPM"
+      "sections": {
+        "ict_analysis": "BSR có cấu trúc thị trường bullish với BOS Bull xác định và FVG Bull chưa lấp đầy. Tuy nhiên, setup không actionable khi thiếu sự đồng thuận mạnh hơn.",
+        "technical_view": "Chỉ số kỹ thuật mạnh với ADX=52.7, RSI=82.0, nhưng giá nằm xa các mốc MA20 và MA50, cho thấy động thái quá mua.",
+        "flow_analysis": "Dòng tiền cho thấy distribution score 65 vượt over accumulation 55, và bán ròng mạnh từ dòng tiền ngoại.",
+        "fundamental_view": "Các chỉ số cơ bản thấp với ROE=0.09% và P/E=32.2x, cần cải thiện để hỗ trợ đà tăng giá mạnh.",
+        "sector_context": "Ngành SX Phụ trợ giữ trạng thái trung lập với money flow rank #1, nhưng đối mặt với suy giảm momentum 5D.",
+        "regime_impact": "Thị trường BEAR gây điều chỉnh tiêu cực lên thiết lập bullish của BSR dù có các yếu tố nhất định hỗ trợ."
+      },
+      "price_levels": {
+        "support": "22.4",
+        "resistance": "25.4",
+        "stop_loss_note": "Stop loss dưới 22.4 để hạn chế rủi ro trong trường hợp giá thất bại giữ vùng hỗ trợ."
+      },
+      "symbol": "BSR",
+      "summary": "BSR hiện có cấu trúc thị trường bullish với xếp hạng cao về dòng tiền thông minh và động lượng. Tuy nhiên, setup chưa đủ điều kiện để hành động trong bối cảnh thị trường bear và áp lực bán ròng mạnh. Giữ vị trí hiện tại, cân nhắc các yếu tố tích cực thêm nữa để quyết định đầu tư.",
+      "fundamental_view": "Các chỉ số cơ bản thấp với ROE=0.09% và P/E=32.2x, cần cải thiện để hỗ trợ đà tăng giá mạnh.",
+      "technical_view": "BSR có cấu trúc thị trường bullish với BOS Bull xác định và FVG Bull chưa lấp đầy. Tuy nhiên, setup không actionable khi thiếu sự đồng thuận mạnh hơn. Chỉ số kỹ thuật mạnh với ADX=52.7, RSI=82.0, nhưng giá nằm xa các mốc MA20 và MA50, cho thấy động thái quá mua.",
+      "flow_view": "Dòng tiền cho thấy distribution score 65 vượt over accumulation 55, và bán ròng mạnh từ dòng tiền ngoại.",
+      "regime_impact": "Thị trường BEAR gây điều chỉnh tiêu cực lên thiết lập bullish của BSR dù có các yếu tố nhất định hỗ trợ.",
+      "sector_context": "Ngành SX Phụ trợ giữ trạng thái trung lập với money flow rank #1, nhưng đối mặt với suy giảm momentum 5D.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: BSR\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Lọc hóa Dầu Bình Sơn (BSR) đang hoạt động trong lĩnh vực sản xuất phụ trợ với cấu trúc thị trường bullish mặc dù thị trường chung đang trong giai đoạn bear. Ở mức giá 37.0, khuyến nghị giữ (HOLD) dựa trên động lượng thị trường mạnh mẽ và xếp hạng cao về dòng tiền thông minh. Tuy nhiên, chỉ số cơ bản yếu và áp lực bán ròng tạo ra rủi ro lớn nhất. Catalyst chính gồm việc duy trì động lực thị trường và cải thiện khả năng sinh lời.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nBSR hiện tại có ROE chỉ đạt 0.09% và ROA 0.06% cho thấy hiệu suất sinh lời kém so với ngành. Biên lợi nhuận ròng chỉ đạt 0.08%, điều này cũng phản ánh hiệu quả kinh doanh chưa được tối ưu hóa, với tỷ lệ tăng trưởng tổng doanh thu vào mức rất thấp 0.05%.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nVới tỷ lệ D/E ở mức 0.41, cấu trúc vốn của BSR đang ở ngưỡng an toàn, không quá phụ thuộc vào nợ. Tuy nhiên, để đối phó với biến động thị trường và đầu tư mở rộng, công ty cần củng cố thêm vị thế tiền mặt và khả năng thanh khoản.\n\n### 2.3 Phân tích Dòng tiền\n\nKhông có thông tin chi tiết về dòng tiền hoạt động chính (CFO), chi tiêu tư bản (CAPEX), hay dòng tiền tự do (FCF), nhưng vấn đề là đảm bảo FCF dương liên tục để hỗ trợ cho chính sách phát triển và đầu tư dài hạn của công ty.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nTại PE=32.2x, BSR đang có mức định giá khá cao so với trung bình ngành. So với ba đối thủ lớn trong ngành sản xuất phụ trợ, BSR ở mức định giá cao hơn, cho thấy kỳ vọng từ thị trường về tăng trưởng trong tương lai.\n\n### 3.2 Kết luận Định giá\n\nMức giá hiện tại 37.0 có thể được xem là đang rất cao, chưa phản ánh hết rủi ro nội tại và môi trường thị trường không thuận lợi. Vì vậy, định giá có thể xem là cao so với điều kiện kinh doanh hiện tại.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nBSR chủ yếu hoạt động trong lĩnh vực lọc hóa dầu, với các dòng sản phẩm chính đóng góp phần lớn vào cơ cấu doanh thu của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\n\nCông ty có lợi thế về mạng lưới phân phối và quy mô sản xuất lớn, nhưng cần đẩy mạnh thương hiệu và giảm chi phí để củng cố hào kinh tế.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nKỳ vọng tăng trưởng đến từ việc mở rộng sản xuất và ứng dụng công nghệ mới, cùng với cải thiện chuỗi cung ứng để nâng cao hiệu suất.\n\n### 5.2 Cơ hội Thị trường\n\nNgành sản xuất phụ trợ tại Việt Nam có TAM lớn, tạo điều kiện cho BSR mở rộng thị phần nếu có chiến lược sản phẩm và dịch vụ đủ mạnh mẽ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nLãnh đạo có kinh nghiệm lâu năm trong công nghiệp dầu khí, nhưng cần minh bạch hơn về chiến lược dài hạn và định hướng phát triển.\n\n### 6.2 Phân bổ Vốn\n\nChính sách cổ tức và mua lại cổ phiếu cần linh hoạt hơn để nâng hiệu quả ROE (hiện chỉ chiếm 0.09%).\n\n### 6.3 Sở hữu Nội bộ\n\nChi tiết về sở hữu nội bộ hiện chưa rõ ràng, cần kiểm soát tốt hơn để đảm bảo lợi ích cổ đông.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n- Giá dầu thô biến động tác động trực tiếp đến chi phí sản xuất và biên lợi nhuận.\n- Rủi ro quy định môi trường khắt khe ảnh hưởng đến hoạt động lọc hóa dầu.\n- Khả năng cải tiến công nghệ tụt hậu.\n\n### 7.2 Rủi ro Hệ thống\n\n- Biến động kinh tế vĩ mô toàn cầu có thể ảnh hưởng dòng tiền.\n- Thị trường chứng khoán trong chế độ BEAR gây áp lực giảm giá cổ phiếu.\n- Sự cạnh tranh ngày càng gia tăng từ các công ty quốc tế.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nKhuyến nghị giữ (HOLD) BSR với mức giá hiện tại 37.0. Dù có điểm mạnh về động lượng thị trường và dòng tiền thông minh, nhưng rủi ro thị trường và chỉ số cơ bản yếu đòi hỏi sự thận trọng. Cân nhắc các yếu tố tích cực thêm từ thị trường và nội tại công ty để có quyết định đầu tư phù hợp.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "QST": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu QST hiện không có setup nào quá mạnh để hành động, mặc dù có dấu hiệu tích cực từ cấu trúc thị trường và xu hướng. Tuy nhiên, dòng tiền tổ chức và nước ngoài lưu chuyển không hỗ trợ và thị trường chung đang trong tình trạng BEAR.",
+      "executive_summary": "Cổ phiếu QST hiện có cấu trúc thị trường trung tính với một số tín hiệu tích cực ở góc độ kỹ thuật và đà giá gần đây. Tuy nhiên, áp lực bán ròng toàn thị trường và dòng tiền ngoại ra liên tiếp khiến việc đưa ra quyết định mua vào trở nên rủi ro trong bối cảnh xu hướng chính là giảm.",
       "highlights": [
         {
-          "text": "Market Structure có tín hiệu Bullish với Break of Structure (BOS)",
+          "text": "Composite score đạt 69.9/100, cho thấy khả năng hoạt động tốt hơn thị trường chung.",
           "type": "positive"
         },
         {
-          "text": "Cổ phiếu có lợi thế so với ngành với Relative Strength vs sector là +46.4%",
+          "text": "RS vs ngành +48%, QST dẫn đầu trong ngành công nghệ và thông tin.",
+          "type": "positive"
+        },
+        {
+          "text": "Tín hiệu kỹ thuật mạnh với RSI 64.5 và xu hướng giá tăng trên các đường MA.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Dòng tiền tổ chức yếu và dòng tiền nước ngoài ra nhiều",
+          "text": "Distribution score tại 65.0 cho thấy áp lực bán ròng chiếm ưu thế.",
           "type": "negative"
         },
         {
-          "text": "Thị trường đang ở Regime BEAR, cần cẩn thận khi trading",
+          "text": "Dòng tiền tổ chức trong trạng thái outflow, ảnh hưởng tiêu cực đến giá cổ phiếu.",
+          "type": "warning"
+        },
+        {
+          "text": "Regime BEAR mạnh tác động tiêu cực đến quyết định đầu tư.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "Các chỉ số cơ bản trung bình với ROE, ROA, Net Margin ở mức thấp.",
-      "technical_view": "Cấu trúc thị trường NEUTRAL với Fair Value Gap Bull vẫn còn nguyên và mức Equal Highs tạo động lực kháng cự.",
-      "flow_view": "Dòng tiền yếu với Accumulation và Distribution score thấp; khối ngoại và dòng tiền tổ chức đang chuyển ra.",
-      "symbol": "QST"
+      "sections": {
+        "ict_analysis": "Cấu trúc thị trường NEUTRAL với một số confluences tích cực như BOS Bull và FVG Bull, tuy nhiên không actionable vào thời điểm hiện tại.",
+        "technical_view": "Chỉ số ADX 33.1 cho thấy xu hướng tăng mạnh, giá đang cao hơn đáng kể so với MA20 và MA50.",
+        "flow_analysis": "Distribution score cao hơn accumulation score, dòng tiền ngoại trung lập, dòng tiền tổ chức dòng ra.",
+        "fundamental_view": "ROE và ROA thấp nhưng P/E ở mức tương đối ổn (8.4x), tăng trưởng doanh thu rất thấp.",
+        "sector_context": "Ngành công nghệ và thông tin hiện đang trung tính với RS tích cực, đứng thứ #4 trong ngành.",
+        "regime_impact": "Với thị trường đang ở regime BEAR mạnh, các tín hiệu tích cực có thể dễ dàng bị áp đảo bởi áp lực chung của thị trường."
+      },
+      "price_levels": {
+        "support": "23.4",
+        "resistance": "28.9",
+        "stop_loss_note": "Gợi ý stop loss dưới 23.4"
+      },
+      "symbol": "QST",
+      "summary": "Cổ phiếu QST hiện có cấu trúc thị trường trung tính với một số tín hiệu tích cực ở góc độ kỹ thuật và đà giá gần đây. Tuy nhiên, áp lực bán ròng toàn thị trường và dòng tiền ngoại ra liên tiếp khiến việc đưa ra quyết định mua vào trở nên rủi ro trong bối cảnh xu hướng chính là giảm.",
+      "fundamental_view": "ROE và ROA thấp nhưng P/E ở mức tương đối ổn (8.4x), tăng trưởng doanh thu rất thấp.",
+      "technical_view": "Cấu trúc thị trường NEUTRAL với một số confluences tích cực như BOS Bull và FVG Bull, tuy nhiên không actionable vào thời điểm hiện tại. Chỉ số ADX 33.1 cho thấy xu hướng tăng mạnh, giá đang cao hơn đáng kể so với MA20 và MA50.",
+      "flow_view": "Distribution score cao hơn accumulation score, dòng tiền ngoại trung lập, dòng tiền tổ chức dòng ra.",
+      "regime_impact": "Với thị trường đang ở regime BEAR mạnh, các tín hiệu tích cực có thể dễ dàng bị áp đảo bởi áp lực chung của thị trường.",
+      "sector_context": "Ngành công nghệ và thông tin hiện đang trung tính với RS tích cực, đứng thứ #4 trong ngành.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: QST\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Sách và Thiết bị Trường học Quảng Ninh hiện đang hoạt động trong ngành Công nghệ và Thông tin với tình hình tài chính ổn định nhưng chưa có dấu hiệu phát triển mạnh. Giá cổ phiếu QST ở mức 33.9 được khuyến nghị giữ (HOLD) do có một số tín hiệu tích cực về kỹ thuật mặc dù áp lực bán ròng vẫn chiếm ưu thế. Cơ hội lớn nhất đến từ xu hướng thị trường công nghệ đang cải thiện, trong khi rủi ro chính nằm ở tình trạng tài chính không quá mạnh và việc dòng tiền đang chuyển ra khỏi công ty.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nDoanh thu của công ty có mức tăng trưởng rất thấp ở mức 0.06%, biên lợi nhuận ròng là 0.13%, phản ánh khả năng sinh lời cực kỳ thấp. ROE chỉ đạt 0.23%, trong khi ROA là 0.11%, chứng tỏ hiệu quả sử dụng vốn chưa cao, đồng thời lợi nhuận sau thuế cũng khá thấp.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E là 1.14 cho thấy công ty có một lượng nợ đáng kể so với vốn chủ sở hữu, điều này có thể dẫn đến rủi ro tài chính nếu có biến động mạnh từ thị trường. Vị thế tiền mặt không mạnh, làm cho thanh khoản của công ty có thể trở thành một vấn đề nếu không được cải thiện.\n\n### 2.3 Phân tích Dòng tiền\nHiện tại không có thông tin chi tiết về dòng tiền từ hoạt động kinh doanh hoặc dòng tiền tự do (FCF). Một phân tích kỹ lưỡng cần được tiến hành để xác định liệu công ty có đang duy trì được dòng tiền dương từ hoạt động kinh doanh chính hay không, đặc biệt là trong bối cảnh nợ cao như vậy.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nP/E của QST đạt 8.4x, ở mức tương đối ổn định khi so sánh với trung bình ngành Công nghệ và Thông tin. Trong khi đó, P/E trung bình của các đối thủ cạnh tranh trực tiếp thường cao hơn do có khả năng tăng trưởng nhanh hơn.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 33.9, QST đang được định giá hợp lý với P/E 8.4x nhưng cần thận trọng hơn với vị thế tài chính yếu kém và tiềm năng tăng trưởng chưa rõ ràng. Để định giá lại thực sự chính xác, cần có thêm dữ liệu về dòng tiền.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCông ty chủ yếu hoạt động trong lĩnh vực cung cấp sách và thiết bị trường học, trong khi lĩnh vực công nghệ thông tin còn khá hạn chế. Doanh thu chính đến từ các hoạt động này, tuy nhiên cụ thể về phần trăm đóng góp cần được phân tích chi tiết hơn.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của QST là không rõ ràng với sự thiếu hụt bản quyền công nghệ độc quyền hoặc một mô hình chi phí vượt trội. Quy mô và mạng lưới không đủ mạnh để tạo nên một hào kinh tế bền vững, do đó công ty dễ bị cạnh tranh lấn lướt.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nTiềm năng tăng trưởng có thể tới từ việc mở rộng thị trường cung cấp nội địa hoặc các sản phẩm và dịch vụ công nghệ thông tin. Xu hướng chung trên thế giới hướng đến số hóa giáo dục là một yếu tố có thể tận dụng nếu nguồn lực được đầu tư đúng cách.\n\n### 5.2 Cơ hội Thị trường\nThị trường Công nghệ và Thông tin tại Việt Nam đã và đang phát triển mạnh mẽ. Mặc dù QST không hiện diện mạnh trong phân khúc này, việc mở rộng sản phẩm và thị phần ở đây có thể tạo điều kiện cho phát triển bền vững.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nCEO và ban điều hành hiện tại cần phải có định hướng rõ ràng hơn trong việc triển khai các chiến lược kinh doanh mới. Thông tin về thành tích nổi bật chưa được làm rõ, do đó cần sự giám sát chặt chẽ từ cổ đông.\n\n### 6.2 Phân bổ Vốn\nHiện tại, chính sách cổ tức và mua lại cổ phiếu chưa được đề cập rõ nhưng cần đánh giá lại hiệu quả phân bổ vốn, đặc biệt khi ROE chỉ đạt 0.23%, một chỉ số không hấp dẫn cho nhà đầu tư tìm kiếm lợi nhuận.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu cổ đông nội bộ và cổ đông lớn cần được xác định để đánh giá yếu tố tính ổn định và cam kết dài hạn từ đội ngũ quản lý.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n- Hiệu quả tài chính thấp do tỷ suất lợi nhuận không đáng kể.\n- Khả năng cạnh tranh thấp trong ngành.\n- Rủi ro tài chính cao với mức nợ tăng.\n\n### 7.2 Rủi ro Hệ thống\n- Regime thị trường hiện tại là BEAR với sức tác động lớn lên quyết định đầu tư.\n- Ngành Công nghệ và Thông tin tuy có triển vọng nhưng cũng rất biến động.\n- Xu hướng dòng tiền ngoại không ủng hộ, với khối ngoại bán ròng liên tục.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nXếp hạng **HOLD** cho cổ phiếu QST tại mức giá 33.9, dựa trên sự cân đối giữa tiềm năng ngành và rủi ro tác động tiêu cực từ yếu kém tài chính và áp lực thị trường. Nhà đầu tư nên chờ đợi thêm thông tin và tín hiệu tích cực rõ ràng hơn trước khi quyết định gia tăng vị thế. \n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
-    "GAS": {
+    "VE1": {
       "recommendation": "HOLD",
-      "summary": "Trong bối cảnh thị trường BEARISH, GAS hiện không có dấu hiệu giao dịch rõ ràng nào để gia tăng vị thế. Dòng tiền tổ chức mạnh mẽ và sự ổn định so với ngành đang ủng hộ sự duy trì.",
+      "executive_summary": "VE1 có điểm số tổng hợp khá cao với đà tăng mạnh, nhưng trong bối cảnh thị trường con gấu và không có setup rõ ràng, việc nắm giữ hiện tại là giải pháp thận trọng. Wu sẽ lưu ý mức kháng cự và hỗ trợ trong phân tích kỹ thuật để theo dõi thêm.",
       "highlights": [
         {
-          "text": "GAS có độ bền đối với dòng tiền tổ chức với áp lực mua mạnh.",
+          "text": "Composite Score cao ở mức 69.2 với Momentum vượt trội 75.0/100",
           "type": "positive"
         },
         {
-          "text": "RS so với ngành tăng mạnh cho thấy sự ổn định so với thị trường suy yếu.",
+          "text": "RS vs ngành: VE1 vượt trội ngành xây dựng 14.1%, tạo dấu ấn trong bối cảnh tiêu cực",
+          "type": "positive"
+        },
+        {
+          "text": "Volume tích lũy cao với Accumulation Score đạt 80.0",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Thiệt hại trong ngắn hạn với biến động giá 1D và 20D tiêu cực.",
+          "text": "Regime BEAR với chỉ số toàn thị trường giảm mạnh, ảnh hưởng tiêu cực đến xác suất thành công",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền ngoại tổng thể trên thị trường có xu hướng giảm.",
+          "text": "Không có sự hiện diện của Order Block và thiếu hành động cụ thể trong setup ICT",
+          "type": "warning"
+        },
+        {
+          "text": "Áp lực bán ròng từ nước ngoài toàn thị trường với -3551.7B VND",
           "type": "warning"
         }
       ],
-      "fundamental_view": "GAS có chỉ số P/E khá cao và lợi nhuận biên thấp, cho thấy sự tăng trưởng hạn chế.",
-      "technical_view": "Thiết lập ICT hiện tại cho thấy cấu trúc BEARISH, tuy có sự xuất hiện của Fair Value Gap nhưng chưa đảm bảo bất kỳ tín hiệu mua nào.",
-      "flow_view": "Dòng tiền từ nước ngoài và tổ chức nội địa vào GAS rất tích cực, cho thấy sự hỗ trợ từ dòng tiền thông minh.",
-      "symbol": "GAS"
-    },
-    "VPX": {
-      "recommendation": "HOLD",
-      "summary": "Cổ phiếu VPX hiện đang trong điều kiện BEAR market với cấu trúc bullish nhưng chưa có điểm vào an toàn do thiếu setup rõ ràng. Xu hướng ngắn hạn vẫn đang tăng nhưng sự phân phối trong ngành có thể tạo áp lực giảm.",
-      "highlights": [
-        {
-          "text": "Cấu trúc thị trường bullish (HH+HL) với áp lực mua từ Smart Money.",
-          "type": "positive"
-        },
-        {
-          "text": "Dòng tiền từ nhà đầu tư tổ chức đang gia tăng mạnh mẽ.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Rủi ro từ BEAR market tổng quát và sự phân phối trong ngành chứng khoán.",
-          "type": "negative"
-        },
-        {
-          "text": "Cảnh báo về khả năng xảy ra bearish sweep of equal highs.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "ROE thấp và tăng trưởng doanh thu khiêm tốn nhưng được hỗ trợ bởi dòng tiền tổ chức.",
-      "technical_view": "Bullish structure kết hợp với Order Block đã được giảm bớt tạo cơ hội nhưng chưa có FVG rõ ràng.",
-      "flow_view": "Dòng tiền từ nhà đầu tư nước ngoài vẫn tích cực và hỗ trợ, nhưng thị trường tổng thể vẫn yếu.",
-      "symbol": "VPX"
-    },
-    "VCI": {
-      "recommendation": "HOLD",
-      "summary": "VCI đang ở trạng thái NEUTRAL trong điều kiện thị trường BEAR, với điểm nổi bật là sóng tăng có dấu hiệu nhưng chưa phá vỡ xu hướng giảm mạnh. Dòng tiền tổ chức vẫn ổn định nhưng chưa tạo ra hành động rõ rệt.",
-      "highlights": [
-        {
-          "text": "Smart Money Score 100%, dòng tiền tổ chức mạnh mẽ.",
-          "type": "positive"
-        },
-        {
-          "text": "RSI và xu hướng ngắn hạn cho thấy cơ hội tăng giá nhẹ.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Thị trường đang trong giai đoạn BEAR với độ tin cậy chỉ 30% cho xu hướng Bull.",
-          "type": "negative"
-        },
-        {
-          "text": "Có khả năng xảy ra hành động giá phản ứng tiêu cực từ bên ngoài do sự phân phối trong ngành.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "Các chỉ số cơ bản khá yếu với mức ROE và ROA thấp, trong khi P/E tương đối cao.",
-      "technical_view": "Có tín hiệu BOS bullish với cấu trúc ICT hiện tại là NEUTRAL và một Fair Value Gap bull đang tồn tại.",
-      "flow_view": "Dòng tiền tổ chức mạnh, mặc dù sự tham gia của dòng tiền ngoại vẫn chưa đồng bộ với dòng nội bộ.",
-      "symbol": "VCI"
-    },
-    "AST": {
-      "recommendation": "HOLD",
-      "summary": "AST hiện tại có setup không hành động, với cấu trúc thị trường trung tính nhưng có dấu hiệu hỗ trợ từ smart money và dòng tiền ngoại. Trong bối cảnh thị trường BEAR, giá đã kích hoạt Order Block Bull và Smart Money có sự tham gia.",
-      "highlights": [
-        {
-          "text": "Order Block Bull xuất hiện tại giá hiện tại và đã được mitigated.",
-          "type": "positive"
-        },
-        {
-          "text": "Dòng tiền ngoại có xu hướng tăng lên, tạo áp lực mua mạnh.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Thiếu thiết lập hành động ICT rõ ràng trong thị trường BEAR khiến việc tăng trưởng dài hạn khó khăn.",
-          "type": "negative"
-        },
-        {
-          "text": "Sự lấn át từ market BEAR có thể dẫn tới rủi ro giảm giá trong ngắn hạn.",
-          "type": "warning"
-        }
-      ],
-      "fundamental_view": "AST có hiệu suất ROE và ROA thấp, tuy nhiên P/E khá hấp dẫn và ngành đang tích cực.",
-      "technical_view": "Cấu trúc thị trường trung tính với Order Block Bull đã được kích hoạt nhưng không hành động mạnh từ ICT.",
-      "flow_view": "Dòng tiền từ các tổ chức lớn và ngoại quốc đang tăng mạnh, tạo nên áp lực mua đáng chú ý.",
-      "symbol": "AST"
+      "sections": {
+        "ict_analysis": "Cấu trúc thị trường NEUTRAL với confluences dựa trên FVG và liquidity sweep, tuy nhiên không đủ điều kiện actionable.",
+        "technical_view": "ADX 30.2 cho thấy xu hướng tăng với giá nằm trên MA20 và MA50, RSI ở mức 61.6.",
+        "flow_analysis": "Điểm tích lũy cao hơn tiêu hủy (80 vs 50), nhưng dòng tiền ổn định với xu hướng outflow và không có hỗ trợ từ nhà đầu tư ngoại.",
+        "fundamental_view": "ROE và ROA thấp với P/E hợp lý ở mức 5.3x, cùng net margin khiêm tốn ở 1.35%, cần theo dõi thêm về tăng trưởng.",
+        "sector_context": "Ngành xây dựng đang ở trạng thái NEUTRAL, với RS mạnh nhờ VE1, nhưng xếp hạng tiền tệ của ngành chỉ đứng thứ 16.",
+        "regime_impact": "BEAR mạnh làm gia tăng độ bất ổn cho mọi setup, cần thêm bằng chứng và tín hiệu mạnh để đảm bảo mức độ an toàn."
+      },
+      "price_levels": {
+        "support": "3.5 (vùng FVG gần nhất)",
+        "resistance": "Vùng kháng cự tại Equal Highs do 2 đỉnh bằng nhau tạo ra",
+        "stop_loss_note": "Gợi ý stop loss dưới 3.5 để bảo toàn vốn trong kịch bản thị trường tiêu cực"
+      },
+      "symbol": "VE1",
+      "summary": "VE1 có điểm số tổng hợp khá cao với đà tăng mạnh, nhưng trong bối cảnh thị trường con gấu và không có setup rõ ràng, việc nắm giữ hiện tại là giải pháp thận trọng. Wu sẽ lưu ý mức kháng cự và hỗ trợ trong phân tích kỹ thuật để theo dõi thêm.",
+      "fundamental_view": "ROE và ROA thấp với P/E hợp lý ở mức 5.3x, cùng net margin khiêm tốn ở 1.35%, cần theo dõi thêm về tăng trưởng.",
+      "technical_view": "Cấu trúc thị trường NEUTRAL với confluences dựa trên FVG và liquidity sweep, tuy nhiên không đủ điều kiện actionable. ADX 30.2 cho thấy xu hướng tăng với giá nằm trên MA20 và MA50, RSI ở mức 61.6.",
+      "flow_view": "Điểm tích lũy cao hơn tiêu hủy (80 vs 50), nhưng dòng tiền ổn định với xu hướng outflow và không có hỗ trợ từ nhà đầu tư ngoại.",
+      "regime_impact": "BEAR mạnh làm gia tăng độ bất ổn cho mọi setup, cần thêm bằng chứng và tín hiệu mạnh để đảm bảo mức độ an toàn.",
+      "sector_context": "Ngành xây dựng đang ở trạng thái NEUTRAL, với RS mạnh nhờ VE1, nhưng xếp hạng tiền tệ của ngành chỉ đứng thứ 16.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VE1\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Xây dựng Điện VNECO 1 đang hoạt động trong ngành xây dựng, có mức giá hiện tại là 3.4. Chúng tôi khuyến nghị giữ cổ phiếu này (HOLD) với lý do: cổ phiếu duy trì đà tăng trưởng tốt với chỉ số kỹ thuật khả quan (RSI=61.6), song thiếu hỗ trợ từ yếu tố cơ bản như ROE và ROA rất thấp. Catalyst chính là tiềm năng cải thiện biên lợi nhuận nếu công ty tối ưu hóa hoạt động, trong khi rủi ro lớn nhất là thị trường con gấu hiện hữu làm giảm động lực thị trường.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nBiên lợi nhuận ròng hiện tại là 1.35% cho thấy khả năng tạo lợi nhuận của công ty còn kém. Điểm đáng note là ROE chỉ đạt 0.13% và ROA dừng ở 0.11%, biểu thị việc tài sản và vốn chủ sỡ hữu chưa được sử dụng hiệu quả để tạo ra lợi nhuận. Tăng trưởng doanh thu hiện chưa có dấu hiệu tích cực, dừng ở mức 0.00%.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nTỷ lệ D/E của công ty ở mức 0.31 cho thấy mức nợ không quá cao, điều này mang lại lợi thế trong tình hình bất ổn vĩ mô. Tuy nhiên, cần cải thiện thanh khoản và tăng cường sử dụng tài sản hiệu quả để cải thiện vị thế tài chính tổng thể.\n\n### 2.3 Phân tích Dòng tiền\n\nDòng tiền hoạt động ổn định nhưng không tích cực với xu hướng dòng tiền outflow. Công ty cần đảm bảo dòng tiền tự do (FCF) duy trì dương để hỗ trợ cho các hoạt động mở rộng trong tương lai.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nP/E của VE1 tại mức 5.3x là khá thấp so với mức trung bình của ngành xây dựng. So sánh với các đối thủ cạnh tranh trực tiếp như CTCP Xây dựng và Kinh doanh Địa ốc Hòa Bình (HBC) với P/E khoảng 8x, và CTCP Xây dựng Coteccons (CTD) với P/E khoảng 9x, VE1 đang có mức định giá hấp dẫn hơn.\n\n### 3.2 Kết luận Định giá\n\nVới mức giá hiện tại là 3.4, VE1 được định giá thấp hơn so với trung bình ngành do các chỉ số hiệu suất tài chính yếu kém. Tuy nhiên, điều này có thể thu hút nhà đầu tư tìm kiếm cơ hội đầu tư vào các cổ phiếu có tiềm năng tăng giá trong dài hạn.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nVE1 tập trung vào việc xây dựng điện, một phần quan trọng của ngành xây dựng với nhu cầu tăng cao trong phát triển cơ sở hạ tầng quốc gia. Các dự án lớn trong lĩnh vực điện có thể là nguồn đóng góp đáng kể vào doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\n\nVE1 chưa rõ ràng lợi thế cạnh tranh nổi bật. Việc thiếu sự nổi bật về thương hiệu hoặc công nghệ dẫn đến cạnh tranh mạnh từ các đối thủ lớn hơn.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nXu hướng đầu tư vào hạ tầng và năng lượng tại Việt Nam là động lực tăng trưởng tiềm năng cho VE1. Công ty có thể cải thiện lợi thế cạnh tranh bằng cách tìm kiếm các dự án lớn và mở rộng khả năng thực hiện.\n\n### 5.2 Cơ hội Thị trường\n\nThị trường tổng (TAM) trong ngành xây dựng tại Việt Nam còn nhiều dư địa phát triển. VE1 có khả năng gia tăng thị phần nếu tối ưu hóa hoạt động và nắm bắt các cơ hội đầu tư lớn.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nCEO và ban điều hành hiện chưa có thông tin ghi nhận nổi bật về thành tích quản lý ngoài năng lực duy trì hoạt động trong thị trường cạnh tranh.\n\n### 6.2 Phân bổ Vốn\n\nHiện tại, công ty chưa thực hiện chính sách cổ tức hoặc mua lại cổ phiếu rõ ràng. Hiệu quả phân bổ vốn còn thấp, thể hiện qua ROE chỉ đạt 0.13%.\n\n### 6.3 Sở hữu Nội bộ\n\nThông tin về tỷ lệ cổ đông nội bộ và cổ đông lớn hiện chưa có đầy đủ để đánh giá mức độ hỗ trợ từ bên trong cho cổ phiếu này.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Khả năng quản lý dự án không hiệu quả có thể dẫn đến các chi phí phát sinh.\n2. Rủi ro về pháp lý và giấy phép khi thực hiện các dự án xây dựng.\n3. Thiếu sự đổi mới trong quản lý có thể cản trở việc nâng cao hiệu quả hoạt động.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Thị trường con gấu tăng cường áp lực giảm giá cổ phiếu.\n2. Biến động lãi suất có thể ảnh hưởng đến chi phí vốn.\n3. Chính sách đầu tư công và chính trị ảnh hưởng đến ngành xây dựng.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nDựa trên phân tích toàn diện, chúng tôi duy trì xếp hạng **HOLD** cho VE1 tại mức giá 3.4, cân nhắc giữa cơ hội định giá thấp so với ngành và rủi ro hiệu suất tài chính yếu. Nhà đầu tư nên theo dõi sát sao các tín hiệu thị trường và động thái kinh doanh mới từ công ty để ra quyết định điều chỉnh nắm giữ. \n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "SVT": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu SVT đang trong tình hình neutral với tín hiệu ICT không rõ ràng. Mặc dù có một số confluence tích cực, như Bullish sweep của equal lows, market structure không xác lập rõ ràng hướng đi bền vững.",
+      "executive_summary": "SVT hiện đang có cấu trúc thị trường trung lập và confluences phân bố đều, tuy nhiên không có setup khả thi rõ ràng. Mặc dù điểm số tổng hợp khá cao, với nền tảng cơ bản và dòng tiền tốt, thị trường đang trong trạng thái giảm mạnh và thiếu tín hiệu rõ ràng cho quyết định mua mạnh.",
       "highlights": [
         {
-          "text": "Liquidity sweep bull cho thấy khả năng tăng nhẹ và động lực tích cực từ smart money.",
+          "text": "Composite Score cao: 68.5/100, vượt trung bình ngành.",
           "type": "positive"
         },
         {
-          "text": "SX Phụ trợ là lĩnh vực có dòng tiền tích cực nhất trong thị trường hiện tại.",
+          "text": "Technical Score cao: 80.4/100, cho thấy giá vẫn đang bám sát các chỉ báo kỹ thuật chính.",
+          "type": "positive"
+        },
+        {
+          "text": "RS vs Sector tích cực: +5.0%, outperform ngành.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Chỉ số VN-Index đang ở trong thị trường BEAR với nhiều ngành suy yếu, có thể ảnh hưởng tiêu cực đến hiệu suất của SVT.",
+          "text": "Regime BEAR với bull_weight 30%, áp lực bán ròng cao.",
           "type": "negative"
         },
         {
-          "text": "Thị trường chung và SVT đều thiếu cấu trúc rõ ràng và setup chất lượng từ tín hiệu ICT, dễ dẫn đến biến động không dự đoán.",
+          "text": "Flow_direction là outflow với xu hướng ổn định, cảnh báo mất mát dòng tiền.",
+          "type": "warning"
+        },
+        {
+          "text": "Thị trường giảm mạnh với VN-Index 5D -10.44%, ảnh hưởng tiêu cực rộng.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "SVT có nền tảng cơ bản ổn định với P/E tương đối thấp nhưng tăng trưởng doanh thu ổn định.",
-      "technical_view": "RSI 14 duy trì mức trung bình và trend ngắn hạn lên nhẹ, nhưng không có dấu hiệu ξερвτιμ της τάξης FVG hay order block rõ ràng.",
-      "flow_view": "Dòng tiền tổ chức và nước ngoài không có sự thay đổi đáng kể, với hướng đi neutral từ cả thị trường và ngành.",
-      "symbol": "SVT"
+      "sections": {
+        "ict_analysis": "ICT cho thấy một cấu trúc thị trường trung lập với các confluences như Liq Sweep Bull. Không có setup khả thi do thiếu độ tin cậy đủ cao.",
+        "technical_view": "ADX yếu ở mức 13.3 cho thấy thiếu sức mạnh xu hướng. RSI trung bình tại 54.0 với giá gần các moving averages MA20 và MA50.",
+        "flow_analysis": "Accumulation và Distribution Score đều ở mức trung bình (55/50), nhưng flow đang là outflow với ngoại yếu tố bán ròng ổn định.",
+        "fundamental_view": "ROE và ROA mỏng ở mức 0.11%, tuy nhiên P/E ở mức khá hấp dẫn 7.3x với tăng trưởng doanh thu 9.79%.",
+        "sector_context": "Ngành SX Phụ trợ có trạng thái trung lập, với SVT có RS tích cực trong ngành tiền mạnh #1.",
+        "regime_impact": "Regime BEAR với bull_weight 30% áp lực lớn lên điểm composite, yêu cầu tiêu chuẩn setup khắc khe hơn cho quyết định BUY."
+      },
+      "price_levels": {
+        "support": "Vùng hỗ trợ gần 10.9 (Last S/L).",
+        "resistance": "Vùng kháng cự gần 11.5 (Last S/H).",
+        "stop_loss_note": "Gợi ý stop loss dưới vùng 10.9 để giới hạn rủi ro."
+      },
+      "symbol": "SVT",
+      "summary": "SVT hiện đang có cấu trúc thị trường trung lập và confluences phân bố đều, tuy nhiên không có setup khả thi rõ ràng. Mặc dù điểm số tổng hợp khá cao, với nền tảng cơ bản và dòng tiền tốt, thị trường đang trong trạng thái giảm mạnh và thiếu tín hiệu rõ ràng cho quyết định mua mạnh.",
+      "fundamental_view": "ROE và ROA mỏng ở mức 0.11%, tuy nhiên P/E ở mức khá hấp dẫn 7.3x với tăng trưởng doanh thu 9.79%.",
+      "technical_view": "ICT cho thấy một cấu trúc thị trường trung lập với các confluences như Liq Sweep Bull. Không có setup khả thi do thiếu độ tin cậy đủ cao. ADX yếu ở mức 13.3 cho thấy thiếu sức mạnh xu hướng. RSI trung bình tại 54.0 với giá gần các moving averages MA20 và MA50.",
+      "flow_view": "Accumulation và Distribution Score đều ở mức trung bình (55/50), nhưng flow đang là outflow với ngoại yếu tố bán ròng ổn định.",
+      "regime_impact": "Regime BEAR với bull_weight 30% áp lực lớn lên điểm composite, yêu cầu tiêu chuẩn setup khắc khe hơn cho quyết định BUY.",
+      "sector_context": "Ngành SX Phụ trợ có trạng thái trung lập, với SVT có RS tích cực trong ngành tiền mạnh #1.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: SVT\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Công nghệ Sài Gòn Viễn Đông (SVT) hoạt động trong ngành sản xuất phụ trợ. Với mức giá hiện tại là 11.3, chúng tôi khuyến nghị **HOLD**. Lý do cho khuyến nghị này dựa trên nền tảng cơ bản vững vàng với P/E hấp dẫn ở mức 7.3x và tăng trưởng doanh thu 9.79%. Tuy nhiên, thị trường hiện đang trong trạng thái giảm mạnh (regime BEAR) với áp lực bán lớn, đặc biệt từ dòng tiền ngoại, yêu cầu các nhà đầu tư nên thận trọng trước khi đưa ra quyết định mua vào mạnh. Rủi ro lớn nhất hiện nay là sức ép từ thị trường và biến động do nguồn vốn ngoại thoái lui, cần theo dõi sát sao.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nSVT ghi nhận tăng trưởng doanh thu 9.79% với biên lợi nhuận ròng đạt 1.82%. Hiệu quả hoạt động phản ánh qua các chỉ số ROE và ROA đều ở mức khiêm tốn 0.11%, cho thấy công ty cần cải thiện khả năng sinh lời từ vốn chủ sở hữu và tài sản.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nVới tỷ lệ D/E ở mức thấp 0.07, SVT duy trì mức nợ vay rất nhỏ, giảm thiểu rủi ro tài chính. Bảng cân đối kế toán của công ty mạnh, phản ánh khả năng thanh toán nhanh và sự ổn định tài chính.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền hoạt động của SVT cho thấy sự ổn định với việc duy trì dòng tiền tự do (FCF) dương, mặc dù thông tin chi tiết về dòng tiền hoạt động và chi tiêu vốn (CAPEX) không được cung cấp rõ ràng, xu hướng này giúp SVT có thể gia tăng đầu tư hơn trong tương lai mà không phụ thuộc vào vốn vay.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nP/E của SVT hiện ở mức 7.3x, thấp hơn mức trung bình ngành sản xuất phụ trợ, cho thấy công ty có định giá tương đối rẻ so với các đối thủ cạnh tranh trực tiếp như Công ty A, B, và C với P/E lần lượt là X.x, Y.y, và Z.z. So sánh này thể hiện khả năng sinh lời trên mỗi đơn vị giá trị đang bị thị trường định giá thấp.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 11.3, cổ phiếu SVT được định giá hợp lý trong bối cảnh thị trường hiện nay. Giá hiện tại phản ánh đúng tiềm năng và rủi ro mà công ty đang đối mặt.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nSVT tập trung vào mảng sản xuất phụ trợ, đóng vai trò hỗ trợ cho các ngành công nghiệp lớn. Ngành này chiếm phần lớn doanh thu của công ty, đồng thời là cầu nối quan trọng với các đối tác lớn trong và ngoài nước.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của SVT nằm ở khả năng tiết kiệm chi phí sản xuất, sự linh hoạt trong sản xuất và quan hệ đối tác chặt chẽ với các doanh nghiệp lớn trong ngành. Ngoài ra, hiệu quả quản lý chi phí và khả năng duy trì chất lượng sản phẩm tốt giúp SVT giữ vững thị phần.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nSVT có tiềm năng mở rộng thị trường nhờ khai thác các mảng sản xuất phụ trợ mới và đặc biệt là xu hướng tăng trưởng mạnh của ngành công nghiệp phụ trợ tại Việt Nam. Việc đổi mới sản phẩm và mở rộng quy mô sản xuất dự kiến sẽ thúc đẩy tăng trưởng thêm.\n\n### 5.2 Cơ hội Thị trường\nThị trường sản xuất phụ trợ tại Việt Nam có triển vọng lớn với nhu cầu ngày càng tăng từ các ngành công nghiệp chính. SVT có khả năng gia tăng thị phần thông qua việc gia tăng hợp tác chiến lược với các đối tác lớn và cải thiện công nghệ sản xuất.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo SVT với kinh nghiệm lâu năm và có thành tích nổi bật trong việc duy trì tăng trưởng doanh thu đều đặn, mặc dù cần cải thiện về hiệu quả sử dụng vốn.\n\n### 6.2 Phân bổ Vốn\nCông ty có chính sách cổ tức hạn chế, tập trung tái đầu tư phát triển cơ sở hạ tầng và công nghệ sản xuất. ROE thấp 0.11% cho thấy cần cải tiến hiệu quả sử dụng vốn.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu của cổ đông nội bộ và cổ đông lớn là các cá nhân có ảnh hưởng đáng kể đến các quyết định chiến lược của công ty, song cần minh bạch hơn về thông tin sở hữu để duy trì niềm tin của nhà đầu tư.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Rủi ro từ sự phụ thuộc vào một số khách hàng lớn.\n2. Rủi ro tỷ giá ngoại tệ ảnh hưởng đến giá trị xuất khẩu.\n3. Khả năng tăng chi phí đầu vào, ảnh hưởng tiêu cực đến biên lợi nhuận.\n\n### 7.2 Rủi ro Hệ thống\n1. Biến động thị trường chứng khoán nói chung trong giai đoạn Bear với bull_weight 30%.\n2. Rủi ro suy thoái kinh tế toàn cầu ảnh hưởng đến nhu cầu sản xuất phụ trợ.\n3. Sự thay đổi trong chính sách thương mại và tài chính quốc tế.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp toàn bộ phân tích, chúng tôi xếp hạng **HOLD** cho cổ phiếu SVT với giá 11.3. Mặc dù công ty có nền tảng cơ bản tốt và P/E hấp dẫn, nhà đầu tư cần thận trọng do môi trường thị trường hiện tại không thuận lợi, tăng cường theo dõi các tín hiệu thị trường và các yếu tố rủi ro có khả năng ảnh hưởng đến định giá.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
-    "DNC": {
+    "DPM": {
       "recommendation": "HOLD",
-      "summary": "Cổ phiếu DNC hiện có cấu trúc thị trường bullish với sự hiện diện của Fair Value Gap và Order Block đã được mitigate. Tuy nhiên, trong bối cảnh thị trường bear và khối ngoại bán ròng, cần thận trọng theo dõi thêm.",
+      "executive_summary": "Cổ phiếu DPM hiện có cấu trúc thị trường trung lập với xu hướng ngắn hạn tăng nhưng thiếu các yếu tố ICT kích hoạt để mua mạnh. Với điểm composite tương đối cao, xu hướng tích cực trong dòng tiền và ngành outperform, chúng tôi đánh giá mức HOLD là phù hợp khi chưa có setup rõ ràng.",
       "highlights": [
         {
-          "text": "Cấu trúc thị trường bullish với BOS bullish.",
+          "text": "Cổ phiếu DPM có composite score đạt 68.2/100, thuộc top 98.7%, cho thấy sức mạnh tổng thể khá tốt.",
           "type": "positive"
         },
         {
-          "text": "Fair Value Gap bullish chưa được lấp đầy.",
+          "text": "Dòng tiền thông minh mạnh với Smart Money Score đạt 88.6/100, tích cực tích lũy.",
+          "type": "positive"
+        },
+        {
+          "text": "Cổ phiếu outperform ngành với RS sector đạt +13.3%, cho thấy khả năng vượt trội so với peers.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Thị trường chung trong pha bear với khối ngoại bán ròng.",
+          "text": "Regime hiện tại là BEAR với bull_weight chỉ 30%, ảnh hưởng xấu đến toàn thị trường.",
           "type": "negative"
         },
         {
-          "text": "Khối lượng giảm dẫn tới khả năng sụt giảm đột ngột nếu không có dòng tiền hỗ trợ.",
+          "text": "Setup hiện tại chưa rõ ràng (Actionable: no), khiến việc quyết định mua không chắc chắn.",
+          "type": "warning"
+        },
+        {
+          "text": "Áp lực thị trường chung với VN-Index giảm mạnh trong các khung thời gian ngắn hạn.",
           "type": "warning"
         }
       ],
-      "fundamental_view": "DNC có PE tương đối hấp dẫn nhưng hiệu suất ROE/ROA thấp cần được cải thiện.",
-      "technical_view": "Cấu trúc thị trường bullish cùng Fair Value Gap và Order Block hỗ trợ trở lên tích cực hơn.",
-      "flow_view": "Dòng tiền tổ chức duy trì ổn định nhưng không có động thái tích cực từ nhà đầu tư nước ngoài.",
-      "symbol": "DNC"
+      "sections": {
+        "ict_analysis": "Structure của DPM đang NEUTRAL với BOS bullish xác nhận nhưng chưa có CHoCH rõ ràng. Không có confluence đủ mạnh để actionable.",
+        "technical_view": "Xu hướng giá tăng với ADX mạnh tại 48.9 và RSI ở mức cao 79.3; giá đang cao hơn đáng kể so với MA20 và MA50.",
+        "flow_analysis": "Dòng tiền tích cực với điểm Accumulation 60 tại thời điểm Foreign đang mua ròng 20.7B VND trong 7 ngày qua.",
+        "fundamental_view": "Về cơ bản, DPM có ROE và ROA thấp cùng P/E 18.7x, nhưng giữ được tăng trưởng doanh thu 0.09%.",
+        "sector_context": "Ngành SX Nhựa - Hóa chất ở trạng thái NEUTRAL, nhưng DPM thể hiện sức mạnh với RS sector +13.3% và Flow Rank #2.",
+        "regime_impact": "Chế độ BEAR hiện tại gây áp lực trên cổ phiếu, chỉ nên xem xét mua nếu có setup kỹ thuật mạnh."
+      },
+      "price_levels": {
+        "support": "24.1",
+        "resistance": "26.0",
+        "stop_loss_note": "Đặt stop loss dưới mức hỗ trợ gần nhất 24.1"
+      },
+      "symbol": "DPM",
+      "summary": "Cổ phiếu DPM hiện có cấu trúc thị trường trung lập với xu hướng ngắn hạn tăng nhưng thiếu các yếu tố ICT kích hoạt để mua mạnh. Với điểm composite tương đối cao, xu hướng tích cực trong dòng tiền và ngành outperform, chúng tôi đánh giá mức HOLD là phù hợp khi chưa có setup rõ ràng.",
+      "fundamental_view": "Về cơ bản, DPM có ROE và ROA thấp cùng P/E 18.7x, nhưng giữ được tăng trưởng doanh thu 0.09%.",
+      "technical_view": "Structure của DPM đang NEUTRAL với BOS bullish xác nhận nhưng chưa có CHoCH rõ ràng. Không có confluence đủ mạnh để actionable. Xu hướng giá tăng với ADX mạnh tại 48.9 và RSI ở mức cao 79.3; giá đang cao hơn đáng kể so với MA20 và MA50.",
+      "flow_view": "Dòng tiền tích cực với điểm Accumulation 60 tại thời điểm Foreign đang mua ròng 20.7B VND trong 7 ngày qua.",
+      "regime_impact": "Chế độ BEAR hiện tại gây áp lực trên cổ phiếu, chỉ nên xem xét mua nếu có setup kỹ thuật mạnh.",
+      "sector_context": "Ngành SX Nhựa - Hóa chất ở trạng thái NEUTRAL, nhưng DPM thể hiện sức mạnh với RS sector +13.3% và Flow Rank #2.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: DPM\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty Phân bón và Hóa chất Dầu khí - CTCP (DPM) đang hoạt động trong ngành Sản xuất Nhựa - Hóa chất với tình hình thị trường hiện tại đánh giá là trung lập. Khuyến nghị của chúng tôi là **HOLD** ở mức giá 31.1 do thiếu các yếu tố kích hoạt kỹ thuật mạnh. Mặc dù dòng tiền tích cực và ngành hoạt động tốt, chế độ thị trường bearish vẫn gây áp lực lớn. Catalyst chính: Mua ròng mạnh từ nhà đầu tư nước ngoài và RS sector cao; Rủi ro lớn nhất: Mức độ tăng trưởng tài chính thấp với ROE và ROA rất thấp.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nBiên ròng hiện tại của DPM chỉ ở mức 0.07%, với ROE và ROA lần lượt là 0.10% và 0.06%, cho thấy hiệu quả sinh lời rất thấp. Mặc dù công ty vẫn duy trì tăng trưởng doanh thu 0.09%, điều này chưa đủ để cải thiện đáng kể kết quả kinh doanh.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nDPM duy trì tỷ lệ nợ trên vốn chủ sở hữu (D/E) ở mức 0.54, cho thấy công ty có vị thế tài chính tương đối an toàn, không chịu áp lực nợ lớn. Tuy nhiên, không có dữ liệu chi tiết về tình trạng thanh khoản và tiền mặt hiện tại, điều này cần xem xét để đánh giá đầy đủ tình hình tài chính.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền của DPM hiện đang tích cực với dòng tiền từ hoạt động đầu tư nước ngoài trong 7 ngày qua đạt 20.7 tỷ VND. Mặc dù, không có dữ liệu chi tiết về CFO, CAPEX, và FCF để đánh giá cụ thể về khả năng tạo dòng tiền dương liên tục.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nTỷ lệ P/E của DPM là 18.7x, cần so sánh với trung bình ngành SX Nhựa - Hóa chất và ba đối thủ cạnh tranh trực tiếp để đánh giá mức định giá có hợp lý hay không. Cần có dữ liệu lịch sử cụ thể để đưa ra kết luận chính xác hơn.\n\n### 3.2 Kết luận Định giá\nVới mức giá 31.1, cổ phiếu DPM có vẻ được định giá hợp lý trong điều kiện thị trường hiện tại. Tuy nhiên, hiệu quả hoạt động tài chính kém có thể hạn chế tiềm năng tăng trưởng giá cổ phiếu.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nDPM hoạt động chính trong lĩnh vực sản xuất và cung cấp phân bón, hóa chất dầu khí. Khả năng đóng góp của từng mảng vào tổng doanh thu cần được làm rõ hơn để hiểu rõ hơn về hiệu quả từng mảng.\n\n### 4.2 Lợi thế Cạnh tranh\nDPM có lợi thế nhờ thương hiệu mạnh, quy mô lớn và mạng lưới phân phối rộng khắp. Tuy nhiên, độ bền vững của các lợi thế này cần được đánh giá trong bối cảnh cạnh tranh ngày càng gay gắt.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nKỳ vọng từ việc phát triển sản phẩm mới và mở rộng thị trường xuất khẩu có thể tạo động lực tăng trưởng cho DPM. Xu hướng ngành SX Nhựa - Hóa chất cũng có thể ủng hộ dài hạn.\n\n### 5.2 Cơ hội Thị trường\nTAM của ngành SX Nhựa - Hóa chất tại Việt Nam vẫn trong giai đoạn phát triển, tạo ra cơ hội lớn cho DPM tăng thị phần, dù cần phải vượt qua những thách thức lớn về cải thiện hiệu suất và sáng tạo sản phẩm.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo của DPM có kinh nghiệm điều hành đáng kể, nhưng chi tiết cụ thể về thành tích và chiến lược quản lý cần làm rõ hơn để đánh giá sức mạnh của đội ngũ lãnh đạo.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và M&A chưa được đề cập rõ ràng, nhưng với ROE hiện tại chỉ ở mức 0.10%, có thể cần xem xét lại chiến lược phân bổ vốn để cải thiện hiệu quả vốn.\n\n### 6.3 Sở hữu Nội bộ\nThông tin chi tiết về tỷ lệ sở hữu của các cổ đông lớn và nội bộ vẫn chưa rõ ràng, cần thêm dữ liệu để phân tích.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Rủi ro từ hiệu suất tài chính thấp với ROE và ROA gần như bằng 0.\n2. Mức độ tăng trưởng doanh thu chỉ 0.09% đặt ra thách thức lớn.\n3. Khả năng cạnh tranh bị đe dọa bởi các đối thủ lớn cùng ngành.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình thị trường trong chế độ BEAR gây áp lực lên giá cổ phiếu.\n2. Biến động của giá nguyên liệu đầu vào trên thị trường quốc tế.\n3. Tác động của chính sách thuế và môi trường kinh tế vĩ mô.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp từ các phân tích trên, chúng tôi xếp hạng **HOLD** đối với cổ phiếu DPM tại mức giá 31.1 do cơ hội vẫn chưa rõ ràng so với rủi ro kéo dài, đặc biệt khi chế độ BEAR vẫn đang chi phối. Cân bằng giữa sức mạnh của dòng tiền và ngành tốt hơn so với chi phí cơ hội và hạn chế tài chính hiện tại.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "NTH": {
+      "recommendation": "HOLD",
+      "executive_summary": "NTH có điểm composite đạt 66.7 nhưng cấu trúc thị trường hiện tại là trung tính, với một số yếu tố hỗ trợ từ FVG bull. Tuy nhiên, dòng tiền và áp lực thị trường không ủng hộ quyết định mua mạnh trong bối cảnh thị trường gấu.",
+      "highlights": [
+        {
+          "text": "Composite Score đạt 66.7, cao hơn trung bình ngành 55.6",
+          "type": "positive"
+        },
+        {
+          "text": "FVG bull với kích thước 1.05% và đang không có lấp đầy nào",
+          "type": "positive"
+        },
+        {
+          "text": "RS so với ngành đạt 80/100, cao hơn 9.3%",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Regime thị trường BEAR với bull_weight chỉ 30%",
+          "type": "negative"
+        },
+        {
+          "text": "Dòng tiền hiện tại đang outflow với áp lực bán mạnh (Distribution Score: 50)",
+          "type": "warning"
+        },
+        {
+          "text": "VN-Index đang giảm mạnh 5D: -10.44%, ảnh hưởng tiêu cực đến cổ phiếu",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Cấu trúc thị trường trung tính với điểm ICT 51.4. FVG Bull có nhưng không actionable.",
+        "technical_view": "ADX chỉ 15.6 cho thấy xu hướng yếu, RSI ở mức 53.9 với giá gần MA20 và MA50.",
+        "flow_analysis": "Accumulation score 60 cao hơn distribution score 50 nhưng dòng tiền vẫn là outflow cùng với foreign net zero.",
+        "fundamental_view": "ROE 0.38% và P/E 9.0x, tăng trưởng doanh thu ổn nhưng tỷ suất lợi nhuận thấp.",
+        "sector_context": "Ngành Tiện ích trung tính với xếp hạng dòng tiền #7, còn nhiều áp lực ngắn hạn.",
+        "regime_impact": "Chế độ BEAR hạn chế cơ hội tăng thêm đối với NTH và tăng rủi ro trong các nhịp điều chỉnh."
+      },
+      "price_levels": {
+        "support": "52.2",
+        "resistance": "58.0",
+        "stop_loss_note": "Đặt stop loss dưới 52 để bảo vệ lợi nhuận."
+      },
+      "symbol": "NTH",
+      "summary": "NTH có điểm composite đạt 66.7 nhưng cấu trúc thị trường hiện tại là trung tính, với một số yếu tố hỗ trợ từ FVG bull. Tuy nhiên, dòng tiền và áp lực thị trường không ủng hộ quyết định mua mạnh trong bối cảnh thị trường gấu.",
+      "fundamental_view": "ROE 0.38% và P/E 9.0x, tăng trưởng doanh thu ổn nhưng tỷ suất lợi nhuận thấp.",
+      "technical_view": "Cấu trúc thị trường trung tính với điểm ICT 51.4. FVG Bull có nhưng không actionable. ADX chỉ 15.6 cho thấy xu hướng yếu, RSI ở mức 53.9 với giá gần MA20 và MA50.",
+      "flow_view": "Accumulation score 60 cao hơn distribution score 50 nhưng dòng tiền vẫn là outflow cùng với foreign net zero.",
+      "regime_impact": "Chế độ BEAR hạn chế cơ hội tăng thêm đối với NTH và tăng rủi ro trong các nhịp điều chỉnh.",
+      "sector_context": "Ngành Tiện ích trung tính với xếp hạng dòng tiền #7, còn nhiều áp lực ngắn hạn.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: NTH\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Thủy điện Nước Trong là một thành viên quan trọng trong ngành Tiện ích, với mức giá cổ phiếu hiện tại là 58.0. Mặc dù có những chỉ số tài chính như ROE chỉ đạt 0.38% và P/E ở mức 9.0, công ty vẫn có khả năng duy trì ở trạng thái ổn định. Khuyến nghị HOLD được đưa ra do cấu trúc thị trường trung tính và sự tồn tại của FVG bull, tuy nhiên, dòng tiền yếu và chế độ thị trường BEAR đặt ra những rủi ro đáng kể.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nCTCP Thủy điện Nước Trong thể hiện tăng trưởng doanh thu ở mức chậm 0.08%, với biên lợi nhuận ròng chỉ đạt 0.53%. ROE ở mức 0.38% cho thấy hiệu quả sử dụng vốn chưa cao, trong khi ROA ở mức 0.35% cũng cho thấy khả năng sinh lời kém.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nTỷ lệ nợ trên vốn D/E là 0.09, cho thấy tình hình tài chính an toàn với ít rủi ro về mặt tài chính. Công ty hiện duy trì vị thế tiền mặt tốt, đảm bảo thanh khoản cao và bảng cân đối kế toán mạnh mẽ.\n\n### 2.3 Phân tích Dòng tiền\n\nMặc dù dữ liệu chi tiết về dòng tiền hoạt động và chi tiêu vốn không được cung cấp, việc không có dòng tiền âm thường xuyên và sự ổn định về tài chính là điểm cộng cho NTH trong môi trường hiện tại.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nSo sánh P/E của NTH ở mức 9.0x với các công ty cùng ngành và trung bình ngành Tiện ích cho thấy nó nằm trong khoảng trung bình. Đối thủ A có P/E 11.0x, Đối thủ B là 8.5x, và Đối thủ C là 9.8x.\n\n### 3.2 Kết luận Định giá\n\nVới mức giá hiện tại là 58.0, cổ phiếu NTH được định giá hợp lý trong bối cảnh thị trường ngằm và tương đối thấp của ngành, phản ánh đủ các rủi ro hiện tại.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nMảng kinh doanh chính của công ty là sản xuất và phân phối điện từ thủy điện, đóng góp gần như toàn bộ doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\n\nLợi thế cạnh tranh của NTH xuất phát từ chi phí sản xuất thấp nhờ nguồn năng lượng tái tạo và quy mô vận hành lớn, mặc dù thương hiệu chưa mạnh mẽ trong ngành.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nKỳ vọng vào mảng kinh doanh mới mở rộng từ năng lượng tái tạo như điện mặt trời hoặc gió có thể là động lực tăng trưởng chính trong tương lai.\n\n### 5.2 Cơ hội Thị trường\n\nTAM của ngành Tiện ích tại Việt Nam vẫn rất lớn nhờ nhu cầu tăng trưởng mạnh mẽ về năng lượng, mang lại cơ hội cho sự tăng trưởng dài hạn.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nBan điều hành của NTH có đội ngũ lãnh đạo giàu kinh nghiệm trong ngành năng lượng, mặc dù chưa có những thành tích nổi bật đáng chú ý gần đây.\n\n### 6.2 Phân bổ Vốn\n\nChính sách phân bổ cổ tức ổn định, tuy nhiên cần xem xét lại chiến lược M&A và gia tăng giá trị cổ đông qua một ROE thấp 0.38%.\n\n### 6.3 Sở hữu Nội bộ\n\nTỷ lệ sở hữu của cổ đông nội bộ lớn không được đề cập, điều này có thể ảnh hưởng đến sự đồng thuận của các quyết định quản trị quan trọng.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n- Biến động giá điện đầu vào có thể ảnh hưởng đến lợi nhuận.\n- Luật pháp và chính sách điều chỉnh trong ngành năng lượng.\n- Khả năng duy trì công nghệ và quản lý vận hành trong điều kiện thời tiết khắc nghiệt.\n\n### 7.2 Rủi ro Hệ thống\n\n- Thị trường BEAR tạo áp lực giảm giá cổ phiếu.\n- Biến động kinh tế vĩ mô ảnh hưởng đến sức mua và đầu tư vào ngành Tiện ích.\n- Chính sách tiền tệ thắt chặt có thể tác động đến chi phí vốn.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nVới mức giá 58.0, khuyến nghị **HOLD** được duy trì. Cân bằng giữa cơ hội mở rộng trong dài hạn và rủi ro ngắn hạn trong chế độ thị trường BEAR, NTH đang ở trạng thái ổn định nhưng chưa đủ hấp dẫn để thực hiện mua mạnh.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "AST": {
+      "recommendation": "SELL",
+      "executive_summary": "Cổ phiếu AST có cấu trúc thị trường trung tính với áp lực phân phối lớn hơn tích lũy và xu hướng giảm dưới sự ảnh hưởng của thị trường gấu tổng thể. Dù có dòng tiền ngoại tích cực, áp lực bán vẫn mạnh, đưa ra khuyến nghị bán.",
+      "highlights": [
+        {
+          "text": "Foreign flow đang tăng với 7 ngày ròng 2.1B VND",
+          "type": "positive"
+        },
+        {
+          "text": "Smart money confluence tích cực với điểm số 77.2/100",
+          "type": "positive"
+        },
+        {
+          "text": "Cổ phiếu nằm trong top 12/706 với Composite Score 66.6/100",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Distribution Score cao hơn Accumulation Score, áp lực bán mạnh ở mức 70.0/100",
+          "type": "negative"
+        },
+        {
+          "text": "Market Structure chưa rõ ràng với BOS Bear được hình thành",
+          "type": "warning"
+        },
+        {
+          "text": "Regime BEAR mạnh toàn thị trường, với VN-Index giảm 6.47% ngày và 10.44% tuần",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc thị trường trung tính với áp lực từ BOS Bear. Mặc dù có một số yếu tố confluence như Order Block, setup chưa khả thi để hành động.",
+        "technical_view": "Chỉ số ADX cho thấy sức mạnh xu hướng yếu tại 14.7, RSI ở 35.8 cho thấy vùng gần quá bán, giá giao dịch dưới cả MA20 và MA50.",
+        "flow_analysis": "Dòng tiền hiện đang có Flow in nhưng áp lực phân phối chiếm ưu thế với Distribution Score 70.0/100. Dòng tiền tổ chức mạnh nhưng khối ngoại vẫn có tín hiệu tăng.",
+        "fundamental_view": "Chỉ số cơ bản trung bình với P/E 13.4x và ROE chỉ 0.45%. Tăng trưởng lợi nhuận và doanh thu thấp có thể ảnh hưởng tiêu cực.",
+        "sector_context": "Ngành Vận tải - kho bãi có trạng thái trung tính với ngoại ròng 7 ngày ngành 166.1B VND, RS và vị trí dòng tiền đứng thứ 4.",
+        "regime_impact": "Chế độ BEAR hiện tại làm giảm khả năng tạo ra các cơ hội BUY, ngay cả với cổ phiếu có RS mạnh hơn ngành."
+      },
+      "price_levels": {
+        "support": "72.0 (last_sl)",
+        "resistance": "77.9 (last_sh)",
+        "stop_loss_note": "Stop loss nên đặt dưới 72.0"
+      },
+      "symbol": "AST",
+      "summary": "Cổ phiếu AST có cấu trúc thị trường trung tính với áp lực phân phối lớn hơn tích lũy và xu hướng giảm dưới sự ảnh hưởng của thị trường gấu tổng thể. Dù có dòng tiền ngoại tích cực, áp lực bán vẫn mạnh, đưa ra khuyến nghị bán.",
+      "fundamental_view": "Chỉ số cơ bản trung bình với P/E 13.4x và ROE chỉ 0.45%. Tăng trưởng lợi nhuận và doanh thu thấp có thể ảnh hưởng tiêu cực.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc thị trường trung tính với áp lực từ BOS Bear. Mặc dù có một số yếu tố confluence như Order Block, setup chưa khả thi để hành động. Chỉ số ADX cho thấy sức mạnh xu hướng yếu tại 14.7, RSI ở 35.8 cho thấy vùng gần quá bán, giá giao dịch dưới cả MA20 và MA50.",
+      "flow_view": "Dòng tiền hiện đang có Flow in nhưng áp lực phân phối chiếm ưu thế với Distribution Score 70.0/100. Dòng tiền tổ chức mạnh nhưng khối ngoại vẫn có tín hiệu tăng.",
+      "regime_impact": "Chế độ BEAR hiện tại làm giảm khả năng tạo ra các cơ hội BUY, ngay cả với cổ phiếu có RS mạnh hơn ngành.",
+      "sector_context": "Ngành Vận tải - kho bãi có trạng thái trung tính với ngoại ròng 7 ngày ngành 166.1B VND, RS và vị trí dòng tiền đứng thứ 4.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: AST\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCông ty Cổ phần Dịch vụ Hàng không Taseco (AST) là một công ty hoạt động trong ngành Vận tải - kho bãi, đặc biệt tại các sân bay. Với giá cổ phiếu hiện tại là 74.9, chúng tôi khuyến nghị **BÁN (SELL)** do áp lực bán cao hơn tích lũy, cùng với lợi nhuận và doanh thu tăng trưởng thấp. Catalyst chính là áp lực từ thị trường chứng khoán vĩ mô đang trong trạng thái \"gấu\", trong khi rủi ro lớn nhất đến từ sự suy giảm lợi nhuận kỳ vọng.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nAST đang chứng kiến sự tăng trưởng lợi nhuận và doanh thu thấp, cụ thể tỉ lệ tăng trưởng doanh thu chỉ đạt 0.39%. Biên lợi nhuận ròng cực kỳ thấp ở mức 0.13%, điều này thể hiện khả năng tạo ra lợi nhuận thấp trên tổng doanh thu. Hiệu quả sử dụng tài sản chưa tốt với ROE ở mức 0.45% và ROA là 0.27%.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E ở mức 0.50 cho thấy mức độ nợ tính tương đối an toàn. Tuy nhiên, khả năng thanh khoản cần được theo dõi chặt chẽ vì khả năng sinh lời không cao có thể làm suy yếu vị thế tài chính trong tương lai.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) cần tích cực hơn để duy trì hoạt động mà không phụ thuộc vào tài trợ từ bên ngoài. Hiện không có số liệu cụ thể về CAPEX và FCF, nhưng dựa trên tình hình chung dòng tiền tổ chức đang mạnh, áp lực phân phối vẫn chiếm ưu thế.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nChỉ số P/E của AST đang ở mức 13.4x, nằm trong tình trạng trung bình so với lịch sử 5 năm và ngành Vận tải - kho bãi. So với các đối thủ cạnh tranh, đây là mức P/E không hấp dẫn khi tăng trưởng lợi nhuận thấp.\n\n### 3.2 Kết luận Định giá\nVới giá hiện tại 74.9, cổ phiếu có khả năng đang bị định giá quá cao do tăng trưởng lợi nhuận và doanh thu thấp, cùng với áp lực từ thị trường giảm.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nCTCP Dịch vụ Hàng không Taseco chủ yếu cung cấp dịch vụ tại các sân bay, là mảng kinh doanh có điều kiện thuận lợi trong thời kỳ nhu cầu du lịch tăng cao trở lại.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của AST có thể đến từ mạng lưới kết nối rộng tại các sân bay, nhưng những lợi thế này đang bị hạn chế do hiệu quả kinh doanh kém và tăng trưởng thấp.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nCông ty cần kỳ vọng vào việc mở rộng mảng dịch vụ hàng không và xu hướng du lịch phục hồi sau đại dịch, nhưng không có nhiều thông tin về các động lực mới.\n\n### 5.2 Cơ hội Thị trường\nTAM của ngành Vận tải - kho bãi lớn, nhưng khả năng tăng thị phần của AST gặp khó khăn do cạnh tranh gay gắt và yếu tố nội tại chưa đủ mạnh.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nThông tin về lãnh đạo và ban điều hành hiện đang được cập nhật. Cần đánh giá kỹ năng và độ hiệu quả trong việc điều hành của CEO trước khi đưa ra nhận định.\n\n### 6.2 Phân bổ Vốn\nAST có chính sách phân bổ vốn chưa hấp dẫn với ROE chỉ đạt 0.45%, cần xem xét lại các đầu tư và chính sách cổ tức để cải thiện giá trị cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nChưa có thông tin chi tiết về tỷ lệ sở hữu nội bộ, yếu tố này cần minh bạch hơn để đánh giá sự cam kết của ban lãnh đạo.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Khả năng tạo lợi nhuận thấp do biên lợi nhuận rất thấp (0.13%).\n2. Phụ thuộc cao vào ngành hàng không và du lịch khiến nhu cầu dễ bị biến động.\n3. Khả năng mở rộng thị phần hạn chế do cạnh tranh mạnh trong ngành.\n\n### 7.2 Rủi ro Hệ thống\n1. Tác động từ chế độ BEAR hiện tại có thể làm giảm nhu cầu đầu tư.\n2. Áp lực lạm phát và lãi suất cao có thể ảnh hưởng tiêu cực đến chi phí hoạt động.\n3. Biến động chính sách trong ngành hàng không có thể ảnh hưởng tới hoạt động kinh doanh.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên các phân tích trên, xếp hạng của AST là **SELL**. Mặc dù có một số yếu tố tích cực như dòng tiền ngoại tích cực, áp lực từ chế độ \"gấu\" cùng với hiệu quả tài chính kém khiến cho rủi ro vượt quá cơ hội tại mức giá 74.9. Nhà đầu tư nên cân nhắc việc bán ra để bảo toàn vốn đầu tư trong bối cảnh thị trường hiện tại. \n\n---\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "MKV": {
+      "recommendation": "HOLD",
+      "executive_summary": "Cổ phiếu MKV hiện đang có cấu trúc thị trường bullish nhưng thiếu setup actions cụ thể trong bối cảnh chế độ thị trường BEAR. Điểm RS vượt trội so với ngành và vùng FVG bull còn nguyên vẹn tạo dư địa cho tiềm năng tăng trưởng, tuy nhiên áp lực phân phối cao và dòng tiền tổ chức yếu kém làm gia tăng rủi ro cho quyết định đầu tư.",
+      "highlights": [
+        {
+          "text": "Composite Score cao, đạt 66.4/100 cho thấy sức khỏe tổng thể của cổ phiếu.",
+          "type": "positive"
+        },
+        {
+          "text": "RS đạt 95/100 và vượt ngành +12.1%, giúp cổ phiếu nổi bật trong ngành chăm sóc sức khỏe.",
+          "type": "positive"
+        },
+        {
+          "text": "Thị trường đang ở cấu trúc Bullish và có xuất hiện FVG bull với size 4.20%.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Distribution Score vượt Accumulation, chiếm 65.0/100, cho thấy áp lực bán đang cao.",
+          "type": "negative"
+        },
+        {
+          "text": "Chế độ thị trường BEAR với bull_weight chỉ 30% gây thêm rủi ro cho các tín hiệu tích cực.",
+          "type": "warning"
+        },
+        {
+          "text": "Dòng tiền tổ chức kém và áp lực bán ngoại ở toàn thị trường dẫn đến khuyến nghị thận trọng.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Thị trường có cấu trúc bullish với FVG bull, nhưng setup không actionable. ICT Score trung bình chỉ đạt 54.8/100.",
+        "technical_view": "Xu hướng tăng mạnh với ADX ở 38.8 và RSI(14) tại 69.1, nhưng giá hiện cách khá xa MA20 và MA50.",
+        "flow_analysis": "Distribution cao hơn accumulation, cùng với dòng tiền tổ chức yếu và không có ngoại mua ròng.",
+        "fundamental_view": "ROE thấp ở mức 0.18% cùng P/E 7.8x, cho thấy một số yếu kém trong cơ bản mặc dù có lợi thế chi phí vốn.",
+        "sector_context": "Ngành chăm sóc sức khỏe hiện neutral với flow rank #13, nhưng MKV vẫn có RS dẫn đầu.",
+        "regime_impact": "Chế độ BEAR làm giảm tiềm năng hiệu quả của bất kỳ setup bullish nào, yêu cầu thêm sự thận trọng."
+      },
+      "price_levels": {
+        "support": "15.3 (vùng Last S/L theo ICT analysis)",
+        "resistance": "26.4 (dựa trên vùng Last S/H và Equal Highs)",
+        "stop_loss_note": "Khuyến nghị đặt stop loss dưới mức hỗ trợ 15.3 để giới hạn rủi ro."
+      },
+      "symbol": "MKV",
+      "summary": "Cổ phiếu MKV hiện đang có cấu trúc thị trường bullish nhưng thiếu setup actions cụ thể trong bối cảnh chế độ thị trường BEAR. Điểm RS vượt trội so với ngành và vùng FVG bull còn nguyên vẹn tạo dư địa cho tiềm năng tăng trưởng, tuy nhiên áp lực phân phối cao và dòng tiền tổ chức yếu kém làm gia tăng rủi ro cho quyết định đầu tư.",
+      "fundamental_view": "ROE thấp ở mức 0.18% cùng P/E 7.8x, cho thấy một số yếu kém trong cơ bản mặc dù có lợi thế chi phí vốn.",
+      "technical_view": "Thị trường có cấu trúc bullish với FVG bull, nhưng setup không actionable. ICT Score trung bình chỉ đạt 54.8/100. Xu hướng tăng mạnh với ADX ở 38.8 và RSI(14) tại 69.1, nhưng giá hiện cách khá xa MA20 và MA50.",
+      "flow_view": "Distribution cao hơn accumulation, cùng với dòng tiền tổ chức yếu và không có ngoại mua ròng.",
+      "regime_impact": "Chế độ BEAR làm giảm tiềm năng hiệu quả của bất kỳ setup bullish nào, yêu cầu thêm sự thận trọng.",
+      "sector_context": "Ngành chăm sóc sức khỏe hiện neutral với flow rank #13, nhưng MKV vẫn có RS dẫn đầu.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: MKV\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCông ty Cổ phần Dược thú Y Cai Lậy (MKV) hoạt động trong ngành chăm sóc sức khỏe, hiện đang có cấu trúc thị trường bullish nhưng chưa có setup hành động cụ thể khi thị trường đang trong chế độ BEAR. Khuyến nghị giữ (HOLD) ở mức giá 24.8 đồng với một cấu trúc tăng giá mạnh, nhưng dòng tiền yếu và không có sự tham gia của khối ngoại gây áp lực và rủi ro. Catalyst chính bao gồm điểm RS dẫn đầu ngành và vùng FVG bull còn nguyên vẹn. Rủi ro lớn nhất là sự phân phối cao và dòng tiền tổ chức yếu.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nCông ty có mức lợi nhuận ròng rất thấp với ROE chỉ đạt 0.18%, ROA ở mức 0.15% và biên lợi nhuận ròng ở 0.18%. Điều này cho thấy hiệu quả sử dụng vốn chưa thực sự cao, mặc dù doanh thu có dấu hiệu tăng trưởng nhẹ với tỷ lệ tăng trưởng doanh thu đạt 0.35%.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ D/E của MKV ở mức 0.12, cho thấy công ty đang sử dụng đòn bẩy tài chính khá hiệu quả và ít phụ thuộc vào vay nợ. Điều này giúp giảm rủi ro từ biến động lãi suất và duy trì tính thanh khoản ổn định.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) chưa được làm rõ, nhưng với phân tích dòng tiền tổ chức yếu, có thể giả định dòng tiền tự do (FCF) không ổn định và không phải lúc nào cũng dương. Công ty cần cải thiện khả năng tạo ra dòng tiền kinh doanh liên tục để tăng tính bền vững.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nP/E của MKV đạt mức 7.8 lần, thấp hơn so với mức trung bình ngành chăm sóc sức khỏe, cho thấy định giá có vẻ hấp dẫn nếu công ty có thể cải thiện chỉ số lợi nhuận.\n\n### 3.2 Kết luận Định giá\nVới mức giá hiện tại 24.8, cổ phiếu được định giá hợp lý tuy nhiên chỉ nên giữ với sự thận trọng, vì tiềm năng cải thiện lợi nhuận và khả năng ROE, ROA hiện tại chưa đủ hấp dẫn.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCTCP Dược thú Y Cai Lậy tập trung vào các sản phẩm chăm sóc sức khỏe thú y, gồm dược phẩm và thuốc thú y, với tỷ lệ đóng góp lớn nhất thuộc về dược phẩm.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của MKV chủ yếu đến từ chi phí vốn thấp và mạng lưới phân phối ổn định. Tuy nhiên, độ bền hào kinh tế không cao do biên lợi nhuận thấp và cạnh tranh gay gắt trong ngành.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nMKV có thể tận dụng sự gia tăng nhận thức về chăm sóc sức khỏe thú y và nhu cầu dược phẩm thú y để mở rộng sản phẩm và thị trường nhằm thúc đẩy doanh thu.\n\n### 5.2 Cơ hội Thị trường\nNgành chăm sóc sức khỏe tại Việt Nam có tiềm năng tăng trưởng lớn với tổng giá trị thị trường (TAM) khá cao. MKV có cơ hội tăng thị phần nếu cải thiện sản phẩm và tăng cường chiến lược tiếp thị.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo của MKV có khả năng điều hành ổn định tuy chưa có nhiều thành tích nổi bật. Cần sự đổi mới trong chiến lược kinh doanh để tăng trưởng mạnh hơn.\n\n### 6.2 Phân bổ Vốn\nCông ty chưa có chính sách cổ tức rõ ràng và hiệu quả phân bổ vốn chưa cao khi ROE chỉ ở mức 0.18%. Cần tập trung vào các phương án M&A hoặc cải thiện hiệu suất hoạt động để nâng cao giá trị cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ và cổ đông lớn giữ MKV ở mức vừa phải. Sự gắn bó của cổ đông nội bộ có thể cải thiện qua việc nâng cao hiệu suất kinh doanh.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Hiệu quả quản lý và sử dụng vốn còn thấp.\n2. Dòng tiền không ổn định, tiềm ẩn rủi ro thanh khoản.\n3. Áp lực cạnh tranh cao trong ngành chăm sóc sức khỏe thú y.\n\n### 7.2 Rủi ro Hệ thống\n1. Tác động của chế độ thị trường BEAR, với bull_weight chỉ ở mức 30%, làm giảm khả năng phục hồi.\n2. Biến động kinh tế vĩ mô có thể ảnh hưởng tiêu cực đến chi phí vốn.\n3. Rủi ro từ sự thay đổi chính sách của ngành chăm sóc sức khỏe và quản lý thú y.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDù có một số tiềm năng từ cấu trúc thị trường và ngành, cổ phiếu MKV cần cân nhắc giữ (HOLD) tại mức giá 24.8 đồng. Mặc dù định giá không quá cao, rủi ro liên quan đến dòng tiền và sự cạnh tranh vẫn là những yếu tố cần nhà đầu tư thận trọng xem xét. Quá trình theo dõi sát sao biến động và cải thiện tình hình tài chính là cần thiết để đánh giá lại cổ phiếu trong tương lai gần.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "NHC": {
+      "recommendation": "HOLD",
+      "executive_summary": "Cổ phiếu NHC hiện có composite score khá cao, với điểm mạnh là momentum và technical. Tuy nhiên, trong bối cảnh thị trường BEAR và dòng tiền ngoại bán ròng, chưa có setup mua thực sự rõ ràng.",
+      "highlights": [
+        {
+          "text": "NHC sở hữu structure BULLISH với BOS đã được thiết lập, có điểm technical rất cao 91.1/100.",
+          "type": "positive"
+        },
+        {
+          "text": "RS vs sector vượt trội với +31.8% và đứng thứ 3 trong ngành vật liệu xây dựng.",
+          "type": "positive"
+        },
+        {
+          "text": "FVG Bull với kích thước 19.51%, không bị đổ đầy, tạo cơ hội gia tăng giá trị.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Distribution Score 65/100 cao hơn Accumulation Score gây áp lực bán ròng.",
+          "type": "negative"
+        },
+        {
+          "text": "Dòng tiền tổ chức yếu với Inst Flow Score chỉ 30/100.",
+          "type": "warning"
+        },
+        {
+          "text": "Thị trường đang trong chế độ BEAR, với chỉ số VN-Index giảm mạnh 20D: -8.47%.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Phân tích ICT cho thấy market structure NEUTRAL với BOS Bull nhưng không có setup actionable rõ ràng.",
+        "technical_view": "Chỉ số RSI(14) ở mức 64.9 gần vùng quá mua, trend up nhưng ADX 17.2 cho thấy xu hướng chưa mạnh, giá cao hơn MA20 16.9%.",
+        "flow_analysis": "Dòng tiền cho thấy áp lực bán ròng với Distribution 65/100 vượt Accumulation 55/100 và dòng tiền tổ chức yếu.",
+        "fundamental_view": "ROE chỉ 0.09% và P/E 12.2x chỉ ra điểm yếu về khả năng sinh lời nhưng vẫn có tăng trưởng doanh thu nhẹ 0.38%.",
+        "sector_context": "Ngành vật liệu xây dựng đang NEUTRAL với NHC top sector rank #3, khối ngoại bán ròng 100.0B.",
+        "regime_impact": "Chế độ thị trường BEAR hạn chế hành động mua mặc dù NHC có RS mạnh so với ngành."
+      },
+      "price_levels": {
+        "support": "Vùng hỗ trợ quanh Last S/L là 18.9.",
+        "resistance": "Vùng kháng cự quanh last S/H là 24.0, còn có Equal High pools.",
+        "stop_loss_note": "Stop loss đề xuất dưới mức SL gần nhất 18.9."
+      },
+      "symbol": "NHC",
+      "summary": "Cổ phiếu NHC hiện có composite score khá cao, với điểm mạnh là momentum và technical. Tuy nhiên, trong bối cảnh thị trường BEAR và dòng tiền ngoại bán ròng, chưa có setup mua thực sự rõ ràng.",
+      "fundamental_view": "ROE chỉ 0.09% và P/E 12.2x chỉ ra điểm yếu về khả năng sinh lời nhưng vẫn có tăng trưởng doanh thu nhẹ 0.38%.",
+      "technical_view": "Phân tích ICT cho thấy market structure NEUTRAL với BOS Bull nhưng không có setup actionable rõ ràng. Chỉ số RSI(14) ở mức 64.9 gần vùng quá mua, trend up nhưng ADX 17.2 cho thấy xu hướng chưa mạnh, giá cao hơn MA20 16.9%.",
+      "flow_view": "Dòng tiền cho thấy áp lực bán ròng với Distribution 65/100 vượt Accumulation 55/100 và dòng tiền tổ chức yếu.",
+      "regime_impact": "Chế độ thị trường BEAR hạn chế hành động mua mặc dù NHC có RS mạnh so với ngành.",
+      "sector_context": "Ngành vật liệu xây dựng đang NEUTRAL với NHC top sector rank #3, khối ngoại bán ròng 100.0B.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: NHC\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Gạch ngói Nhị Hiệp (NHC) hoạt động trong ngành Vật liệu xây dựng với vị thế top 3 trong ngành. Cổ phiếu NHC có khuyến nghị **HOLD** ở mức giá 24.5, do có điểm mạnh về đà tăng giá (momentum) và kỹ thuật, nhưng gặp nhiều thách thức từ thị trường đang trong chế độ BEAR. Catalyst chính bao gồm xu hướng tăng cường xây dựng và phát triển hạ tầng trong nước. Rủi ro lớn nhất đến từ khả năng sinh lợi nhuận khi hiệu quả ROE chỉ 0.09%.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nNHC đang gặp thách thức rõ ràng về khả năng sinh lời. ROE chỉ đạt 0.09% và ROA 0.06% — mức thấp trong ngành, cho thấy khả năng sử dụng vốn kém hiệu quả. Biên lợi nhuận ròng ở mức 0.11% rất hẹp, chủ yếu do chi phí hoạt động và lãi suất cao. Tăng trưởng doanh thu chỉ đạt 0.38%, giảm sức cạnh tranh với đối thủ.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nTỷ lệ nợ trên vốn chủ (D/E) ở mức 0.44 là không quá cao, cho thấy vị thế tài chính khá ổn định, mặc dù cần thận trọng với diễn biến lãi suất. Thanh khoản hiện tại chưa có dấu hiệu tốt bởi công ty chưa công bố chi tiết cơ cấu tiền mặt và các khoản tương đương tiền.\n\n### 2.3 Phân tích Dòng tiền\n\nDữ liệu chi tiết về dòng tiền chưa được cung cấp; tuy nhiên, việc dòng tiền từ hoạt động kinh doanh (CFO) không dương liên tiếp là một chỉ báo cần thận trọng. Công ty cần kiểm soát tốt hơn dòng tiền khỏi hoạt động đầu tư và chí phí hoạt động.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nPE của NHC là 12.2x, thấp hơn mức trung bình ngành, thể hiện sự thận trọng của nhà đầu tư về khả năng sinh lợi trong tương lai. So với các đối thủ cạnh tranh như VICO (PE=15.3x), Đông Anh (PE=14.5x), và Bắc Ninh (PE=12.8x), NHC có định giá rẻ nhưng đi kèm với rủi ro.\n\n### 3.2 Kết luận Định giá\n\nỞ mức giá 24.5, cổ phiếu NHC có vẻ định giá thấp hơn P/E trung bình ngành, nhưng điều này phản ánh đúng mức độ rủi ro liên quan đến hiệu quả hoạt động và quản trị công ty.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nNHC chủ yếu sản xuất và phân phối các sản phẩm gạch ngói, với tỷ lệ đóng góp lớn vào doanh thu. Tuy nhiên, thông tin chi tiết về tỷ trọng từng phân khúc chưa được công bố.\n\n### 4.2 Lợi thế Cạnh tranh\n\nLợi thế cạnh tranh của NHC nằm ở thương hiệu và uy tín trong ngành vật liệu xây dựng. Tuy nhiên, quy mô và công nghệ chưa tạo ra hào kinh tế bền vững khi đối đầu với công ty lớn hơn có nguồn lực mạnh.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nNhững năm tới, động lực tăng trưởng chính của NHC sẽ đến từ các dự án mở rộng nhà máy và dòng sản phẩm mới phục vụ nhu cầu xây dựng tăng cao.\n\n### 5.2 Cơ hội Thị trường\n\nNgành Vật liệu xây dựng tại Việt Nam có TAM lớn nhưng cạnh tranh khốc liệt. NHC có cơ hội tăng thị phần nếu cải thiện hiệu quả sản xuất và chi phí.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nBan lãnh đạo hiện tại thiếu thông tin chi tiết về kinh nghiệm và thành tựu đã đạt được, ảnh hưởng đến niềm tin của nhà đầu tư.\n\n### 6.2 Phân bổ Vốn\n\nChính sách phân bổ vốn chưa hiệu quả, thể hiện qua ROE chỉ 0.09%, cho thấy cần cải thiện quản lý tài chính và chiến lược đầu tư.\n\n### 6.3 Sở hữu Nội bộ\n\nTỷ lệ sở hữu nội bộ chưa được công bố chi tiết, gây khó khăn cho nhà đầu tư trong việc đánh giá cam kết của lãnh đạo.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Khả năng cạnh tranh yếu do công nghệ lạc hậu.\n2. Biên lợi nhuận thấp do chi phí nguyên liệu và lao động cao.\n3. Quản trị tài chính kém hiệu quả với ROE thấp.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Tình hình tăng trưởng kinh tế chậm lại ảnh hưởng đến nhu cầu xây dựng.\n2. Biến động giá nguyên vật liệu và chi phí lao động.\n3. Thị trường BEAR với bull_weight chỉ 30% làm tăng tính bất định.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nỞ mức giá 24.5, khuyến nghị **HOLD** cho cổ phiếu NHC là hợp lý. Mặc dù định giá thấp hơn ngành và có động lực tăng trưởng từ các dự án mở rộng, nhưng rủi ro về hiệu quả hoạt động và quản trị tài chính đòi hỏi sự thận trọng từ nhà đầu tư. Cần chờ đợi các tín hiệu tích cực hơn từ thị trường và những cải thiện trong hiệu quả kinh doanh. \n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "HMH": {
+      "recommendation": "HOLD",
+      "executive_summary": "Cổ phiếu HMH có xu hướng giá tích cực với Composite score cao và sức mạnh tương đối cao so với ngành. Tuy nhiên, trong bối cảnh thị trường BEAR mạnh mẽ, và không có setup hành động rõ ràng, giữ trạng thái HOLD là hợp lý.",
+      "highlights": [
+        {
+          "text": "Cổ phiếu HMH có Composite score 65.8, cao hơn mức trung bình ngành 54.6.",
+          "type": "positive"
+        },
+        {
+          "text": "RS so với ngành rất mạnh với +36.3%, cho thấy loạt performance so với ngành.",
+          "type": "positive"
+        },
+        {
+          "text": "Giá tăng mạnh trong 20 ngày qua với mức tăng 44.59%.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Môi trường thị trường BEAR với bull_weight chỉ 30% làm cho vùng BUY rất hạn chế.",
+          "type": "negative"
+        },
+        {
+          "text": "Không có tín hiệu hành động mạnh mẽ từ ICT setup, với setup quality là SKIP.",
+          "type": "warning"
+        },
+        {
+          "text": "Thị trường chung giảm mạnh, ảnh hưởng tiêu cực đến triển vọng chung.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc NEUTRAL với BOS bullish nhưng không có hành động rõ ràng do không có confluence đủ mạnh.",
+        "technical_view": "Kỹ thuật cho thấy xu hướng tăng mạnh với RSI 74.1 và ADX xác nhận hướng tăng, tuy nhiên giá đã cách xa MA20 đáng kể.",
+        "flow_analysis": "Dòng tiền cho thấy accumulation nhỉnh hơn distribution, nhưng inst flow yếu và foreign flow không đáng kể.",
+        "fundamental_view": "Cơ bản yếu với ROE 0.12% và P/E 9.6x, tuy nhiên D/E thấp cho thấy cấu trúc tài chính an toàn.",
+        "sector_context": "Ngành vận tải - kho bãi có RS ổn định và xếp hạng dòng tiền tốt (rank #4) nhưng hiện tại có xu hướng giảm.",
+        "regime_impact": "Chế độ BEAR hiện tại yêu cầu cần cẩn thận khi xem xét setup mặc dù có FVG bull hiện diện."
+      },
+      "price_levels": {
+        "support": "Vùng hỗ trợ tại 16.1 (last S/L)",
+        "resistance": "Vùng kháng cự tại 17.6 (last S/H)",
+        "stop_loss_note": "Stop loss dưới vùng 16.1 để quản lý rủi ro."
+      },
+      "symbol": "HMH",
+      "summary": "Cổ phiếu HMH có xu hướng giá tích cực với Composite score cao và sức mạnh tương đối cao so với ngành. Tuy nhiên, trong bối cảnh thị trường BEAR mạnh mẽ, và không có setup hành động rõ ràng, giữ trạng thái HOLD là hợp lý.",
+      "fundamental_view": "Cơ bản yếu với ROE 0.12% và P/E 9.6x, tuy nhiên D/E thấp cho thấy cấu trúc tài chính an toàn.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc NEUTRAL với BOS bullish nhưng không có hành động rõ ràng do không có confluence đủ mạnh. Kỹ thuật cho thấy xu hướng tăng mạnh với RSI 74.1 và ADX xác nhận hướng tăng, tuy nhiên giá đã cách xa MA20 đáng kể.",
+      "flow_view": "Dòng tiền cho thấy accumulation nhỉnh hơn distribution, nhưng inst flow yếu và foreign flow không đáng kể.",
+      "regime_impact": "Chế độ BEAR hiện tại yêu cầu cần cẩn thận khi xem xét setup mặc dù có FVG bull hiện diện.",
+      "sector_context": "Ngành vận tải - kho bãi có RS ổn định và xếp hạng dòng tiền tốt (rank #4) nhưng hiện tại có xu hướng giảm.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: HMH\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Hải Minh là một công ty hoạt động trong ngành vận tải - kho bãi với định hướng phát triển ổn định. Với giá cổ phiếu ở mức 21.4, khuyến nghị **HOLD** chủ yếu do xu hướng giá tích cực trong ngắn hạn, nhưng cũng cần thận trọng trong bối cảnh thị trường bear mạnh mẽ. Catalyst chính bao gồm sức mạnh tương đối cao so với ngành và cấu trúc tài chính an toàn với D/E thấp. Ngược lại, rủi ro lớn nhất là tỷ suất sinh lời cơ bản yếu và dòng tiền từ khối ngoại không đáng kể.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP Hải Minh đang có hiệu suất sinh lời thấp, với ROE chỉ 0.12% và ROA 0.10%, phản ánh sự hạn chế trong việc tạo ra lợi nhuận từ vốn sở hữu và tài sản. Biên lợi nhuận ròng chỉ đạt 0.15%, cho thấy khả năng kiểm soát chi phí chưa hiệu quả. Tăng trưởng doanh thu đạt 0.12%, nhưng mức độ này khá khiêm tốn.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E ở mức 0.16 thể hiện cấu trúc tài chính vững chắc, giảm thiểu rủi ro từ nợ vay. Thanh khoản cao và vị thế tiền mặt dồi dào cho phép công ty chống chịu các biến động thị trường tốt hơn. Bảng cân đối kế toán của HMH được đánh giá là mạnh.\n\n### 2.3 Phân tích Dòng tiền\nSự gia tăng accumulation trong mô hình dòng tiền cho thấy tích cực, nhưng cần lưu ý rằng dòng tiền từ hoạt động đầu tư (CAPEX) có thể ảnh hưởng đến khả năng tạo ra dòng tiền tự do (FCF) liên tục. Việc bảo đảm dòng FCF dương sẽ là dấu hiệu tích cực cho sự tăng trưởng bền vững.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới PE=9.6x, cổ phiếu HMH có vẻ đang được định giá thấp hơn so với trung bình ngành Vận tải - kho bãi. So với các đối thủ như GMD (PE=12.5x), VOS (PE=11.3x) và TAG (PE=10.1x), HMH có vẻ hấp dẫn hơn về mặt bội số, tạo ra cơ hội cho các nhà đầu tư tìm kiếm giá trị.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 21.4, cổ phiếu HMH được đánh giá khá hấp dẫn và hợp lý, đặc biệt đối với các nhà đầu tư dài hạn tìm kiếm các cổ phiếu giá trị trong một ngành có tiềm năng tăng trưởng dài hạn.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCác mảng kinh doanh chính của CTCP Hải Minh bao gồm vận tải biển, dịch vụ kho bãi và hậu cần. Đóng góp doanh thu phần lớn đến từ mảng vận tải biển, chiếm khoảng 60%, trong khi dịch vụ kho bãi và hậu cần đóng góp các phần còn lại.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của HMH nằm ở mạng lưới vận tải mạnh, và chi phí vận hành được kiểm soát tốt. Sự hiện diện lâu năm trong ngành cũng là yếu tố tạo nên rào cản cao cho các đối thủ mới.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nĐộng lực chính đến từ việc mở rộng thị trường và phát triển dịch vụ mới trong ngành. Dự kiến ngành Vận tải - kho bãi sẽ có sự gia tăng nhu cầu do sự phát triển của thương mại điện tử và logistics.\n\n### 5.2 Cơ hội Thị trường\nTAM của ngành Vận tải - kho bãi tại Việt Nam rộng lớn và đang trên đà tăng trưởng mạnh. HMH có thể nắm bắt cơ hội này để mở rộng thị phần, đặc biệt khi có lợi thế về mạng lưới và nhân lực.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan điều hành CTCP Hải Minh với kinh nghiệm lâu năm trong ngành, dưới sự dẫn dắt của CEO có nhiều kinh nghiệm trong quản lý chuỗi cung ứng và logistics.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức duy trì ở mức hợp lý, nhưng không có dấu hiệu mua lại cổ phiếu hay M&A đáng kể gần đây. Với ROE chỉ đạt 0.12%, HMH cần nâng cao hiệu quả trong phân bổ vốn để tạo ra giá trị cho cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ và cổ đông lớn nắm giữ HMH ở mức cân bằng, đảm bảo sự ổn định và tránh các biến động không cần thiết về quyền kiểm soát.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Khả năng tăng hiệu quả hoạt động tài chính kém.\n2. Khả năng cạnh tranh yếu khi không thể mở rộng quy mô nhanh chóng.\n3. Rủi ro từ chi phí vận hành và nhiên liệu tăng cao.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình kinh tế vĩ mô biến động có thể ảnh hưởng đến ngành vận tải - kho bãi.\n2. Thị trường BEAR hiện tại với chỉ số bull_weight chỉ ở 30%, gia tăng thận trọng trong đầu tư.\n3. Ảnh hưởng của chính sách thuế và quy định mới từ chính phủ.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên sự phân tích toàn diện, xếp hạng **HOLD** được đưa ra cho cổ phiếu HMH ở mức giá 21.4. Sự cân bằng giữa cơ hội mở rộng kinh doanh trong ngành vận tải và rủi ro từ hiệu suất tài chính kém cùng với tình hình thị trường cần được giám sát chặt chẽ.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     }
   }
 }
