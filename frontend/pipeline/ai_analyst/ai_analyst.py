@@ -223,9 +223,9 @@ def generate_rule_based_analysis(stock: dict, sector_status: dict) -> dict:
             "text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính lành mạnh",
             "type": "positive"
         })
-        if roe > 15:
+        if roe > 0.15:
             analysis["highlights"].append({
-                "text": f"ROE {roe:.1f}% - Sinh lời trên vốn cao",
+                "text": f"ROE {roe*100:.1f}% - Sinh lời trên vốn cao",
                 "type": "positive"
             })
         if 0 < pe < 15:
@@ -394,7 +394,7 @@ def generate_ai_analysis(stock: dict, sector_status: dict) -> Optional[dict]:
     - Momentum: {stock.get('momentum_score', 0):.1f}/100
     - Technical: {stock.get('technical_score', 0):.1f}/100
     - Tier: {stock.get('tier', 'C')}
-    - ROE: {stock.get('roe', 0):.1f}%
+    - ROE: {(stock.get('roe') or 0)*100:.1f}%
     - P/E: {stock.get('pe', 0):.1f}
     - RSI: {stock.get('rsi14', 50):.0f}
     - Khối ngoại 7D: {stock.get('foreign_net_7d', 0):.1f}B
