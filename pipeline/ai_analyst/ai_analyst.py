@@ -447,11 +447,11 @@ def build_prompt(symbol, screener, ict, sector, regime, market_stats, total_symb
         flow_trend=ict.get("flow_trend", "N/A"),
         buy_pressure_pct=_fmt(ict.get("buy_pressure_pct"), 1),
         inst_flow_score=_fmt(ict.get("inst_flow_score"), 1),
-        roe=_fmt(screener.get("roe"), 2),
-        roa=_fmt(screener.get("roa"), 2),
+        roe=_fmt((screener.get("roe") or 0)*100, 2),
+        roa=_fmt((screener.get("roa") or 0)*100, 2),
         pe=_fmt(screener.get("pe"), 1),
-        net_margin=_fmt(screener.get("net_margin"), 2),
-        revenue_growth=_fmt(screener.get("revenue_growth"), 2),
+        net_margin=_fmt((screener.get("net_margin") or 0)*100, 2),
+        revenue_growth=_fmt((screener.get("revenue_growth") or 0)*100, 2),
         debt_equity=_fmt(screener.get("debt_equity"), 2),
         foreign_net_7d=_fmt(screener.get("foreign_net_7d"), 1),
         foreign_net_30d=_fmt(screener.get("foreign_net_30d"), 1),
@@ -542,10 +542,10 @@ def build_report_prompt(symbol: str, parsed: Dict, screener: Dict, ict: Dict, re
         momentum=_fmt(screener.get("momentum_score"), 1),
         technical=_fmt(screener.get("technical_score"), 1),
         pe=_fmt(screener.get("pe"), 1),
-        roe=_fmt(screener.get("roe"), 2),
-        roa=_fmt(screener.get("roa"), 2),
-        net_margin=_fmt(screener.get("net_margin"), 2),
-        revenue_growth=_fmt(screener.get("revenue_growth"), 2),
+        roe=_fmt((screener.get("roe") or 0)*100, 2),
+        roa=_fmt((screener.get("roa") or 0)*100, 2),
+        net_margin=_fmt((screener.get("net_margin") or 0)*100, 2),
+        revenue_growth=_fmt((screener.get("revenue_growth") or 0)*100, 2),
         debt_equity=_fmt(screener.get("debt_equity"), 2),
         rsi=_fmt(screener.get("rsi14"), 1),
         adx=_fmt(screener.get("adx14"), 1),
@@ -667,7 +667,7 @@ def generate_rule_based(symbol, screener, ict, sector, regime) -> Dict:
 
     # Fundamentals
     if f_score >= 70:
-        fundamental_view = f"Cơ bản vững (score={f_score:.0f}" + (f", ROE={roe:.1f}%" if roe > 10 else "") + ")"
+        fundamental_view = f"Cơ bản vững (score={f_score:.0f}" + (f", ROE={roe*100:.1f}%" if roe > 0.10 else "") + ")"
     elif f_score >= 50:
         fundamental_view = f"Cơ bản ổn định (score={f_score:.0f})"
     else:
