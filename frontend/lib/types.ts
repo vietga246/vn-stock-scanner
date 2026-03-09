@@ -213,6 +213,7 @@ export interface AIAnalysis {
   };
   regime_impact?: string;
   sector_context?: string;
+  detailed_report?: string;  // Báo cáo chi tiết markdown 8 phần — gen bởi workflow 6
 }
 
 export interface AnalysisPoint {
