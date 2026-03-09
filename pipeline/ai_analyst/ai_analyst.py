@@ -38,17 +38,30 @@ log = logging.getLogger(__name__)
 # ─── PROMPTS ───────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """\
-Bạn là chuyên gia phân tích chứng khoán Việt Nam với 20 năm kinh nghiệm, \
-chuyên về phân tích kỹ thuật ICT (Inner Circle Trader), dòng tiền tổ chức, và cơ bản.
+Bạn là nhà phân tích nghiên cứu vốn cổ phần cấp cao, chuyên về thị trường chứng khoán Việt Nam với 20 năm kinh nghiệm. Bạn thành thạo phân tích kỹ thuật ICT (Inner Circle Trader), dòng tiền tổ chức, phân tích cơ bản và định giá.
 
-Nhiệm vụ: Phân tích cổ phiếu được cung cấp và đưa ra nhận định đầu tư toàn diện.
+NHIỆM VỤ: Biên soạn báo cáo phân tích đầu tư toàn diện, khách quan, dựa trên dữ liệu được cung cấp.
 
-Nguyên tắc:
-- Ngắn gọn, súc tích, đi thẳng trọng tâm
-- Ưu tiên tín hiệu ICT (structure, FVG, OB, sweep) kết hợp dòng tiền
-- Cân nhắc market regime (BULL/BEAR) — trong BEAR market, chỉ khuyến nghị BUY/STRONG_BUY khi có setup rõ ràng
-- Cảnh báo rủi ro cụ thể
-- KHÔNG đưa lời khuyên tài chính cụ thể
+QUY TẮC QUAN TRỌNG VỀ RECOMMENDATION:
+Phải phân biệt rõ ràng 5 mức — TUYỆT ĐỐI KHÔNG để tất cả cổ phiếu cùng mức HOLD:
+
+  STRONG_BUY: Composite ≥75 + structure BULLISH + actionable=YES + regime BULL/TRANSITION
+  BUY:        Composite ≥65 + structure BULLISH + setup rõ ràng, ngay cả trong BEAR nếu RS mạnh
+  HOLD:       Composite 50-65 HOẶC setup chưa đủ điều kiện mua/bán rõ ràng
+  SELL:       Composite <50 HOẶC structure BEARISH + distribution + foreign bán ròng mạnh
+  STRONG_SELL: Composite <40 + structure BEARISH + BOS bear + regime BEAR mạnh
+
+ĐIỀU CHỈNH THEO BEAR MARKET (bull_weight ≤ 35%):
+  - Nâng tiêu chuẩn BUY: cần thêm FVG bull HOẶC OB bull HOẶC wyckoff_spring
+  - Cổ phiếu composite ≥70 nhưng structure BEARISH → HOLD, không phải BUY
+  - Cổ phiếu structure BEARISH + distribution_score >60 → SELL dù composite cao
+  - Ưu tiên RS vs sector: nếu cổ phiếu outperform ngành ≥10% trong BEAR → vẫn có thể BUY
+
+ĐỌC KỸTRƯỚC KHI QUYẾT ĐỊNH:
+  - signal_breakdown.regime phản ánh điểm của market regime (thấp = BEAR)
+  - distribution_score > accumulation_score → áp lực bán ròng
+  - flow_direction=outflow + foreign bán ròng → KHÔNG BUY dù score cao
+  - breakout_imminent=YES → tăng 1 bậc recommendation nếu các yếu tố khác ủng hộ
 
 Format output: JSON chính xác theo cấu trúc yêu cầu, không có text ngoài JSON.\
 """
@@ -56,95 +69,207 @@ Format output: JSON chính xác theo cấu trúc yêu cầu, không có text ngo
 ANALYSIS_PROMPT_TEMPLATE = """\
 Phân tích cổ phiếu {symbol} với toàn bộ dữ liệu sau:
 
-## MARKET CONTEXT
-- Regime: {regime} (bull_weight={bull_weight}%, strength={regime_strength}%)
-- VN-Index: {vnindex} | 1D={vnindex_1d}% | 5D={vnindex_5d}% | 20D={vnindex_20d}%
-- Breadth: Advance {breadth_advance}% | Bear sectors {bear_sectors}/25
-- Foreign net 7D tổng thị trường: {market_foreign_net}B VND
+════════════════════════════════════════
+MARKET CONTEXT — ĐỌC KỸ TRƯỚC KHI PHÂN TÍCH
+════════════════════════════════════════
+Regime: {regime} | bull_weight={bull_weight}% | strength={regime_strength}%
+VN-Index: {vnindex} | 1D={vnindex_1d}% | 5D={vnindex_5d}% | 20D={vnindex_20d}%
+Advance/Decline: {breadth_advance}% tăng | {bear_sectors}/25 ngành giảm
+Foreign net 7D toàn thị trường: {market_foreign_net}B VND
 
-## THÔNG TIN CỔ PHIẾU
-- Symbol: {symbol} | Tên: {name}
-- Ngành: {industry} | Exchange: {exchange} | Tier: {tier}
-- Rank: #{rank} / {total_symbols} (top {rank_pct}%)
+⚠ HƯỚNG DẪN REGIME:
+- Nếu BEAR (bull_weight≤35%): Chỉ BUY khi có FVG/OB/sweep rõ ràng + RS ngành tốt
+- Nếu TRANSITION (35-60%): Cân nhắc từng case, ưu tiên actionable=YES
+- Nếu BULL (>60%): Tiêu chuẩn bình thường
 
-## ĐIỂM SỐ TỔNG HỢP
-- Composite Score: {composite_score}/100
-- Fundamental:    {fundamental_score}/100
-- Smart Money:    {smart_money_score}/100
-- Momentum:       {momentum_score}/100
-- Technical:      {technical_score}/100
+════════════════════════════════════════
+1. THÔNG TIN & ĐIỂM SỐ
+════════════════════════════════════════
+Symbol: {symbol} | Tên: {name}
+Ngành: {industry} | Exchange: {exchange} | Tier: {tier}
+Rank: #{rank} / {total_symbols} (top {rank_pct}%)
 
-## ICT ANALYSIS
-- ICT Score: {ict_score}/100 | Alpha Score: {alpha_score}/100
-- Setup Quality: {setup_quality} | Confluences: {ict_confluence} signals
-- Actionable: {actionable}
-- Market Structure: {structure}
-  + BOS Bull={bos_bull} | BOS Bear={bos_bear} | CHoCH Bull={choch_bull} | CHoCH Bear={choch_bear}
-  + Last S/H: {last_sh} / Last S/L: {last_sl}
-  + Equal Highs: {eq_high_count} | Equal Lows: {eq_low_count}
+Composite Score: {composite_score}/100
+  ├ Fundamental:  {fundamental_score}/100
+  ├ Smart Money:  {smart_money_score}/100
+  ├ Momentum:     {momentum_score}/100
+  └ Technical:    {technical_score}/100
 
-ICT Confluences:
-  + Fair Value Gap Bull: {fvg_bull} (size={fvg_bull_size}%, filled={fvg_bull_fill}%, age={fvg_bull_age}d)
-  + Order Block Bull: {ob_bull} | Price at OB: {ob_price_at} | Mitigated: {ob_mitigated}
-  + Liquidity Sweep Bull: {sweep_bull} | Stop Hunt: {stop_hunt_bull}
-  + Wyckoff Spring: {wyckoff_spring} | Smart Money: {smart_money}
-  + Breakout Imminent: {breakout_imminent}
+════════════════════════════════════════
+2. PHÂN TÍCH ICT — SIGNAL CHẤT LƯỢNG NHẤT
+════════════════════════════════════════
+ICT Score: {ict_score}/100 | Alpha Score: {alpha_score}/100
+Setup Quality: {setup_quality} | Confluences: {ict_confluence} | Actionable: {actionable}
+
+Market Structure: {structure}
+  BOS Bull={bos_bull} | BOS Bear={bos_bear} | CHoCH Bull={choch_bull} | CHoCH Bear={choch_bear}
+  Last S/H: {last_sh} | Last S/L: {last_sl}
+  Equal Highs: {eq_high_count} | Equal Lows: {eq_low_count}
+
+Confluences:
+  FVG Bull: {fvg_bull} (size={fvg_bull_size}%, filled={fvg_bull_fill}%, age={fvg_bull_age}d)
+  Order Block Bull: {ob_bull} | Giá tại OB: {ob_price_at} | Đã mitigate: {ob_mitigated}
+  Liq Sweep Bull: {sweep_bull} | Stop Hunt: {stop_hunt_bull}
+  Wyckoff Spring: {wyckoff_spring} | Smart Money: {smart_money}
+  Breakout Imminent: {breakout_imminent}
 
 Signal Breakdown (0-100):
 {signal_breakdown_text}
 
-Top ICT Signals:
+Top Signals:
 {top_signals_text}
 
-## TECHNICALS
-- RSI(14): {rsi14} | ADX(14): {adx14}
-- +DI={plus_di} / -DI={minus_di} | DI Spread: {di_spread}
-- Trend Short: {trend_short} | Trend Strength: {trend_strength}%
-- BB Width: {bb_width}% | ATR(14): {atr_pct}%
-- Vol Ratio vs avg: {vol_ratio}x | Vol Trend: {vol_trend}
-- MACD Hist: {macd_hist}
-- % from MA20: {pct_from_ma20}% | % from MA50: {pct_from_ma50}%
-- Price 1D: {price_1d}% | 5D: {price_5d}% | 20D: {price_20d}%
+════════════════════════════════════════
+3. KỸ THUẬT
+════════════════════════════════════════
+RSI(14): {rsi14} | ADX: {adx14} (+DI={plus_di} / -DI={minus_di} / Spread={di_spread})
+Trend: {trend_short} | Strength: {trend_strength}%
+BB Width: {bb_width}% | ATR: {atr_pct}% | MACD Hist: {macd_hist}
+Vol Ratio: {vol_ratio}x | Vol Trend: {vol_trend}
+% from MA20: {pct_from_ma20}% | % from MA50: {pct_from_ma50}%
+Price: 1D={price_1d}% | 5D={price_5d}% | 20D={price_20d}%
 
-## VOLUME & FLOW (ICT)
-- Accumulation Score: {accumulation_score}/100
-- Distribution Score: {distribution_score}/100
-- Vol Spike: {vol_spike}x | Flow Direction: {flow_direction} | Flow Trend: {flow_trend}
-- Buy Pressure: {buy_pressure_pct}%
-- Inst Flow Score: {inst_flow_score}/100
+════════════════════════════════════════
+4. DÒNG TIỀN & TÍCH LŨY
+════════════════════════════════════════
+Accumulation Score: {accumulation_score}/100
+Distribution Score: {distribution_score}/100
+→ Nếu distribution > accumulation: áp lực bán ròng — cẩn thận BUY
+Vol Spike: {vol_spike}x | Flow: {flow_direction} | Flow Trend: {flow_trend}
+Buy Pressure: {buy_pressure_pct}% | Inst Flow Score: {inst_flow_score}/100
+Foreign 7D: {foreign_net_7d}B | 30D: {foreign_net_30d}B VND
 
-## FUNDAMENTALS
-- ROE: {roe}% | ROA: {roa}%
-- P/E: {pe}x | Net Margin: {net_margin}%
-- Revenue Growth: {revenue_growth}% | Debt/Equity: {debt_equity}
+════════════════════════════════════════
+5. CƠ BẢN
+════════════════════════════════════════
+ROE: {roe}% | ROA: {roa}% | P/E: {pe}x
+Net Margin: {net_margin}% | Rev Growth: {revenue_growth}% | D/E: {debt_equity}
 
-## FOREIGN FLOW
-- 7D: {foreign_net_7d}B VND | 30D: {foreign_net_30d}B VND
+════════════════════════════════════════
+6. NGÀNH: {industry}
+════════════════════════════════════════
+Avg Composite: {sector_avg_composite}/100 | Momentum 5D: {sector_momentum}%
+Foreign 7D ngành: {sector_foreign_7d}B | Status: {sector_status} | Money Flow Rank: #{sector_money_rank}
+Top stocks: {sector_top_stocks}
 
-## SECTOR: {industry}
-- Avg Composite: {sector_avg_composite}/100 | Momentum 5D: {sector_momentum}%
-- Foreign 7D tổng ngành: {sector_foreign_7d}B VND
-- Status: {sector_status} | Money Flow Rank: #{sector_money_rank}
-- Top stocks ngành: {sector_top_stocks}
-
-## YÊU CẦU OUTPUT
-
-Trả về JSON với cấu trúc sau (không có text ngoài JSON):
+════════════════════════════════════════
+YÊU CẦU OUTPUT — BÁO CÁO ĐẦU TƯ
+════════════════════════════════════════
+Trả về JSON sau (KHÔNG có text ngoài JSON):
 {{
   "recommendation": "STRONG_BUY|BUY|HOLD|SELL|STRONG_SELL",
-  "summary": "Tóm tắt 2-3 câu: setup hiện tại + lý do chính",
+
+  "executive_summary": "2-3 câu tóm tắt luận điểm đầu tư: setup + lý do chính + verdict",
+
   "highlights": [
-    {{"text": "Điểm tích cực cụ thể 1", "type": "positive"}},
-    {{"text": "Điểm tích cực cụ thể 2", "type": "positive"}}
+    {{"text": "Điểm tích cực cụ thể với số liệu", "type": "positive"}},
+    {{"text": "Điểm tích cực 2", "type": "positive"}},
+    {{"text": "Điểm tích cực 3", "type": "positive"}}
   ],
   "risks": [
-    {{"text": "Rủi ro cụ thể 1", "type": "negative"}},
-    {{"text": "Cảnh báo 1", "type": "warning"}}
+    {{"text": "Rủi ro cụ thể với số liệu", "type": "negative"}},
+    {{"text": "Cảnh báo cụ thể", "type": "warning"}},
+    {{"text": "Rủi ro hệ thống nếu có", "type": "warning"}}
   ],
-  "fundamental_view": "Nhận định cơ bản 1 câu",
-  "technical_view": "Nhận định kỹ thuật ICT 1 câu (đề cập structure/FVG/OB nếu có)",
-  "flow_view": "Nhận định dòng tiền 1 câu (foreign + inst flow)"
+
+  "sections": {{
+    "ict_analysis": "Phân tích ICT 2 câu: structure + confluences + actionable hay không",
+    "technical_view": "Kỹ thuật 1 câu: ADX/RSI/trend + vị trí giá vs MA",
+    "flow_analysis": "Dòng tiền 1 câu: acc vs dist score + foreign + inst flow",
+    "fundamental_view": "Cơ bản 1 câu: ROE/PE/growth + điểm mạnh/yếu",
+    "sector_context": "Ngành 1 câu: status + RS + money flow rank",
+    "regime_impact": "Tác động regime 1 câu: BEAR/BULL ảnh hưởng thế nào đến setup này"
+  }},
+
+  "price_levels": {{
+    "support": "Vùng hỗ trợ dựa trên ICT (last_sl hoặc OB/FVG nếu có)",
+    "resistance": "Vùng kháng cự dựa trên ICT (last_sh hoặc equal highs nếu có)",
+    "stop_loss_note": "Gợi ý stop loss ngắn gọn (dưới SL gần nhất hoặc OB)"
+  }}
 }}
+"""
+
+# ─── REPORT PROMPT ─────────────────────────────────────────────────────────
+
+REPORT_SYSTEM_PROMPT = """Bạn là chuyên gia phân tích đầu tư chứng khoán Việt Nam với 20 năm kinh nghiệm.
+Viết báo cáo phân tích đầu tư TOÀN DIỆN bằng tiếng Việt, có chiều sâu thực sự.
+Dùng dữ liệu cụ thể để lập luận, không viết chung chung.
+Output: văn bản Markdown thuần túy (không phải JSON)."""
+
+REPORT_PROMPT_TEMPLATE = """Dựa trên dữ liệu đầy đủ dưới đây, hãy viết báo cáo phân tích đầu tư hoàn chỉnh cho cổ phiếu {symbol}:
+
+PHÂN TÍCH AI (sơ bộ đã có):
+  Khuyến nghị: {recommendation}
+  Tóm tắt: {executive_summary}
+  ICT: {ict_analysis}
+  Kỹ thuật: {technical_view}
+  Dòng tiền: {flow_analysis}
+  Cơ bản: {fundamental_view}
+  Ngành: {sector_context}
+  Regime: {regime_impact}
+
+DỮ LIỆU:
+  Tên: {name} | Ngành: {industry} | Tier: {tier}
+  Regime: {regime} | bull_weight={bull_weight}%
+  Giá: {price} | 1D={price_1d}% 5D={price_5d}% 20D={price_20d}%
+  Điểm: Tổng={composite} Cơbản={fundamental} SmartMoney={smart_money} Momentum={momentum} Kỹthuật={technical}
+  PE={pe} ROE={roe}% ROA={roa}% BienRong={net_margin}% TT.DT={revenue_growth}% D/E={debt_equity}
+  RSI={rsi} ADX={adx} FVG={fvg} OB={ob} Structure={structure}
+  Khối ngoại: 7D={foreign_7d}B 30D={foreign_30d}B
+
+---
+Viết báo cáo đầy đủ BẰNG TIẾNG VIỆT theo đúng 8 phần. Phân tích THỰC CHẤT, dùng số liệu cụ thể:
+
+# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: {symbol}
+
+## 1. TÓM TẮT ĐIỀU HÀNH
+Tổng quan hoạt động kinh doanh của {name}. Luận điểm đầu tư 2-3 câu: {recommendation} ở mức giá {price} vì lý do gì? Catalyst chính và rủi ro lớn nhất.
+
+## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH
+### 2.1 Phân tích Báo cáo Thu nhập
+Phân tích xu hướng doanh thu, biên lợi nhuận gộp/hoạt động/ròng. Dùng số cụ thể: ROE={roe}%, ROA={roa}%, biên ròng={net_margin}%, tăng trưởng={revenue_growth}%.
+### 2.2 Phân tích Bảng Cân đối Kế toán
+D/E={debt_equity} — mức nợ này có rủi ro không? Thanh khoản, vị thế tiền mặt. Bảng cân đối mạnh hay yếu?
+### 2.3 Phân tích Dòng tiền
+Dựa trên dữ liệu dòng tiền — CFO, CAPEX, FCF. Công ty có liên tục dương FCF không?
+
+## 3. ĐỊNH GIÁ
+### 3.1 Phân tích Bội số
+PE={pe}x so với lịch sử 5 năm và trung bình ngành {industry}. So sánh với 3 đối thủ cạnh tranh trực tiếp.
+### 3.2 Kết luận Định giá
+Ở mức giá {price}: định giá quá cao / thấp / hợp lý? Lý giải cụ thể.
+
+## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ
+### 4.1 Phân khúc Kinh doanh
+Các mảng kinh doanh cốt lõi của {name} và đóng góp doanh thu tương ứng.
+### 4.2 Lợi thế Cạnh tranh
+Nguồn lợi thế cạnh tranh: thương hiệu, chi phí, quy mô, mạng lưới, giấy phép? Độ bền của hào kinh tế.
+
+## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG
+### 5.1 Động lực Tăng trưởng
+Catalyst kỳ vọng: mảng kinh doanh mới, mở rộng thị trường, xu hướng ngành {industry}.
+### 5.2 Cơ hội Thị trường
+TAM ngành {industry} tại Việt Nam và tiềm năng tăng thị phần của {symbol}.
+
+## 6. QUẢN LÝ & QUẢN TRỊ
+### 6.1 Lãnh đạo
+CEO và ban điều hành {name} — nhiệm kỳ, thành tích nổi bật.
+### 6.2 Phân bổ Vốn
+Chính sách cổ tức, mua lại cổ phiếu, M&A. Hiệu quả phân bổ vốn qua ROE={roe}%.
+### 6.3 Sở hữu Nội bộ
+Tỷ lệ cổ đông nội bộ và cổ đông lớn nắm giữ {symbol}.
+
+## 7. PHÂN TÍCH RỦI RO
+### 7.1 Rủi ro Đặc thù
+3 rủi ro nội tại cụ thể của {symbol} (không phải rủi ro chung).
+### 7.2 Rủi ro Hệ thống
+3 rủi ro vĩ mô/thị trường ảnh hưởng trực tiếp, bao gồm tác động của regime {regime} (bull={bull_weight}%).
+
+## 8. KHUYẾN NGHỊ CUỐI CÙNG
+Tổng hợp toàn bộ phân tích → Xếp hạng **{recommendation}** với lý luận cụ thể: cân bằng cơ hội vs rủi ro ở mức giá {price}.
+
+---
+*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*
 """
 
 # ─── DATA LOADERS ──────────────────────────────────────────────────────────
@@ -371,6 +496,75 @@ def call_ai(prompt: str) -> Optional[str]:
         return None
 
 
+
+def call_ai_report(prompt: str) -> Optional[str]:
+    """Gen báo cáo chi tiết dạng Markdown — không dùng json_object mode."""
+    if not OPENAI_API_KEY:
+        return None
+    try:
+        import openai
+    except ImportError:
+        return None
+    try:
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": REPORT_SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=4096,
+            # Không dùng response_format json_object — output là markdown text
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        log.warning("⚠️  call_ai_report lỗi: %s", e)
+        return None
+
+
+def build_report_prompt(symbol: str, parsed: Dict, screener: Dict, ict: Dict, regime: Dict) -> str:
+    """Build prompt cho báo cáo chi tiết dựa trên kết quả phân tích đã có."""
+    sections = parsed.get("sections") or {}
+    return REPORT_PROMPT_TEMPLATE.format(
+        symbol=symbol,
+        name=screener.get("name", symbol),
+        industry=screener.get("industry", "N/A"),
+        tier=screener.get("tier", "N/A"),
+        regime=regime.get("regime", "UNKNOWN"),
+        bull_weight=_fmt((regime.get("bull_weight") or 0) * 100, 0),
+        price=_fmt(screener.get("close") or screener.get("price"), 1),
+        price_1d=_fmt(screener.get("price_change_1d"), 2),
+        price_5d=_fmt(screener.get("price_change_5d"), 2),
+        price_20d=_fmt(screener.get("price_change_20d"), 2),
+        composite=_fmt(screener.get("composite_score"), 1),
+        fundamental=_fmt(screener.get("fundamental_score"), 1),
+        smart_money=_fmt(screener.get("smart_money_score"), 1),
+        momentum=_fmt(screener.get("momentum_score"), 1),
+        technical=_fmt(screener.get("technical_score"), 1),
+        pe=_fmt(screener.get("pe"), 1),
+        roe=_fmt(screener.get("roe"), 2),
+        roa=_fmt(screener.get("roa"), 2),
+        net_margin=_fmt(screener.get("net_margin"), 2),
+        revenue_growth=_fmt(screener.get("revenue_growth"), 2),
+        debt_equity=_fmt(screener.get("debt_equity"), 2),
+        rsi=_fmt(screener.get("rsi14"), 1),
+        adx=_fmt(screener.get("adx14"), 1),
+        fvg=_bool(ict.get("fvg_bull")),
+        ob=_bool(ict.get("ob_bull")),
+        structure=ict.get("structure", "N/A"),
+        foreign_7d=_fmt(screener.get("foreign_net_7d"), 1),
+        foreign_30d=_fmt(screener.get("foreign_net_30d"), 1),
+        recommendation=parsed.get("recommendation", "HOLD"),
+        executive_summary=parsed.get("executive_summary") or parsed.get("summary", ""),
+        ict_analysis=sections.get("ict_analysis", ""),
+        technical_view=sections.get("technical_view", ""),
+        flow_analysis=sections.get("flow_analysis", ""),
+        fundamental_view=sections.get("fundamental_view", ""),
+        sector_context=sections.get("sector_context", ""),
+        regime_impact=sections.get("regime_impact", ""),
+    )
+
+
 def parse_ai_response(response: str) -> Optional[Dict]:
     try:
         cleaned = response.strip()
@@ -589,6 +783,21 @@ def run() -> None:
                     parsed = parse_ai_response(raw)
                     if parsed:
                         parsed["symbol"] = sym
+                        # Normalize new structure → backward-compat with frontend
+                        # Map executive_summary → summary if needed
+                        if "executive_summary" in parsed and "summary" not in parsed:
+                            parsed["summary"] = parsed["executive_summary"]
+                        # Flatten sections → top-level for frontend
+                        if "sections" in parsed:
+                            secs = parsed["sections"]
+                            if "fundamental_view" not in parsed:
+                                parsed["fundamental_view"] = secs.get("fundamental_view", "")
+                            if "technical_view" not in parsed:
+                                parsed["technical_view"] = secs.get("ict_analysis", "") + " " + secs.get("technical_view", "")
+                            if "flow_view" not in parsed:
+                                parsed["flow_view"] = secs.get("flow_analysis", "")
+                            parsed["regime_impact"]   = secs.get("regime_impact", "")
+                            parsed["sector_context"]  = secs.get("sector_context", "")
                         result = parsed
                         ai_ok += 1
                     else:
@@ -601,6 +810,20 @@ def run() -> None:
         if result is None:
             result = generate_rule_based(sym, s, ic, sc, regime)
             rb_ok += 1
+
+        # ── Gen detailed_report (markdown 8 phần) cho mọi stock có AI ──────
+        # Chỉ gen khi có OPENAI_API_KEY và result đến từ AI (không phải rule-based)
+        if use_ai and result.get("recommendation") and "rule_based" not in result.get("_source", ""):
+            try:
+                report_prompt = build_report_prompt(sym, result, s, ic, regime)
+                detailed = call_ai_report(report_prompt)
+                if detailed:
+                    result["detailed_report"] = detailed
+                    log.info("   ✅ %s: detailed_report generated (%d chars)", sym, len(detailed))
+                else:
+                    log.warning("   ⚠️  %s: detailed_report skipped (no output)", sym)
+            except Exception as e:
+                log.warning("   ⚠️  %s: detailed_report error: %s", sym, e)
 
         analyses[sym] = result
 
