@@ -23,7 +23,7 @@ from typing import Optional, Dict, List, Any
 
 EXPORT_DIR     = os.getenv("EXPORT_DIR",    "data/exports")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-TOP_N_STOCKS   = int(os.getenv("TOP_N_STOCKS", "10"))   # chỉ phân tích top 10
+TOP_N_STOCKS   = int(os.getenv("TOP_N_STOCKS", "5"))    # chỉ phân tích top 5 BUY candidates
 MAX_TOKENS     = int(os.getenv("MAX_TOKENS",   "2000"))
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
@@ -311,20 +311,86 @@ def load_sectors() -> Dict[str, Dict]:
 
 
 def get_top_symbols(screener: Dict[str, Dict], ict_map: Dict[str, Dict], limit: int) -> List[str]:
-    candidates = []
+    """
+    Chọn top N mã khuyến nghị MUA để phân tích AI.
+
+    Ưu tiên theo thứ tự:
+    1. Super Combo: Trend=UP + ADX>25 + RSI<35 (backtest: win 72.7% 20D, avg +9.79%)
+    2. Mean Reversion: crash -15% (20D) + RSI<40 + bull_weight>0.3 (bounce edge +1.79%)
+    3. Quality BEAR plays: composite >= T_BUY_BEAR (65 + regime_shift=5 = 70) trong BEAR
+    4. Fallback: top composite score nếu chưa đủ limit
+
+    Mục đích: AI chỉ phân tích sâu các mã có setup MUA — không lãng phí token vào HOLD/SELL.
+    """
+    # Lấy bull_weight từ ict_map (bất kỳ symbol nào đều có bull_weight của regime)
+    bull_weight = 0.5
+    for sym_ict in ict_map.values():
+        if "bull_weight" in sym_ict:
+            bull_weight = float(sym_ict["bull_weight"])
+            break
+
+    # Dynamic threshold theo regime (giống signals.ts v3)
+    regime_shift = 5 if bull_weight <= 0.3 else (-3 if bull_weight >= 0.65 else 0)
+    T_BUY = 65 + regime_shift   # BEAR: 70 | NEUTRAL: 65 | BULL: 62
+
+    buy_candidates = []
+    fallback_candidates = []
+
     for sym, s in screener.items():
-        ict = ict_map.get(sym, {})
-        candidates.append({
-            "symbol":          sym,
-            "composite_score": s.get("composite_score") or 0,
-            "alpha_score":     ict.get("alpha_score") or 0,
-            "actionable":      ict.get("actionable", False),
-        })
-    candidates.sort(
-        key=lambda x: (x["actionable"], x["composite_score"], x["alpha_score"]),
+        ict   = ict_map.get(sym, {})
+        comp  = s.get("composite_score") or 0
+        rsi   = s.get("rsi14") or 50
+        trend = s.get("trend_short") or 0
+        p20d  = s.get("price_change_20d") or 0
+        alpha = ict.get("alpha_score") or 0
+        adx   = s.get("adx14") or 0
+        actionable = ict.get("actionable", False)
+
+        # Super Combo: Trend+ADX>25+RSI<35 — edge mạnh nhất (n=11, win 72.7%)
+        is_super_combo = (trend == 1 and adx > 25 and rsi < 35 and bull_weight > 0.25)
+
+        # Mean Reversion: crash bounce (5-10D edge +1.79%)
+        is_mean_rev = (p20d < -15 and rsi < 40 and bull_weight > 0.3)
+
+        # Quality play: score cao nhất trong regime hiện tại
+        is_quality = (comp >= T_BUY)
+
+        if is_super_combo or is_mean_rev or is_quality:
+            # Priority score: super combo > mean rev > quality, tiebreak by composite
+            priority = (3 if is_super_combo else 2 if is_mean_rev else 1)
+            buy_candidates.append({
+                "symbol":          sym,
+                "composite_score": comp,
+                "alpha_score":     alpha,
+                "priority":        priority,
+                "actionable":      actionable,
+            })
+        else:
+            fallback_candidates.append({
+                "symbol":          sym,
+                "composite_score": comp,
+                "alpha_score":     alpha,
+            })
+
+    # Sort buy candidates: priority desc, then composite desc
+    buy_candidates.sort(
+        key=lambda x: (x["priority"], x["actionable"], x["composite_score"], x["alpha_score"]),
         reverse=True,
     )
-    return [c["symbol"] for c in candidates[:limit]]
+
+    result = [c["symbol"] for c in buy_candidates[:limit]]
+
+    # Nếu chưa đủ limit → fill từ fallback (top composite)
+    if len(result) < limit:
+        fallback_candidates.sort(key=lambda x: x["composite_score"], reverse=True)
+        for c in fallback_candidates:
+            if len(result) >= limit:
+                break
+            if c["symbol"] not in result:
+                result.append(c["symbol"])
+
+    log.info("BUY candidates: %d total | Top %d: %s", len(buy_candidates), limit, result)
+    return result
 
 
 # ─── PROMPT BUILDER ────────────────────────────────────────────────────────
