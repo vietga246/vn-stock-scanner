@@ -187,6 +187,7 @@ export interface PriceBoardResponse {
 export interface AIAnalysis {
   symbol: string;
   recommendation: 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL';
+  // Legacy flat fields (rule-based fallback + backward compat)
   summary: string;
   highlights: AnalysisPoint[];
   risks: AnalysisPoint[];
@@ -195,6 +196,23 @@ export interface AIAnalysis {
   flow_view: string;
   target_price?: number;
   stop_loss?: number;
+  // New AI report fields
+  executive_summary?: string;
+  sections?: {
+    ict_analysis?: string;
+    technical_view?: string;
+    flow_analysis?: string;
+    fundamental_view?: string;
+    sector_context?: string;
+    regime_impact?: string;
+  };
+  price_levels?: {
+    support?: string;
+    resistance?: string;
+    stop_loss_note?: string;
+  };
+  regime_impact?: string;
+  sector_context?: string;
 }
 
 export interface AnalysisPoint {
