@@ -28,8 +28,8 @@ jobs:
     timeout-minutes: 15
 
     # Chỉ chạy nếu:
-    # - workflow_dispatch hoặc schedule: luôn chạy
-    # - workflow_run: chỉ khi ③ thành công VÀ là phiên chiều EOD (>= 08:00 UTC = 15:00 ICT)
+    # - workflow_dispatch: luôn chạy
+    # - workflow_run: chỉ khi ③ thành công (cả 2 phiên sáng + chiều)
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' &&
@@ -41,30 +41,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      # Khi trigger từ workflow_run: chỉ chạy phiên chiều EOD (>= 08:00 UTC)
-      # Phiên sáng (04:45 UTC) bỏ qua — data chưa đầy đủ
-      - name: "🕐 Kiểm tra phiên EOD (chỉ cho workflow_run)"
-        id: eod_check
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            HOUR=$(date -u +%H)
-            MINUTE=$(date -u +%M)
-            TOTAL_MIN=$((HOUR * 60 + MINUTE))
-            # >= 08:00 UTC (15:00 ICT) = phiên chiều EOD
-            if [ "$TOTAL_MIN" -ge 480 ]; then
-              echo "is_eod=true" >> $GITHUB_OUTPUT
-              echo "✅ Phiên chiều EOD — chạy AI Analysis"
-            else
-              echo "is_eod=false" >> $GITHUB_OUTPUT
-              echo "⏭️  Phiên sáng — bỏ qua AI Analysis (chỉ chạy EOD)"
-            fi
-          else
-            echo "is_eod=true" >> $GITHUB_OUTPUT
-            echo "✅ Manual/Schedule trigger — luôn chạy"
-          fi
-
       - name: Setup Python
-        if: steps.eod_check.outputs.is_eod == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -72,7 +49,6 @@ jobs:
           cache-dependency-path: pipeline/requirements.txt
 
       - name: Install dependencies
-        if: steps.eod_check.outputs.is_eod == 'true'
         run: |
           pip install -r pipeline/requirements.txt
           if [ "${{ inputs.run_mode || 'ai' }}" = "ai" ]; then
@@ -80,7 +56,6 @@ jobs:
           fi
 
       - name: Restore DB from cache
-        if: steps.eod_check.outputs.is_eod == 'true'
         uses: actions/cache@v4
         with:
           path: data/db/stock.db
@@ -89,7 +64,6 @@ jobs:
             stock-db-
 
       - name: Check DB exists
-        if: steps.eod_check.outputs.is_eod == 'true'
         id: check_db
         run: |
           mkdir -p data/db data/exports
