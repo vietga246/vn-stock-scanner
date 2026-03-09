@@ -426,7 +426,7 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
     """
     screener_path = os.path.join(EXPORT_DIR, "screener.json")
 
-    # Load history từ prices.json
+    # Load history và close từ prices.json
     price_data = {}
     prices_path = os.path.join(EXPORT_DIR, "prices.json")
     if os.path.exists(prices_path):
@@ -440,6 +440,23 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
                 "history": close_prices[-30:] if close_prices else [],
             }
         log.info("Loaded price history for %d symbols from prices.json", len(price_data))
+
+    # Override close bằng match_price từ price_board.json (giá ATC thực tế, mới nhất)
+    # Dùng cho cả phiên sáng (daily_prices chưa có giá hôm nay) và phiên chiều
+    pb_path = os.path.join(EXPORT_DIR, "price_board.json")
+    if os.path.exists(pb_path):
+        with open(pb_path) as f:
+            pb_json = json.load(f)
+        pb_count = 0
+        for entry in pb_json.get("data", []):
+            sym = entry.get("symbol")
+            mp  = entry.get("match_price")
+            if sym and mp:
+                if sym not in price_data:
+                    price_data[sym] = {"close": None, "history": []}
+                price_data[sym]["close"] = mp  # match_price là giá ATC chính xác nhất
+                pb_count += 1
+        log.info("Override close với match_price từ price_board.json: %d symbols", pb_count)
 
     # Build symbols lookup
     sym_lookup = {}
@@ -509,6 +526,8 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
             # Smart money
             "foreign_net_7d":     safe_float(row.get("foreign_net_7d"), 1),
             "foreign_net_30d":    safe_float(row.get("foreign_net_30d"), 1),
+            # Giá hiện tại (match_price từ price_board nếu có, fallback từ prices.json)
+            "close":              price.get("close"),
             # History sparkline (từ prices.json)
             "history":            price.get("history", []),
             "data_completeness":  safe_float(row.get("data_completeness")),
