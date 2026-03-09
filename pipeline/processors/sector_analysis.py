@@ -531,6 +531,9 @@ def export_screener(conn, scores_df: pd.DataFrame, symbols_df: pd.DataFrame):
             # History sparkline (từ prices.json)
             "history":            price.get("history", []),
             "data_completeness":  safe_float(row.get("data_completeness")),
+            # v3: backtest-derived scores
+            "mean_reversion_score": safe_float(row.get("mean_reversion_score")),
+            "regime_adj_score":      safe_float(row.get("regime_adj_score")),
         })
 
     output = {
