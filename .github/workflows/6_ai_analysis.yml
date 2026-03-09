@@ -84,7 +84,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           RUN_MODE: ${{ inputs.run_mode || 'ai' }}
           AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
-          TOP_N_STOCKS: "15"
+          TOP_N_STOCKS: "5"
         run: python pipeline/ai_analyst/ai_analyst.py
 
       - name: Generate Reports
