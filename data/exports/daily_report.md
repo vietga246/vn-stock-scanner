@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 09/03/2026
 
-> Cập nhật lúc 05:53 ICT
+> Cập nhật lúc 06:56 ICT
 
 ---
 
@@ -21,7 +21,7 @@
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
 | 1 | PVT | Tổng Công ty cổ phần | Vận tải - kho b | 73.9 | A | Giữ |
-| 2 | DCM | CTCP - Tổng công ty  | SX Nhựa - Hóa c | 73.8 | A | Mua |
+| 2 | DCM | CTCP - Tổng công ty  | SX Nhựa - Hóa c | 73.8 | A | Giữ |
 | 3 | VVS | CTCP Đầu tư phát tri | Bán buôn | 72.7 | A | Giữ |
 | 4 | FDC | CTCP Ngoại thương và | Bất động sản | 72.5 | A | Giữ |
 | 5 | DGC | CTCP Tập đoàn Hóa ch | SX Nhựa - Hóa c | 71.0 | A | Giữ |
