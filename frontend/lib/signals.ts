@@ -87,8 +87,14 @@ export function computeSignal(
   let conviction: ConvictionLevel;
 
   if (bullWeight <= 0.3) {
-    // BEAR market override
-    action = effectiveScore >= THRESHOLDS.BUY ? 'HOLD' : 'AVOID';
+    // BEAR market — phân loại rõ hơn thay vì chỉ HOLD/AVOID
+    if (effectiveScore >= THRESHOLDS.BUY) {
+      action = 'HOLD';          // composite tốt nhưng không mua trong BEAR
+    } else if (effectiveScore >= THRESHOLDS.HOLD) {
+      action = 'REDUCE';        // dưới ngưỡng mua → giảm vị thế
+    } else {
+      action = 'SELL';          // yếu + BEAR market → thoát
+    }
     conviction = 'LOW';
   } else if (effectiveScore >= THRESHOLDS.STRONG_BUY) {
     action = 'STRONG_BUY'; conviction = 'HIGH';
