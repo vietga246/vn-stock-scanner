@@ -174,12 +174,37 @@ function AnalysisTab({
 
       {/* ── 0. AI Source Badge ───────────────────────────────── */}
       {hasAI && (
-        <div className="flex items-center gap-1.5 mb-3 px-2 py-1 rounded-lg w-fit"
-          style={{ background: '#00d4ff0c', border: '1px solid #00d4ff25' }}>
-          <span className="text-[9px]">🤖</span>
-          <span className="text-[9px] font-semibold tracking-widest" style={{ color: '#00d4ff' }}>
-            AI ANALYSIS — GPT-4o
-          </span>
+        <div className="flex items-center justify-between mb-3">
+          {/* AI badge */}
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
+            style={{ background: '#00d4ff0c', border: '1px solid #00d4ff25' }}>
+            <span className="text-[9px]">🤖</span>
+            <span className="text-[9px] font-semibold tracking-widest" style={{ color: '#00d4ff' }}>
+              AI ANALYSIS — GPT-4o
+            </span>
+          </div>
+          {/* Báo cáo chi tiết button */}
+          <button
+            onClick={() => window.open(`/report/${stock.symbol}`, '_blank')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all"
+            style={{
+              background: '#00d4ff12',
+              border: '1px solid #00d4ff40',
+              color: '#00d4ff',
+              cursor: 'pointer',
+              letterSpacing: '0.06em',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = '#00d4ff20';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = '#00d4ff70';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = '#00d4ff12';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = '#00d4ff40';
+            }}
+          >
+            📋 BÁO CÁO CHI TIẾT ↗
+          </button>
         </div>
       )}
 
