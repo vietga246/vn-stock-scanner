@@ -1,36 +1,33 @@
 """
-ai_analyst.py — AI-Powered Stock Analysis Module (v2)
+ai_analyst.py — AI-Powered Stock Analysis Module (v3)
 
-Output format phù hợp với frontend design:
-- ai_analysis.json với cấu trúc analyses[symbol] chứa recommendation, summary, highlights, risks
+Đưa toàn bộ data vào AI để phân tích:
+  - Screener: composite/sub-scores, technicals, fundamentals, foreign flow, FVG
+  - ICT Signals: ict_score, alpha_score, setup_quality, signal_breakdown,
+                 structure, confluences (FVG/OB/sweep/wyckoff), top_signals
+  - Sector context: ngành đang acc/dist, RS vs sector, top stocks
+  - Market regime: BULL/BEAR/TRANSITION, bull_weight, breadth, foreign net
 
-Features:
-- Load top stocks từ stock_scores
-- Tạo prompt với context đầy đủ (Technical + Fundamental + Smart Money)
-- Gọi AI API để phân tích (hoặc fallback rule-based)
-- Export ai_analysis.json cho frontend
-
-Chạy sau scoring_engine.py và sector_analysis.py.
+Output: ai_analysis.json với cấu trúc phù hợp frontend.
+Chạy sau workflow 2+3 (collect + process).
 """
 
-import sqlite3
-import pandas as pd
 import json
-import os
 import logging
+import os
 import sys
 from datetime import datetime
 from typing import Optional, Dict, List, Any
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────
 
-DB_PATH = os.getenv("DB_PATH", "data/db/stock.db")
-EXPORT_DIR = os.getenv("EXPORT_DIR", "data/exports")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+EXPORT_DIR        = os.getenv("EXPORT_DIR",       "data/exports")
+OPENAI_API_KEY    = os.getenv("OPENAI_API_KEY",    "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-AI_PROVIDER = os.getenv("AI_PROVIDER", "openai")  # "openai" or "anthropic"
-TOP_N_STOCKS = int(os.getenv("TOP_N_STOCKS", "50"))  # Increased for frontend
-MAX_TOKENS = int(os.getenv("MAX_TOKENS", "2000"))
+AI_PROVIDER       = os.getenv("AI_PROVIDER",       "anthropic")
+TOP_N_STOCKS      = int(os.getenv("TOP_N_STOCKS",  "50"))
+MAX_TOKENS        = int(os.getenv("MAX_TOKENS",    "2000"))
+AI_TOP_N          = int(os.getenv("AI_TOP_N",      "50"))
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────
 
@@ -41,525 +38,583 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ─── PROMPT TEMPLATES ──────────────────────────────────────────────────────
+# ─── PROMPTS ───────────────────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """Bạn là một chuyên gia phân tích chứng khoán Việt Nam với 20 năm kinh nghiệm.
-Nhiệm vụ: Phân tích các cổ phiếu được đề xuất và đưa ra nhận định đầu tư.
+SYSTEM_PROMPT = """\
+Bạn là chuyên gia phân tích chứng khoán Việt Nam với 20 năm kinh nghiệm, \
+chuyên về phân tích kỹ thuật ICT (Inner Circle Trader), dòng tiền tổ chức, và cơ bản.
 
-Phong cách phân tích:
-- Ngắn gọn, súc tích, đi thẳng vào trọng tâm
-- Sử dụng ngôn ngữ chuyên nghiệp nhưng dễ hiểu
-- Đưa ra lý do cụ thể cho mỗi nhận định
-- Cảnh báo rủi ro rõ ràng
-- Không đưa ra lời khuyên tài chính cụ thể, chỉ phân tích
+Nhiệm vụ: Phân tích cổ phiếu được cung cấp và đưa ra nhận định đầu tư toàn diện.
 
-Format output: JSON với cấu trúc được chỉ định."""
+Nguyên tắc:
+- Ngắn gọn, súc tích, đi thẳng trọng tâm
+- Ưu tiên tín hiệu ICT (structure, FVG, OB, sweep) kết hợp dòng tiền
+- Cân nhắc market regime (BULL/BEAR) — trong BEAR market, chỉ khuyến nghị BUY/STRONG_BUY khi có setup rõ ràng
+- Cảnh báo rủi ro cụ thể
+- KHÔNG đưa lời khuyên tài chính cụ thể
 
-ANALYSIS_PROMPT_TEMPLATE = """
-Phân tích cổ phiếu {symbol} với dữ liệu sau:
+Format output: JSON chính xác theo cấu trúc yêu cầu, không có text ngoài JSON.\
+"""
 
-## DỮ LIỆU CỔ PHIẾU
+ANALYSIS_PROMPT_TEMPLATE = """\
+Phân tích cổ phiếu {symbol} với toàn bộ dữ liệu sau:
 
-- Symbol: {symbol}
-- Tên: {name}
-- Ngành: {industry}
-- Composite Score: {composite_score}/100 (Tier {tier})
-- Fundamental Score: {fundamental_score}/100
-- Smart Money Score: {smart_money_score}/100
-- Momentum Score: {momentum_score}/100
-- Technical Score: {technical_score}/100
+## MARKET CONTEXT
+- Regime: {regime} (bull_weight={bull_weight}%, strength={regime_strength}%)
+- VN-Index: {vnindex} | 1D={vnindex_1d}% | 5D={vnindex_5d}% | 20D={vnindex_20d}%
+- Breadth: Advance {breadth_advance}% | Bear sectors {bear_sectors}/25
+- Foreign net 7D tổng thị trường: {market_foreign_net}B VND
 
-Chỉ số tài chính:
-- ROE: {roe}%
-- ROA: {roa}%
-- P/E: {pe}x
-- Revenue Growth: {revenue_growth}%
-- Net Margin: {net_margin}%
-- Debt/Equity: {debt_equity}
+## THÔNG TIN CỔ PHIẾU
+- Symbol: {symbol} | Tên: {name}
+- Ngành: {industry} | Exchange: {exchange} | Tier: {tier}
+- Rank: #{rank} / {total_symbols} (top {rank_pct}%)
 
-Kỹ thuật:
-- RSI(14): {rsi14}
-- Trend Short: {trend_short}
-- Price Change 5D: {price_change_5d}%
-- Price Change 20D: {price_change_20d}%
+## ĐIỂM SỐ TỔNG HỢP
+- Composite Score: {composite_score}/100
+- Fundamental:    {fundamental_score}/100
+- Smart Money:    {smart_money_score}/100
+- Momentum:       {momentum_score}/100
+- Technical:      {technical_score}/100
 
-Dòng tiền:
-- Khối ngoại 7D: {foreign_net_7d}B VND
-- Khối ngoại 30D: {foreign_net_30d}B VND
+## ICT ANALYSIS
+- ICT Score: {ict_score}/100 | Alpha Score: {alpha_score}/100
+- Setup Quality: {setup_quality} | Confluences: {ict_confluence} signals
+- Actionable: {actionable}
+- Market Structure: {structure}
+  + BOS Bull={bos_bull} | BOS Bear={bos_bear} | CHoCH Bull={choch_bull} | CHoCH Bear={choch_bear}
+  + Last S/H: {last_sh} / Last S/L: {last_sl}
+  + Equal Highs: {eq_high_count} | Equal Lows: {eq_low_count}
 
-Ngành {industry}: {sector_status}
+ICT Confluences:
+  + Fair Value Gap Bull: {fvg_bull} (size={fvg_bull_size}%, filled={fvg_bull_fill}%, age={fvg_bull_age}d)
+  + Order Block Bull: {ob_bull} | Price at OB: {ob_price_at} | Mitigated: {ob_mitigated}
+  + Liquidity Sweep Bull: {sweep_bull} | Stop Hunt: {stop_hunt_bull}
+  + Wyckoff Spring: {wyckoff_spring} | Smart Money: {smart_money}
+  + Breakout Imminent: {breakout_imminent}
 
-## YÊU CẦU
+Signal Breakdown (0-100):
+{signal_breakdown_text}
 
-Trả về JSON với cấu trúc:
+Top ICT Signals:
+{top_signals_text}
+
+## TECHNICALS
+- RSI(14): {rsi14} | ADX(14): {adx14}
+- +DI={plus_di} / -DI={minus_di} | DI Spread: {di_spread}
+- Trend Short: {trend_short} | Trend Strength: {trend_strength}%
+- BB Width: {bb_width}% | ATR(14): {atr_pct}%
+- Vol Ratio vs avg: {vol_ratio}x | Vol Trend: {vol_trend}
+- MACD Hist: {macd_hist}
+- % from MA20: {pct_from_ma20}% | % from MA50: {pct_from_ma50}%
+- Price 1D: {price_1d}% | 5D: {price_5d}% | 20D: {price_20d}%
+
+## VOLUME & FLOW (ICT)
+- Accumulation Score: {accumulation_score}/100
+- Distribution Score: {distribution_score}/100
+- Vol Spike: {vol_spike}x | Flow Direction: {flow_direction} | Flow Trend: {flow_trend}
+- Buy Pressure: {buy_pressure_pct}%
+- Inst Flow Score: {inst_flow_score}/100
+
+## FUNDAMENTALS
+- ROE: {roe}% | ROA: {roa}%
+- P/E: {pe}x | Net Margin: {net_margin}%
+- Revenue Growth: {revenue_growth}% | Debt/Equity: {debt_equity}
+
+## FOREIGN FLOW
+- 7D: {foreign_net_7d}B VND | 30D: {foreign_net_30d}B VND
+
+## SECTOR: {industry}
+- Avg Composite: {sector_avg_composite}/100 | Momentum 5D: {sector_momentum}%
+- Foreign 7D tổng ngành: {sector_foreign_7d}B VND
+- Status: {sector_status} | Money Flow Rank: #{sector_money_rank}
+- Top stocks ngành: {sector_top_stocks}
+
+## YÊU CẦU OUTPUT
+
+Trả về JSON với cấu trúc sau (không có text ngoài JSON):
 {{
   "recommendation": "STRONG_BUY|BUY|HOLD|SELL|STRONG_SELL",
-  "summary": "Tóm tắt 2-3 câu về cổ phiếu",
+  "summary": "Tóm tắt 2-3 câu: setup hiện tại + lý do chính",
   "highlights": [
-    {{"text": "Điểm tích cực 1", "type": "positive"}},
-    {{"text": "Điểm tích cực 2", "type": "positive"}}
+    {{"text": "Điểm tích cực cụ thể 1", "type": "positive"}},
+    {{"text": "Điểm tích cực cụ thể 2", "type": "positive"}}
   ],
   "risks": [
-    {{"text": "Rủi ro 1", "type": "negative"}},
+    {{"text": "Rủi ro cụ thể 1", "type": "negative"}},
     {{"text": "Cảnh báo 1", "type": "warning"}}
   ],
-  "fundamental_view": "Nhận định về cơ bản (1 câu)",
-  "technical_view": "Nhận định về kỹ thuật (1 câu)",
-  "flow_view": "Nhận định về dòng tiền (1 câu)"
+  "fundamental_view": "Nhận định cơ bản 1 câu",
+  "technical_view": "Nhận định kỹ thuật ICT 1 câu (đề cập structure/FVG/OB nếu có)",
+  "flow_view": "Nhận định dòng tiền 1 câu (foreign + inst flow)"
 }}
-
-Trả về CHÍNH XÁC JSON, không có text khác.
 """
 
 # ─── DATA LOADERS ──────────────────────────────────────────────────────────
 
-def create_connection():
-    """Create database connection."""
-    if not os.path.exists(DB_PATH):
-        log.error("Database not found: %s", DB_PATH)
-        return None
-    conn = sqlite3.connect(DB_PATH, timeout=60)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def get_available_columns(conn, table: str) -> set:
-    """Get available columns in a table."""
-    try:
-        cursor = conn.execute(f"PRAGMA table_info({table})")
-        return {row[1] for row in cursor.fetchall()}
-    except Exception as e:
-        log.warning("Could not get columns for %s: %s", table, e)
-        return set()
-
-
-def load_top_stocks(conn, limit: int = 50) -> pd.DataFrame:
-    """Load top N stocks by composite score - dynamically adapt to available columns."""
-    
-    available = get_available_columns(conn, "stock_scores")
-    log.info("Available columns in stock_scores: %d", len(available))
-    
-    # Core columns
-    core_cols = [
-        "symbol", "composite_score", "fundamental_score", 
-        "smart_money_score", "momentum_score", "technical_score",
-        "tier", "rank_total"
-    ]
-    
-    # Optional columns
-    optional_cols = [
-        "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
-        "rsi14", "price_change_5d", "price_change_20d", "trend_short",
-        "foreign_net_7d", "foreign_net_30d", "vol_ratio"
-    ]
-    
-    # Build SELECT clause
-    select_cols = []
-    for col in core_cols:
-        if col in available:
-            select_cols.append(f"s.{col}")
-    
-    for col in optional_cols:
-        if col in available:
-            select_cols.append(f"s.{col}")
-    
-    if not select_cols:
-        log.error("No columns available in stock_scores!")
-        return pd.DataFrame()
-    
-    query = f"""
-        SELECT 
-            {', '.join(select_cols)},
-            sym.organ_name,
-            sym.industry_name,
-            sym.exchange
-        FROM stock_scores s
-        LEFT JOIN symbols sym ON s.symbol = sym.symbol
-        WHERE s.composite_score IS NOT NULL
-        ORDER BY s.composite_score DESC
-        LIMIT ?
-    """
-    
-    df = pd.read_sql(query, conn, params=(limit,))
-    log.info("Loaded %d top stocks", len(df))
-    return df
-
-
-def load_sector_status(conn) -> Dict[str, str]:
-    """Load sector accumulating/distributing status."""
-    try:
-        df = pd.read_sql("""
-            SELECT 
-                industry_name,
-                total_foreign_7d,
-                avg_composite
-            FROM sector_scores
-        """, conn)
-        
-        result = {}
-        for _, row in df.iterrows():
-            industry = row['industry_name']
-            foreign = row.get('total_foreign_7d', 0) or 0
-            score = row.get('avg_composite', 50) or 50
-            
-            if foreign > 10 and score > 55:
-                result[industry] = 'accumulating'
-            elif foreign < -10 and score < 50:
-                result[industry] = 'distributing'
-            else:
-                result[industry] = 'neutral'
-        
-        return result
-    except Exception as e:
-        log.warning("Could not load sector status: %s", e)
+def load_screener() -> Dict[str, Dict]:
+    path = os.path.join(EXPORT_DIR, "screener.json")
+    if not os.path.exists(path):
+        log.warning("screener.json not found")
         return {}
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    return {s["symbol"]: s for s in data.get("screener", [])}
 
 
-# ─── AI FUNCTIONS ──────────────────────────────────────────────────────────
+def load_ict_signals():
+    path = os.path.join(EXPORT_DIR, "ict_signals.json")
+    if not os.path.exists(path):
+        log.warning("ict_signals.json not found")
+        return {}, {}, {}
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    sig_map = {s["symbol"]: s for s in data.get("signals", [])}
+    return sig_map, data.get("regime", {}), data.get("market_stats", {})
 
-def call_ai(prompt: str, system_prompt: str = SYSTEM_PROMPT) -> Optional[str]:
-    """Call AI API (OpenAI or Anthropic)."""
-    
+
+def load_sectors() -> Dict[str, Dict]:
+    path = os.path.join(EXPORT_DIR, "sectors.json")
+    if not os.path.exists(path):
+        log.warning("sectors.json not found")
+        return {}
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    result = {}
+    for s in data.get("sectors", []):
+        name = s.get("name") or s.get("industry_name", "")
+        if name:
+            result[name] = s
+    return result
+
+
+def get_top_symbols(screener: Dict[str, Dict], ict_map: Dict[str, Dict], limit: int) -> List[str]:
+    candidates = []
+    for sym, s in screener.items():
+        ict = ict_map.get(sym, {})
+        candidates.append({
+            "symbol":          sym,
+            "composite_score": s.get("composite_score") or 0,
+            "alpha_score":     ict.get("alpha_score") or 0,
+            "actionable":      ict.get("actionable", False),
+        })
+    candidates.sort(
+        key=lambda x: (x["actionable"], x["composite_score"], x["alpha_score"]),
+        reverse=True,
+    )
+    return [c["symbol"] for c in candidates[:limit]]
+
+
+# ─── PROMPT BUILDER ────────────────────────────────────────────────────────
+
+def _fmt(v, decimals=2, default="N/A") -> str:
+    if v is None:
+        return default
+    try:
+        return f"{float(v):.{decimals}f}"
+    except Exception:
+        return str(v)
+
+
+def _bool(v) -> str:
+    if v is None:
+        return "N/A"
+    return "YES" if bool(v) else "no"
+
+
+def build_prompt(symbol, screener, ict, sector, regime, market_stats, total_symbols) -> str:
+    sb = ict.get("signal_breakdown") or {}
+    sb_lines = "\n".join(
+        f"  + {k.replace('_', ' ').title()}: {_fmt(v, 0)}/100"
+        for k, v in sb.items()
+    ) if sb else "  (N/A)"
+
+    ts = ict.get("top_signals") or []
+    ts_text = "\n".join(f"  + {s}" for s in ts) if ts else "  (none)"
+
+    s_foreign = float(sector.get("foreign_net_7d") or 0)
+    s_comp    = float(sector.get("avg_composite_score") or 50)
+    if s_foreign > 20 and s_comp > 55:
+        sector_status = "ACCUMULATING"
+    elif s_foreign < -20 and s_comp < 50:
+        sector_status = "DISTRIBUTING"
+    else:
+        sector_status = "NEUTRAL"
+
+    ts_val = screener.get("trend_short")
+    trend_short_label = "Up" if ts_val == 1 else "Down" if ts_val == -1 else "Sideways"
+
+    rank = screener.get("rank") or 0
+    rank_pct = screener.get("rank_pct") or (
+        round((1 - rank / max(total_symbols, 1)) * 100, 1) if rank else 0
+    )
+
+    return ANALYSIS_PROMPT_TEMPLATE.format(
+        regime=regime.get("regime", "UNKNOWN"),
+        bull_weight=_fmt((regime.get("bull_weight") or 0) * 100, 0),
+        regime_strength=_fmt(regime.get("regime_strength"), 0),
+        vnindex=_fmt(regime.get("vnindex"), 2),
+        vnindex_1d=_fmt(regime.get("vnindex_change_1d"), 2),
+        vnindex_5d=_fmt(regime.get("vnindex_change_5d"), 2),
+        vnindex_20d=_fmt(regime.get("vnindex_change_20d"), 2),
+        breadth_advance=_fmt(regime.get("breadth_advance_pct"), 1),
+        bear_sectors=regime.get("bear_sectors", "N/A"),
+        market_foreign_net=_fmt(regime.get("foreign_net_total_bn"), 1),
+        symbol=symbol,
+        name=screener.get("name", symbol),
+        industry=screener.get("industry", "N/A"),
+        exchange=screener.get("exchange", "N/A"),
+        tier=screener.get("tier", "N/A"),
+        rank=rank,
+        total_symbols=total_symbols,
+        rank_pct=_fmt(rank_pct, 1),
+        composite_score=_fmt(screener.get("composite_score"), 1),
+        fundamental_score=_fmt(screener.get("fundamental_score"), 1),
+        smart_money_score=_fmt(screener.get("smart_money_score"), 1),
+        momentum_score=_fmt(screener.get("momentum_score"), 1),
+        technical_score=_fmt(screener.get("technical_score"), 1),
+        ict_score=_fmt(ict.get("ict_score"), 1),
+        alpha_score=_fmt(ict.get("alpha_score"), 1),
+        setup_quality=ict.get("setup_quality", "N/A"),
+        ict_confluence=ict.get("ict_confluence", 0),
+        actionable=_bool(ict.get("actionable")),
+        structure=ict.get("structure", "N/A"),
+        bos_bull=_bool(ict.get("bos_bull")),
+        bos_bear=_bool(ict.get("bos_bear")),
+        choch_bull=_bool(ict.get("choch_bull")),
+        choch_bear=_bool(ict.get("choch_bear")),
+        last_sh=_fmt(ict.get("last_sh"), 1),
+        last_sl=_fmt(ict.get("last_sl"), 1),
+        eq_high_count=ict.get("eq_high_count", 0),
+        eq_low_count=ict.get("eq_low_count", 0),
+        fvg_bull=_bool(ict.get("fvg_bull")),
+        fvg_bull_size=_fmt(screener.get("fvg_bull_size"), 2),
+        fvg_bull_fill=_fmt(screener.get("fvg_bull_fill"), 1),
+        fvg_bull_age=screener.get("fvg_bull_age", "N/A"),
+        ob_bull=_bool(ict.get("ob_bull")),
+        ob_price_at=_bool(ict.get("ob_price_at")),
+        ob_mitigated=_bool(ict.get("ob_mitigated")),
+        sweep_bull=_bool(ict.get("sweep_bull")),
+        stop_hunt_bull=_bool(ict.get("stop_hunt_bull")),
+        wyckoff_spring=_bool(ict.get("wyckoff_spring")),
+        smart_money=_bool(ict.get("smart_money")),
+        breakout_imminent=_bool(ict.get("breakout_imminent")),
+        signal_breakdown_text=sb_lines,
+        top_signals_text=ts_text,
+        rsi14=_fmt(screener.get("rsi14"), 1),
+        adx14=_fmt(screener.get("adx14"), 1),
+        plus_di=_fmt(screener.get("plus_di14"), 1),
+        minus_di=_fmt(screener.get("minus_di14"), 1),
+        di_spread=_fmt(screener.get("di_spread"), 1),
+        trend_short=trend_short_label,
+        trend_strength=_fmt(screener.get("trend_strength"), 1),
+        bb_width=_fmt(screener.get("bb_width"), 1),
+        atr_pct=_fmt(screener.get("atr_pct"), 2),
+        vol_ratio=_fmt(screener.get("vol_ratio"), 2),
+        vol_trend=ict.get("vol_trend", "N/A"),
+        macd_hist=_fmt(screener.get("macd_hist"), 4),
+        pct_from_ma20=_fmt(screener.get("pct_from_ma20"), 1),
+        pct_from_ma50=_fmt(screener.get("pct_from_ma50"), 1),
+        price_1d=_fmt(screener.get("price_change_1d"), 2),
+        price_5d=_fmt(screener.get("price_change_5d"), 2),
+        price_20d=_fmt(screener.get("price_change_20d"), 2),
+        accumulation_score=_fmt(ict.get("accumulation_score"), 1),
+        distribution_score=_fmt(ict.get("distribution_score"), 1),
+        vol_spike=_fmt(ict.get("vol_spike"), 2),
+        flow_direction=ict.get("flow_direction", "N/A"),
+        flow_trend=ict.get("flow_trend", "N/A"),
+        buy_pressure_pct=_fmt(ict.get("buy_pressure_pct"), 1),
+        inst_flow_score=_fmt(ict.get("inst_flow_score"), 1),
+        roe=_fmt(screener.get("roe"), 2),
+        roa=_fmt(screener.get("roa"), 2),
+        pe=_fmt(screener.get("pe"), 1),
+        net_margin=_fmt(screener.get("net_margin"), 2),
+        revenue_growth=_fmt(screener.get("revenue_growth"), 2),
+        debt_equity=_fmt(screener.get("debt_equity"), 2),
+        foreign_net_7d=_fmt(screener.get("foreign_net_7d"), 1),
+        foreign_net_30d=_fmt(screener.get("foreign_net_30d"), 1),
+        sector_avg_composite=_fmt(sector.get("avg_composite_score"), 1),
+        sector_momentum=_fmt(sector.get("avg_price_5d"), 2),
+        sector_foreign_7d=_fmt(sector.get("foreign_net_7d"), 1),
+        sector_status=sector_status,
+        sector_money_rank=sector.get("money_flow_rank", "N/A"),
+        sector_top_stocks=", ".join(sector.get("top_stocks") or [])[:80] or "N/A",
+    )
+
+
+# ─── AI CALLER ─────────────────────────────────────────────────────────────
+
+def call_ai(prompt: str) -> Optional[str]:
     if AI_PROVIDER == "anthropic" and ANTHROPIC_API_KEY:
         try:
             import anthropic
             client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
             response = client.messages.create(
-                model="claude-3-sonnet-20240229",
+                model="claude-sonnet-4-20250514",
                 max_tokens=MAX_TOKENS,
-                system=system_prompt,
+                system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": prompt}],
             )
             return response.content[0].text
         except Exception as e:
-            log.error("Anthropic API error: %s", e)
-            return None
-    
-    elif OPENAI_API_KEY:
+            log.error("Anthropic error: %s", e)
+
+    if OPENAI_API_KEY:
         try:
             import openai
             client = openai.OpenAI(api_key=OPENAI_API_KEY)
             response = client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model="gpt-4o",
                 messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt},
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user",   "content": prompt},
                 ],
                 max_tokens=MAX_TOKENS,
                 response_format={"type": "json_object"},
             )
             return response.choices[0].message.content
         except Exception as e:
-            log.error("OpenAI API error: %s", e)
-            return None
-    
+            log.error("OpenAI error: %s", e)
+
     return None
 
 
 def parse_ai_response(response: str) -> Optional[Dict]:
-    """Parse JSON from AI response."""
     try:
         cleaned = response.strip()
-        if cleaned.startswith("```json"):
-            cleaned = cleaned[7:]
-        if cleaned.startswith("```"):
-            cleaned = cleaned[3:]
+        for fence in ("```json", "```"):
+            if cleaned.startswith(fence):
+                cleaned = cleaned[len(fence):]
         if cleaned.endswith("```"):
             cleaned = cleaned[:-3]
-        
         return json.loads(cleaned.strip())
     except json.JSONDecodeError as e:
-        log.warning("Failed to parse AI response: %s", e)
+        log.warning("Parse failed: %s | %s...", e, response[:100])
         return None
 
 
-# ─── RULE-BASED ANALYSIS ───────────────────────────────────────────────────
+# ─── RULE-BASED FALLBACK ───────────────────────────────────────────────────
 
-def generate_rule_based_analysis(row: pd.Series, sector_status: Dict[str, str]) -> Dict:
-    """Generate analysis using rule-based logic (fallback when no AI)."""
-    
-    def safe_get(col, default=0):
-        val = row.get(col, default)
-        return default if pd.isna(val) else val
-    
-    symbol = row['symbol']
-    score = safe_get('composite_score', 50)
-    f_score = safe_get('fundamental_score', 50)
-    s_score = safe_get('smart_money_score', 50)
-    m_score = safe_get('momentum_score', 50)
-    t_score = safe_get('technical_score', 50)
-    tier = safe_get('tier', 'C')
-    industry = safe_get('industry_name', '')
-    
-    # ─── Recommendation ───
-    if score >= 75:
-        recommendation = "STRONG_BUY"
-        summary = f"{symbol} đang có điểm số xuất sắc ({score:.1f}) với tất cả các chỉ báo đều tích cực. Cổ phiếu thuộc nhóm chất lượng cao, đây là thời điểm tốt để tích lũy."
-    elif score >= 65:
-        recommendation = "BUY"
-        summary = f"{symbol} có điểm số tốt ({score:.1f}) với nhiều yếu tố hỗ trợ. Có thể xem xét mua vào khi giá điều chỉnh về vùng hỗ trợ."
-    elif score >= 55:
-        recommendation = "HOLD"
-        summary = f"{symbol} đang trong vùng trung tính ({score:.1f}). Nên giữ nếu đã có vị thế và chờ tín hiệu rõ ràng hơn trước khi hành động."
-    elif score >= 45:
-        recommendation = "SELL"
-        summary = f"{symbol} có nhiều chỉ báo tiêu cực ({score:.1f}). Nên cân nhắc chốt lời hoặc cắt lỗ để bảo toàn vốn."
+def generate_rule_based(symbol, screener, ict, sector, regime) -> Dict:
+    def g(d, key, default=0):
+        v = d.get(key)
+        if v is None:
+            return default
+        try:
+            return float(v)
+        except Exception:
+            return default
+
+    score      = g(screener, "composite_score", 50)
+    ict_score  = g(ict,      "ict_score", 50)
+    alpha      = g(ict,      "alpha_score", 50)
+    f_score    = g(screener, "fundamental_score", 50)
+    s_score    = g(screener, "smart_money_score", 50)
+    m_score    = g(screener, "momentum_score", 50)
+    t_score    = g(screener, "technical_score", 50)
+    rsi        = g(screener, "rsi14", 50)
+    adx        = g(screener, "adx14", 20)
+    nn7d       = g(screener, "foreign_net_7d", 0)
+    c20d       = g(screener, "price_change_20d", 0)
+    ma20_pct   = g(screener, "pct_from_ma20", 0)
+    de         = g(screener, "debt_equity", 0)
+    roe        = g(screener, "roe", 0)
+    pe         = g(screener, "pe", 0)
+    rev_growth = g(screener, "revenue_growth", 0)
+
+    bull_weight = float(regime.get("bull_weight") or 0.5)
+    is_bear     = bull_weight <= 0.35
+    structure   = ict.get("structure", "NEUTRAL")
+    actionable  = bool(ict.get("actionable"))
+
+    # ── Recommendation ──
+    eff = score * (0.7 if is_bear else 1.0)
+    if   eff >= 75 and not is_bear:                          rec = "STRONG_BUY"
+    elif eff >= 68 and structure == "BULLISH" and actionable: rec = "BUY"
+    elif eff >= 58:                                           rec = "HOLD"
+    elif eff >= 45:                                           rec = "SELL"
+    else:                                                     rec = "STRONG_SELL"
+
+    highlights, risks = [], []
+
+    # ICT
+    if structure == "BULLISH":
+        highlights.append({"text": f"Market structure BULLISH (ICT score {ict_score:.0f})", "type": "positive"})
+    elif structure == "BEARISH":
+        risks.append({"text": "Market structure BEARISH — LH/LL pattern", "type": "negative"})
+    if ict.get("fvg_bull"):
+        highlights.append({"text": f"FVG Bull active ({g(screener,'fvg_bull_size',0):.1f}%) — demand zone intact", "type": "positive"})
+    if ict.get("sweep_bull") or ict.get("stop_hunt_bull"):
+        highlights.append({"text": "Liquidity sweep bull xong — tiềm năng reversal", "type": "positive"})
+    if ict.get("wyckoff_spring"):
+        highlights.append({"text": "Wyckoff Spring — tín hiệu tích lũy tổ chức", "type": "positive"})
+    if ict.get("breakout_imminent"):
+        highlights.append({"text": "Breakout imminent — sắp bứt phá kháng cự", "type": "positive"})
+
+    # Technicals
+    if adx >= 30 and t_score >= 65:
+        highlights.append({"text": f"ADX={adx:.0f} — trending market mạnh", "type": "positive"})
+    if rsi > 75:
+        risks.append({"text": f"RSI={rsi:.0f} — quá mua, cẩn thận pullback", "type": "warning"})
+    if ma20_pct > 20:
+        risks.append({"text": f"Giá cách MA20 +{ma20_pct:.0f}% — extended, rủi ro điều chỉnh", "type": "warning"})
+
+    # Momentum
+    if c20d > 15:
+        highlights.append({"text": f"Tăng {c20d:.1f}% / 20 phiên — uptrend mạnh", "type": "positive"})
+    elif c20d < -15:
+        risks.append({"text": f"Giảm {abs(c20d):.1f}% / 20 phiên — downtrend", "type": "negative"})
+
+    # Foreign
+    if nn7d > 50:
+        highlights.append({"text": f"Khối ngoại mua ròng +{nn7d:.0f}B (7D)", "type": "positive"})
+    elif nn7d < -50:
+        risks.append({"text": f"Khối ngoại bán ròng {nn7d:.0f}B (7D)", "type": "negative"})
+
+    # Sector
+    s_foreign = float(sector.get("foreign_net_7d") or 0)
+    s_comp    = float(sector.get("avg_composite_score") or 50)
+    if s_foreign > 20 and s_comp > 55:
+        highlights.append({"text": f"Ngành {screener.get('industry','')} đang được tích lũy", "type": "positive"})
+    elif s_foreign < -20:
+        risks.append({"text": f"Ngành {screener.get('industry','')} đang bị phân phối", "type": "negative"})
+
+    # Fundamentals
+    if f_score >= 70:
+        fundamental_view = f"Cơ bản vững (score={f_score:.0f}" + (f", ROE={roe:.1f}%" if roe > 10 else "") + ")"
+    elif f_score >= 50:
+        fundamental_view = f"Cơ bản ổn định (score={f_score:.0f})"
     else:
-        recommendation = "STRONG_SELL"
-        summary = f"{symbol} đang trong xu hướng giảm mạnh ({score:.1f}) với nhiều rủi ro. Khuyến nghị thoát hàng và chờ cơ hội tốt hơn."
-    
-    highlights = []
-    risks = []
-    
-    # ─── Fundamental Analysis ───
-    roe = safe_get('roe', 0)
-    roa = safe_get('roa', 0)
-    pe = safe_get('pe', 0)
-    revenue_growth = safe_get('revenue_growth', 0)
-    debt_equity = safe_get('debt_equity', 0)
-    
-    if f_score >= 75:
-        fundamental_view = "Nền tảng tài chính vững chắc với các chỉ số cơ bản ấn tượng."
-        highlights.append({"text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính lành mạnh", "type": "positive"})
-        if roe > 15:
-            highlights.append({"text": f"ROE {roe:.1f}% - Sinh lời trên vốn cao", "type": "positive"})
-        if 0 < pe < 15:
-            highlights.append({"text": f"P/E {pe:.1f} - Định giá hấp dẫn", "type": "positive"})
-        if revenue_growth > 20:
-            highlights.append({"text": f"Tăng trưởng doanh thu {revenue_growth:.1f}% - Tăng mạnh", "type": "positive"})
-    elif f_score >= 55:
-        fundamental_view = "Tài chính ổn định, các chỉ số trong ngưỡng chấp nhận được."
-        highlights.append({"text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính ổn định", "type": "neutral"})
-    else:
-        fundamental_view = "Nền tảng tài chính cần được cải thiện, theo dõi khả năng trả nợ."
-        risks.append({"text": f"Điểm cơ bản {f_score:.0f}/100 - Tài chính cần cải thiện", "type": "negative"})
-        if debt_equity > 2:
-            risks.append({"text": f"D/E {debt_equity:.1f} - Đòn bẩy tài chính cao", "type": "negative"})
-        if pe > 25 and pe > 0:
-            risks.append({"text": f"P/E {pe:.1f} - Định giá cao", "type": "warning"})
-    
-    # ─── Smart Money Analysis ───
-    nn7d = safe_get('foreign_net_7d', 0)
-    nn30d = safe_get('foreign_net_30d', 0)
-    
-    if s_score >= 70 and nn7d > 0:
-        flow_view = "Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục."
-        highlights.append({"text": f"Khối ngoại mua ròng +{nn7d:.1f}B trong 7 ngày", "type": "positive"})
-        if nn30d > nn7d * 3:
-            highlights.append({"text": f"Tích lũy bền vững: +{nn30d:.1f}B trong 30 ngày", "type": "positive"})
-    elif s_score >= 55:
-        flow_view = "Dòng tiền ổn định, không có dấu hiệu phân phối lớn."
-    else:
-        flow_view = "Dòng tiền đang rút ra, khối ngoại bán ròng."
-        if nn7d < -5:
-            risks.append({"text": f"Khối ngoại bán ròng {nn7d:.1f}B trong 7 ngày", "type": "negative"})
-    
-    # ─── Momentum Analysis ───
-    change_5d = safe_get('price_change_5d', 0)
-    change_20d = safe_get('price_change_20d', 0)
-    
-    if m_score >= 70:
-        highlights.append({"text": "Momentum mạnh - Đà tăng tích cực", "type": "positive"})
-        if change_20d > 10:
-            highlights.append({"text": f"Tăng {change_20d:.1f}% trong 20 phiên - Uptrend mạnh", "type": "positive"})
-    elif m_score < 45:
-        risks.append({"text": "Momentum yếu - Đà tăng suy giảm", "type": "negative"})
-        if change_20d < -10:
-            risks.append({"text": f"Giảm {abs(change_20d):.1f}% trong 20 phiên - Downtrend", "type": "negative"})
-    
-    # ─── Technical Analysis ───
-    rsi = safe_get('rsi14', 50)
-    trend = safe_get('trend_short', 0)
-    
-    if t_score >= 70:
-        technical_view = "Kỹ thuật tích cực, giá trên các đường MA, xu hướng tăng rõ ràng."
-        highlights.append({"text": "Tín hiệu kỹ thuật tích cực", "type": "positive"})
-        if 50 <= rsi <= 70:
-            highlights.append({"text": f"RSI {rsi:.0f} - Vùng tăng bền vững", "type": "positive"})
-    elif t_score >= 55:
-        technical_view = "Kỹ thuật trung tính, đang tích lũy trong biên độ hẹp."
-        if rsi > 70:
-            risks.append({"text": f"RSI {rsi:.0f} - Vùng quá mua, cẩn thận điều chỉnh", "type": "warning"})
-    else:
-        technical_view = "Kỹ thuật tiêu cực, giá dưới MA, momentum giảm."
-        risks.append({"text": "Tín hiệu kỹ thuật tiêu cực", "type": "negative"})
-        if rsi < 30:
-            highlights.append({"text": f"RSI {rsi:.0f} - Quá bán, có thể rebound", "type": "neutral"})
-    
-    # ─── Sector Analysis ───
-    status = sector_status.get(industry, 'neutral')
-    if status == 'accumulating':
-        highlights.append({"text": f"Ngành {industry} đang được tích lũy", "type": "positive"})
-    elif status == 'distributing':
-        risks.append({"text": f"Ngành {industry} đang bị phân phối", "type": "negative"})
-    
-    # ─── Tier Analysis ───
-    if tier == 'A':
-        highlights.append({"text": "Tier A - Cổ phiếu chất lượng cao, thanh khoản tốt", "type": "positive"})
-    elif tier in ['D', 'F']:
-        risks.append({"text": f"Tier {tier} - Cần theo dõi chặt chẽ, rủi ro cao", "type": "warning"})
-    
+        fundamental_view = f"Cơ bản yếu (score={f_score:.0f}" + (f", D/E={de:.1f}" if de > 1.5 else "") + ")"
+        risks.append({"text": f"Fundamental Score {f_score:.0f} — cần cải thiện", "type": "negative"})
+
+    # Bear warning
+    if is_bear:
+        risks.append({"text": f"BEAR market (bull={bull_weight*100:.0f}%) — risk management chặt", "type": "warning"})
+
+    technical_view = (
+        f"Structure {structure}, ICT {ict_score:.0f}/alpha {alpha:.0f}, ADX={adx:.0f}"
+        + (" + FVG bull" if ict.get("fvg_bull") else "")
+        + (" + sweep" if ict.get("sweep_bull") else "")
+    )
+    flow_view = (
+        f"NN 7D: {nn7d:+.0f}B, flow {ict.get('flow_direction','neutral')}, "
+        f"inst_flow_score={g(ict,'inst_flow_score',50):.0f}"
+    )
+    summary = (
+        f"{symbol} score={score:.1f} (rank #{screener.get('rank','?')}/{len(screener)}), "
+        f"structure {structure}, ICT {ict_score:.0f}. "
+        f"Regime {regime.get('regime','?')} → {rec.replace('_',' ')}."
+    )
+
     return {
-        "symbol": symbol,
-        "recommendation": recommendation,
-        "summary": summary,
-        "highlights": highlights[:5],  # Limit to 5
-        "risks": risks[:4],  # Limit to 4
+        "symbol":           symbol,
+        "recommendation":   rec,
+        "summary":          summary,
+        "highlights":       highlights[:5],
+        "risks":            risks[:4],
         "fundamental_view": fundamental_view,
-        "technical_view": technical_view,
-        "flow_view": flow_view,
+        "technical_view":   technical_view,
+        "flow_view":        flow_view,
     }
 
 
-def analyze_single_stock_with_ai(row: pd.Series, sector_status: Dict[str, str]) -> Optional[Dict]:
-    """Analyze single stock with AI API."""
-    
-    def safe_get(col, default=0):
-        val = row.get(col, default)
-        return default if pd.isna(val) else val
-    
-    industry = safe_get('industry_name', '')
-    status = sector_status.get(industry, 'neutral')
-    status_text = "đang được tích lũy" if status == 'accumulating' else "đang bị phân phối" if status == 'distributing' else "trung lập"
-    
-    prompt = ANALYSIS_PROMPT_TEMPLATE.format(
-        symbol=row['symbol'],
-        name=safe_get('organ_name', row['symbol']),
-        industry=industry,
-        composite_score=f"{safe_get('composite_score', 50):.1f}",
-        tier=safe_get('tier', 'C'),
-        fundamental_score=f"{safe_get('fundamental_score', 50):.1f}",
-        smart_money_score=f"{safe_get('smart_money_score', 50):.1f}",
-        momentum_score=f"{safe_get('momentum_score', 50):.1f}",
-        technical_score=f"{safe_get('technical_score', 50):.1f}",
-        roe=f"{safe_get('roe', 0):.1f}",
-        roa=f"{safe_get('roa', 0):.1f}",
-        pe=f"{safe_get('pe', 0):.1f}",
-        revenue_growth=f"{safe_get('revenue_growth', 0):.1f}",
-        net_margin=f"{safe_get('net_margin', 0):.1f}",
-        debt_equity=f"{safe_get('debt_equity', 0):.2f}",
-        rsi14=f"{safe_get('rsi14', 50):.0f}",
-        trend_short="↑ Up" if safe_get('trend_short', 0) == 1 else "↓ Down" if safe_get('trend_short', 0) == -1 else "→ Side",
-        price_change_5d=f"{safe_get('price_change_5d', 0):.1f}",
-        price_change_20d=f"{safe_get('price_change_20d', 0):.1f}",
-        foreign_net_7d=f"{safe_get('foreign_net_7d', 0):.1f}",
-        foreign_net_30d=f"{safe_get('foreign_net_30d', 0):.1f}",
-        sector_status=status_text,
-    )
-    
-    response = call_ai(prompt)
-    if response:
-        result = parse_ai_response(response)
-        if result:
-            result['symbol'] = row['symbol']
-            return result
-    
-    return None
+# ─── EXPORT ────────────────────────────────────────────────────────────────
 
-
-# ─── EXPORT FUNCTIONS ──────────────────────────────────────────────────────
-
-def export_analysis(analyses: Dict[str, Dict], model: str):
-    """Export analysis to ai_analysis.json for frontend."""
+def export_analysis(analyses: Dict[str, Dict], model: str) -> None:
     os.makedirs(EXPORT_DIR, exist_ok=True)
-    
-    # Summary statistics
-    rec_counts = {}
+    rec_counts: Dict[str, int] = {}
     for a in analyses.values():
-        rec = a.get('recommendation', 'HOLD')
-        rec_counts[rec] = rec_counts.get(rec, 0) + 1
-    
+        r = a.get("recommendation", "HOLD")
+        rec_counts[r] = rec_counts.get(r, 0) + 1
+
     output = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-        "model": model,
+        "generated_at":   datetime.utcnow().isoformat() + "Z",
+        "model":          model,
         "total_analyzed": len(analyses),
         "summary": {
-            "STRONG_BUY": rec_counts.get('STRONG_BUY', 0),
-            "BUY": rec_counts.get('BUY', 0),
-            "HOLD": rec_counts.get('HOLD', 0),
-            "SELL": rec_counts.get('SELL', 0),
-            "STRONG_SELL": rec_counts.get('STRONG_SELL', 0),
+            "STRONG_BUY":  rec_counts.get("STRONG_BUY", 0),
+            "BUY":         rec_counts.get("BUY", 0),
+            "HOLD":        rec_counts.get("HOLD", 0),
+            "SELL":        rec_counts.get("SELL", 0),
+            "STRONG_SELL": rec_counts.get("STRONG_SELL", 0),
         },
         "analyses": analyses,
     }
-    
+
     out_path = os.path.join(EXPORT_DIR, "ai_analysis.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
-    
-    log.info("✅ Exported → %s", out_path)
-    log.info("   Model: %s", model)
-    log.info("   Total: %d stocks", len(analyses))
-    log.info("   Summary: %s", rec_counts)
+
+    log.info("✅ Exported %d analyses → %s (model=%s)", len(analyses), out_path, model)
+    log.info("   Distribution: %s", rec_counts)
 
 
 # ─── MAIN ──────────────────────────────────────────────────────────────────
 
-def run():
-    """Main function to run AI analysis."""
+def run() -> None:
     log.info("=" * 60)
-    log.info("🤖 AI ANALYST — VN Stock Scanner")
+    log.info("🤖 AI ANALYST v3 — Full Data Context")
     log.info("=" * 60)
-    
-    # Load data
-    conn = create_connection()
-    if conn is None:
-        log.error("Cannot connect to database")
+
+    screener_map             = load_screener()
+    ict_map, regime, mstats  = load_ict_signals()
+    sector_map               = load_sectors()
+
+    if not screener_map:
+        log.error("No screener data. Run workflows 2+3 first.")
         return
-    
-    stocks_df = load_top_stocks(conn, limit=TOP_N_STOCKS)
-    sector_status = load_sector_status(conn)
-    conn.close()
-    
-    if stocks_df.empty:
-        log.error("No stock data available. Run scoring_engine.py first.")
-        return
-    
-    log.info("📊 Loaded %d stocks", len(stocks_df))
-    log.info("📈 Sector status: %d accumulating, %d distributing",
-             sum(1 for v in sector_status.values() if v == 'accumulating'),
-             sum(1 for v in sector_status.values() if v == 'distributing'))
-    
-    # Generate analyses
-    analyses = {}
-    model_used = "rule-based"
-    use_ai = bool(OPENAI_API_KEY or ANTHROPIC_API_KEY)
-    
-    if use_ai:
-        model_used = f"ai-{AI_PROVIDER}"
-        log.info("🤖 Using AI provider: %s", AI_PROVIDER)
-    else:
-        log.info("📋 Using rule-based analysis (no AI API key)")
-    
-    log.info("🔍 Generating analyses...")
-    
-    for i, (_, row) in enumerate(stocks_df.iterrows()):
-        symbol = row['symbol']
-        
-        # Try AI first if available (only for top 10 to save API calls)
-        if use_ai and i < 10:
-            ai_result = analyze_single_stock_with_ai(row, sector_status)
-            if ai_result:
-                analyses[symbol] = ai_result
-                continue
-        
-        # Fallback to rule-based
-        analyses[symbol] = generate_rule_based_analysis(row, sector_status)
-        
+
+    total = len(screener_map)
+    log.info("📊 Screener=%d | ICT=%d | Sectors=%d | Regime=%s (bull=%.0f%%)",
+             total, len(ict_map), len(sector_map),
+             regime.get("regime","?"), (regime.get("bull_weight") or 0) * 100)
+
+    top_syms  = get_top_symbols(screener_map, ict_map, TOP_N_STOCKS)
+    use_ai    = bool(OPENAI_API_KEY or ANTHROPIC_API_KEY)
+    model_str = f"ai-{AI_PROVIDER}" if use_ai else "rule-based-v3"
+
+    log.info("🔍 Analyzing %d stocks | Mode: %s", len(top_syms), model_str)
+
+    analyses: Dict[str, Dict] = {}
+    ai_ok = rb_ok = 0
+
+    for i, sym in enumerate(top_syms):
+        s  = screener_map.get(sym, {})
+        ic = ict_map.get(sym, {})
+        sc = sector_map.get(s.get("industry", ""), {})
+
+        result = None
+
+        if use_ai and i < AI_TOP_N:
+            try:
+                prompt = build_prompt(sym, s, ic, sc, regime, mstats, total)
+                raw = call_ai(prompt)
+                if raw:
+                    parsed = parse_ai_response(raw)
+                    if parsed:
+                        parsed["symbol"] = sym
+                        result = parsed
+                        ai_ok += 1
+            except Exception as e:
+                log.warning("AI failed for %s: %s", sym, e)
+
+        if result is None:
+            result = generate_rule_based(sym, s, ic, sc, regime)
+            rb_ok += 1
+
+        analyses[sym] = result
+
         if (i + 1) % 10 == 0:
-            log.info("   Processed %d/%d stocks", i + 1, len(stocks_df))
-    
-    # Export
-    export_analysis(analyses, model_used)
-    
-    # Summary
+            log.info("   [%d/%d] ai=%d rule=%d", i + 1, len(top_syms), ai_ok, rb_ok)
+
+    export_analysis(analyses, model_str)
+
     log.info("")
-    log.info("📋 Top 5 recommendations:")
-    for symbol, analysis in list(analyses.items())[:5]:
-        log.info("   %s: %s", symbol, analysis.get('recommendation', 'N/A'))
-    
-    log.info("")
-    log.info("✅ AI Analyst completed")
+    log.info("📋 Top 5:")
+    for sym in top_syms[:5]:
+        log.info("   %s → %s", sym, analyses[sym].get("recommendation", "?"))
+    log.info("✅ Done — AI=%d Rule-based=%d", ai_ok, rb_ok)
 
 
 if __name__ == "__main__":
