@@ -704,6 +704,7 @@ export default function Dashboard() {
           sectorStatus={getStockSectorStatus(selectedStock)}
           preloadedAnalysis={aiAnalyses[selectedStock.symbol]}
           ictSignal={ictMap[selectedStock.symbol]}
+          regimeBullWeight={ictData?.regime?.bull_weight}
           onClose={() => setSelectedStock(null)}
         />
       )}
