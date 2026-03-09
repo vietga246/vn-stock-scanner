@@ -4,7 +4,7 @@
 import type { Stock, AIAnalysis, AnalysisPoint } from './types';
 import { computeSignal, actionToRecommendation } from './signals';
 
-export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | 'distributing' | 'neutral'): AIAnalysis {
+export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | 'distributing' | 'neutral', bullWeight?: number): AIAnalysis {
   const analysis: AIAnalysis = {
     symbol: stock.symbol,
     recommendation: 'HOLD',
@@ -23,7 +23,9 @@ export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | '
   const t = stock.technical_score;
 
   // ============ Determine Recommendation (dùng shared computeSignal) ============
-  const sig = computeSignal(score, 0.5, undefined, stock.foreign_net_7d);
+  // bullWeight: từ ICT regime — KHÔNG dùng hardcoded 0.5
+  const bw = bullWeight ?? 0.5;
+  const sig = computeSignal(score, bw, undefined, stock.foreign_net_7d);
   analysis.recommendation = actionToRecommendation(sig.action);
   const recLabels: Record<string, string> = {
     STRONG_BUY:  `${stock.symbol} đang có điểm số xuất sắc (${score.toFixed(1)}) với tất cả các chỉ báo đều tích cực. Cổ phiếu thuộc nhóm chất lượng cao, đây là thời điểm tốt để tích lũy.`,
