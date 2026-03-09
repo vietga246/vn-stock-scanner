@@ -70,6 +70,10 @@ export interface Stock {
   open_history?: number[];
   high_history?: number[];
   low_history?: number[];
+  // v3: backtest-derived scores
+  mean_reversion_score?: number;  // crash bounce edge — short-term signal
+  regime_adj_score?: number;      // composite adjusted for market regime
+
   // Price board (from price_board.json)
   bid1_price?: number; bid1_volume?: number;
   bid2_price?: number; bid2_volume?: number;
