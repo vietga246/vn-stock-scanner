@@ -34,6 +34,11 @@ Chạy sau scoring.py trong GitHub Actions.
 """
 
 import sqlite3
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
+from trading_calendar import trading_date_cutoff
 import pandas as pd
 import numpy as np
 import json
@@ -201,10 +206,12 @@ def load_foreign_flow_series(conn) -> pd.DataFrame:
     Nếu rỗng trả về DataFrame rỗng.
     """
     try:
-        df = pd.read_sql("""
+        from datetime import date as _date
+        cutoff_30d = trading_date_cutoff(30, _date.today())
+        df = pd.read_sql(f"""
             SELECT symbol, date, net_value AS foreign_net
             FROM foreign_trading
-            WHERE date >= date('now', '-30 days')
+            WHERE date >= '{cutoff_30d}'
             ORDER BY date
         """, conn)
         return df
