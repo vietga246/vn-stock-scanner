@@ -1,23 +1,22 @@
-name: "⑥ AI Analysis — Phân tích AI (Manual/Weekly)"
+name: "⑥ AI Analysis — Phân tích AI (Auto-daily/Manual)"
 
 # ============================================================
-# CHỈ CHẠY KHI:
-# 1. Manual trigger (workflow_dispatch) - click "Run workflow"
-# 2. Schedule (Chủ nhật 19:00 ICT)
-#
-# KHÔNG TỰ ĐỘNG TRIGGER TỪ PUSH HOẶC WORKFLOW KHÁC
+# CHẠY KHI:
+# 1. Tự động sau ③ Daily Process hoàn thành (EOD T2-T6)
+# 2. Manual trigger (workflow_dispatch)
 # ============================================================
 
 on:
-  schedule:
-    - cron: "0 12 * * 0"
-  
+  workflow_run:
+    workflows: ["③ Daily Process — Scoring & Sector (sau Daily Collect)"]
+    types: [completed]
+
   workflow_dispatch:
     inputs:
       run_mode:
         description: 'Chế độ chạy'
         required: true
-        default: 'fallback'
+        default: 'ai'
         type: choice
         options:
           - 'fallback'
@@ -27,6 +26,14 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    # Chỉ chạy nếu:
+    # - workflow_dispatch hoặc schedule: luôn chạy
+    # - workflow_run: chỉ khi ③ thành công VÀ là phiên chiều EOD (>= 08:00 UTC = 15:00 ICT)
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success')
     
     steps:
       - name: Checkout code
@@ -34,7 +41,30 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Khi trigger từ workflow_run: chỉ chạy phiên chiều EOD (>= 08:00 UTC)
+      # Phiên sáng (04:45 UTC) bỏ qua — data chưa đầy đủ
+      - name: "🕐 Kiểm tra phiên EOD (chỉ cho workflow_run)"
+        id: eod_check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            HOUR=$(date -u +%H)
+            MINUTE=$(date -u +%M)
+            TOTAL_MIN=$((HOUR * 60 + MINUTE))
+            # >= 08:00 UTC (15:00 ICT) = phiên chiều EOD
+            if [ "$TOTAL_MIN" -ge 480 ]; then
+              echo "is_eod=true" >> $GITHUB_OUTPUT
+              echo "✅ Phiên chiều EOD — chạy AI Analysis"
+            else
+              echo "is_eod=false" >> $GITHUB_OUTPUT
+              echo "⏭️  Phiên sáng — bỏ qua AI Analysis (chỉ chạy EOD)"
+            fi
+          else
+            echo "is_eod=true" >> $GITHUB_OUTPUT
+            echo "✅ Manual/Schedule trigger — luôn chạy"
+          fi
+
       - name: Setup Python
+        if: steps.eod_check.outputs.is_eod == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -42,13 +72,15 @@ jobs:
           cache-dependency-path: pipeline/requirements.txt
 
       - name: Install dependencies
+        if: steps.eod_check.outputs.is_eod == 'true'
         run: |
           pip install -r pipeline/requirements.txt
-          if [ "${{ inputs.run_mode }}" = "ai" ]; then
+          if [ "${{ inputs.run_mode || 'ai' }}" = "ai" ]; then
             pip install openai anthropic
           fi
 
       - name: Restore DB from cache
+        if: steps.eod_check.outputs.is_eod == 'true'
         uses: actions/cache@v4
         with:
           path: data/db/stock.db
@@ -57,6 +89,7 @@ jobs:
             stock-db-
 
       - name: Check DB exists
+        if: steps.eod_check.outputs.is_eod == 'true'
         id: check_db
         run: |
           mkdir -p data/db data/exports
@@ -75,6 +108,7 @@ jobs:
           EXPORT_DIR: data/exports
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RUN_MODE: ${{ inputs.run_mode || 'ai' }}
           AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
           TOP_N_STOCKS: "15"
         run: python pipeline/ai_analyst/ai_analyst.py
