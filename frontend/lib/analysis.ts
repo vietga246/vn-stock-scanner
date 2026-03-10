@@ -86,13 +86,13 @@ export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | '
   if (s >= 70 && nn7d > 0) {
     analysis.flow_view = 'Dòng tiền lớn đang tích lũy mạnh, khối ngoại mua ròng liên tục.';
     analysis.highlights.push({
-      text: `Khối ngoại mua ròng +${nn7d.toFixed(1)}B trong 7 ngày`,
+      text: `Khối ngoại mua ròng +${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))} tỷ trong 7 ngày`,
       type: 'positive'
     });
     
     if (nn30d > nn7d * 3) {
       analysis.highlights.push({
-        text: `Tích lũy bền vững: +${nn30d.toFixed(1)}B trong 30 ngày`,
+        text: `Tích lũy bền vững: +${new Intl.NumberFormat('vi-VN').format(Math.round(nn30d))} tỷ trong 30 ngày`,
         type: 'positive'
       });
     }
@@ -102,7 +102,7 @@ export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | '
     analysis.flow_view = 'Dòng tiền đang rút ra, khối ngoại bán ròng.';
     if (nn7d < 0) {
       analysis.risks.push({
-        text: `Khối ngoại bán ròng ${nn7d.toFixed(1)}B trong 7 ngày`,
+        text: `Khối ngoại bán ròng ${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))} tỷ trong 7 ngày`,
         type: 'negative'
       });
     }
