@@ -117,6 +117,8 @@ export default function Dashboard() {
       ask2_price: pb.ask2_price, ask2_volume: pb.ask2_volume,
       ask3_price: pb.ask3_price, ask3_volume: pb.ask3_volume,
       buy_pressure_pct: pb.buy_pressure_pct,
+      foreign_buy_qty: pb.foreign_buy_qty,
+      foreign_sell_qty: pb.foreign_sell_qty,
     };
   };
   const [searchQuery, setSearchQuery] = useState('');
