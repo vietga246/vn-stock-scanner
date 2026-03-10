@@ -102,6 +102,23 @@ export default function Dashboard() {
 
   // UI state
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+
+  // Merge bid/ask + buy_pressure từ price_board vào stock object
+  const withPriceBoard = (stock: Stock): Stock => {
+    if (!priceBoardData?.stocks) return stock;
+    const pb = priceBoardData.stocks.find((p: any) => p.symbol === stock.symbol);
+    if (!pb) return stock;
+    return {
+      ...stock,
+      bid1_price: pb.bid1_price, bid1_volume: pb.bid1_volume,
+      bid2_price: pb.bid2_price, bid2_volume: pb.bid2_volume,
+      bid3_price: pb.bid3_price, bid3_volume: pb.bid3_volume,
+      ask1_price: pb.ask1_price, ask1_volume: pb.ask1_volume,
+      ask2_price: pb.ask2_price, ask2_volume: pb.ask2_volume,
+      ask3_price: pb.ask3_price, ask3_volume: pb.ask3_volume,
+      buy_pressure_pct: pb.buy_pressure_pct,
+    };
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [industryFilter, setIndustryFilter] = useState<string | null>(null);
@@ -438,7 +455,7 @@ export default function Dashboard() {
           priceBoard={priceBoardData}
           onSymbolClick={(symbol) => {
             const stock = stocks.find((s) => s.symbol === symbol);
-            if (stock) setSelectedStock(stock);
+            if (stock) setSelectedStock(withPriceBoard(stock));
           }}
         />
       </div>
@@ -546,7 +563,7 @@ export default function Dashboard() {
                   paginatedStocks.map((s) => (
                     <tr
                       key={s.symbol}
-                      onClick={() => setSelectedStock(s)}
+                      onClick={() => setSelectedStock(withPriceBoard(s))}
                       className="stock-row cursor-pointer transition-all"
                       style={{ borderBottom: '1px solid #1e2832' }}
                     >
