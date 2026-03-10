@@ -771,9 +771,10 @@ function TradingTab({ stock }: { stock: Stock }) {
 
 // ─── Capital Tab ─────────────────────────────────────────────────────────────
 function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
+  // Luôn hiển thị đơn vị tỷ đồng, format số có dấu phân cách hàng nghìn
   const fmtB = (v: number | null | undefined) => {
     if (v == null) return '–';
-    return Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'T' : v.toFixed(0) + 'B';
+    return new Intl.NumberFormat('vi-VN').format(Math.round(v)) + ' tỷ';
   };
 
   const bal = detail ? [...detail.balance].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)) : [];
