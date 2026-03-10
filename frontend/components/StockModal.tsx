@@ -1683,71 +1683,120 @@ function ModalInner({
           {/* Scores Tab */}
           {activeTab === 'scores' && (
             <div>
-              <div
-                className="p-3 rounded-lg mb-3"
-                style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-              >
+              {/* Component Score Circles */}
+              <div className="p-3 rounded-lg mb-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
                 <div className="text-[11px] mb-3" style={{ color: '#4a5a6a', letterSpacing: '0.5px' }}>
-                  COMPONENT SCORES
+                  COMPONENT SCORES (v5 — 5 trụ cột)
                 </div>
-                <div className="grid grid-cols-4 gap-3">
-                  <ScoreCircle value={stock.fundamental_score} label="FUND" Icon={Shield} />
-                  <ScoreCircle value={stock.smart_money_score} label="FLOW" Icon={Globe} />
-                  <ScoreCircle value={stock.momentum_score} label="MOM" Icon={Zap} />
-                  <ScoreCircle value={stock.technical_score} label="TECH" Icon={Activity} />
+                <div className="grid grid-cols-5 gap-2">
+                  <ScoreCircle value={stock.fundamental_score} label="FUND 35%" Icon={Shield} />
+                  <ScoreCircle value={stock.smart_money_score} label="FLOW 25%" Icon={Globe} />
+                  <ScoreCircle value={stock.momentum_score} label="MOM 10%" Icon={Zap} />
+                  <ScoreCircle value={stock.technical_score} label="TECH 20%" Icon={Activity} />
+                  <ScoreCircle value={stock.mean_reversion_score ?? 50} label="MR 10%" Icon={TrendingUp} />
                 </div>
               </div>
 
-              {/* Score Explanations */}
-              <div className="space-y-2">
-                {[
-                  {
-                    label: 'Fundamental (F)',
-                    value: stock.fundamental_score,
-                    color: '#a855f7',
-                    desc: 'Đánh giá sức khỏe tài chính: ROE, ROA, P/E, tăng trưởng doanh thu',
-                  },
-                  {
-                    label: 'Smart Flow (S)',
-                    value: stock.smart_money_score,
-                    color: '#00d4ff',
-                    desc: 'Dòng tiền thông minh: Khối ngoại, tự doanh, tổ chức',
-                  },
-                  {
-                    label: 'Momentum (M)',
-                    value: stock.momentum_score,
-                    color: '#ffcc00',
-                    desc: 'Cẩn thận: momentum >15% (20D) edge -2.38%. Low volatility (ATR%<2%) outperform',
-                  },
-                  {
-                    label: 'Technical (T)',
-                    value: stock.technical_score,
-                    color: '#00ff88',
-                    desc: 'Backtest v4: RSI oversold (+1.52%), ADX trend, Stochastic, BB %B. MACD loại bỏ (edge âm)',
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="p-2.5 rounded-lg"
-                    style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
-                  >
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[11px] font-semibold" style={{ color: item.color }}>
-                        {item.label}
-                      </span>
-                      <span
-                        className="text-[12px] font-mono font-bold"
-                        style={{ color: getScoreColor(item.value) }}
-                      >
-                        {item.value.toFixed(0)}
-                      </span>
-                    </div>
-                    <p className="text-[11px]" style={{ color: '#6a7a8a' }}>
-                      {item.desc}
-                    </p>
-                  </div>
-                ))}
+              {/* Composite Score Bar */}
+              <div className="p-2.5 rounded-lg mb-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[11px] font-bold" style={{ color: '#00d4ff' }}>COMPOSITE SCORE</span>
+                  <span className="text-[14px] font-mono font-black" style={{ color: getScoreColor(stock.composite_score) }}>
+                    {stock.composite_score.toFixed(1)}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(stock.composite_score, 100)}%`, background: getScoreColor(stock.composite_score), boxShadow: `0 0 8px ${getScoreColor(stock.composite_score)}60` }} />
+                </div>
               </div>
+
+              {/* ── FUNDAMENTAL BREAKDOWN ──────────────────────────── */}
+              {(() => {
+                const fmtPct = (v?: number) => v != null ? (Math.abs(v) < 1 ? (v * 100).toFixed(1) + '%' : v.toFixed(1) + '%') : '–';
+                const fmtX = (v?: number) => v != null ? v.toFixed(1) + 'x' : '–';
+                const subColor = (v: number) => v >= 70 ? '#00ff88' : v >= 50 ? '#00d4ff' : v >= 30 ? '#ffcc00' : '#ff3366';
+
+                type SubItem = { label: string; raw: string; weight: string; note?: string };
+
+                const fundItems: SubItem[] = [
+                  { label: 'ROE', raw: fmtPct(stock.roe), weight: '25%', note: stock.roe != null ? (stock.roe > 0.15 || stock.roe > 15 ? 'Tốt' : stock.roe > 0.08 || stock.roe > 8 ? 'TB' : 'Yếu') : undefined },
+                  { label: 'ROA', raw: fmtPct(stock.roa), weight: '15%' },
+                  { label: 'Revenue Growth', raw: fmtPct(stock.revenue_growth), weight: '20%', note: stock.revenue_growth != null ? ((stock.revenue_growth > 0.1 || stock.revenue_growth > 10) ? 'Tăng trưởng' : stock.revenue_growth < 0 ? 'Suy giảm' : 'Ổn định') : undefined },
+                  { label: 'Net Margin', raw: fmtPct(stock.net_margin), weight: '15%' },
+                  { label: 'P/E', raw: fmtX(stock.pe), weight: '15%', note: stock.pe != null ? (stock.pe < 10 ? 'Rẻ' : stock.pe < 20 ? 'Hợp lý' : 'Đắt') : undefined },
+                  { label: 'D/E', raw: fmtX(stock.debt_equity), weight: '10%', note: stock.debt_equity != null ? (stock.debt_equity < 0.5 ? 'An toàn' : stock.debt_equity < 1.5 ? 'TB' : 'Cao') : undefined },
+                ];
+
+                const flowItems: SubItem[] = [
+                  { label: 'Foreign Net 7D', raw: stock.foreign_net_7d != null ? `${stock.foreign_net_7d >= 0 ? '+' : ''}${Math.round(stock.foreign_net_7d)} tỷ` : '–', weight: '60%', note: stock.foreign_net_7d != null ? (stock.foreign_net_7d > 50 ? 'Mua ròng mạnh' : stock.foreign_net_7d > 0 ? 'Mua ròng' : stock.foreign_net_7d < -50 ? 'Bán ròng mạnh' : 'Bán ròng') : undefined },
+                  { label: 'Foreign Net 30D', raw: stock.foreign_net_30d != null ? `${stock.foreign_net_30d >= 0 ? '+' : ''}${Math.round(stock.foreign_net_30d)} tỷ` : '–', weight: '40%' },
+                ];
+
+                const momItems: SubItem[] = [
+                  { label: 'Price 5D', raw: stock.price_change_5d != null ? `${stock.price_change_5d >= 0 ? '+' : ''}${stock.price_change_5d.toFixed(1)}%` : '–', weight: '25%' },
+                  { label: 'Price 20D', raw: stock.price_change_20d != null ? `${stock.price_change_20d >= 0 ? '+' : ''}${stock.price_change_20d.toFixed(1)}%` : '–', weight: '15%', note: stock.price_change_20d != null ? (stock.price_change_20d > 15 ? '⚠ Edge ~0%' : stock.price_change_20d < -15 ? '🟢 Mean Rev edge' : '') : undefined },
+                  { label: 'Volume Ratio', raw: stock.vol_ratio != null ? `${stock.vol_ratio.toFixed(2)}x` : '–', weight: '30%', note: stock.vol_ratio != null ? (stock.vol_ratio > 2 ? 'Vol spike!' : stock.vol_ratio < 0.5 ? 'Vol dry' : '') : undefined },
+                  { label: 'RS vs Market', raw: '–', weight: '30%' },
+                ];
+
+                const rsi = stock.rsi14 ?? 50;
+                const adx = stock.adx14 ?? 0;
+                const pma20 = stock.pct_from_ma20 ?? 0;
+                const bbW = stock.bb_width ?? 15;
+                const atrP = stock.atr_pct ?? 3;
+
+                const techItems: SubItem[] = [
+                  { label: 'RSI(14)', raw: rsi.toFixed(1), weight: '30%', note: rsi < 30 ? '🟢 Oversold +1.49%' : rsi < 35 ? '🟢 OS nhẹ +1.00%' : rsi > 80 ? '🔴 OB! -0.34%' : rsi > 70 ? '🟡 Overbought' : 'Trung tính' },
+                  { label: 'BB Position', raw: `MA20: ${pma20.toFixed(1)}%`, weight: '25%', note: pma20 < -(bbW/2) ? '🟢 Below BB ↓ win 58.6%' : pma20 > (bbW/2) ? 'Above BB ↑' : 'Trong dải BB' },
+                  { label: 'Stoch/W%R', raw: stock.williams_r != null ? `W%R: ${stock.williams_r.toFixed(0)}` : (stock.stoch_k != null ? `K: ${stock.stoch_k.toFixed(0)}` : '–'), weight: '20%', note: (stock.williams_r ?? -50) < -80 ? '🟢 Oversold' : (stock.williams_r ?? -50) > -20 ? '🔴 Overbought' : '' },
+                  { label: 'Trend', raw: (stock.trend_short ?? 0) > 0 ? 'UP ↑' : (stock.trend_short ?? 0) < 0 ? 'DOWN ↓' : 'Sideways', weight: '15%', note: (stock.trend_medium ?? 0) > 0 ? 'MA20>MA50 ✓' : '' },
+                  { label: 'ADX', raw: adx.toFixed(1), weight: '10%', note: adx > 30 ? 'Trend mạnh' : adx > 25 ? 'Trending' : 'Yếu' },
+                ];
+
+                const p20d = stock.price_change_20d ?? 0;
+                const mrItems: SubItem[] = [
+                  { label: 'Crash 20D', raw: `${p20d >= 0 ? '+' : ''}${p20d.toFixed(1)}%`, weight: '–', note: p20d < -15 ? '🟢 Crash bounce +3.3%' : p20d < -10 ? '🟢 Dip bounce +1.8%' : p20d > 15 ? '🟡 No edge' : '' },
+                  { label: 'Distance MA20', raw: `${pma20 >= 0 ? '+' : ''}${pma20.toFixed(1)}%`, weight: '–', note: pma20 < -10 ? '🟢 Panic zone' : '' },
+                  { label: 'RSI Level', raw: rsi.toFixed(0), weight: '–', note: rsi < 30 ? '🟢 Deep OS' : rsi < 40 ? 'OS vùng phục hồi' : '' },
+                  { label: 'ATR%', raw: `${atrP.toFixed(1)}%`, weight: '–', note: atrP > 5 ? '⚠ Vol cao' : atrP < 2 ? '🟢 Vol thấp +1.46%' : '' },
+                ];
+
+                const sections = [
+                  { label: 'Fundamental', color: '#a855f7', score: stock.fundamental_score, weight: '35%', items: fundItems },
+                  { label: 'Smart Flow', color: '#00d4ff', score: stock.smart_money_score, weight: '25%', items: flowItems },
+                  { label: 'Momentum', color: '#ffcc00', score: stock.momentum_score, weight: '10%', items: momItems },
+                  { label: 'Technical', color: '#00ff88', score: stock.technical_score, weight: '20%', items: techItems },
+                  { label: 'Mean Reversion', color: '#ff9500', score: stock.mean_reversion_score ?? 50, weight: '10%', items: mrItems },
+                ];
+
+                return (
+                  <div className="space-y-2">
+                    {sections.map(sec => (
+                      <div key={sec.label} className="rounded-lg overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+                        {/* Section header */}
+                        <div className="flex justify-between items-center px-3 py-2" style={{ borderBottom: '1px solid #1e2832' }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-bold" style={{ color: sec.color }}>{sec.label}</span>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${sec.color}12`, color: `${sec.color}aa`, border: `1px solid ${sec.color}20` }}>{sec.weight}</span>
+                          </div>
+                          <span className="text-[13px] font-mono font-black" style={{ color: getScoreColor(sec.score) }}>{sec.score.toFixed(0)}</span>
+                        </div>
+                        {/* Sub-items */}
+                        <div className="px-3 py-1.5">
+                          {sec.items.map(item => (
+                            <div key={item.label} className="flex items-center gap-2 py-1" style={{ borderBottom: '1px solid #0d1520' }}>
+                              <span className="text-[10px] w-[110px] shrink-0" style={{ color: '#6a7a8a' }}>{item.label}</span>
+                              <span className="text-[10px] font-mono font-semibold w-[70px] shrink-0" style={{ color: '#c8d4e0' }}>{item.raw}</span>
+                              <span className="text-[9px] w-[30px] shrink-0" style={{ color: '#3a4a5a' }}>{item.weight}</span>
+                              {item.note && <span className="text-[9px]" style={{ color: item.note.startsWith('🟢') ? '#00ff88' : item.note.startsWith('🔴') ? '#ff3366' : item.note.startsWith('🟡') || item.note.startsWith('⚠') ? '#ff9500' : '#4a5a6a' }}>{item.note}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
