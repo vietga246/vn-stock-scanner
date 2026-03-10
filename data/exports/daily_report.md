@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 10/03/2026
 
-> Cập nhật lúc 06:40 ICT
+> Cập nhật lúc 07:01 ICT
 
 ---
 
@@ -21,8 +21,8 @@
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
 | 1 | DGC | CTCP Tập đoàn Hóa ch | SX Nhựa - Hóa c | 70.5 | A | Mua |
-| 2 | DCM | CTCP - Tổng công ty  | SX Nhựa - Hóa c | 67.6 | B | Mua |
-| 3 | PVT | Tổng Công ty cổ phần | Vận tải - kho b | 67.4 | B | Mua |
+| 2 | DCM | CTCP - Tổng công ty  | SX Nhựa - Hóa c | 67.6 | B | Giữ |
+| 3 | PVT | Tổng Công ty cổ phần | Vận tải - kho b | 67.4 | B | Giữ |
 | 4 | FDC | CTCP Ngoại thương và | Bất động sản | 65.5 | B | Giữ |
 | 5 | VNM | CTCP Sữa Việt Nam | Thực phẩm - Đồ  | 65.2 | B | Giữ |
 | 6 | DNC | CTCP Điện Nước Lắp m | Tiện ích | 64.8 | B | Giữ |
