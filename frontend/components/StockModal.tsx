@@ -547,7 +547,6 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
 // ─── Finance Tab ─────────────────────────────────────────────────────────────
 function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
-  // Luôn hiển thị đơn vị tỷ đồng
   const fmtB = (v: number | null | undefined) => {
     if (v == null) return '–';
     return new Intl.NumberFormat('vi-VN').format(Math.round(v)) + ' tỷ';
@@ -564,13 +563,18 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
   const ratio = [...detail.ratio].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
   const latestR = ratio[0] ?? null;
   const cf = [...detail.cashflow].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6);
+  const bal = [...detail.balance].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
+  const latestBal = bal[0] ?? null;
+  const annual = bal.filter((b) => b.quarter === 4).slice(0, 5).reverse();
+  const totalAssets = latestBal ? (latestBal.total_assets || 1) : 1;
 
   return (
     <div className="space-y-3">
+      {/* ── 1. CHỈ SỐ ĐÁNH GIÁ HIỆU QUẢ ────────────────────── */}
       {latestR && (
         <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
           <div className="text-[10px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
-            CHỈ SỐ ĐỊNH GIÁ & HIỆU QUẢ
+            📊 CHỈ SỐ ĐÁNH GIÁ HIỆU QUẢ — Q{latestR.quarter}/{latestR.year}
           </div>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -582,7 +586,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
               { label: 'ROIC', val: latestR.roic != null ? latestR.roic.toFixed(1) : '–', note: '%', color: colPct(latestR.roic ?? 0) },
               { label: 'Gross Margin', val: latestR.gross_margin != null ? latestR.gross_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.gross_margin ?? 0) },
               { label: 'Net Margin', val: latestR.net_margin != null ? latestR.net_margin.toFixed(1) : '–', note: '%', color: colPct(latestR.net_margin ?? 0) },
-              { label: 'D/E', val: latestR.debt_equity != null ? latestR.debt_equity.toFixed(2) : '–', note: 'x', color: undefined as string | undefined },
+              { label: 'D/E', val: latestR.debt_equity != null ? latestR.debt_equity.toFixed(2) : '–', note: 'x', color: latestR.debt_equity != null ? (latestR.debt_equity > 2 ? '#ff3366' : latestR.debt_equity > 1 ? '#ff9500' : '#00d4ff') : undefined },
             ].map(({ label, val, note, color }) => (
               <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
                 <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
@@ -594,10 +598,85 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
           </div>
         </div>
       )}
+
+      {/* ── 2. BẢNG CÂN ĐỐI KẾ TOÁN — QUÝ GẦN NHẤT ─────── */}
+      {latestBal && (
+        <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
+            🏦 BẢNG CÂN ĐỐI KẾ TOÁN — Q{latestBal.quarter}/{latestBal.year}
+          </div>
+          {[
+            { label: 'Tổng tài sản', val: latestBal.total_assets, color: '#00d4ff' },
+            { label: 'Vốn chủ sở hữu', val: latestBal.total_equity, color: '#00ff88' },
+            { label: 'Tổng nợ', val: latestBal.total_debt, color: '#ff9500' },
+            { label: 'Nợ ngắn hạn', val: latestBal.short_term_debt, color: '#ff3366' },
+            { label: 'Tiền mặt', val: latestBal.cash, color: '#a78bfa' },
+          ].map(({ label, val, color }) => (
+            <div key={label} className="mb-2">
+              <div className="flex justify-between mb-1">
+                <span className="text-[11px]" style={{ color: '#8b99a8' }}>{label}</span>
+                <span className="font-mono text-[11px] font-semibold" style={{ color }}>{fmtB(val)}</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
+                <div className="h-full rounded-full" style={{ width: Math.min((val / totalAssets) * 100, 100) + '%', background: color, boxShadow: `0 0 4px ${color}40` }} />
+              </div>
+            </div>
+          ))}
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            {latestBal.total_equity > 0 ? [
+              { label: 'Đòn bẩy (D/E)', val: (latestBal.total_debt / latestBal.total_equity).toFixed(2) + 'x', color: latestBal.total_debt / latestBal.total_equity > 2 ? '#ff3366' : '#00d4ff' },
+              { label: 'Cash / Equity', val: ((latestBal.cash / latestBal.total_equity) * 100).toFixed(1) + '%', color: '#a78bfa' },
+            ].map(({ label, val, color }) => (
+              <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
+                <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+                <div className="font-mono text-sm font-bold" style={{ color }}>{val}</div>
+              </div>
+            )) : null}
+          </div>
+        </div>
+      )}
+
+      {/* ── 3. XU HƯỚNG VỐN HÀNG NĂM ────────────────────────── */}
+      {annual.length > 0 && (
+        <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
+            📈 XU HƯỚNG VỐN (HÀNG NĂM)
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr style={{ borderBottom: '1px solid #1e2832' }}>
+                  <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ số</th>
+                  {annual.map((r) => (
+                    <th key={r.year} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>{r.year}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { label: 'Tổng TS', key: 'total_assets' as const, color: '#00d4ff' },
+                  { label: 'VCSH', key: 'total_equity' as const, color: '#00ff88' },
+                  { label: 'Tổng nợ', key: 'total_debt' as const, color: '#ff9500' },
+                  { label: 'Tiền mặt', key: 'cash' as const, color: '#a78bfa' },
+                ].map(({ label, key, color }) => (
+                  <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
+                    <td className="p-2 font-medium" style={{ color }}>{label}</td>
+                    {annual.map((r) => (
+                      <td key={r.year} className="p-2 text-right font-mono" style={{ color: '#e2e8f0' }}>{fmtB(r[key])}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 4. KẾT QUẢ KINH DOANH ────────────────────────────── */}
       {income.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
           <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
-            KẾT QUẢ KINH DOANH
+            💰 KẾT QUẢ KINH DOANH
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-[11px]">
@@ -605,28 +684,27 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
                 <tr style={{ borderBottom: '1px solid #1e2832' }}>
                   <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ tiêu</th>
                   {income.map((r) => (
-                    <th key={r.year + '-' + r.quarter} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>
-                      Q{r.quarter}/{r.year}
-                    </th>
+                    <th key={r.year + '-' + r.quarter} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>Q{r.quarter}/{r.year}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {[
                   { label: 'Doanh thu', key: 'revenue' as const },
-                  { label: 'Lợi nhuận', key: 'net_profit' as const },
+                  { label: 'LN gộp', key: 'gross_profit' as const },
+                  { label: 'LN ròng', key: 'net_profit' as const },
                 ].map(({ label, key }) => (
                   <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
                     <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>{label}</td>
                     {income.map((r) => (
-                      <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono" style={{ color: '#e2e8f0' }}>{fmtB(r[key])}</td>
+                      <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono" style={{ color: r[key] != null && r[key] < 0 ? '#ff3366' : '#e2e8f0' }}>{fmtB(r[key])}</td>
                     ))}
                   </tr>
                 ))}
                 <tr style={{ borderBottom: '1px solid #0d1520' }}>
                   <td className="p-2 font-medium" style={{ color: '#8b99a8' }}>Tăng trưởng DT</td>
                   {income.map((r) => (
-                    <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono" style={{ color: r.revenue_growth != null ? (r.revenue_growth >= 0 ? '#00ff88' : '#ff3366') : '#4a5a6a' }}>
+                    <td key={r.year + '-' + r.quarter} className="p-2 text-right font-mono font-semibold" style={{ color: r.revenue_growth != null ? (r.revenue_growth >= 0 ? '#00ff88' : '#ff3366') : '#4a5a6a' }}>
                       {r.revenue_growth != null ? (r.revenue_growth >= 0 ? '+' : '') + r.revenue_growth.toFixed(1) + '%' : '–'}
                     </td>
                   ))}
@@ -636,10 +714,12 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
           </div>
         </div>
       )}
+
+      {/* ── 5. DÒNG TIỀN ─────────────────────────────────────── */}
       {cf.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
           <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
-            DÒNG TIỀN
+            💸 DÒNG TIỀN
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-[11px]">
@@ -647,17 +727,15 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
                 <tr style={{ borderBottom: '1px solid #1e2832' }}>
                   <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ tiêu</th>
                   {cf.map((r) => (
-                    <th key={r.year + '-' + r.quarter} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>
-                      Q{r.quarter}/{r.year}
-                    </th>
+                    <th key={r.year + '-' + r.quarter} className="p-2 text-right font-semibold" style={{ color: '#4a5a6a' }}>Q{r.quarter}/{r.year}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { label: 'HĐKD', key: 'cfo' as const },
-                  { label: 'HĐĐT', key: 'cfi' as const },
-                  { label: 'HĐTC', key: 'cff' as const },
+                  { label: 'HĐKD (CFO)', key: 'cfo' as const },
+                  { label: 'HĐĐT (CFI)', key: 'cfi' as const },
+                  { label: 'HĐTC (CFF)', key: 'cff' as const },
                   { label: 'CapEx', key: 'capex' as const },
                 ].map(({ label, key }) => (
                   <tr key={label} style={{ borderBottom: '1px solid #0d1520' }}>
@@ -1535,7 +1613,6 @@ function ModalInner({
     { id: 'scores',    label: 'Điểm số',    icon: Activity },
     { id: 'finance',   label: 'Tài chính',  icon: BarChart3 },
     { id: 'trading',   label: 'Giao dịch',  icon: TrendingUp },
-    { id: 'capital',   label: 'Vốn',        icon: Shield },
     { id: 'stats',     label: 'Thống kê',   icon: Activity },
   ];
   const tabs = ictSignal ? [...baseTabs, { id: 'ict', label: '🧠 ICT', icon: Info }] : baseTabs;
@@ -1838,9 +1915,6 @@ function ModalInner({
         {/* ── TAB: GIAO DỊCH ───────────────────────────────── */}
         {activeTab === 'trading' && <TradingTab stock={stock} />}
 
-        {/* ── TAB: VỐN ─────────────────────────────────────── */}
-        {activeTab === 'capital' && <CapitalTab detail={detail} detailLoading={detailLoading} />}
-
         {/* ── TAB: THỐNG KÊ ────────────────────────────────── */}
         {activeTab === 'stats' && <StatsTab stock={stock} />}
 
@@ -1880,7 +1954,7 @@ export default function StockModal({
 
   useEffect(() => {
     if (!stock || detail) return;
-    const needsDetail = ['finance', 'trading', 'capital', 'stats'].includes(activeTab);
+    const needsDetail = ['finance', 'trading', 'stats'].includes(activeTab);
     if (!needsDetail) return;
     setDetailLoading(true);
     getStockDetails()
