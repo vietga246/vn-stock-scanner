@@ -546,14 +546,14 @@ export default function Dashboard() {
                   <th onClick={() => handleSort('foreign_net_7d')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>NN 7D</th>
                   <th onClick={() => handleSort('adx14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>ADX</th>
                   <th onClick={() => handleSort('rsi14')} className="p-2 text-right text-[9px] font-medium cursor-pointer" style={{ color: '#4a5a6a' }}>RSI</th>
-                  <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>ICT</th>
+                  <th className="p-2 text-center text-[9px] font-medium" style={{ color: '#4a5a6a' }}>STRATEGY</th>
                   <th className="p-2 text-right text-[9px] font-medium w-[100px]" style={{ color: '#4a5a6a' }}>30D</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedStocks.length === 0 ? (
                   <tr>
-                    <td colSpan={13} className="p-8 text-center">
+                    <td colSpan={14} className="p-8 text-center">
                       <div style={{ color: '#4a5a6a' }}>
                         <Search size={32} className="mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Không tìm thấy kết quả</p>
@@ -650,68 +650,91 @@ export default function Dashboard() {
                         )}
                       </td>
                       <td className="p-2 text-center">
-                        <div className="flex items-center justify-center gap-0.5 flex-wrap">
-                          {s.fvg_bull && (
-                            <span
-                              className="px-1 py-0.5 rounded text-[7px] font-bold"
-                              style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}
-                              title="Fair Value Gap Bullish"
-                            >
-                              FVG
-                            </span>
-                          )}
-                          {(s.trend_strength != null && (s.trend_strength || 0) >= 65) && (
-                            <span
-                              className="px-1 py-0.5 rounded text-[7px] font-bold"
-                              style={{ background: '#00d4ff15', color: '#00d4ff', border: '1px solid #00d4ff30' }}
-                              title={`Trend strength: ${s.trend_strength}`}
-                            >
-                              TRD
-                            </span>
-                          )}
-                          {/* v4 Backtest signals */}
-                          {(s.rsi14 != null && s.rsi14 < 30) && (
-                            <span
-                              className="px-1 py-0.5 rounded text-[7px] font-bold"
-                              style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}
-                              title={`RSI ${s.rsi14?.toFixed(0)} < 30 — Backtest edge +1.52%`}
-                            >
-                              OS
-                            </span>
-                          )}
-                          {(s.rsi14 != null && s.rsi14 > 80) && (
-                            <span
-                              className="px-1 py-0.5 rounded text-[7px] font-bold"
-                              style={{ background: '#ff336615', color: '#ff3366', border: '1px solid #ff336630' }}
-                              title={`RSI ${s.rsi14?.toFixed(0)} > 80 — Backtest edge -2.91%`}
-                            >
-                              OB
-                            </span>
-                          )}
-                          {(s.bb_pct != null && s.bb_pct < 0) && (
-                            <span
-                              className="px-1 py-0.5 rounded text-[7px] font-bold"
-                              style={{ background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}
-                              title={`BB%B < 0 — Win 51%, edge +1.08%`}
-                            >
-                              BB↓
-                            </span>
-                          )}
-                          {(s.atr_pct != null && s.atr_pct < 2) && (
-                            <span
-                              className="px-1 py-0.5 rounded text-[7px] font-bold"
-                              style={{ background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}
-                              title={`ATR% < 2% — Low vol, Sharpe 0.154`}
-                            >
-                              LV
-                            </span>
-                          )}
-                          {!s.fvg_bull && !(s.trend_strength != null && (s.trend_strength || 0) >= 65)
-                            && !(s.rsi14 != null && s.rsi14 < 30) && !(s.rsi14 != null && s.rsi14 > 80)
-                            && !(s.bb_pct != null && s.bb_pct < 0) && !(s.atr_pct != null && s.atr_pct < 2) && (
-                            <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>
-                          )}
-                        </div>
+                        {(() => {
+                          // ── Strategy signal detection (v5 backtest 493K obs) ──
+                          const rsi = s.rsi14 ?? 50;
+                          const adx = s.adx14 ?? 0;
+                          const trend = s.trend_short ?? 0;
+                          const trendMed = s.trend_medium ?? 0;
+                          const p20d = s.price_change_20d ?? s.change_20d ?? 0;
+                          const pma20 = s.pct_from_ma20 ?? 0;
+                          const bbPct = s.bb_pct ?? 0.5;
+                          const bbWidth = s.bb_width ?? 15;
+                          const stochK = s.stoch_k ?? 50;
+
+                          // Priority signals ordered by edge (strongest first)
+                          type Sig = { label: string; color: string; bg: string; border: string; title: string };
+                          let sig: Sig | null = null;
+
+                          // 1. Panic Bottom: drop>10%MA20 + RSI<30 → edge +4.26%, win 65.8%
+                          if (pma20 < -10 && rsi < 30) {
+                            sig = { label: 'PANIC', color: '#00ff88', bg: '#00ff8818', border: '#00ff8840',
+                              title: `Panic Bottom: MA20 ${pma20.toFixed(0)}%, RSI ${rsi.toFixed(0)} → edge +4.26%, win 65.8%` };
+                          }
+                          // 2. Crash -15% + RSI<40 → edge +3.32%, win 62%
+                          else if (p20d < -15 && rsi < 40) {
+                            sig = { label: 'CRASH', color: '#00ff88', bg: '#00ff8815', border: '#00ff8835',
+                              title: `Crash ${p20d.toFixed(0)}% + RSI ${rsi.toFixed(0)} → edge +3.32%, win 62%` };
+                          }
+                          // 3. Super Combo: Trend+ADX>25+RSI<35 → edge +3.27%, win 59.2%
+                          else if (trend === 1 && adx > 25 && rsi < 35) {
+                            sig = { label: 'COMBO', color: '#00d4ff', bg: '#00d4ff18', border: '#00d4ff40',
+                              title: `Trend+ADX ${adx.toFixed(0)}+RSI ${rsi.toFixed(0)} → edge +3.27%, win 59.2%` };
+                          }
+                          // 4. RSI < 30 → edge +1.49%, win 52.9%
+                          else if (rsi < 30) {
+                            sig = { label: 'OS', color: '#00ff88', bg: '#00ff8812', border: '#00ff8830',
+                              title: `RSI ${rsi.toFixed(0)} < 30 → edge +1.49%, win 52.9%` };
+                          }
+                          // 5. BB Below Lower → edge +1.11%, win 58.6%
+                          else if (pma20 < -(bbWidth/2)) {
+                            sig = { label: 'BB↓', color: '#a78bfa', bg: '#a78bfa12', border: '#a78bfa30',
+                              title: `BB Below Lower Band → edge +1.11%, win 58.6%` };
+                          }
+                          // 6. Crash -10% → edge +1.76%, win 57.4%
+                          else if (p20d < -10) {
+                            sig = { label: 'DIP', color: '#ffcc00', bg: '#ffcc0012', border: '#ffcc0030',
+                              title: `Crash ${p20d.toFixed(0)}% → edge +1.76%, win 57.4%` };
+                          }
+                          // 7. RSI < 35 → edge +1.00%, win 53.7%
+                          else if (rsi < 35) {
+                            sig = { label: 'OS', color: '#00ff8899', bg: '#00ff8808', border: '#00ff8825',
+                              title: `RSI ${rsi.toFixed(0)} < 35 → edge +1.00%, win 53.7%` };
+                          }
+                          // 8. Stoch OS in Uptrend → edge +0.52%, win 53.8%
+                          else if (stochK < 20 && trendMed === 1) {
+                            sig = { label: 'PULL', color: '#00d4ff', bg: '#00d4ff08', border: '#00d4ff25',
+                              title: `Stoch ${stochK.toFixed(0)} pullback in uptrend → edge +0.52%, win 53.8%` };
+                          }
+                          // SELL: RSI > 80 → edge -0.34%, win 43.2%
+                          else if (rsi > 80) {
+                            sig = { label: 'OB!', color: '#ff3366', bg: '#ff336618', border: '#ff336640',
+                              title: `RSI ${rsi.toFixed(0)} > 80 — Overbought, win chỉ 43.2%` };
+                          }
+                          // WARN: RSI > 70
+                          else if (rsi > 70) {
+                            sig = { label: 'OB', color: '#ff9500', bg: '#ff950010', border: '#ff950030',
+                              title: `RSI ${rsi.toFixed(0)} > 70 — Overbought zone` };
+                          }
+                          // WARN: Strong momentum >15% → no edge
+                          else if (p20d > 15) {
+                            sig = { label: 'HOT', color: '#ff9500', bg: '#ff950008', border: '#ff950025',
+                              title: `Tăng ${p20d.toFixed(0)}% 20D — momentum mạnh nhưng edge ~0%` };
+                          }
+
+                          if (sig) {
+                            return (
+                              <span
+                                className="px-1.5 py-0.5 rounded text-[7px] font-bold tracking-wide whitespace-nowrap"
+                                style={{ background: sig.bg, color: sig.color, border: `1px solid ${sig.border}`, boxShadow: `0 0 6px ${sig.color}15` }}
+                                title={sig.title}
+                              >
+                                {sig.label}
+                              </span>
+                            );
+                          }
+                          return <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>;
+                        })()}
                       </td>
                       <td className="p-2 text-right overflow-visible" onClick={(e) => e.stopPropagation()}>
                         {s.price_history && s.price_history.length > 1 ? (
