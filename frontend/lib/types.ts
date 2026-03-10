@@ -70,10 +70,6 @@ export interface Stock {
   open_history?: number[];
   high_history?: number[];
   low_history?: number[];
-  // v3: backtest-derived scores
-  mean_reversion_score?: number;  // crash bounce edge — short-term signal
-  regime_adj_score?: number;      // composite adjusted for market regime
-
   // Price board (from price_board.json)
   bid1_price?: number; bid1_volume?: number;
   bid2_price?: number; bid2_volume?: number;
@@ -167,10 +163,12 @@ export interface PriceBoardStock {
   foreign_net_qty?: number;
   foreign_net_value_bn?: number;
   foreign_room?: number;
-  bid1_price?: number;
-  bid1_volume?: number;
-  ask1_price?: number;
-  ask1_volume?: number;
+  bid1_price?: number; bid1_volume?: number;
+  bid2_price?: number; bid2_volume?: number;
+  bid3_price?: number; bid3_volume?: number;
+  ask1_price?: number; ask1_volume?: number;
+  ask2_price?: number; ask2_volume?: number;
+  ask3_price?: number; ask3_volume?: number;
   buy_pressure_pct?: number;
 }
 
