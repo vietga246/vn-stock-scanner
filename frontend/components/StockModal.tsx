@@ -78,7 +78,7 @@ function ScoreCircle({
           />
         </svg>
         <div
-          className="absolute inset-0 flex items-center justify-center font-mono font-bold text-[10px]"
+          className="absolute inset-0 flex items-center justify-center font-mono font-bold text-[11px]"
           style={{ color, textShadow: '0 0 6px ' + color + '50' }}
         >
           {value?.toFixed(0)}
@@ -86,7 +86,7 @@ function ScoreCircle({
       </div>
       <div className="flex items-center justify-center gap-1 mt-1.5">
         <Icon size={9} color="#4a5a6a" />
-        <span className="text-[9px]" style={{ color: '#4a5a6a' }}>
+        <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
           {label}
         </span>
       </div>
@@ -110,7 +110,7 @@ function HighlightItem({ item }: { item: { text: string; type: string } }) {
       style={{ background: style.bg, border: '1px solid ' + (style.border) }}
     >
       <IconComp size={12} color={style.text} className="mt-0.5 flex-shrink-0" />
-      <span className="text-[11px]" style={{ color: style.text }}>
+      <span className="text-[12px]" style={{ color: style.text }}>
         {item.text}
       </span>
     </div>
@@ -179,15 +179,15 @@ function AnalysisTab({
           {/* AI badge */}
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg"
             style={{ background: '#00d4ff0c', border: '1px solid #00d4ff25' }}>
-            <span className="text-[9px]">🤖</span>
-            <span className="text-[9px] font-semibold tracking-widest" style={{ color: '#00d4ff' }}>
+            <span className="text-[10px]">🤖</span>
+            <span className="text-[10px] font-semibold tracking-widest" style={{ color: '#00d4ff' }}>
               AI ANALYSIS — GPT-4o
             </span>
           </div>
           {/* Báo cáo chi tiết button */}
           <button
             onClick={() => window.open(`/report/${stock.symbol}`, '_blank')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-widest transition-all"
             style={{
               background: '#00d4ff12',
               border: '1px solid #00d4ff40',
@@ -218,7 +218,7 @@ function AnalysisTab({
               {hasAI ? (ai.executive_summary ?? ai.summary ?? d.headline) : d.headline}
             </div>
             {!hasAI && (
-              <div className="text-[9px] mt-0.5 font-semibold tracking-widest" style={{ color: cc.color }}>
+              <div className="text-[10px] mt-0.5 font-semibold tracking-widest" style={{ color: cc.color }}>
                 {cc.label}
               </div>
             )}
@@ -230,7 +230,7 @@ function AnalysisTab({
         </div>
         {/* Narrative (rule-based only, AI uses executive_summary above) */}
         {!hasAI && (
-          <p className="text-[11px] leading-relaxed" style={{ color: '#c8d4e0' }}>{d.narrative}</p>
+          <p className="text-[12px] leading-relaxed" style={{ color: '#c8d4e0' }}>{d.narrative}</p>
         )}
       </div>
 
@@ -241,10 +241,10 @@ function AnalysisTab({
           {aiSections.regime_impact && (
             <div className="rounded-lg px-3 py-2"
               style={{ background: '#ff950008', border: '1px solid #ff950025' }}>
-              <div className="text-[8px] font-semibold tracking-widest mb-1" style={{ color: '#ff9500' }}>
+              <div className="text-[9px] font-semibold tracking-widest mb-1" style={{ color: '#ff9500' }}>
                 🌐 MARKET REGIME
               </div>
-              <p className="text-[10px] leading-relaxed" style={{ color: '#c8d4e0' }}>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#c8d4e0' }}>
                 {aiSections.regime_impact}
               </p>
             </div>
@@ -261,12 +261,12 @@ function AnalysisTab({
               <div key={key} className="rounded-lg p-2.5"
                 style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
                 <div className="flex items-center gap-1 mb-1">
-                  <span className="text-[10px]">{icon}</span>
-                  <div className="text-[8px] font-semibold tracking-widest" style={{ color: accent }}>
+                  <span className="text-[11px]">{icon}</span>
+                  <div className="text-[9px] font-semibold tracking-widest" style={{ color: accent }}>
                     {label}
                   </div>
                 </div>
-                <p className="text-[10px] leading-relaxed" style={{ color: '#a8b8c8' }}>
+                <p className="text-[11px] leading-relaxed" style={{ color: '#a8b8c8' }}>
                   {aiSections[key]}
                 </p>
               </div>
@@ -279,10 +279,10 @@ function AnalysisTab({
       {hasAI && priceLevels && (priceLevels.support || priceLevels.resistance) && (
         <div className="rounded-xl p-3 mb-3"
           style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
             📍 ICT PRICE LEVELS
           </div>
-          <div className="grid grid-cols-3 gap-2 text-[10px]">
+          <div className="grid grid-cols-3 gap-2 text-[11px]">
             {[
               { label: '🟢 Support',    val: priceLevels.support,    col: '#00ff88' },
               { label: '🔴 Resistance', val: priceLevels.resistance, col: '#ff3366' },
@@ -290,8 +290,8 @@ function AnalysisTab({
             ].filter(r => r.val).map(({ label, val, col }) => (
               <div key={label} className="p-2 rounded-lg"
                 style={{ background: '#0a0f14', border: '1px solid ' + col + '25' }}>
-                <div className="text-[8px] mb-1" style={{ color: col + 'aa' }}>{label}</div>
-                <div className="font-mono text-[9px] font-semibold leading-snug" style={{ color: col }}>
+                <div className="text-[9px] mb-1" style={{ color: col + 'aa' }}>{label}</div>
+                <div className="font-mono text-[10px] font-semibold leading-snug" style={{ color: col }}>
                   {val}
                 </div>
               </div>
@@ -304,10 +304,10 @@ function AnalysisTab({
       {!hasAI && (d.setup.entry_zone || d.setup.stop_loss) && (
         <div className="rounded-xl p-3 mb-3"
           style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
             TRADE SETUP
           </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px]">
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
             {[
               { label: '📍 Entry Zone',    val: d.setup.entry_zone   },
               { label: '🛑 Stop Loss',     val: d.setup.stop_loss    },
@@ -324,7 +324,7 @@ function AnalysisTab({
             ))}
           </div>
           {d.setup.invalidation && (
-            <div className="mt-2 p-2 rounded-lg text-[10px]"
+            <div className="mt-2 p-2 rounded-lg text-[11px]"
               style={{ background: '#ff336610', border: '1px solid #ff336630' }}>
               <span style={{ color: '#ff3366' }}>⚡ Invalidation: </span>
               <span style={{ color: '#c8d4e0' }}>{d.setup.invalidation}</span>
@@ -343,12 +343,12 @@ function AnalysisTab({
             {highlights.length > 0 && (
               <div className="rounded-xl p-2.5"
                 style={{ background: '#00ff8808', border: '1px solid #00ff8828' }}>
-                <div className="text-[9px] font-semibold mb-1.5 tracking-widest" style={{ color: '#00ff88' }}>
+                <div className="text-[10px] font-semibold mb-1.5 tracking-widest" style={{ color: '#00ff88' }}>
                   ✅ {hasAI ? 'HIGHLIGHTS' : 'CATALYSTS'}
                 </div>
                 <ul className="space-y-1">
                   {highlights.map((h, i) => (
-                    <li key={i} className="text-[10px] leading-snug flex gap-1.5" style={{ color: '#c8d4e0' }}>
+                    <li key={i} className="text-[11px] leading-snug flex gap-1.5" style={{ color: '#c8d4e0' }}>
                       <span style={{ color: '#00ff88' }}>+</span>{h.text}
                     </li>
                   ))}
@@ -358,14 +358,14 @@ function AnalysisTab({
             {risks.length > 0 && (
               <div className="rounded-xl p-2.5"
                 style={{ background: '#ff336808', border: '1px solid #ff336828' }}>
-                <div className="text-[9px] font-semibold mb-1.5 tracking-widest" style={{ color: '#ff3366' }}>
+                <div className="text-[10px] font-semibold mb-1.5 tracking-widest" style={{ color: '#ff3366' }}>
                   ⚠️ {hasAI ? 'RISKS' : 'KEY RISKS'}
                 </div>
                 <ul className="space-y-1">
                   {risks.map((r, i) => {
                     const ss = statusStyle[r.type] ?? statusStyle.negative;
                     return (
-                      <li key={i} className="text-[10px] leading-snug flex gap-1.5" style={{ color: '#c8d4e0' }}>
+                      <li key={i} className="text-[11px] leading-snug flex gap-1.5" style={{ color: '#c8d4e0' }}>
                         <span style={{ color: ss.color }}>–</span>{r.text}
                       </li>
                     );
@@ -380,7 +380,7 @@ function AnalysisTab({
       {/* ── 5. Signal Groups (rule-based desk analysis) ─────── */}
       {d.signal_groups.length > 0 && (
         <>
-          <div className="text-[9px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-2" style={{ color: '#4a5a6a' }}>
             SIGNAL ANALYSIS — {d.signal_groups.length} GROUPS
             {hasAI && <span style={{ color: '#00d4ff50' }}> · rule-based detail</span>}
           </div>
@@ -394,7 +394,7 @@ function AnalysisTab({
                     style={{ background: sc.color + '08', borderBottom: '1px solid ' + sc.color + '20' }}>
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{group.icon}</span>
-                      <span className="text-[10px] font-bold tracking-widest" style={{ color: sc.color }}>
+                      <span className="text-[11px] font-bold tracking-widest" style={{ color: sc.color }}>
                         {group.label}
                       </span>
                     </div>
@@ -403,7 +403,7 @@ function AnalysisTab({
                         <div className="h-full rounded-full"
                           style={{ width: group.score + '%', background: sc.color, boxShadow: '0 0 4px ' + sc.color + '60' }} />
                       </div>
-                      <span className="font-mono font-bold text-[10px]" style={{ color: sc.color }}>
+                      <span className="font-mono font-bold text-[11px]" style={{ color: sc.color }}>
                         {group.strength}
                       </span>
                     </div>
@@ -417,11 +417,11 @@ function AnalysisTab({
                           <div className="flex items-start gap-2 flex-1 min-w-0">
                             <div className="w-1 h-1 rounded-full mt-1.5 shrink-0" style={{ background: ss.color }} />
                             <div className="min-w-0">
-                              <div className="text-[9px] font-semibold" style={{ color: '#8b99a8' }}>{sig.label}</div>
-                              {sig.note && <div className="text-[9px] mt-0.5 leading-snug" style={{ color: '#4a5a6a' }}>{sig.note}</div>}
+                              <div className="text-[10px] font-semibold" style={{ color: '#8b99a8' }}>{sig.label}</div>
+                              {sig.note && <div className="text-[10px] mt-0.5 leading-snug" style={{ color: '#4a5a6a' }}>{sig.note}</div>}
                             </div>
                           </div>
-                          <div className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold shrink-0"
+                          <div className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0"
                             style={{ background: ss.bg, color: ss.color, border: '1px solid ' + ss.color + '30' }}>
                             {sig.value}
                           </div>
@@ -453,7 +453,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
           { label: 'QUALITY',     val: ictSignal.setup_quality,          col: qCol },
         ].map(({ label, val, col }) => (
           <div key={label} className="rounded-lg p-2 text-center" style={{ background: '#0a0f14', border: '1px solid ' + (col) + '30' }}>
-            <div className="text-[8px] mb-1 tracking-widest" style={{ color: '#4a5a6a' }}>{label}</div>
+            <div className="text-[9px] mb-1 tracking-widest" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color: col }}>{val}</div>
           </div>
         ))}
@@ -461,7 +461,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
       {/* Market Structure */}
       <div className="p-2.5 rounded-lg mb-2" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-        <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>MARKET STRUCTURE</div>
+        <div className="text-[10px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>MARKET STRUCTURE</div>
         <div className="flex items-center gap-2 mb-2">
           <span className="font-bold text-sm" style={{ color: structCol }}>
             {ictSignal.structure === 'BULLISH' ? '↑ BULLISH' : ictSignal.structure === 'BEARISH' ? '↓ BEARISH' : '— NEUTRAL'}
@@ -470,7 +470,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
             <span className="text-base">{ictSignal.smart_money ? '💎' : ''}{ictSignal.wyckoff_spring ? '💧' : ''}</span>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-1 text-[10px]">
+        <div className="grid grid-cols-2 gap-1 text-[11px]">
           {[
             { label: 'BOS Bullish',   on: ictSignal.bos_bull,         col: '#00ff88' },
             { label: 'BOS Bearish',   on: ictSignal.bos_bear,         col: '#ff3366' },
@@ -479,7 +479,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
           ].map(({ label, on, col }) => (
             <div key={label} className="flex items-center justify-between px-2 py-1 rounded" style={{ background: '#0f1519', opacity: on ? 1 : 0.35 }}>
               <span style={{ color: '#8b99a8' }}>{label}</span>
-              <span className="font-bold text-[9px]" style={{ color: on ? col : '#2a3642' }}>{on ? 'YES' : 'no'}</span>
+              <span className="font-bold text-[10px]" style={{ color: on ? col : '#2a3642' }}>{on ? 'YES' : 'no'}</span>
             </div>
           ))}
         </div>
@@ -487,8 +487,8 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
       {/* ICT Confluences */}
       <div className="p-2.5 rounded-lg mb-2" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-        <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>ICT CONFLUENCES ({ictSignal.ict_confluence} signals)</div>
-        <div className="grid grid-cols-2 gap-1 text-[10px]">
+        <div className="text-[10px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>ICT CONFLUENCES ({ictSignal.ict_confluence} signals)</div>
+        <div className="grid grid-cols-2 gap-1 text-[11px]">
           {[
             { label: 'Fair Value Gap', on: !!ictSignal.fvg_bull,          col: '#00ff88', extra: '' },
             { label: 'Order Block',    on: ictSignal.ob_bull && !ictSignal.ob_mitigated, col: '#00d4ff', extra: ictSignal.ob_price_at ? ' 🎯' : '' },
@@ -501,7 +501,7 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
           ].map(({ label, on, col, extra }) => (
             <div key={label} className="flex items-center justify-between px-2 py-1 rounded" style={{ background: '#0f1519', opacity: on ? 1 : 0.3 }}>
               <span style={{ color: '#8b99a8' }}>{label}</span>
-              <span className="font-bold text-[9px]" style={{ color: on ? col : '#2a3642' }}>{on ? 'YES' + (extra) : 'no'}</span>
+              <span className="font-bold text-[10px]" style={{ color: on ? col : '#2a3642' }}>{on ? 'YES' + (extra) : 'no'}</span>
             </div>
           ))}
         </div>
@@ -509,19 +509,19 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
       {/* Signal Breakdown bars */}
       <div className="p-2.5 rounded-lg mb-2" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-        <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>SIGNAL BREAKDOWN</div>
+        <div className="text-[10px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>SIGNAL BREAKDOWN</div>
         <div className="space-y-1.5">
           {Object.entries(ictSignal.signal_breakdown).map(([key, val]) => {
             const col = val >= 70 ? '#00ff88' : val >= 55 ? '#00d4ff' : val >= 40 ? '#ffcc00' : '#ff3366';
             return (
               <div key={key} className="flex items-center gap-2">
-                <div className="text-[9px] w-28 shrink-0 font-mono" style={{ color: '#8b99a8' }}>
+                <div className="text-[10px] w-28 shrink-0 font-mono" style={{ color: '#8b99a8' }}>
                   {key.replace(/_/g, ' ')}
                 </div>
                 <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
                   <div className="h-full rounded-full transition-all" style={{ width: (Math.max(val, 0)) + '%', background: col, boxShadow: '0 0 4px ' + (col) + '60' }} />
                 </div>
-                <div className="font-mono text-[9px] w-7 text-right" style={{ color: col }}>{val.toFixed(0)}</div>
+                <div className="font-mono text-[10px] w-7 text-right" style={{ color: col }}>{val.toFixed(0)}</div>
               </div>
             );
           })}
@@ -531,10 +531,10 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
       {/* Top signals */}
       {ictSignal.top_signals.length > 0 && (
         <div className="p-2.5 rounded-lg" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>TOP SIGNALS</div>
+          <div className="text-[10px] font-semibold mb-2 tracking-widest" style={{ color: '#4a5a6a' }}>TOP SIGNALS</div>
           <ul className="space-y-1">
             {ictSignal.top_signals.map((sig, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-[10px]" style={{ color: '#8b99a8' }}>
+              <li key={i} className="flex items-start gap-1.5 text-[11px]" style={{ color: '#8b99a8' }}>
                 <span style={{ color: '#00d4ff' }}>•</span>{sig}
               </li>
             ))}
@@ -547,14 +547,15 @@ function ICTTab({ ictSignal }: { ictSignal: ICTSignal }) {
 
 // ─── Finance Tab ─────────────────────────────────────────────────────────────
 function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; detailLoading: boolean }) {
+  // Luôn hiển thị đơn vị tỷ đồng
   const fmtB = (v: number | null | undefined) => {
     if (v == null) return '–';
-    return Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'T' : v.toFixed(0) + 'B';
+    return new Intl.NumberFormat('vi-VN').format(Math.round(v)) + ' tỷ';
   };
   const colPct = (v: number) => v >= 20 ? '#00ff88' : v >= 10 ? '#00d4ff' : v >= 0 ? '#ffcc00' : '#ff3366';
 
   if (!detail) return (
-    <div className="flex items-center justify-center py-12 text-[11px]" style={{ color: '#4a5a6a' }}>
+    <div className="flex items-center justify-center py-12 text-[12px]" style={{ color: '#4a5a6a' }}>
       {detailLoading ? 'Đang tải dữ liệu tài chính...' : 'Không có dữ liệu tài chính'}
     </div>
   );
@@ -568,7 +569,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
     <div className="space-y-3">
       {latestR && (
         <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
             CHỈ SỐ ĐỊNH GIÁ & HIỆU QUẢ
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -584,9 +585,9 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
               { label: 'D/E', val: latestR.debt_equity != null ? latestR.debt_equity.toFixed(2) : '–', note: 'x', color: undefined as string | undefined },
             ].map(({ label, val, note, color }) => (
               <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
-                <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
-                <div className="font-mono text-xs font-bold" style={{ color: color || '#e2e8f0' }}>
-                  {val}<span className="text-[9px] ml-0.5" style={{ color: '#4a5a6a' }}>{note}</span>
+                <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+                <div className="font-mono text-sm font-bold" style={{ color: color || '#e2e8f0' }}>
+                  {val}<span className="text-[10px] ml-0.5" style={{ color: '#4a5a6a' }}>{note}</span>
                 </div>
               </div>
             ))}
@@ -595,11 +596,11 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
       )}
       {income.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
             KẾT QUẢ KINH DOANH
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-[10px]">
+            <table className="w-full text-[11px]">
               <thead>
                 <tr style={{ borderBottom: '1px solid #1e2832' }}>
                   <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ tiêu</th>
@@ -637,11 +638,11 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
       )}
       {cf.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
             DÒNG TIỀN
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-[10px]">
+            <table className="w-full text-[11px]">
               <thead>
                 <tr style={{ borderBottom: '1px solid #1e2832' }}>
                   <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ tiêu</th>
@@ -697,7 +698,7 @@ function TradingTab({ stock }: { stock: Stock }) {
   const foreignItems = [
     { label: 'NN Mua', val: stock.foreign_buy_qty != null ? (stock.foreign_buy_qty / 1000).toFixed(0) + 'K' : '–', color: '#00ff88' },
     { label: 'NN Bán', val: stock.foreign_sell_qty != null ? (stock.foreign_sell_qty / 1000).toFixed(0) + 'K' : '–', color: '#ff3366' },
-    { label: 'NN Ròng 7D', val: (fnet >= 0 ? '+' : '') + fnet.toFixed(1) + 'B', color: fnet >= 0 ? '#00ff88' : '#ff3366' },
+    { label: 'NN Ròng 7D', val: (fnet >= 0 ? '+' : '') + new Intl.NumberFormat('vi-VN').format(Math.round(fnet)) + ' tỷ', color: fnet >= 0 ? '#00ff88' : '#ff3366' },
   ];
 
   return (
@@ -705,14 +706,14 @@ function TradingTab({ stock }: { stock: Stock }) {
       <div className="grid grid-cols-2 gap-2">
         {priceItems.map(({ label, val, color }) => (
           <div key={label} className="p-2.5 rounded-lg" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-            <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+            <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
           </div>
         ))}
       </div>
       {history.length > 1 && (
         <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
             GIÁ {history.length} PHIÊN GẦN NHẤT
           </div>
           <SparklineModal data={history} volume={volumes} dates={dates} width={580} height={100} />
@@ -720,24 +721,24 @@ function TradingTab({ stock }: { stock: Stock }) {
       )}
       <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
         <div className="grid grid-cols-2" style={{ borderBottom: '1px solid #1e2832' }}>
-          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest text-center" style={{ color: '#00ff88', borderRight: '1px solid #1e2832' }}>BÊN MUA</div>
-          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest text-center" style={{ color: '#ff3366' }}>BÊN BÁN</div>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest text-center" style={{ color: '#00ff88', borderRight: '1px solid #1e2832' }}>BÊN MUA</div>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest text-center" style={{ color: '#ff3366' }}>BÊN BÁN</div>
         </div>
         {[0, 1, 2].map(i => (
           <div key={i} className="grid grid-cols-2" style={{ borderBottom: i < 2 ? '1px solid #1e2832' : 'none' }}>
             <div className="flex justify-between px-3 py-1.5" style={{ borderRight: '1px solid #1e2832' }}>
-              <span className="font-mono text-[11px]" style={{ color: '#00ff88' }}>
+              <span className="font-mono text-[12px]" style={{ color: '#00ff88' }}>
                 {i === 0 && stock.bid1_price != null ? formatPrice(stock.bid1_price) : i === 1 && stock.bid2_price != null ? formatPrice(stock.bid2_price) : i === 2 && stock.bid3_price != null ? formatPrice(stock.bid3_price) : '–'}
               </span>
-              <span className="font-mono text-[10px]" style={{ color: '#8b99a8' }}>
+              <span className="font-mono text-[11px]" style={{ color: '#8b99a8' }}>
                 {i === 0 && stock.bid1_volume != null ? (stock.bid1_volume / 1000).toFixed(0) + 'K' : i === 1 && stock.bid2_volume != null ? (stock.bid2_volume / 1000).toFixed(0) + 'K' : i === 2 && stock.bid3_volume != null ? (stock.bid3_volume / 1000).toFixed(0) + 'K' : '–'}
               </span>
             </div>
             <div className="flex justify-between px-3 py-1.5">
-              <span className="font-mono text-[11px]" style={{ color: '#ff3366' }}>
+              <span className="font-mono text-[12px]" style={{ color: '#ff3366' }}>
                 {i === 0 && stock.ask1_price != null ? formatPrice(stock.ask1_price) : i === 1 && stock.ask2_price != null ? formatPrice(stock.ask2_price) : i === 2 && stock.ask3_price != null ? formatPrice(stock.ask3_price) : '–'}
               </span>
-              <span className="font-mono text-[10px]" style={{ color: '#8b99a8' }}>
+              <span className="font-mono text-[11px]" style={{ color: '#8b99a8' }}>
                 {i === 0 && stock.ask1_volume != null ? (stock.ask1_volume / 1000).toFixed(0) + 'K' : i === 1 && stock.ask2_volume != null ? (stock.ask2_volume / 1000).toFixed(0) + 'K' : i === 2 && stock.ask3_volume != null ? (stock.ask3_volume / 1000).toFixed(0) + 'K' : '–'}
               </span>
             </div>
@@ -746,8 +747,8 @@ function TradingTab({ stock }: { stock: Stock }) {
         {stock.buy_pressure_pct != null && (
           <div className="px-3 py-2" style={{ borderTop: '1px solid #1e2832' }}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[9px]" style={{ color: '#4a5a6a' }}>Buy Pressure</span>
-              <span className="font-mono text-[10px] font-bold" style={{ color: stock.buy_pressure_pct >= 50 ? '#00ff88' : '#ff3366' }}>
+              <span className="text-[10px]" style={{ color: '#4a5a6a' }}>Buy Pressure</span>
+              <span className="font-mono text-[11px] font-bold" style={{ color: stock.buy_pressure_pct >= 50 ? '#00ff88' : '#ff3366' }}>
                 {stock.buy_pressure_pct.toFixed(0)}%
               </span>
             </div>
@@ -760,7 +761,7 @@ function TradingTab({ stock }: { stock: Stock }) {
       <div className="grid grid-cols-3 gap-2">
         {foreignItems.map(({ label, val, color }) => (
           <div key={label} className="p-2.5 rounded-lg text-center" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-            <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+            <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
           </div>
         ))}
@@ -786,19 +787,19 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
     <div>
       {detailLoading && (
         <div className="flex items-center justify-center py-12">
-          <div className="text-[11px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải...</div>
+          <div className="text-[12px] animate-pulse" style={{ color: '#4a5a6a' }}>Đang tải...</div>
         </div>
       )}
       {!detailLoading && !detail && (
         <div className="flex items-center justify-center py-12">
-          <div className="text-[11px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu</div>
+          <div className="text-[12px]" style={{ color: '#4a5a6a' }}>Không có dữ liệu</div>
         </div>
       )}
       {!detailLoading && detail && (
     <div className="space-y-3">
       {latest && (
         <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
             BẢNG CÂN ĐỐI — Q{latest.quarter}/{latest.year}
           </div>
           {[
@@ -810,8 +811,8 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
           ].map(({ label, val, color }) => (
             <div key={label} className="mb-2">
               <div className="flex justify-between mb-1">
-                <span className="text-[10px]" style={{ color: '#8b99a8' }}>{label}</span>
-                <span className="font-mono text-[10px] font-semibold" style={{ color }}>{fmtB(val)}</span>
+                <span className="text-[11px]" style={{ color: '#8b99a8' }}>{label}</span>
+                <span className="font-mono text-[11px] font-semibold" style={{ color }}>{fmtB(val)}</span>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e2832' }}>
                 <div
@@ -827,8 +828,8 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
               { label: 'Cash / Equity', val: ((latest.cash / latest.total_equity) * 100).toFixed(1) + '%', color: '#a78bfa' },
             ].map(({ label, val, color }) => (
               <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
-                <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
-                <div className="font-mono text-xs font-bold" style={{ color }}>{val}</div>
+                <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+                <div className="font-mono text-sm font-bold" style={{ color }}>{val}</div>
               </div>
             )) : null}
           </div>
@@ -836,11 +837,11 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
       )}
       {annual.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
             XU HƯỚNG VỐN (HÀNG NĂM)
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-[10px]">
+            <table className="w-full text-[11px]">
               <thead>
                 <tr style={{ borderBottom: '1px solid #1e2832' }}>
                   <th className="p-2 text-left font-semibold" style={{ color: '#4a5a6a' }}>Chỉ số</th>
@@ -906,7 +907,7 @@ function StatsTab({ stock }: { stock: Stock }) {
       <div className="grid grid-cols-3 gap-2">
         {perfItems.map(({ label, val }) => (
           <div key={label} className="p-2.5 rounded-lg text-center" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-            <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+            <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
             <div className="font-mono font-bold text-sm" style={{ color: (val ?? 0) >= 0 ? '#00ff88' : '#ff3366' }}>
               {val != null ? (val >= 0 ? '+' : '') + val.toFixed(2) + '%' : '–'}
             </div>
@@ -926,8 +927,8 @@ function StatsTab({ stock }: { stock: Stock }) {
         ]).map(({ label, val, color, note }) => (
           <div key={label} className="p-2.5 rounded-lg flex items-center justify-between" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
             <div>
-              <div className="text-[9px]" style={{ color: '#4a5a6a' }}>{label}</div>
-              <div className="text-[9px] mt-0.5" style={{ color: '#2a3642' }}>{note}</div>
+              <div className="text-[10px]" style={{ color: '#4a5a6a' }}>{label}</div>
+              <div className="text-[10px] mt-0.5" style={{ color: '#2a3642' }}>{note}</div>
             </div>
             <div className="font-mono font-bold text-sm" style={{ color }}>{val}</div>
           </div>
@@ -935,11 +936,11 @@ function StatsTab({ stock }: { stock: Stock }) {
       </div>
       {history.length > 0 && dates.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="px-3 py-2 text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
+          <div className="px-3 py-2 text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a', borderBottom: '1px solid #1e2832' }}>
             LỊCH SỬ GIÁ — {dates.length} phiên
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: '200px' }}>
-            <table className="w-full text-[10px]">
+            <table className="w-full text-[11px]">
               <thead className="sticky top-0" style={{ background: '#0f1519' }}>
                 <tr>
                   {['Ngày', 'Giá đóng cửa', 'Thay đổi', 'KL/MA'].map(h => (
@@ -1161,17 +1162,17 @@ function TradingStrategyTab({
                 {strat.label}
               </span>
               {comboActive && (
-                <span className="px-1.5 py-0.5 rounded text-[8px] font-bold tracking-widest"
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest"
                   style={{ background: '#00d4ff20', color: '#00d4ff', border: '1px solid #00d4ff40' }}>
                   COMBO BONUS
                 </span>
               )}
             </div>
-            <div className="text-[10px] mb-2" style={{ color: '#8b99a8' }}>{strat.tagline}</div>
-            <p className="text-[10px] leading-relaxed" style={{ color: '#c8d4e0' }}>{strat.desc}</p>
+            <div className="text-[11px] mb-2" style={{ color: '#8b99a8' }}>{strat.tagline}</div>
+            <p className="text-[11px] leading-relaxed" style={{ color: '#c8d4e0' }}>{strat.desc}</p>
           </div>
           <div className="text-right shrink-0">
-            <div className="text-[8px] tracking-widest mb-1" style={{ color: '#4a5a6a' }}>BACKTEST EDGE</div>
+            <div className="text-[9px] tracking-widest mb-1" style={{ color: '#4a5a6a' }}>BACKTEST EDGE</div>
             <div className="font-mono font-black text-base" style={{ color: strat.color }}>{strat.edge}</div>
           </div>
         </div>
@@ -1180,7 +1181,7 @@ function TradingStrategyTab({
       {/* ── 2. Entry / Exit Setup ─────────────────────────────────────── */}
       {(s.entry_zone || s.stop_loss || s.target_1) && (
         <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-2.5" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-2.5" style={{ color: '#4a5a6a' }}>
             📍 ENTRY / EXIT PLAN
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -1194,15 +1195,15 @@ function TradingStrategyTab({
             ].filter(r => r.val).map(({ label, val, col }) => (
               <div key={label} className="p-2 rounded-lg"
                 style={{ background: '#0d1520', border: '1px solid ' + col + '20' }}>
-                <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
-                <div className="font-mono text-[10px] font-semibold leading-snug" style={{ color: col }}>
+                <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+                <div className="font-mono text-[11px] font-semibold leading-snug" style={{ color: col }}>
                   {val}
                 </div>
               </div>
             ))}
           </div>
           {s.invalidation && (
-            <div className="mt-2 px-2.5 py-2 rounded-lg text-[10px]"
+            <div className="mt-2 px-2.5 py-2 rounded-lg text-[11px]"
               style={{ background: '#ff336610', border: '1px solid #ff336630' }}>
               <span style={{ color: '#ff3366' }}>⚡ Invalidation: </span>
               <span style={{ color: '#c8d4e0' }}>{s.invalidation}</span>
@@ -1214,10 +1215,10 @@ function TradingStrategyTab({
       {/* ── 3. Position Sizing (ATR-based) ───────────────────────────── */}
       <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
         <div className="flex items-center justify-between mb-2.5">
-          <div className="text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
             📐 POSITION SIZING — ATR-BASED (ref: 100M VND)
           </div>
-          <div className="text-[8px] px-1.5 py-0.5 rounded"
+          <div className="text-[9px] px-1.5 py-0.5 rounded"
             style={{ background: isBear ? '#ff336615' : isBull ? '#00ff8815' : '#ffcc0015',
                      color: isBear ? '#ff3366' : isBull ? '#00ff88' : '#ffcc00',
                      border: '1px solid ' + (isBear ? '#ff336630' : isBull ? '#00ff8830' : '#ffcc0030') }}>
@@ -1228,21 +1229,21 @@ function TradingStrategyTab({
           {[
             { label: 'ATR Stop (1.5×)',  val: atr > 0 ? `${(atrStop).toFixed(2)}đ` : '–',                           col: '#ffcc00' },
             { label: 'Số CP gợi ý',      val: adjShares > 0 ? adjShares.toLocaleString('vi-VN') + ' CP' : '–',       col: '#00d4ff' },
-            { label: 'Giá trị vị thế',   val: adjValue > 0 ? (adjValue/1_000_000).toFixed(1) + 'M' : '–',            col: '#00ff88' },
+            { label: 'Giá trị vị thế',   val: adjValue > 0 ? new Intl.NumberFormat('vi-VN').format(Math.round(adjValue / 1e9)) + ' tỷ' : '–', col: '#00ff88' },
           ].map(({ label, val, col }) => (
             <div key={label} className="p-2 rounded-lg text-center" style={{ background: '#0d1520' }}>
-              <div className="text-[9px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
-              <div className="font-mono font-bold text-xs" style={{ color: col }}>{val}</div>
+              <div className="text-[10px] mb-1" style={{ color: '#4a5a6a' }}>{label}</div>
+              <div className="font-mono font-bold text-sm" style={{ color: col }}>{val}</div>
             </div>
           ))}
         </div>
-        <div className="text-[9px] leading-relaxed" style={{ color: '#4a5a6a' }}>
+        <div className="text-[10px] leading-relaxed" style={{ color: '#4a5a6a' }}>
           Rủi ro mỗi lệnh: {isBear ? '1%' : '2%'} portfolio · ATR ({atrPct > 0 ? atrPct.toFixed(1) + '% volatility' : 'N/A'}) · Chỉ mang tính tham khảo
         </div>
         {/* Portfolio bar */}
         {adjValue > 0 && (
           <div className="mt-2">
-            <div className="flex justify-between text-[9px] mb-1" style={{ color: '#4a5a6a' }}>
+            <div className="flex justify-between text-[10px] mb-1" style={{ color: '#4a5a6a' }}>
               <span>% Portfolio</span>
               <span style={{ color: '#00d4ff' }}>{Math.min(positionPct * sizeMultiplier, 100).toFixed(1)}%</span>
             </div>
@@ -1258,10 +1259,10 @@ function TradingStrategyTab({
       {/* ── 4. Entry Checklist ────────────────────────────────────────── */}
       <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
         <div className="flex items-center justify-between mb-2.5">
-          <div className="text-[9px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
+          <div className="text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
             ✅ ENTRY CHECKLIST — BACKTEST CRITERIA
           </div>
-          <div className="font-mono text-[10px] font-bold"
+          <div className="font-mono text-[11px] font-bold"
             style={{ color: passCount >= 4 ? '#00ff88' : passCount >= 3 ? '#ffcc00' : '#ff3366' }}>
             {passCount} / {checklist.length}
           </div>
@@ -1271,20 +1272,20 @@ function TradingStrategyTab({
             <div key={label} className="flex items-start gap-2 px-2 py-1.5 rounded-lg"
               style={{ background: pass ? '#00ff8808' : '#ff336808',
                        border: '1px solid ' + (pass ? '#00ff8825' : '#ff336825') }}>
-              <span className="text-[11px] mt-0.5 shrink-0" style={{ color: pass ? '#00ff88' : '#ff3366' }}>
+              <span className="text-[12px] mt-0.5 shrink-0" style={{ color: pass ? '#00ff88' : '#ff3366' }}>
                 {pass ? '✓' : '✗'}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="text-[10px] font-medium" style={{ color: pass ? '#c8d4e0' : '#8b99a8' }}>
+                <div className="text-[11px] font-medium" style={{ color: pass ? '#c8d4e0' : '#8b99a8' }}>
                   {label}
                 </div>
-                <div className="text-[9px] mt-0.5" style={{ color: '#4a5a6a' }}>{note}</div>
+                <div className="text-[10px] mt-0.5" style={{ color: '#4a5a6a' }}>{note}</div>
               </div>
             </div>
           ))}
         </div>
         {/* Summary verdict */}
-        <div className="mt-2.5 px-2.5 py-2 rounded-lg text-[10px]"
+        <div className="mt-2.5 px-2.5 py-2 rounded-lg text-[11px]"
           style={{ background: passCount >= 4 ? '#00ff8808' : passCount >= 3 ? '#ffcc0008' : '#ff336808',
                    border: '1px solid ' + (passCount >= 4 ? '#00ff8828' : passCount >= 3 ? '#ffcc0028' : '#ff336828') }}>
           <span style={{ color: passCount >= 4 ? '#00ff88' : passCount >= 3 ? '#ffcc00' : '#ff3366', fontWeight: 700 }}>
@@ -1299,10 +1300,10 @@ function TradingStrategyTab({
       {/* ── 5. AI Strategy Note (nếu có) ─────────────────────────────── */}
       {aiAnalysis?.sections && (aiAnalysis.sections as Record<string,string>).ict_analysis && (
         <div className="rounded-xl p-3" style={{ background: '#0f1519', border: '1px solid #1e2832' }}>
-          <div className="text-[9px] font-semibold tracking-widest mb-1.5" style={{ color: '#a78bfa' }}>
+          <div className="text-[10px] font-semibold tracking-widest mb-1.5" style={{ color: '#a78bfa' }}>
             🤖 AI — ICT ANALYSIS
           </div>
-          <p className="text-[10px] leading-relaxed" style={{ color: '#a8b8c8' }}>
+          <p className="text-[11px] leading-relaxed" style={{ color: '#a8b8c8' }}>
             {(aiAnalysis.sections as Record<string,string>).ict_analysis}
           </p>
         </div>
@@ -1406,7 +1407,7 @@ function ModalInner({
               <div className="flex items-center gap-2">
                 <span className="text-xl font-bold">{stock.symbol}</span>
                 <span
-                  className="px-2 py-0.5 rounded text-[10px] font-bold"
+                  className="px-2 py-0.5 rounded text-[11px] font-bold"
                   style={{
                     background: (tierColor) + '20',
                     color: tierColor,
@@ -1416,7 +1417,7 @@ function ModalInner({
                   {stock.tier}
                 </span>
               </div>
-              <div className="text-xs mt-1" style={{ color: '#8b99a8' }}>
+              <div className="text-sm mt-1" style={{ color: '#8b99a8' }}>
                 {stock.name} • {stock.industry}
               </div>
             </div>
@@ -1440,7 +1441,7 @@ function ModalInner({
                 >
                   {formatPercent(change)}
                 </span>
-                <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
+                <span className="text-[11px]" style={{ color: '#4a5a6a' }}>
                   20D
                 </span>
               </div>
@@ -1460,7 +1461,7 @@ function ModalInner({
                 {recDisplay.icon === 'hold' && <MinusCircle size={14} />}
                 {recDisplay.text}
               </div>
-              <div className="text-[10px] mt-1" style={{ color: '#4a5a6a' }}>
+              <div className="text-[11px] mt-1" style={{ color: '#4a5a6a' }}>
                 Score:{' '}
                 <span style={{ color: getScoreColor(stock.composite_score) }}>
                   {stock.composite_score.toFixed(1)}
@@ -1476,7 +1477,7 @@ function ModalInner({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className="flex-1 py-2.5 flex items-center justify-center gap-1.5 text-[11px] font-medium transition-all"
+              className="flex-1 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-medium transition-all"
               style={{
                 background:
                   activeTab === tab.id
@@ -1514,7 +1515,7 @@ function ModalInner({
                 className="p-3 rounded-lg mb-3"
                 style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
               >
-                <div className="text-[10px] mb-3" style={{ color: '#4a5a6a', letterSpacing: '0.5px' }}>
+                <div className="text-[11px] mb-3" style={{ color: '#4a5a6a', letterSpacing: '0.5px' }}>
                   COMPONENT SCORES
                 </div>
                 <div className="grid grid-cols-4 gap-3">
@@ -1559,17 +1560,17 @@ function ModalInner({
                     style={{ background: '#0a0f14', border: '1px solid #1e2832' }}
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-semibold" style={{ color: item.color }}>
+                      <span className="text-[11px] font-semibold" style={{ color: item.color }}>
                         {item.label}
                       </span>
                       <span
-                        className="text-[11px] font-mono font-bold"
+                        className="text-[12px] font-mono font-bold"
                         style={{ color: getScoreColor(item.value) }}
                       >
                         {item.value.toFixed(0)}
                       </span>
                     </div>
-                    <p className="text-[10px]" style={{ color: '#6a7a8a' }}>
+                    <p className="text-[11px]" style={{ color: '#6a7a8a' }}>
                       {item.desc}
                     </p>
                   </div>
@@ -1600,7 +1601,7 @@ function ModalInner({
                     width={320}
                     height={80}
                   />
-                  <div className="text-center py-2 text-[10px]" style={{ color: '#4a5a6a' }}>
+                  <div className="text-center py-2 text-[11px]" style={{ color: '#4a5a6a' }}>
                     Dữ liệu OHLC chưa sẵn sàng
                   </div>
                 </div>
@@ -1624,7 +1625,7 @@ function ModalInner({
 
         {/* Footer Disclaimer */}
         <div className="px-4 py-2" style={{ borderTop: '1px solid #1e2832', background: '#0a0f14' }}>
-          <p className="text-[9px] text-center" style={{ color: '#4a5a6a' }}>
+          <p className="text-[10px] text-center" style={{ color: '#4a5a6a' }}>
             * Phân tích chỉ mang tính tham khảo, không phải khuyến nghị đầu tư
           </p>
         </div>
