@@ -54,29 +54,28 @@ export default function SparklineModal({
     setHover({ 
       pt: pts[idx], 
       idx,
-      mouseX: e.clientX,
-      mouseY: e.clientY
+      mouseX: x,                        // relative to container
+      mouseY: e.clientY - rect.top,     // relative to container
     });
   };
 
-  // Tooltip hiện bên trái chuột, căn giữa dọc
-  // Nếu sát mép trái màn hình → hiện bên phải
+  // Tooltip bên trái chuột — dùng absolute relative to chart container
   const getTooltipStyle = () => {
     if (!hover) return {};
 
-    const tooltipWidth  = 100; // actual rendered width (minWidth 70, maxWidth 90 + border/shadow)
+    const tooltipWidth  = 100;
     const tooltipHeight = 95;
     const offset        = 14;
 
     const showRight = hover.mouseX - tooltipWidth - offset < 0;
 
     return {
-      position: 'fixed' as const,
+      position: 'absolute' as const,
       left: showRight
         ? hover.mouseX + offset
         : hover.mouseX - tooltipWidth - offset,
       top: hover.mouseY - tooltipHeight / 2,
-      zIndex: 99999,
+      zIndex: 10,
     };
   };
 
