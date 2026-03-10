@@ -669,7 +669,46 @@ export default function Dashboard() {
                               TRD
                             </span>
                           )}
-                          {!s.fvg_bull && !(s.trend_strength != null && (s.trend_strength || 0) >= 65) && (
+                          {/* v4 Backtest signals */}
+                          {(s.rsi14 != null && s.rsi14 < 30) && (
+                            <span
+                              className="px-1 py-0.5 rounded text-[7px] font-bold"
+                              style={{ background: '#00ff8815', color: '#00ff88', border: '1px solid #00ff8830' }}
+                              title={`RSI ${s.rsi14?.toFixed(0)} < 30 — Backtest edge +1.52%`}
+                            >
+                              OS
+                            </span>
+                          )}
+                          {(s.rsi14 != null && s.rsi14 > 80) && (
+                            <span
+                              className="px-1 py-0.5 rounded text-[7px] font-bold"
+                              style={{ background: '#ff336615', color: '#ff3366', border: '1px solid #ff336630' }}
+                              title={`RSI ${s.rsi14?.toFixed(0)} > 80 — Backtest edge -2.91%`}
+                            >
+                              OB
+                            </span>
+                          )}
+                          {(s.bb_pct != null && s.bb_pct < 0) && (
+                            <span
+                              className="px-1 py-0.5 rounded text-[7px] font-bold"
+                              style={{ background: '#a78bfa15', color: '#a78bfa', border: '1px solid #a78bfa30' }}
+                              title={`BB%B < 0 — Win 51%, edge +1.08%`}
+                            >
+                              BB↓
+                            </span>
+                          )}
+                          {(s.atr_pct != null && s.atr_pct < 2) && (
+                            <span
+                              className="px-1 py-0.5 rounded text-[7px] font-bold"
+                              style={{ background: '#ffcc0015', color: '#ffcc00', border: '1px solid #ffcc0030' }}
+                              title={`ATR% < 2% — Low vol, Sharpe 0.154`}
+                            >
+                              LV
+                            </span>
+                          )}
+                          {!s.fvg_bull && !(s.trend_strength != null && (s.trend_strength || 0) >= 65)
+                            && !(s.rsi14 != null && s.rsi14 < 30) && !(s.rsi14 != null && s.rsi14 > 80)
+                            && !(s.bb_pct != null && s.bb_pct < 0) && !(s.atr_pct != null && s.atr_pct < 2) && (
                             <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>
                           )}
                         </div>
