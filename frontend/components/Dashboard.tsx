@@ -68,12 +68,29 @@ function PriceChange({ value }: { value?: number }) {
 
 function SignalBadge({ stock, ict }: { stock: Stock; ict?: import('@/lib/types').ICTSignal }) {
   const sig = getStockSignal(stock, ict);
+  const convColor = sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8';
   return (
-    <span
-      className="px-1.5 py-0.5 rounded font-bold text-[9px] tracking-wide whitespace-nowrap"
-      style={{ color: sig.color, background: sig.bg, border: `1px solid ${sig.border}`, boxShadow: `0 0 8px ${sig.color}20` }}
-    >
-      {sig.label}
+    <span className="strat-tip-wrap">
+      <span
+        className="px-1.5 py-0.5 rounded font-bold text-[9px] tracking-wide whitespace-nowrap cursor-help"
+        style={{ color: sig.color, background: sig.bg, border: `1px solid ${sig.border}`, boxShadow: `0 0 8px ${sig.color}20` }}
+      >
+        {sig.label}
+      </span>
+      {sig.reason && (
+        <div className="strat-tip" style={{ width: 260 }}>
+          <div style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: 10, height: 10, background: '#0f1519', borderRight: '1px solid #2a3642', borderBottom: '1px solid #2a3642' }} />
+          <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #1e2832', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: sig.color }}>{sig.label}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: convColor, padding: '2px 6px', borderRadius: 4, background: `${convColor}15`, border: `1px solid ${convColor}30` }}>
+              {sig.conviction}
+            </span>
+          </div>
+          <div style={{ padding: '8px 12px 10px' }}>
+            <p style={{ fontSize: 10.5, color: '#b8c8d8', lineHeight: 1.65, margin: 0 }}>{sig.reason}</p>
+          </div>
+        </div>
+      )}
     </span>
   );
 }

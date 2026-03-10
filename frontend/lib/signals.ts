@@ -32,6 +32,7 @@ export interface SignalConfig {
   bg: string;
   border: string;
   conviction: ConvictionLevel;
+  reason?: string;              // v5: giải thích tại sao signal này được trigger
 }
 
 // ─── Signal Thresholds (single source) ───────────────────────────────────────
@@ -107,64 +108,71 @@ export function computeSignal(
     const bbPct   = stock.bb_pct ?? 0.5;
     const atrPct  = stock.atr_pct ?? 3;
 
-    // ── PATH 1: Panic Bottom — edge +4.26-5.19%, win 64-66% ────────────
-    // Backtest: drop>10% from MA20 + RSI<30 → Sharpe 0.320 (BEST)
+    // ── PATH 1: Panic Bottom — edge +4.26%, win 65.8% ──────────────────
     if (pma20 < -10 && rsi < 30 && bullWeight > 0.2) {
       const conv: ConvictionLevel = pma20 < -15 && rsi < 25 ? 'HIGH' : 'MEDIUM';
+      const reason = `Panic Bottom: giá cách MA20 ${pma20.toFixed(1)}%, RSI ${rsi.toFixed(0)} → edge +4.26%, win 65.8% (493K obs)`;
       if (bullWeight >= 0.4) {
-        return { ...SIGNAL_CONFIG['STRONG_BUY'], action: 'STRONG_BUY', conviction: conv };
+        return { ...SIGNAL_CONFIG['STRONG_BUY'], action: 'STRONG_BUY', conviction: conv, reason };
       }
-      return { ...SIGNAL_CONFIG['BUY'], action: 'BUY', conviction: 'LOW' };
+      return { ...SIGNAL_CONFIG['BUY'], action: 'BUY', conviction: 'LOW', reason: reason + ' (BEAR → giảm bậc)' };
     }
 
     // ── PATH 2: Deep Crash — edge +4.05%, win 61.4% ────────────────────
     if (p20d < -20 && rsi < 40 && bullWeight > 0.2) {
       const conv: ConvictionLevel = rsi < 35 ? 'HIGH' : 'MEDIUM';
+      const reason = `Crash -${Math.abs(p20d).toFixed(0)}% (20D) + RSI ${rsi.toFixed(0)} → edge +4.05%, win 61.4%`;
       if (bullWeight >= 0.4) {
-        return { ...SIGNAL_CONFIG['BUY'], action: 'BUY', conviction: conv };
+        return { ...SIGNAL_CONFIG['BUY'], action: 'BUY', conviction: conv, reason };
       }
-      return { ...SIGNAL_CONFIG['ACCUMULATE'], action: 'ACCUMULATE', conviction: 'LOW' };
+      return { ...SIGNAL_CONFIG['ACCUMULATE'], action: 'ACCUMULATE', conviction: 'LOW', reason: reason + ' (BEAR → giảm bậc)' };
     }
 
     // ── PATH 3: Super Combo — edge +3.27%, win 59.2% ───────────────────
     if (trend === 1 && adx > 25 && rsi < 35 && bullWeight > 0.25) {
       const conv: ConvictionLevel = adx > 35 && rsi < 30 ? 'HIGH' : 'MEDIUM';
+      const reason = `Super Combo: Trend↑ + ADX ${adx.toFixed(0)} + RSI ${rsi.toFixed(0)} → edge +3.27%, Sharpe 0.381`;
       if (bullWeight >= 0.5) {
-        return { ...SIGNAL_CONFIG['STRONG_BUY'], action: 'STRONG_BUY', conviction: conv };
+        return { ...SIGNAL_CONFIG['STRONG_BUY'], action: 'STRONG_BUY', conviction: conv, reason };
       }
-      return { ...SIGNAL_CONFIG['BUY'], action: 'BUY', conviction: 'LOW' };
+      return { ...SIGNAL_CONFIG['BUY'], action: 'BUY', conviction: 'LOW', reason };
     }
 
     // ── PATH 4: Crash -15% + RSI<40 — edge +3.32%, win 62% ─────────────
     if (p20d < -15 && rsi < 40 && bullWeight > 0.25) {
       return { ...SIGNAL_CONFIG['ACCUMULATE'], action: 'ACCUMULATE',
-               conviction: rsi < 30 ? 'HIGH' : 'MEDIUM' };
+               conviction: rsi < 30 ? 'HIGH' : 'MEDIUM',
+               reason: `Crash ${p20d.toFixed(0)}% + RSI ${rsi.toFixed(0)} → edge +3.32%, win 62%` };
     }
 
     // ── PATH 5: RSI Deep Oversold — edge +1.49%, win 52.9% ─────────────
     if (rsi < 30 && bullWeight > 0.25) {
       return { ...SIGNAL_CONFIG['ACCUMULATE'], action: 'ACCUMULATE',
-               conviction: rsi < 25 ? 'HIGH' : 'MEDIUM' };
+               conviction: rsi < 25 ? 'HIGH' : 'MEDIUM',
+               reason: `RSI ${rsi.toFixed(0)} < 30 — oversold, edge +1.49%, win 52.9%` };
     }
 
     // ── PATH 6: BB Below Lower Band — win 58.6%, edge +1.11% ───────────
     if (bbPct < 0 && rsi < 45 && bullWeight > 0.3) {
-      return { ...SIGNAL_CONFIG['ACCUMULATE'], action: 'ACCUMULATE', conviction: 'MEDIUM' };
+      return { ...SIGNAL_CONFIG['ACCUMULATE'], action: 'ACCUMULATE', conviction: 'MEDIUM',
+               reason: `BB Below Lower Band + RSI ${rsi.toFixed(0)} → win 58.6%, edge +1.11%` };
     }
 
     // ── SELL PATHS ──────────────────────────────────────────────────────
 
     // RSI > 80: edge -0.34%, win 43.2%
     if (rsi > 80) {
+      const reason = `RSI ${rsi.toFixed(0)} > 80 — overbought, win chỉ 43.2%, edge -0.34%`;
       if (bullWeight <= 0.4) {
-        return { ...SIGNAL_CONFIG['SELL'], action: 'SELL', conviction: 'HIGH' };
+        return { ...SIGNAL_CONFIG['SELL'], action: 'SELL', conviction: 'HIGH', reason };
       }
-      return { ...SIGNAL_CONFIG['REDUCE'], action: 'REDUCE', conviction: 'HIGH' };
+      return { ...SIGNAL_CONFIG['REDUCE'], action: 'REDUCE', conviction: 'HIGH', reason };
     }
 
     // Strong momentum + overbought: no edge confirmed
     if (p20d > 15 && rsi > 65) {
-      return { ...SIGNAL_CONFIG['REDUCE'], action: 'REDUCE', conviction: 'MEDIUM' };
+      return { ...SIGNAL_CONFIG['REDUCE'], action: 'REDUCE', conviction: 'MEDIUM',
+               reason: `Tăng ${p20d.toFixed(0)}% (20D) + RSI ${rsi.toFixed(0)} — momentum quá nóng, backtest 493K obs: edge ~0%` };
     }
   }
 
@@ -197,6 +205,7 @@ export function computeSignal(
   }
 
   // Foreign flow boost: ACCUMULATE → BUY nếu khối ngoại mua mạnh và gần ngưỡng
+  let reason = '';
   if (
     action === 'ACCUMULATE' &&
     (foreignNet7d ?? 0) > 100 &&
@@ -204,16 +213,27 @@ export function computeSignal(
   ) {
     action = 'BUY';
     conviction = 'MEDIUM';
+    reason = `Score ${effectiveScore.toFixed(0)} + khối ngoại mua mạnh (${Math.round(foreignNet7d ?? 0)} tỷ) → nâng từ ACCUMULATE lên BUY`;
   }
 
   // ── v4: Low Volatility boost — ATR%<2% Sharpe 0.154 (best risk-adjusted) ─
   if (stock && action === 'HOLD' && (stock.atr_pct ?? 3) < 2 && effectiveScore >= 45) {
     action = 'ACCUMULATE';
     conviction = 'MEDIUM';
+    reason = `Low volatility (ATR ${(stock.atr_pct ?? 0).toFixed(1)}%) + score ${effectiveScore.toFixed(0)} → nâng từ HOLD lên ACCUMULATE`;
+  }
+
+  // Build reason for standard path if not already set
+  if (!reason) {
+    if (bullWeight <= 0.3) {
+      reason = `BEAR market (bull_weight ${(bullWeight*100).toFixed(0)}%) → tín hiệu bị giảm bậc. Score: ${effectiveScore.toFixed(0)}`;
+    } else {
+      reason = `Composite score ${effectiveScore.toFixed(0)} → ${action} (threshold: ${action === 'STRONG_BUY' ? T.STRONG_BUY : action === 'BUY' ? T.BUY : action === 'ACCUMULATE' ? T.ACCUMULATE : action === 'HOLD' ? T.HOLD : T.REDUCE})`;
+    }
   }
 
   const cfg = SIGNAL_CONFIG[action];
-  return { ...cfg, action, conviction };
+  return { ...cfg, action, conviction, reason };
 }
 
 /**

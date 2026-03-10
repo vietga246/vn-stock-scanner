@@ -24,8 +24,9 @@ export function generateAnalysis(stock: Stock, sectorStatus?: 'accumulating' | '
 
   // ============ Determine Recommendation (dùng shared computeSignal) ============
   // bullWeight: từ ICT regime — KHÔNG dùng hardcoded 0.5
+  // v5: truyền stock để kích hoạt special paths (Panic Bottom, Crash, RSI check...)
   const bw = bullWeight ?? 0.5;
-  const sig = computeSignal(score, bw, undefined, stock.foreign_net_7d);
+  const sig = computeSignal(score, bw, undefined, stock.foreign_net_7d, stock);
   analysis.recommendation = actionToRecommendation(sig.action);
   const recLabels: Record<string, string> = {
     STRONG_BUY:  `${stock.symbol} đang có điểm số xuất sắc (${score.toFixed(1)}) với tất cả các chỉ báo đều tích cực. Cổ phiếu thuộc nhóm chất lượng cao, đây là thời điểm tốt để tích lũy.`,
