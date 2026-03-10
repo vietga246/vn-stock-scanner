@@ -19,12 +19,12 @@ import {
   Info,
 } from 'lucide-react';
 import type { Stock, AIAnalysis, ICTSignal, StockDetail, IncomeRecord, BalanceRecord, CashflowRecord, RatioRecord } from '@/lib/types';
-import { getStockSignal } from '@/lib/signals';
 import { generateAnalysis, getRecommendationDisplay } from '@/lib/analysis';
 import { generateDeskAnalysis } from '@/lib/desk_analysis';
 import type { DeskAnalysis, SignalGroup, SignalItem, TradeSetup, TradeAction } from '@/lib/types';
 import { formatPrice, formatPercent, getScoreColor, getTierColor, getStockDetails } from '@/lib/api';
 import Sparkline from './Sparkline';
+import SparklineModal from './SparklineModal';
 import CandlestickChart from './CandlestickChart';
 
 interface StockModalProps {
@@ -122,12 +122,10 @@ function AnalysisTab({
   stock,
   deskAnalysis,
   aiAnalysis,
-  ictSignal,
 }: {
   stock: Stock;
   deskAnalysis: DeskAnalysis;
   aiAnalysis?: AIAnalysis;
-  ictSignal?: ICTSignal;
 }) {
   const d = deskAnalysis;
   const ai = aiAnalysis;
@@ -162,12 +160,10 @@ function AnalysisTab({
     warning:  { color: '#ff9500', bg: '#ff950010', border: '#ff950028' },
   };
 
-  // Signal từ computeSignal — SINGLE SOURCE OF TRUTH (đồng bộ với Dashboard)
-  // AI recommendation chỉ dùng cho narrative/text, KHÔNG override action
-  const sig = getStockSignal(stock, ictSignal, d.signal_groups);
-  const rec = sig.action;
+  // Determine display recommendation — prefer AI if available
+  const rec = ai?.recommendation ?? d.setup.action;
   const ac = actionCfg[rec] ?? actionCfg.HOLD;
-  const cc = convCfg[sig.conviction] ?? convCfg.LOW;
+  const cc = convCfg[d.setup.conviction] ?? convCfg.LOW;
 
   // AI sections
   const aiSections = ai?.sections as Record<string, string> | undefined;
@@ -719,7 +715,7 @@ function TradingTab({ stock }: { stock: Stock }) {
           <div className="text-[9px] font-semibold tracking-widest mb-3" style={{ color: '#4a5a6a' }}>
             GIÁ {history.length} PHIÊN GẦN NHẤT
           </div>
-          <Sparkline data={history} volume={volumes} dates={dates} width={580} height={100} />
+          <SparklineModal data={history} volume={volumes} dates={dates} width={580} height={100} />
         </div>
       )}
       <div className="rounded-xl overflow-hidden" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
@@ -1498,7 +1494,7 @@ function ModalInner({
         {/* Content */}
         <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 220px)' }}>
           {/* Analysis Tab */}
-          {activeTab === 'analysis' && <AnalysisTab stock={stock} deskAnalysis={deskAnalysis} aiAnalysis={preloadedAnalysis} ictSignal={ictSignal} />}
+          {activeTab === 'analysis' && <AnalysisTab stock={stock} deskAnalysis={deskAnalysis} aiAnalysis={preloadedAnalysis} />}
 
           {/* Strategy Tab */}
           {activeTab === 'strategy' && (
@@ -1596,7 +1592,7 @@ function ModalInner({
                 />
               ) : (
                 <div>
-                  <Sparkline
+                  <SparklineModal
                     data={stock.price_history ?? []}
                     volume={stock.volume_history}
                     dates={stock.dates}
