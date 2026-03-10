@@ -289,9 +289,14 @@ export default function Dashboard() {
     // Strategy filter
     if (strategyFilter !== 'all') {
       if (strategyFilter === 'buy') {
-        result = result.filter((s) => { const k = getStockStrategy(s); return STRATEGY_DEFS[k].type === 'buy'; });
+        result = result.filter((s) => STRATEGY_DEFS[getStockStrategy(s)].type === 'buy');
       } else if (strategyFilter === 'sell') {
-        result = result.filter((s) => { const k = getStockStrategy(s); return STRATEGY_DEFS[k].type === 'sell' || STRATEGY_DEFS[k].type === 'warn'; });
+        result = result.filter((s) => { const t = STRATEGY_DEFS[getStockStrategy(s)].type; return t === 'sell' || t === 'warn'; });
+      } else if (strategyFilter === 'wait') {
+        result = result.filter((s) => getStockStrategy(s) === 'none');
+      } else if (strategyFilter === 'os_deep') {
+        // OS filter includes both os_deep and os
+        result = result.filter((s) => { const k = getStockStrategy(s); return k === 'os_deep' || k === 'os'; });
       } else {
         result = result.filter((s) => getStockStrategy(s) === strategyFilter);
       }
@@ -545,38 +550,89 @@ export default function Dashboard() {
         {/* Divider */}
         <div style={{ width: 1, height: 20, background: '#1e2832', margin: '0 4px' }} />
 
-        {/* Strategy filter */}
-        {([
-          { key: 'all',   label: 'ALL',     color: '#8b99a8' },
-          { key: 'buy',   label: '🟢 MUA',  color: '#00ff88' },
-          { key: 'sell',  label: '🔴 BÁN',  color: '#ff3366' },
-          { key: 'panic', label: 'PANIC',   color: '#00ff88' },
-          { key: 'crash', label: 'CRASH',   color: '#00ff88' },
-          { key: 'combo', label: 'COMBO',   color: '#00d4ff' },
-          { key: 'os_deep', label: 'OS',    color: '#00ff88' },
-          { key: 'bb_below', label: 'BB↓',  color: '#a78bfa' },
-          { key: 'dip',   label: 'DIP',     color: '#ffcc00' },
-          { key: 'pull',  label: 'PULL',    color: '#00d4ff' },
-          { key: 'ob_deep', label: 'OB!',   color: '#ff3366' },
-          { key: 'hot',   label: 'HOT',     color: '#ff9500' },
-        ] as { key: string; label: string; color: string }[]).map(({ key, label, color }) => {
-          const isActive = strategyFilter === key;
+        {/* Strategy filter — grouped by type */}
+        {(() => {
+          // Count stocks per strategy for badges
+          const counts: Record<string, number> = {};
+          stocks.forEach(s => {
+            const k = getStockStrategy(s);
+            counts[k] = (counts[k] || 0) + 1;
+          });
+          const buyCount = stocks.filter(s => STRATEGY_DEFS[getStockStrategy(s)].type === 'buy').length;
+          const sellCount = stocks.filter(s => { const t = STRATEGY_DEFS[getStockStrategy(s)].type; return t === 'sell' || t === 'warn'; }).length;
+          const waitCount = stocks.filter(s => getStockStrategy(s) === 'none').length;
+
+          // Which group is active?
+          const isBuyGroup = strategyFilter === 'buy' || ['panic','crash','combo','os_deep','bb_below','dip','os','pull'].includes(strategyFilter);
+          const isSellGroup = strategyFilter === 'sell' || ['ob_deep','ob','hot'].includes(strategyFilter);
+          const isWaitGroup = strategyFilter === 'wait';
+
+          type FilterBtn = { key: string; label: string; color: string; count?: number; group?: 'buy'|'sell'|'wait' };
+          const buttons: FilterBtn[] = [
+            { key: 'all',   label: 'ALL',       color: '#8b99a8' },
+            { key: 'buy',   label: `🟢 MUA (${buyCount})`,  color: '#00ff88', group: 'buy' },
+            { key: 'sell',  label: `🔴 BÁN (${sellCount})`, color: '#ff3366', group: 'sell' },
+            { key: 'wait',  label: `⏸ CHỜ (${waitCount})`,  color: '#8b99a8', group: 'wait' },
+          ];
+
+          const subBuy: FilterBtn[] = [
+            { key: 'panic',   label: `PANIC`,  color: '#00ff88', count: counts['panic']||0, group: 'buy' },
+            { key: 'crash',   label: `CRASH`,  color: '#00ff88', count: counts['crash']||0, group: 'buy' },
+            { key: 'combo',   label: `COMBO`,  color: '#00d4ff', count: counts['combo']||0, group: 'buy' },
+            { key: 'os_deep', label: `OS`,     color: '#00ff88', count: (counts['os_deep']||0)+(counts['os']||0), group: 'buy' },
+            { key: 'bb_below',label: `BB↓`,    color: '#a78bfa', count: counts['bb_below']||0, group: 'buy' },
+            { key: 'dip',     label: `DIP`,    color: '#ffcc00', count: counts['dip']||0, group: 'buy' },
+            { key: 'pull',    label: `PULL`,   color: '#00d4ff', count: counts['pull']||0, group: 'buy' },
+          ];
+
+          const subSell: FilterBtn[] = [
+            { key: 'ob_deep', label: `OB!`,    color: '#ff3366', count: counts['ob_deep']||0, group: 'sell' },
+            { key: 'ob',      label: `OB`,     color: '#ff9500', count: counts['ob']||0, group: 'sell' },
+            { key: 'hot',     label: `HOT`,    color: '#ff9500', count: counts['hot']||0, group: 'sell' },
+          ];
+
+          const renderBtn = (btn: FilterBtn) => {
+            const isActive = strategyFilter === btn.key;
+            // Highlight sub-badges when parent group is selected
+            const isHighlighted = (isBuyGroup && btn.group === 'buy') || (isSellGroup && btn.group === 'sell') || (isWaitGroup && btn.group === 'wait');
+            const showActive = isActive || (isHighlighted && !isActive && strategyFilter !== 'all');
+            return (
+              <button
+                key={btn.key}
+                onClick={() => setStrategyFilter(strategyFilter === btn.key ? 'all' : btn.key)}
+                className="px-2 py-1 rounded text-[9px] font-bold transition-all"
+                style={{
+                  background: isActive ? `${btn.color}22` : showActive ? `${btn.color}0c` : 'transparent',
+                  color: isActive ? btn.color : showActive ? `${btn.color}cc` : '#4a5a6a',
+                  border: isActive ? `1px solid ${btn.color}50` : showActive ? `1px solid ${btn.color}20` : '1px solid transparent',
+                  letterSpacing: '0.3px',
+                  boxShadow: isActive ? `0 0 8px ${btn.color}20` : 'none',
+                }}
+              >
+                {btn.label}{btn.count !== undefined ? ` (${btn.count})` : ''}
+              </button>
+            );
+          };
+
           return (
-            <button
-              key={key}
-              onClick={() => setStrategyFilter(key)}
-              className="px-2 py-1 rounded text-[9px] font-bold transition-all"
-              style={{
-                background: isActive ? `${color}18` : 'transparent',
-                color: isActive ? color : '#4a5a6a',
-                border: isActive ? `1px solid ${color}40` : '1px solid transparent',
-                letterSpacing: '0.3px',
-              }}
-            >
-              {label}
-            </button>
+            <>
+              {buttons.map(renderBtn)}
+              {/* Show sub-badges when MUA or BÁN group is active */}
+              {(isBuyGroup || strategyFilter === 'all') && (
+                <>
+                  <div style={{ width: 1, height: 14, background: '#1e2832', margin: '0 2px' }} />
+                  {subBuy.map(renderBtn)}
+                </>
+              )}
+              {(isSellGroup) && (
+                <>
+                  <div style={{ width: 1, height: 14, background: '#1e2832', margin: '0 2px' }} />
+                  {subSell.map(renderBtn)}
+                </>
+              )}
+            </>
           );
-        })}
+        })()}
 
         {/* Active strategy filter tag */}
         {strategyFilter !== 'all' && (
@@ -585,7 +641,7 @@ export default function Dashboard() {
             style={{ background: '#a78bfa12', border: '1px solid #a78bfa30' }}
           >
             <span className="text-[9px] font-semibold" style={{ color: '#a78bfa' }}>
-              Strategy: {STRATEGY_DEFS[strategyFilter as StrategyKey]?.name || (strategyFilter === 'buy' ? 'Tất cả MUA' : 'Tất cả BÁN')}
+              Strategy: {STRATEGY_DEFS[strategyFilter as StrategyKey]?.name || (strategyFilter === 'buy' ? 'Tất cả MUA' : strategyFilter === 'sell' ? 'Tất cả BÁN' : strategyFilter === 'wait' ? 'Chờ — Không có tín hiệu' : strategyFilter)}
             </span>
             <X
               size={10}
