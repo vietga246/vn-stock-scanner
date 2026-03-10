@@ -4,6 +4,11 @@ on:
   workflow_run:
     workflows: ["② Daily Collect — Giá & Dòng tiền (2x/ngày T2-T6)"]
     types: [completed]
+  # Fallback schedule: đảm bảo process chạy ngay cả khi workflow_run bị miss
+  # workflow_run chỉ trigger trên default branch và có thể bị skip nếu ② fail
+  schedule:
+    - cron: "30 5 * * 1-5"   # 12:30 ICT — fallback sau phiên sáng
+    - cron: "0 9 * * 1-5"    # 16:00 ICT — fallback sau phiên chiều
   workflow_dispatch:
 
 jobs:
@@ -13,6 +18,7 @@ jobs:
 
     if: >
       github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     steps:
