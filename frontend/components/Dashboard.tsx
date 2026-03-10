@@ -649,7 +649,7 @@ export default function Dashboard() {
                           <span className="text-[10px]" style={{ color: '#2a3642' }}>–</span>
                         )}
                       </td>
-                      <td className="p-2 text-center">
+                      <td className="p-2 text-center" style={{ overflow: 'visible', position: 'relative' }}>
                         {(() => {
                           // ── Strategy signal detection (v5 backtest 493K obs) ──
                           const rsi = s.rsi14 ?? 50;
@@ -658,82 +658,113 @@ export default function Dashboard() {
                           const trendMed = s.trend_medium ?? 0;
                           const p20d = s.price_change_20d ?? s.change_20d ?? 0;
                           const pma20 = s.pct_from_ma20 ?? 0;
-                          const bbPct = s.bb_pct ?? 0.5;
                           const bbWidth = s.bb_width ?? 15;
                           const stochK = s.stoch_k ?? 50;
 
-                          // Priority signals ordered by edge (strongest first)
-                          type Sig = { label: string; color: string; bg: string; border: string; title: string };
-                          let sig: Sig | null = null;
+                          type StratSig = {
+                            label: string; name: string; type: 'buy'|'sell'|'warn';
+                            color: string; bg: string; border: string;
+                            def: string; cond: string;
+                            edge: string; win: string; n: string;
+                            conf: number; confLabel: string;
+                          };
+                          let sig: StratSig | null = null;
 
-                          // 1. Panic Bottom: drop>10%MA20 + RSI<30 → edge +4.26%, win 65.8%
                           if (pma20 < -10 && rsi < 30) {
-                            sig = { label: 'PANIC', color: '#00ff88', bg: '#00ff8818', border: '#00ff8840',
-                              title: `Panic Bottom: MA20 ${pma20.toFixed(0)}%, RSI ${rsi.toFixed(0)} → edge +4.26%, win 65.8%` };
-                          }
-                          // 2. Crash -15% + RSI<40 → edge +3.32%, win 62%
-                          else if (p20d < -15 && rsi < 40) {
-                            sig = { label: 'CRASH', color: '#00ff88', bg: '#00ff8815', border: '#00ff8835',
-                              title: `Crash ${p20d.toFixed(0)}% + RSI ${rsi.toFixed(0)} → edge +3.32%, win 62%` };
-                          }
-                          // 3. Super Combo: Trend+ADX>25+RSI<35 → edge +3.27%, win 59.2%
-                          else if (trend === 1 && adx > 25 && rsi < 35) {
-                            sig = { label: 'COMBO', color: '#00d4ff', bg: '#00d4ff18', border: '#00d4ff40',
-                              title: `Trend+ADX ${adx.toFixed(0)}+RSI ${rsi.toFixed(0)} → edge +3.27%, win 59.2%` };
-                          }
-                          // 4. RSI < 30 → edge +1.49%, win 52.9%
-                          else if (rsi < 30) {
-                            sig = { label: 'OS', color: '#00ff88', bg: '#00ff8812', border: '#00ff8830',
-                              title: `RSI ${rsi.toFixed(0)} < 30 → edge +1.49%, win 52.9%` };
-                          }
-                          // 5. BB Below Lower → edge +1.11%, win 58.6%
-                          else if (pma20 < -(bbWidth/2)) {
-                            sig = { label: 'BB↓', color: '#a78bfa', bg: '#a78bfa12', border: '#a78bfa30',
-                              title: `BB Below Lower Band → edge +1.11%, win 58.6%` };
-                          }
-                          // 6. Crash -10% → edge +1.76%, win 57.4%
-                          else if (p20d < -10) {
-                            sig = { label: 'DIP', color: '#ffcc00', bg: '#ffcc0012', border: '#ffcc0030',
-                              title: `Crash ${p20d.toFixed(0)}% → edge +1.76%, win 57.4%` };
-                          }
-                          // 7. RSI < 35 → edge +1.00%, win 53.7%
-                          else if (rsi < 35) {
-                            sig = { label: 'OS', color: '#00ff8899', bg: '#00ff8808', border: '#00ff8825',
-                              title: `RSI ${rsi.toFixed(0)} < 35 → edge +1.00%, win 53.7%` };
-                          }
-                          // 8. Stoch OS in Uptrend → edge +0.52%, win 53.8%
-                          else if (stochK < 20 && trendMed === 1) {
-                            sig = { label: 'PULL', color: '#00d4ff', bg: '#00d4ff08', border: '#00d4ff25',
-                              title: `Stoch ${stochK.toFixed(0)} pullback in uptrend → edge +0.52%, win 53.8%` };
-                          }
-                          // SELL: RSI > 80 → edge -0.34%, win 43.2%
-                          else if (rsi > 80) {
-                            sig = { label: 'OB!', color: '#ff3366', bg: '#ff336618', border: '#ff336640',
-                              title: `RSI ${rsi.toFixed(0)} > 80 — Overbought, win chỉ 43.2%` };
-                          }
-                          // WARN: RSI > 70
-                          else if (rsi > 70) {
-                            sig = { label: 'OB', color: '#ff9500', bg: '#ff950010', border: '#ff950030',
-                              title: `RSI ${rsi.toFixed(0)} > 70 — Overbought zone` };
-                          }
-                          // WARN: Strong momentum >15% → no edge
-                          else if (p20d > 15) {
-                            sig = { label: 'HOT', color: '#ff9500', bg: '#ff950008', border: '#ff950025',
-                              title: `Tăng ${p20d.toFixed(0)}% 20D — momentum mạnh nhưng edge ~0%` };
+                            sig = { label:'PANIC', name:'Panic Bottom', type:'buy', color:'#00ff88', bg:'#00ff8818', border:'#00ff8840',
+                              def:'Bán tháo hoảng loạn — giá xa MA20 bất thường + RSI oversold cực mạnh. Setup #1 trên VNSTOCK.', cond:`MA20: ${pma20.toFixed(1)}% · RSI: ${rsi.toFixed(0)}`,
+                              edge:'+4.26%', win:'65.8%', n:'6,585', conf:92, confLabel:'Rất cao' };
+                          } else if (p20d < -15 && rsi < 40) {
+                            sig = { label:'CRASH', name:'Crash Recovery', type:'buy', color:'#00ff88', bg:'#00ff8815', border:'#00ff8835',
+                              def:'Crash mạnh + RSI thấp → xác suất phục hồi cao. VNSTOCK mean-revert: crash càng sâu, bounce càng lớn.', cond:`20D: ${p20d.toFixed(1)}% · RSI: ${rsi.toFixed(0)}`,
+                              edge:'+3.32%', win:'62.0%', n:'14,300', conf:88, confLabel:'Rất cao' };
+                          } else if (trend === 1 && adx > 25 && rsi < 35) {
+                            sig = { label:'COMBO', name:'Super Combo', type:'buy', color:'#00d4ff', bg:'#00d4ff18', border:'#00d4ff40',
+                              def:'Trend tăng + ADX xác nhận + RSI pullback oversold — vào lệnh lý tưởng trong uptrend. Sharpe 0.381 (cao nhất).', cond:`Trend↑ · ADX: ${adx.toFixed(0)} · RSI: ${rsi.toFixed(0)}`,
+                              edge:'+3.27%', win:'59.2%', n:'326', conf:82, confLabel:'Cao' };
+                          } else if (rsi < 30) {
+                            sig = { label:'OS', name:'RSI Deep Oversold', type:'buy', color:'#00ff88', bg:'#00ff8812', border:'#00ff8830',
+                              def:'RSI < 30: áp lực bán kiệt sức, lực cầu sắp quay lại. Chỉ báo đơn có mẫu lớn nhất nhóm oversold.', cond:`RSI: ${rsi.toFixed(0)}`,
+                              edge:'+1.49%', win:'52.9%', n:'21,083', conf:78, confLabel:'Cao' };
+                          } else if (pma20 < -(bbWidth/2)) {
+                            sig = { label:'BB↓', name:'BB Below Lower', type:'buy', color:'#a78bfa', bg:'#a78bfa12', border:'#a78bfa30',
+                              def:'Giá phá dưới dải Bollinger dưới — xu hướng quay về TB. Chỉ báo đơn có TỶ LỆ THẮNG CAO NHẤT toàn dataset.', cond:`MA20: ${pma20.toFixed(1)}% · BB: ${bbWidth.toFixed(0)}%`,
+                              edge:'+1.11%', win:'58.6%', n:'20,796', conf:80, confLabel:'Cao' };
+                          } else if (p20d < -10) {
+                            sig = { label:'DIP', name:'Crash Dip -10%', type:'buy', color:'#ffcc00', bg:'#ffcc0012', border:'#ffcc0030',
+                              def:'Điều chỉnh đáng kể (>10%). Chưa panic nhưng đã có edge bounce dương trên VNSTOCK.', cond:`20D: ${p20d.toFixed(1)}%`,
+                              edge:'+1.76%', win:'57.4%', n:'40,312', conf:75, confLabel:'Khá cao' };
+                          } else if (rsi < 35) {
+                            sig = { label:'OS', name:'RSI Oversold', type:'buy', color:'#00ff88', bg:'#00ff8808', border:'#00ff8825',
+                              def:'RSI < 35: oversold nhẹ. Edge dương có ý nghĩa nhưng thấp hơn RSI<30.', cond:`RSI: ${rsi.toFixed(0)}`,
+                              edge:'+1.00%', win:'53.7%', n:'40,707', conf:68, confLabel:'Trung bình' };
+                          } else if (stochK < 20 && trendMed === 1) {
+                            sig = { label:'PULL', name:'Pullback in Uptrend', type:'buy', color:'#00d4ff', bg:'#00d4ff08', border:'#00d4ff25',
+                              def:'Stoch oversold trong uptrend trung hạn — mua pullback tốt hơn mua breakout trên VNSTOCK.', cond:`Stoch: ${stochK.toFixed(0)} · MA20>MA50`,
+                              edge:'+0.52%', win:'53.8%', n:'40,277', conf:62, confLabel:'Trung bình' };
+                          } else if (rsi > 80) {
+                            sig = { label:'OB!', name:'Deep Overbought', type:'sell', color:'#ff3366', bg:'#ff336618', border:'#ff336640',
+                              def:'RSI > 80: overbought cực. Xác suất giảm 20 phiên cao hơn TB. Nên chốt lời.', cond:`RSI: ${rsi.toFixed(0)}`,
+                              edge:'-0.34%', win:'43.2%', n:'11,968', conf:72, confLabel:'Khá cao' };
+                          } else if (rsi > 70) {
+                            sig = { label:'OB', name:'Overbought', type:'warn', color:'#ff9500', bg:'#ff950010', border:'#ff950030',
+                              def:'Edge gần 0 — không nên mua đuổi. Theo dõi thêm.', cond:`RSI: ${rsi.toFixed(0)}`,
+                              edge:'+0.18%', win:'47.6%', n:'38,510', conf:55, confLabel:'Trung bình' };
+                          } else if (p20d > 15) {
+                            sig = { label:'HOT', name:'Momentum quá nóng', type:'warn', color:'#ff9500', bg:'#ff950008', border:'#ff950025',
+                              def:'Backtest 493K obs: momentum >15% KHÔNG có edge trên VNSTOCK. Tránh mua đuổi.', cond:`20D: +${p20d.toFixed(1)}%`,
+                              edge:'+0.06%', win:'46.3%', n:'37,580', conf:45, confLabel:'Thấp' };
                           }
 
-                          if (sig) {
-                            return (
+                          if (!sig) return <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>;
+
+                          const cc = sig.conf >= 80 ? '#00ff88' : sig.conf >= 65 ? '#00d4ff' : sig.conf >= 50 ? '#ffcc00' : '#ff9500';
+                          const ti = sig.type === 'buy' ? '🟢' : sig.type === 'sell' ? '🔴' : '🟡';
+
+                          return (
+                            <span className="strat-tip-wrap">
                               <span
-                                className="px-1.5 py-0.5 rounded text-[7px] font-bold tracking-wide whitespace-nowrap"
+                                className="px-1.5 py-0.5 rounded text-[7px] font-bold tracking-wide whitespace-nowrap cursor-help"
                                 style={{ background: sig.bg, color: sig.color, border: `1px solid ${sig.border}`, boxShadow: `0 0 6px ${sig.color}15` }}
-                                title={sig.title}
                               >
                                 {sig.label}
                               </span>
-                            );
-                          }
-                          return <span className="text-[9px]" style={{ color: '#2a3642' }}>–</span>;
+                              <div className="strat-tip" onClick={(e) => e.stopPropagation()}>
+                                <div style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: 10, height: 10, background: '#0f1519', borderRight: `1px solid ${sig.border}`, borderBottom: `1px solid ${sig.border}` }} />
+                                <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #1e2832', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <span style={{ fontSize: 13 }}>{ti}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 800, color: sig.color, letterSpacing: 0.5 }}>{sig.name}</span>
+                                  </div>
+                                  <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: sig.type==='buy'?'#00ff8815':sig.type==='sell'?'#ff336615':'#ff950015', color: sig.type==='buy'?'#00ff88':sig.type==='sell'?'#ff3366':'#ff9500' }}>{sig.type==='buy'?'MUA':sig.type==='sell'?'BÁN':'CHỜ'}</span>
+                                </div>
+                                <div style={{ padding: '8px 12px', borderBottom: '1px solid #1e2832' }}>
+                                  <p style={{ fontSize: 10.5, color: '#b8c8d8', lineHeight: 1.65, margin: 0 }}>{sig.def}</p>
+                                </div>
+                                <div style={{ padding: '6px 12px', borderBottom: '1px solid #1e2832', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <span style={{ fontSize: 9, color: '#4a5a6a' }}>Điều kiện:</span>
+                                  <span style={{ fontSize: 10.5, color: sig.color, fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{sig.cond}</span>
+                                </div>
+                                <div style={{ padding: '8px 12px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, borderBottom: '1px solid #1e2832' }}>
+                                  {[{l:'EDGE 20D',v:sig.edge,c:sig.type==='sell'?'#ff3366':sig.color},{l:'WIN RATE',v:sig.win,c:parseFloat(sig.win)>=55?'#00ff88':parseFloat(sig.win)>=50?'#00d4ff':'#ff9500'},{l:'MẪU (N)',v:sig.n,c:'#8b99a8'}].map(x=>(
+                                    <div key={x.l} style={{ textAlign: 'center' }}>
+                                      <div style={{ fontSize: 8, color: '#4a5a6a', marginBottom: 2, letterSpacing: 0.5 }}>{x.l}</div>
+                                      <div style={{ fontSize: 13, fontWeight: 800, fontFamily: "'JetBrains Mono',monospace", color: x.c }}>{x.v}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div style={{ padding: '8px 12px 10px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                                    <span style={{ fontSize: 9, color: '#4a5a6a', fontWeight: 500 }}>Mức độ tự tin</span>
+                                    <span style={{ fontSize: 10, fontWeight: 700, color: cc }}>{sig.confLabel} ({sig.conf}%)</span>
+                                  </div>
+                                  <div style={{ height: 5, background: '#1e2832', borderRadius: 3, overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', width: `${sig.conf}%`, background: `linear-gradient(90deg, ${cc}90, ${cc})`, borderRadius: 3, boxShadow: `0 0 8px ${cc}50` }} />
+                                  </div>
+                                </div>
+                              </div>
+                            </span>
+                          );
                         })()}
                       </td>
                       <td className="p-2 text-right overflow-visible" onClick={(e) => e.stopPropagation()}>

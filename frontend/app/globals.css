@@ -256,3 +256,48 @@ tr {
   color: var(--primary);
   border-color: rgba(0, 212, 255, 0.25);
 }
+
+/* ── Strategy Badge Tooltip ──────────────────────────────────────────── */
+.strat-tip-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.strat-tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 290px;
+  border-radius: 12px;
+  z-index: 200;
+  pointer-events: none;
+  background: #0f1519;
+  border: 1px solid #2a3642;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 25px rgba(0,212,255,0.08);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease;
+  transform: translateX(-50%) translateY(4px);
+}
+
+.strat-tip-wrap:hover .strat-tip {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Ensure tooltip doesn't go off-screen left/right */
+tr:first-child .strat-tip,
+tr:nth-child(2) .strat-tip {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+
+tr:first-child .strat-tip > div:first-child,
+tr:nth-child(2) .strat-tip > div:first-child {
+  bottom: auto;
+  top: -5px;
+  transform: translateX(-50%) rotate(225deg);
+}
