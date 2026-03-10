@@ -64,9 +64,9 @@ export default function SparklineModal({
   const getTooltipStyle = () => {
     if (!hover) return {};
 
-    const tooltipWidth  = 90;
-    const tooltipHeight = 90;
-    const offset        = 12;
+    const tooltipWidth  = 100; // actual rendered width (minWidth 70, maxWidth 90 + border/shadow)
+    const tooltipHeight = 95;
+    const offset        = 14;
 
     const showRight = hover.mouseX - tooltipWidth - offset < 0;
 
