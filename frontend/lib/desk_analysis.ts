@@ -182,17 +182,17 @@ function buildFlowGroup(stock: Stock, ict?: ICTSignal): SignalGroup {
   if (nn7d > 50) {
     const note = sameAs30d
       ? flowNote7d
-      : (nn30d > 0 ? `30D: +${nn30d.toFixed(1)}B — tích lũy bền vững` : undefined);
-    signals.push(pos(flowLabel, `+${nn7d.toFixed(1)}B`, note));
+      : (nn30d > 0 ? `30D: +${new Intl.NumberFormat('vi-VN').format(Math.round(nn30d))}​ tỷ — tích lũy bền vững` : undefined);
+    signals.push(pos(flowLabel, `+${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))}​ tỷ`, note));
   } else if (nn7d > 0) {
-    signals.push(neu(flowLabel, `+${nn7d.toFixed(1)}B`, sameAs30d ? flowNote7d : 'Mua nhỏ, chờ xác nhận'));
+    signals.push(neu(flowLabel, `+${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))}​ tỷ`, sameAs30d ? flowNote7d : 'Mua nhỏ, chờ xác nhận'));
   } else if (nn7d < -50) {
     const note = sameAs30d
       ? flowNote7d
-      : (nn30d < 0 ? `30D: ${nn30d.toFixed(1)}B — phân phối liên tục` : 'Cần theo dõi');
-    signals.push(neg(flowLabel, `${nn7d.toFixed(1)}B`, note));
+      : (nn30d < 0 ? `30D: ${new Intl.NumberFormat('vi-VN').format(Math.round(nn30d))}​ tỷ — phân phối liên tục` : 'Cần theo dõi');
+    signals.push(neg(flowLabel, `${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))}​ tỷ`, note));
   } else if (nn7d < 0) {
-    signals.push(warn(flowLabel, `${nn7d.toFixed(1)}B`, sameAs30d ? flowNote7d : 'Bán nhỏ, chưa đáng ngại'));
+    signals.push(warn(flowLabel, `${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))}​ tỷ`, sameAs30d ? flowNote7d : 'Bán nhỏ, chưa đáng ngại'));
   } else {
     signals.push(neu(flowLabel, '–', 'Trung lập'));
   }
@@ -200,11 +200,11 @@ function buildFlowGroup(stock: Stock, ict?: ICTSignal): SignalGroup {
   // 30D trend — only show when 30D has DIFFERENT (richer) data than 7D
   if (!sameAs30d) {
     if (nn30d > 0 && nn7d > 0) {
-      signals.push(pos('Flow Trend', 'Mua ròng liên tục 30D', `+${nn30d.toFixed(1)}B`));
+      signals.push(pos('Flow Trend', 'Mua ròng liên tục 30D', `+${new Intl.NumberFormat('vi-VN').format(Math.round(nn30d))}​ tỷ`));
     } else if (nn30d < 0 && nn7d < 0) {
-      signals.push(neg('Flow Trend', 'Bán ròng liên tục 30D', `${nn30d.toFixed(1)}B`));
+      signals.push(neg('Flow Trend', 'Bán ròng liên tục 30D', `${new Intl.NumberFormat('vi-VN').format(Math.round(nn30d))}​ tỷ`));
     } else if (nn30d !== 0) {
-      signals.push(neu('Flow Trend', 'Mixed 30D', `30D: ${nn30d.toFixed(1)}B vs 7D: ${nn7d.toFixed(1)}B`));
+      signals.push(neu('Flow Trend', 'Mixed 30D', `30D: ${new Intl.NumberFormat('vi-VN').format(Math.round(nn30d))}​ tỷ vs 7D: ${new Intl.NumberFormat('vi-VN').format(Math.round(nn7d))}​ tỷ`));
     }
   }
 
@@ -545,7 +545,7 @@ function buildNarrative(
 
   if (flowGroup && flowGroup.score >= 60) {
     const nn = stock.foreign_net_7d ?? 0;
-    if (nn > 0) parts.push(`Dòng tiền ngoại tích cực với +${nn.toFixed(1)}B trong 7 ngày${ict?.smart_money ? ', smart money confluence xác nhận' : ''}.`);
+    if (nn > 0) parts.push(`Dòng tiền ngoại tích cực với +${new Intl.NumberFormat('vi-VN').format(Math.round(nn))} tỷ trong 7 ngày${ict?.smart_money ? ', smart money confluence xác nhận' : ''}.`);
   } else if (flowGroup && flowGroup.score <= 40) {
     parts.push(`Dòng tiền đang tiêu cực, cần thận trọng.`);
   }
@@ -558,7 +558,7 @@ function buildNarrative(
   if (ict?.wyckoff_spring) catalysts.push('Wyckoff Spring — smart money hấp thụ áp lực bán');
   if (ict?.sweep_bull) catalysts.push('Vừa sweep liquidity dưới EqL — bullish reversal setup');
   if (ict?.breakout_imminent) catalysts.push('NR7 + volume compression — breakout sắp xảy ra');
-  if ((stock.foreign_net_7d ?? 0) > 50) catalysts.push(`Khối ngoại mua ròng mạnh +${(stock.foreign_net_7d ?? 0).toFixed(1)}B`);
+  if ((stock.foreign_net_7d ?? 0) > 50) catalysts.push(`Khối ngoại mua ròng mạnh +${new Intl.NumberFormat('vi-VN').format(Math.round(stock.foreign_net_7d ?? 0))} tỷ`);
   if (stock.rsi14 != null && stock.rsi14 < 30) catalysts.push(`RSI ${stock.rsi14.toFixed(0)} — vùng oversold, tiềm năng bounce`);
   if (stock.revenue_growth != null && stock.revenue_growth > 0.15) catalysts.push(`Tăng trưởng doanh thu +${(stock.revenue_growth > 1 ? stock.revenue_growth : stock.revenue_growth * 100).toFixed(0)}%`);
 
@@ -568,7 +568,7 @@ function buildNarrative(
   if (ict?.eq_high_count && ict.eq_high_count >= 2) key_risks.push(`${ict.eq_high_count} Equal Highs phía trên — liquidity pool, nguy cơ stop hunt`);
   if (stock.debt_equity != null && stock.debt_equity > 2) key_risks.push(`D/E ${stock.debt_equity.toFixed(1)}x — đòn bẩy tài chính cao`);
   if (stock.rsi14 != null && stock.rsi14 > 70) key_risks.push(`RSI ${stock.rsi14.toFixed(0)} — vùng overbought, cẩn thận pullback`);
-  if ((stock.foreign_net_7d ?? 0) < -50) key_risks.push(`Khối ngoại bán ròng ${(stock.foreign_net_7d ?? 0).toFixed(1)}B`);
+  if ((stock.foreign_net_7d ?? 0) < -50) key_risks.push(`Khối ngoại bán ròng ${new Intl.NumberFormat('vi-VN').format(Math.round(stock.foreign_net_7d ?? 0))} tỷ`);
   if (ict?.bos_bear) key_risks.push('BOS bearish — xu hướng giảm đang được xác nhận');
 
   return { headline, narrative, catalysts, key_risks };
