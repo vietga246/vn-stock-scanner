@@ -59,22 +59,23 @@ export default function Sparkline({
     });
   };
 
-  // Tính vị trí tooltip - luôn nằm phía trên con trỏ
-  // Nếu gần mép trên màn hình, hiển thị phía dưới
+  // Tính vị trí tooltip - luôn nằm phía bên trái con trỏ
   const getTooltipStyle = () => {
     if (!hover) return {};
-    
-    const tooltipHeight = 90; // Estimated tooltip height
-    const offset = 15; // Khoảng cách từ con trỏ
-    
-    // Nếu không đủ chỗ phía trên, hiển thị phía dưới
-    const showBelow = hover.mouseY < tooltipHeight + offset + 20;
-    
+
+    const tooltipWidth  = 90;  // max-width của tooltip
+    const tooltipHeight = 90;  // estimated height
+    const offset        = 12;  // khoảng cách ngang từ con trỏ
+
+    // Nếu không đủ chỗ bên trái → hiện bên phải
+    const showRight = hover.mouseX - tooltipWidth - offset < 0;
+
     return {
       position: 'fixed' as const,
-      left: hover.mouseX,
-      top: showBelow ? hover.mouseY + offset : hover.mouseY - tooltipHeight - offset,
-      transform: 'translateX(-50%)',
+      left: showRight
+        ? hover.mouseX + offset
+        : hover.mouseX - tooltipWidth - offset,
+      top: hover.mouseY - tooltipHeight / 2,  // căn giữa theo chiều dọc
       zIndex: 99999,
     };
   };
