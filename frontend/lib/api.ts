@@ -15,7 +15,9 @@ import type {
 } from './types';
 
 // Cache config - client-side only
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Giảm từ 5 phút → 1 phút để đồng bộ với ISR revalidate của server
+// (tránh client giữ data cũ lâu hơn server)
+const CACHE_DURATION = 1 * 60 * 1000; // 1 minute
 const cache: Map<string, { data: unknown; timestamp: number }> = new Map();
 
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
