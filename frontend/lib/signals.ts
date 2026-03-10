@@ -109,17 +109,80 @@ export function computeSignal(
         const cfg = SIGNAL_CONFIG['STRONG_BUY'];
         return { ...cfg, action: 'STRONG_BUY', conviction };
       } else {
-        // BEAR-ish but not extreme: BUY with lower conviction
         const cfg = SIGNAL_CONFIG['BUY'];
         return { ...cfg, action: 'BUY', conviction: 'LOW' };
       }
     }
   }
 
+  // ── v4: Pullback in Uptrend — Stoch<20 + MA20>MA50 ───────────────────────
+  // Backtest (29,327 obs): edge +1.43% 20D, win 46%, n=1906, p<0.0001
+  // Oversold pullback trong xu hướng tăng trung hạn
+  if (stock && bullWeight > 0.3) {
+    const stoch = stock.stoch_k ?? 50;
+    const trendMed = stock.trend_medium ?? 0;
+    const rsi = stock.rsi14 ?? 50;
+    if (stoch < 20 && trendMed === 1 && rsi < 50) {
+      const conviction: ConvictionLevel = rsi < 35 ? 'HIGH' : 'MEDIUM';
+      if (bullWeight >= 0.5) {
+        const cfg = SIGNAL_CONFIG['BUY'];
+        return { ...cfg, action: 'BUY', conviction };
+      } else {
+        const cfg = SIGNAL_CONFIG['ACCUMULATE'];
+        return { ...cfg, action: 'ACCUMULATE', conviction: 'LOW' };
+      }
+    }
+  }
+
+  // ── v4: Deep Oversold RSI<30 — strongest single indicator ────────────────
+  // Backtest: edge +1.52% 20D, win 47%, n=1125, p<0.0001, Sharpe 0.107
+  if (stock && bullWeight > 0.25) {
+    const rsi = stock.rsi14 ?? 50;
+    if (rsi < 30) {
+      const cfg = SIGNAL_CONFIG['ACCUMULATE'];
+      return {
+        ...cfg,
+        action: 'ACCUMULATE',
+        conviction: rsi < 25 ? 'HIGH' : 'MEDIUM',
+      };
+    }
+  }
+
+  // ── v4: BB Below Lower Band — only signal with win>50% ───────────────────
+  // Backtest: edge +1.08% 20D, WIN 51%, n=1301, p<0.0001
+  if (stock && bullWeight > 0.3) {
+    const bbPct = stock.bb_pct ?? 0.5;
+    const rsi = stock.rsi14 ?? 50;
+    if (bbPct < 0 && rsi < 45) {
+      const cfg = SIGNAL_CONFIG['ACCUMULATE'];
+      return { ...cfg, action: 'ACCUMULATE', conviction: 'MEDIUM' };
+    }
+  }
+
+  // ── v4: Overbought SELL path — RSI>80 edge -2.91%, strongest sell ────────
+  // Backtest: edge -2.91% 20D, n=285, p<0.0001
+  if (stock) {
+    const rsi = stock.rsi14 ?? 50;
+    const p20d = stock.price_change_20d ?? stock.change_20d ?? 0;
+    // RSI > 80: deep overbought → SELL/REDUCE
+    if (rsi > 80) {
+      if (bullWeight <= 0.4) {
+        const cfg = SIGNAL_CONFIG['SELL'];
+        return { ...cfg, action: 'SELL', conviction: 'HIGH' };
+      } else {
+        const cfg = SIGNAL_CONFIG['REDUCE'];
+        return { ...cfg, action: 'REDUCE', conviction: 'HIGH' };
+      }
+    }
+    // Momentum > +15% 20D: mean reversion risk, edge -2.38%
+    if (p20d > 15 && rsi > 65) {
+      const cfg = SIGNAL_CONFIG['REDUCE'];
+      return { ...cfg, action: 'REDUCE', conviction: 'MEDIUM' };
+    }
+  }
+
   // ── v3: Mean Reversion path — crash bounce (SHORT TERM) ──────────────────
-  // Backtest: crash -15%/20D → bounce avg +1.79% 10D, +8% vs bench (5-10D)
-  // Override chỉ cho SHORT TERM signal — không dùng cho position sizing
-  // Không override nếu đang ở BEAR extreme (sẽ tiếp tục giảm 20D)
+  // Backtest: crash -15%/20D + RSI<40 → edge +1.61% 20D, n=591, p=0.039
   if (stock && bullWeight > 0.3) {
     const p20d = stock.price_change_20d ?? stock.change_20d ?? 0;
     const rsi  = stock.rsi14 ?? 50;
@@ -169,6 +232,12 @@ export function computeSignal(
     effectiveScore >= 62
   ) {
     action = 'BUY';
+    conviction = 'MEDIUM';
+  }
+
+  // ── v4: Low Volatility boost — ATR%<2% Sharpe 0.154 (best risk-adjusted) ─
+  if (stock && action === 'HOLD' && (stock.atr_pct ?? 3) < 2 && effectiveScore >= 45) {
+    action = 'ACCUMULATE';
     conviction = 'MEDIUM';
   }
 
