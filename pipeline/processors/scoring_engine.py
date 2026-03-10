@@ -45,14 +45,24 @@ from trading_calendar import trading_date_cutoff, get_trading_date_list_sql
 
 DB_PATH = os.getenv("DB_PATH", "data/db/stock.db")
 
-# Trọng số các trụ cột
-# v2: Momentum giảm 20→15%, Technical tăng 15→20%
-# Lý do: backtest 33k obs — momentum cao có edge âm (-0.88%), RSI/Trend có edge dương mạnh
+# ══════════════════════════════════════════════════════════════════════════
+# TRỌNG SỐ CÁC TRỤ CỘT — v5 (Backtest 493,695 obs, Oct 2022 – Mar 2026)
+#
+# Findings chính từ backtest 3.5 năm:
+#   ✅ VNSTOCK là mean-reversion market: crash+RSI<30 → edge +4-5%, win 63-66%
+#   ✅ BB Below Lower Band: win 58.6%, edge +1.11% — chỉ báo đơn tốt nhất
+#   ✅ Panic Bottom (drop>10% MA20 + RSI<30): Sharpe 0.320, win 65.8%
+#   ❌ MACD Cross Up: edge -0.47%, Golden Cross: -0.71%
+#   ❌ Momentum >15% (20D): edge +0.06% → không có edge (p>0.1)
+#   ❌ BB Squeeze + ADX: edge -0.52% — breakout setup KHÔNG work trên VNSTOCK
+#   ❌ Price > MA200: edge -1.50% — bullish filter là trap
+# ══════════════════════════════════════════════════════════════════════════
 WEIGHTS = {
-    "fundamental": 0.35,
-    "smart_money": 0.30,
-    "momentum":    0.15,   # ↓ từ 0.20 — momentum mạnh có edge âm trên VNSTOCK
-    "technical":   0.20,   # ↑ từ 0.15 — RSI oversold & trend có edge dương có ý nghĩa
+    "fundamental":     0.35,  # Giữ nguyên — nền tảng long-term
+    "smart_money":     0.25,  # ↓ từ 0.30 — nhường cho mean_reversion
+    "momentum":        0.10,  # ↓ từ 0.15 — VNSTOCK mean-revert, momentum vô edge
+    "technical":       0.20,  # Giữ — RSI/BB/Stoch oversold work tốt
+    "mean_reversion":  0.10,  # NEW pillar — crash bounce edge +3-5%, win 60-65%
 }
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -85,23 +95,29 @@ SMART_MONEY_WEIGHTS = {
 }
 
 MOMENTUM_WEIGHTS = {
-    # v2: giảm trọng số price_20d vì momentum mạnh (>10%) có edge âm (-0.88%)
-    # RS vs market giữ nguyên — relative strength có giá trị hơn absolute momentum
-    "price_5d_score":     0.25,   # ↓ từ 0.30
-    "price_20d_score":    0.25,   # ↓ từ 0.35 — cẩn thận momentum kéo dài
-    "vol_surge_score":    0.25,   # ↑ từ 0.20 — volume confirmation quan trọng hơn
-    "rs_vs_market_score": 0.25,   # ↑ từ 0.15 — relative strength tốt hơn absolute
+    # v5: Momentum trên VNSTOCK gần như vô edge (>10% 20D: edge +0.07%, p>0.1)
+    # Giảm mạnh price_20d, tăng RS vs market (relative strength vẫn hữu ích)
+    "price_5d_score":     0.25,
+    "price_20d_score":    0.15,   # ↓ từ 0.25 — momentum tuyệt đối vô nghĩa
+    "vol_surge_score":    0.30,   # ↑ từ 0.25 — volume confirmation quan trọng hơn
+    "rs_vs_market_score": 0.30,   # ↑ từ 0.25 — relative strength > absolute
 }
 
 TECHNICAL_WEIGHTS = {
-    # v2: Bỏ MACD (edge -0.67%), thêm ADX bucket score
-    # RSI oversold edge +1.02% (p=0.0001) → tăng trọng số
-    # Trend UP edge +0.77% (p=0.0000) → giữ nguyên cao
-    # ADX >50 edge +0.62% (p=0.021) → thêm mới
-    "rsi_score":   0.40,   # ↑ từ 0.35 — RSI oversold là signal tốt nhất
-    "trend_score": 0.35,   # ↑ từ 0.30 — Trend UP có ý nghĩa thống kê mạnh
-    "adx_score":   0.25,   # NEW — thay MACD (0.35 → 0): ADX >50 edge +0.62%
-    # macd_score: LOẠI BỎ — edge -0.67% fwd20D, contrarian signal trên VNSTOCK
+    # v5 (493K obs backtest):
+    # RSI<30: edge +1.49%, win 52.9% → trụ cột chính
+    # BB %B<0: edge +1.11%, win 58.6% → NEW, win rate cao nhất
+    # Stoch<20: edge +0.60%, win 54.1% → NEW bổ trợ
+    # Trend UP medium (MA20>MA50): edge +0.29% → nhẹ nhưng có ý nghĩa
+    # ADX>25: edge +0.37% → giảm trọng số (không mạnh như tưởng)
+    # MACD: LOẠI BỎ (edge -0.47%)
+    "rsi_score":          0.30,  # ↓ từ 0.40 — chia cho BB + Stoch
+    "bb_oversold_score":  0.25,  # NEW — BB %B: win 58.6%, edge +1.11%
+    "stoch_score":        0.20,  # NEW — Stoch<20: win 54.1%, edge +0.60%
+    "trend_score":        0.15,  # ↓ từ 0.35 — MA20>MA50 edge chỉ +0.29%
+    "adx_score":          0.10,  # ↓ từ 0.25 — ADX>25 edge chỉ +0.37%
+    # macd_score: LOẠI BỎ (edge -0.47%, n=21,256)
+    # bb_squeeze: LOẠI BỎ (edge -0.52%, n=168,844)
 }
 
 logging.basicConfig(
@@ -253,7 +269,9 @@ def _migrate_stock_scores(conn):
         ("fvg_bull_fill",   "REAL"),
         ("fvg_bear_fill",   "REAL"),
         ("adx_score",       "REAL"),   # v2: NEW — thay MACD trong technical score
-        ("mean_reversion_score", "REAL"), # v3: crash bounce edge +1.79% fwd10D
+        ("bb_oversold_score","REAL"),   # v5: BB %B oversold score — win 58.6%
+        ("stoch_score",     "REAL"),    # v5: Stochastic oversold score — win 54.1%
+        ("mean_reversion_score", "REAL"), # v3→v5: crash bounce edge +3-5%
         ("regime_adj_score",     "REAL"), # v3: composite × regime_multiplier
     ]
 
@@ -530,96 +548,160 @@ def score_momentum_technical(df: pd.DataFrame, tech_df: pd.DataFrame) -> pd.Data
     )
 
     # ── TECHNICAL SUB-SCORES ─────────────────────────────────────────────────
+    # v5: Calibrated với 493,695 observations (Oct 2022 – Mar 2026)
 
-    # RSI SCORE v2 — calibrated theo backtest buckets:
-    # RSI 0-25:  +2.26% fwd20D → điểm 90–100 (strong buy signal)
-    # RSI 25-35: +0.71% fwd20D → điểm 75–90
-    # RSI 35-45: -0.18% fwd20D → điểm 55–70
-    # RSI 45-65: neutral       → điểm 40–55
-    # RSI 65-75: +0.11% fwd20D → điểm 30–40 (overbought, nhẹ thôi)
-    # RSI 75+:   -0.53% fwd20D → điểm 10–30 (overbought penalty)
+    # RSI SCORE v5 — recalibrated:
+    # RSI < 25:  edge +1.72%, win 48.9% → điểm 90–100
+    # RSI 25-30: edge +1.49%, win 52.9% → điểm 80–90
+    # RSI 30-35: edge +1.00%, win 53.7% → điểm 70–80
+    # RSI 35-40: edge +0.45%, win 52.7% → điểm 60–70
+    # RSI 40-60: edge -0.33% (neutral)  → điểm 40–55
+    # RSI 60-70: neutral                → điểm 30–40
+    # RSI 70-80: edge +0.18% (noise)    → điểm 25–30
+    # RSI > 80:  edge -0.34%, win 43.2% → điểm 10–25
     rsi = df["rsi14"].fillna(50)
-    rsi_score = np.where(rsi < 25,  90 + (25 - rsi) * 0.4,          # 0–25:  90–100
-                np.where(rsi < 35,  75 + (35 - rsi) * 1.5,          # 25–35: 75–90
-                np.where(rsi < 45,  55 + (45 - rsi) * 2.0,          # 35–45: 55–75
-                np.where(rsi < 65,  40 + (65 - rsi) * 0.75,         # 45–65: 40–55
-                np.where(rsi < 75,  30 - (rsi - 65) * 1.0,          # 65–75: 20–30
-                         10.0)))))                                    # 75+:   10
+    rsi_score = np.where(rsi < 25,  95.0,
+                np.where(rsi < 30,  85.0,
+                np.where(rsi < 35,  75.0,
+                np.where(rsi < 40,  65.0,
+                np.where(rsi < 50,  50.0,
+                np.where(rsi < 60,  45.0,
+                np.where(rsi < 70,  35.0,
+                np.where(rsi < 80,  25.0,
+                         12.0))))))))
     df["rsi_score"] = pd.Series(rsi_score, index=df.index).clip(0, 100)
 
-    # MACD SCORE: giữ lại field để backward-compat với DB/export nhưng weight=0
-    # Không dùng trong technical_score nữa (edge -0.67%)
+    # BB OVERSOLD SCORE v5 (NEW — strongest single indicator by win rate):
+    # BB %B < 0:   edge +1.11%, WIN 58.6%, n=20,796 → 95
+    # BB %B < 0.1: edge +0.52%, win 55.4% → 80
+    # BB %B < 0.2: edge +0.20%, win 53.5% → 65
+    # BB %B 0.2-0.8: neutral → 50
+    # BB %B > 0.8: edge +0.35%, win 48.4% → 45
+    # BB %B > 1.0: edge +0.43%, win 47.3% → 40
+    bb_pct_val = df.get("bb_width", pd.Series(np.nan, index=df.index))
+    # Dùng close vs BB bands để tính %B nếu có
+    # Nếu đã có trong tech_df thì dùng pct_from_ma20 làm proxy
+    pma20 = df["pct_from_ma20"].fillna(0)
+    bbw = df.get("bb_width", pd.Series(15, index=df.index)).fillna(15)
+    # Proxy BB %B: nếu pct_from_ma20 < -(bb_width/2) thì giá dưới lower band
+    bb_proxy = pma20 / (bbw/2).replace(0, np.nan)  # -1 = at lower band, +1 = at upper band
+    bb_score = np.where(bb_proxy < -1.0, 95.0,   # Below lower band → max score
+               np.where(bb_proxy < -0.6, 80.0,   # Near lower band
+               np.where(bb_proxy < -0.2, 65.0,   # Somewhat below middle
+               np.where(bb_proxy < 0.6,  50.0,   # Middle zone
+               np.where(bb_proxy < 1.0,  40.0,   # Near upper band
+                        30.0)))))                  # Above upper band
+    df["bb_oversold_score"] = pd.Series(bb_score, index=df.index).clip(0, 100)
+
+    # STOCHASTIC SCORE v5 (NEW):
+    # Stoch K < 15: edge +0.80%, win 54.8%, n=66,189 → 90
+    # Stoch K < 20: edge +0.60%, win 54.1%, n=87,082 → 80
+    # Stoch K 20-40: mild oversold → 60
+    # Stoch K 40-60: neutral → 50
+    # Stoch K 60-80: mild OB → 40
+    # Stoch K > 80: edge -0.06%, win 47.4% → 30
+    # Stoch K > 85: edge -0.13%, win 46.6% → 20
+    # Dùng Williams %R làm proxy nếu không có Stoch (Williams %R ≈ -100 + Stoch K)
+    wr = df.get("williams_r", pd.Series(np.nan, index=df.index))
+    # Williams %R < -80 ≈ Stoch < 20 (oversold) — edge +0.60%, win 54.1%
+    if wr.notna().any():
+        stoch_proxy = 100 + wr.fillna(-50)  # Convert W%R to Stoch-like scale
+    else:
+        stoch_proxy = pd.Series(50, index=df.index)
+
+    stoch_score = np.where(stoch_proxy < 15, 90.0,
+                  np.where(stoch_proxy < 20, 80.0,
+                  np.where(stoch_proxy < 40, 60.0,
+                  np.where(stoch_proxy < 60, 50.0,
+                  np.where(stoch_proxy < 80, 40.0,
+                  np.where(stoch_proxy < 85, 25.0,
+                           15.0))))))
+    df["stoch_score"] = pd.Series(stoch_score, index=df.index).clip(0, 100)
+
+    # MACD SCORE: giữ field backward-compat nhưng weight=0 (edge -0.47%)
     macd_hist = df.get("macd_hist", pd.Series(0.0, index=df.index)).fillna(0)
-    df["macd_score"] = percentile_rank(macd_hist)  # vẫn tính nhưng không dùng trong formula
+    df["macd_score"] = percentile_rank(macd_hist)
 
-    # TREND SCORE: P>MA20>MA50 — edge +0.77% (p=0.0000)
-    # v2: tăng spread giữa trend=1 và trend=-1 để phân biệt rõ hơn
+    # TREND SCORE v5: MA20>MA50 edge +0.29%, MA5>MA20 edge +0.26%
+    # Giảm spread vì edge nhỏ hơn expected
     trend = df.get("trend_short", pd.Series(0, index=df.index)).fillna(0)
-    df["trend_score"] = trend.map({1: 85.0, 0: 50.0, -1: 15.0}).fillna(50.0)
+    trend_med = df.get("trend_medium", pd.Series(0, index=df.index)).fillna(0)
+    # Blend short + medium trend
+    trend_blend = trend * 0.4 + trend_med * 0.6  # medium trend quan trọng hơn
+    df["trend_score"] = np.where(trend_blend > 0.5, 70.0,
+                        np.where(trend_blend > 0, 55.0,
+                        np.where(trend_blend > -0.5, 45.0,
+                                 30.0)))
 
-    # ADX SCORE v2 (NEW — thay MACD):
-    # Backtest: ADX >50 edge +0.62% (p=0.021); ADX <20 no edge; ADX linear IC ≈ 0
-    # → Dùng bucket scoring thay vì linear percentile rank
-    # ADX 0-15:   weak trend    → 30
-    # ADX 15-25:  developing    → 45
-    # ADX 25-35:  moderate      → 60
-    # ADX 35-50:  strong        → 70
-    # ADX >50:    very strong   → 90  ← có ý nghĩa thống kê p=0.021
+    # ADX SCORE v5: ADX>25 edge +0.37%, ADX>30 edge +0.40%
+    # Giảm trọng số vì edge thấp hơn expected
     adx = df.get("adx14", pd.Series(np.nan, index=df.index)).fillna(20)
-    adx_score = np.where(adx > 50, 90.0,
-                np.where(adx > 35, 70.0,
-                np.where(adx > 25, 60.0,
+    adx_score = np.where(adx > 50, 80.0,
+                np.where(adx > 40, 70.0,
+                np.where(adx > 30, 60.0,
+                np.where(adx > 25, 55.0,
                 np.where(adx > 15, 45.0,
-                         30.0))))
+                         35.0)))))
     df["adx_score"] = pd.Series(adx_score, index=df.index)
 
-    # TECHNICAL SCORE (không có MACD)
+    # TECHNICAL SCORE v5
     df["technical_score"] = (
-        df["rsi_score"]   * TECHNICAL_WEIGHTS["rsi_score"] +
-        df["trend_score"] * TECHNICAL_WEIGHTS["trend_score"] +
-        df["adx_score"]   * TECHNICAL_WEIGHTS["adx_score"]
+        df["rsi_score"]          * TECHNICAL_WEIGHTS["rsi_score"] +
+        df["bb_oversold_score"]  * TECHNICAL_WEIGHTS["bb_oversold_score"] +
+        df["stoch_score"]        * TECHNICAL_WEIGHTS["stoch_score"] +
+        df["trend_score"]        * TECHNICAL_WEIGHTS["trend_score"] +
+        df["adx_score"]          * TECHNICAL_WEIGHTS["adx_score"]
     )
 
-    # ── COMBO BONUS v3 ───────────────────────────────────────────────────────
-    # Backtest: Trend+ADX>30+RSI<70 → edge +1.54% fwd20D (p=0.0000)
-    # Backtest: Trend+ADX>25+RSI<35 → edge +9.79% fwd10D, win 72.7% (n=11)
-    # v3: tăng bonus từ +5 lên +8 để reflect edge thực tế mạnh hơn
+    # ── COMBO BONUS v5 ───────────────────────────────────────────────────────
+    # Backtest 493K: Trend+ADX>25+RSI<35 → edge +3.27%, win 59.2%, n=326
+    # Super Combo vẫn có ý nghĩa nhưng sample nhỏ → bonus moderate
 
-    # Combo 1: Trend + ADX>30 + RSI không overbought
+    # Combo 1: Trend + ADX>30 + RSI<70 → edge +0.31%, n=58,713
     combo_mask = (trend == 1) & (adx > 30) & (rsi < 70)
     df.loc[combo_mask, "technical_score"] = (
-        df.loc[combo_mask, "technical_score"] + 8.0
+        df.loc[combo_mask, "technical_score"] + 5.0
     ).clip(0, 100)
 
-    # Combo 2 (Super Combo): Trend + ADX>25 + RSI oversold (<35)
-    # Edge: win 72.7% fwd20D, avg +9.79% fwd10D — setup tiềm năng nhất
+    # Combo 2 (Super Combo): Trend + ADX>25 + RSI<35 → edge +3.27%, win 59.2%
     super_combo_mask = (trend == 1) & (adx > 25) & (rsi < 35)
     df.loc[super_combo_mask, "technical_score"] = (
-        df.loc[super_combo_mask, "technical_score"] + 15.0
+        df.loc[super_combo_mask, "technical_score"] + 12.0
     ).clip(0, 100)
 
-    # ── MEAN REVERSION SCORE (v3 NEW) ────────────────────────────────────────
-    # Backtest: crash -15% (20D) → bounce +1.13% avg 10D, win 49% (+8% vs bench)
-    # Backtest: crash -20% (20D) → bounce +1.79% avg 10D, win 49% (+8% vs bench)
-    # Lưu ý: bounce là SHORT TERM (5-10D), không phải trend đổi chiều
-    # → Mean Reversion Score dùng cho SHORT TERM signal, không cho composite dài hạn
+    # ── MEAN REVERSION SCORE v5 ──────────────────────────────────────────────
+    # Đây là trụ cột mới — VNSTOCK mean-reversion market confirmed
+    # Backtest 493K obs:
+    #   Panic Bottom (drop>15% MA20 + RSI<25): edge +5.19%, win 64.5%, Sharpe 0.283
+    #   Crash -20% + RSI<35:                   edge +4.44%, win 63.2%, Sharpe 0.300
+    #   Panic Bottom v2 (drop>10% + RSI<30):   edge +4.26%, WIN 65.8%, Sharpe 0.320 ← BEST
+    #   Crash -15% + RSI<40:                   edge +3.32%, win 62.0%
+    #   Crash -10%:                            edge +1.76%, win 57.4%
+    #   Ultra OS (RSI<30+BB<0+CCI<-100):       edge +1.82%, win 61.3%
     p20d_val = df["price_change_20d"].fillna(0)
-    rsi_vals  = df["rsi14"].fillna(50)
+    rsi_vals = df["rsi14"].fillna(50)
+    pma20_val = pma20
 
-    # MR Score: cao khi giá giảm mạnh + RSI oversold → bounce potential
-    # Thấp khi giá giảm vừa (không đủ oversold để bounce)
     mr_score = np.where(
-        (p20d_val < -20) & (rsi_vals < 35),  90.0,  # Crash + RSI oversold: bounce mạnh
+        (pma20_val < -15) & (rsi_vals < 25),  98.0,  # Panic Bottom: edge +5.19%, win 64.5%
         np.where(
-        (p20d_val < -15) & (rsi_vals < 40),  75.0,  # Crash + RSI low: bounce moderate
+        (p20d_val < -20) & (rsi_vals < 35),   95.0,  # Deep crash + RSI: edge +4.44%, win 63.2%
         np.where(
-        (p20d_val < -10) & (rsi_vals < 45),  60.0,  # Pullback + oversold: watch
+        (pma20_val < -10) & (rsi_vals < 30),  92.0,  # Panic v2: edge +4.26%, win 65.8% (BEST Sharpe)
         np.where(
-        p20d_val > 15,                         20.0,  # Overbought momentum: mean rev risk
+        (p20d_val < -15) & (rsi_vals < 40),   85.0,  # Crash + RSI low: edge +3.32%, win 62%
         np.where(
-        p20d_val > 25,                         10.0,  # Extreme overbought: high risk
+        (p20d_val < -10),                      70.0,  # Crash -10%: edge +1.76%, win 57.4%
+        np.where(
+        (rsi_vals < 30),                       65.0,  # RSI<30 standalone: edge +1.49%, win 52.9%
+        np.where(
+        (rsi_vals < 35),                       55.0,  # RSI<35: edge +1.00%
+        np.where(
+        (p20d_val > 20) & (rsi_vals > 70),    15.0,  # OB combo: watch for reversal
+        np.where(
+        (p20d_val > 15),                       25.0,  # Strong momentum: no edge (0.06%)
                                                50.0   # Neutral
-    )))))
+    )))))))))
     df["mean_reversion_score"] = pd.Series(mr_score, index=df.index).clip(0, 100)
 
     return df
@@ -633,11 +715,13 @@ def calc_composite(df: pd.DataFrame, symbols_df: pd.DataFrame = None) -> pd.Data
     df = df.copy()
 
     # Base composite score (chưa có penalty)
+    # v5: 5 trụ cột — thêm mean_reversion pillar
     df["composite_score_raw"] = (
-        df["fundamental_score"] * WEIGHTS["fundamental"] +
-        df["smart_money_score"] * WEIGHTS["smart_money"] +
-        df["momentum_score"]    * WEIGHTS["momentum"] +
-        df["technical_score"]   * WEIGHTS["technical"]
+        df["fundamental_score"]     * WEIGHTS["fundamental"] +
+        df["smart_money_score"]     * WEIGHTS["smart_money"] +
+        df["momentum_score"]        * WEIGHTS["momentum"] +
+        df["technical_score"]       * WEIGHTS["technical"] +
+        df["mean_reversion_score"]  * WEIGHTS["mean_reversion"]
     ).round(2)
     
     # Merge warning_status từ symbols_df
@@ -784,6 +868,7 @@ OUTPUT_COLS = [
     "foreign_net_7d_score", "foreign_net_30d_score",
     "price_5d_score", "price_20d_score", "vol_surge_score", "rs_vs_market_score",
     "rsi_score", "macd_score", "adx_score", "trend_score",
+    "bb_oversold_score", "stoch_score",
     # Fundamental raw values
     "roe", "roa", "pe", "revenue_growth", "net_margin", "debt_equity",
     # Price momentum

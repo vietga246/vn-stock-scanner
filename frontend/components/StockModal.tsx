@@ -1016,7 +1016,7 @@ function TradingStrategyTab({
   const williamsR = stock.williams_r ?? -50;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // BACKTEST-PROVEN SIGNAL DETECTION (29,327 obs, Aug'25–Mar'26)
+  // BACKTEST-PROVEN SIGNAL DETECTION (493,695 obs, Oct'22–Mar'26, 717 symbols)
   // ═══════════════════════════════════════════════════════════════════════════
 
   type ActiveSignal = {
@@ -1035,27 +1035,27 @@ function TradingStrategyTab({
 
   const activeSignals: ActiveSignal[] = [];
 
-  // 1. RSI < 30 (Deep Oversold) — edge +1.52% 20D, win 47%, n=1125
+  // 1. RSI < 30 (Deep Oversold) — edge +1.49% 20D, win 52.9%, n=21,083
   if (rsi < 30) {
     activeSignals.push({
       id: 'rsi_deep_os', label: 'RSI Deep Oversold', icon: '📉', color: '#00ff88',
-      type: 'buy', edge: '+1.52%', horizon: '20D', win: '47%', n: 1125, confidence: 'HIGH',
-      desc: `RSI ${rsi.toFixed(0)} < 30 — cổ phiếu bị bán quá mức. Edge +1.52% forward 20D.`,
+      type: 'buy', edge: '+1.49%', horizon: '20D', win: '52.9%', n: 21083, confidence: 'HIGH',
+      desc: `RSI ${rsi.toFixed(0)} < 30 — cổ phiếu bị bán quá mức. Edge +1.49% forward 20D trên 493K obs.`,
     });
   } else if (rsi < 35) {
     activeSignals.push({
       id: 'rsi_os', label: 'RSI Oversold', icon: '📉', color: '#00ff88',
-      type: 'buy', edge: '+0.91%', horizon: '20D', win: '45%', n: 2843, confidence: 'HIGH',
-      desc: `RSI ${rsi.toFixed(0)} < 35 — oversold. Edge +0.91% forward 20D.`,
+      type: 'buy', edge: '+1.00%', horizon: '20D', win: '53.7%', n: 40707, confidence: 'HIGH',
+      desc: `RSI ${rsi.toFixed(0)} < 35 — oversold. Edge +1.00% forward 20D.`,
     });
   }
 
-  // 2. Pullback in Uptrend (Stoch<20 + MA20>MA50) — edge +1.43%, win 46%, n=1906
+  // 2. Stochastic Oversold + Uptrend — edge +0.52%, win 53.8%, n=40,277
   if (stochK < 20 && trendMed === 1) {
     activeSignals.push({
       id: 'pullback_uptrend', label: 'Pullback in Uptrend', icon: '🎯', color: '#00d4ff',
-      type: 'buy', edge: '+1.43%', horizon: '20D', win: '46%', n: 1906, confidence: 'HIGH',
-      desc: `Stochastic ${stochK.toFixed(0)} oversold trong xu hướng tăng (MA20>MA50). Setup combo mạnh nhất.`,
+      type: 'buy', edge: '+0.52%', horizon: '20D', win: '53.8%', n: 40277, confidence: 'HIGH',
+      desc: `Stochastic ${stochK.toFixed(0)} oversold trong xu hướng tăng (MA20>MA50). Mẫu lớn (40K obs).`,
     });
   }
 
@@ -1068,65 +1068,79 @@ function TradingStrategyTab({
     });
   }
 
-  // 4. Triple Oversold (RSI<35 + Stoch<20 + CCI<-100)
+  // 4. Triple Oversold (RSI<35 + Stoch<20 + CCI<-100) — win 57.3%
   if (rsi < 35 && stochK < 20 && cci < -100) {
     activeSignals.push({
       id: 'triple_os', label: 'Triple Oversold', icon: '🔻', color: '#a78bfa',
-      type: 'buy', edge: '+1.09%', horizon: '20D', win: '47%', n: 1522, confidence: 'HIGH',
-      desc: `RSI + Stoch + CCI đồng loạt oversold. Ba chỉ báo xác nhận lẫn nhau.`,
+      type: 'buy', edge: '+1.13%', horizon: '20D', win: '57.3%', n: 22328, confidence: 'HIGH',
+      desc: `RSI + Stoch + CCI đồng loạt oversold. Ba chỉ báo xác nhận — mẫu 22K obs.`,
     });
   }
 
-  // 5. BB Below Lower Band — WIN 51% (only signal >50%)
+  // 5. BB Below Lower Band — WIN 58.6% (best single indicator by win rate)
   if (bbPct < 0) {
     activeSignals.push({
       id: 'bb_below', label: 'BB Below Lower Band', icon: '📊', color: '#00d4ff',
-      type: 'buy', edge: '+1.08%', horizon: '20D', win: '51%', n: 1301, confidence: 'HIGH',
-      desc: `BB %B=${bbPct.toFixed(2)} — giá phá dưới dải BB. Win rate 51% — tín hiệu có tỷ lệ thắng cao nhất.`,
+      type: 'buy', edge: '+1.11%', horizon: '20D', win: '58.6%', n: 20796, confidence: 'HIGH',
+      desc: `BB %B=${bbPct.toFixed(2)} — giá phá dưới dải BB. Win 58.6% — chỉ báo đơn có tỷ lệ thắng cao nhất (493K obs).`,
     });
   }
 
-  // 6. Mean Reversion — Crash + RSI
-  if (mom20 < -15 && rsi < 40) {
+  // 6. Panic Bottom (drop>10% MA20 + RSI<30) — BEST Sharpe 0.320, win 65.8%
+  if (pctMa20 < -10 && rsi < 30) {
     activeSignals.push({
-      id: 'mean_rev', label: 'Mean Reversion Setup', icon: '🔄', color: '#ff9500',
-      type: 'buy', edge: '+1.61%', horizon: '20D', win: '38%', n: 591, confidence: 'MEDIUM',
-      desc: `Giảm ${mom20.toFixed(1)}% (20D) + RSI ${rsi.toFixed(0)} — crash bounce potential. Win thấp nhưng edge cao.`,
+      id: 'panic_bottom', label: 'PANIC BOTTOM', icon: '💥', color: '#00ff88',
+      type: 'buy', edge: '+4.26%', horizon: '20D', win: '65.8%', n: 6585, confidence: 'HIGH',
+      desc: `Drop ${pctMa20.toFixed(1)}% from MA20 + RSI ${rsi.toFixed(0)} — Sharpe 0.320, chiến lược #1 trên VNSTOCK.`,
+    });
+  } else if (mom20 < -15 && rsi < 40) {
+    activeSignals.push({
+      id: 'mean_rev', label: 'Crash Recovery', icon: '🔄', color: '#ff9500',
+      type: 'buy', edge: '+3.32%', horizon: '20D', win: '62.0%', n: 14300, confidence: 'HIGH',
+      desc: `Giảm ${mom20.toFixed(1)}% (20D) + RSI ${rsi.toFixed(0)} — mean reversion edge mạnh.`,
+    });
+  } else if (mom20 < -10) {
+    activeSignals.push({
+      id: 'crash_10', label: 'Crash -10% Bounce', icon: '🔄', color: '#ffcc00',
+      type: 'buy', edge: '+1.76%', horizon: '20D', win: '57.4%', n: 40312, confidence: 'HIGH',
+      desc: `Giảm ${mom20.toFixed(1)}% (20D) — crash bounce tiềm năng. Win 57.4%.`,
     });
   }
 
-  // 7. Trend + ADX combo
+  // 7. Trend + ADX combo — edge +0.31%, win 49.2%, n=58,713
   if (trend === 1 && adx > 30 && rsi < 70) {
     activeSignals.push({
       id: 'trend_adx', label: 'Trend + ADX Combo', icon: '📈', color: '#00d4ff',
-      type: 'buy', edge: '+0.82%', horizon: '20D', win: '40%', n: 2820, confidence: 'HIGH',
-      desc: `Trend UP + ADX ${adx.toFixed(0)} > 30 + RSI < 70 — xu hướng tăng mạnh được xác nhận.`,
+      type: 'buy', edge: '+0.31%', horizon: '20D', win: '49.2%', n: 58713, confidence: 'MEDIUM',
+      desc: `Trend UP + ADX ${adx.toFixed(0)} > 30 + RSI < 70 — edge nhẹ nhưng mẫu rất lớn.`,
     });
   }
 
-  // 8. BB Squeeze + ADX — breakout setup
-  if (bbWidth < 8 && adx > 20) {
+  // 8. BB Squeeze + ADX — NEGATIVE EDGE (remove as buy signal)
+  // Backtest 493K: BB Squeeze<8% + ADX>20 → edge -0.52%, win 46.9%
+  // BB Squeeze is NOT a buy signal on VNSTOCK — it's actually a warning
+  if (bbWidth < 6 && adx > 25) {
     activeSignals.push({
-      id: 'bb_squeeze', label: 'BB Squeeze Breakout', icon: '💥', color: '#ffcc00',
-      type: 'buy', edge: '+0.76%', horizon: '20D', win: '43%', n: 7440, confidence: 'HIGH',
-      desc: `BB Width ${bbWidth.toFixed(1)}% squeeze + ADX ${adx.toFixed(0)} — nén biên độ, breakout sắp xảy ra.`,
+      id: 'bb_squeeze', label: 'BB Squeeze (Caution)', icon: '⚡', color: '#ff9500',
+      type: 'warning', edge: '-0.40%', horizon: '20D', win: '44.8%', n: 41340, confidence: 'MEDIUM',
+      desc: `BB Squeeze ${bbWidth.toFixed(1)}% — backtest 493K obs cho thấy breakout setup có edge ÂM trên VNSTOCK.`,
     });
   }
 
   // ── SELL SIGNALS ──────────────────────────────────────────────────────────
 
-  // 9. RSI > 80 — edge -2.91% 20D (strongest sell)
+  // 9. RSI > 80 — edge -0.34%, win 43.2% (n=11,968)
   if (rsi > 80) {
     activeSignals.push({
       id: 'rsi_deep_ob', label: 'RSI Deep Overbought', icon: '🔴', color: '#ff3366',
-      type: 'sell', edge: '-2.91%', horizon: '20D', win: '40%', n: 285, confidence: 'HIGH',
-      desc: `RSI ${rsi.toFixed(0)} > 80 — overbought cực mạnh. Tín hiệu bán có edge âm mạnh nhất.`,
+      type: 'sell', edge: '-0.34%', horizon: '20D', win: '43.2%', n: 11968, confidence: 'HIGH',
+      desc: `RSI ${rsi.toFixed(0)} > 80 — overbought. Win chỉ 43.2% trên 493K observations.`,
     });
   } else if (rsi > 70) {
     activeSignals.push({
       id: 'rsi_ob', label: 'RSI Overbought', icon: '⚠️', color: '#ff9500',
-      type: 'warning', edge: '-0.96%', horizon: '20D', win: '40%', n: 1255, confidence: 'MEDIUM',
-      desc: `RSI ${rsi.toFixed(0)} > 70 — vùng overbought. Cân nhắc chốt lời một phần.`,
+      type: 'warning', edge: '+0.18%', horizon: '20D', win: '47.6%', n: 38510, confidence: 'LOW',
+      desc: `RSI ${rsi.toFixed(0)} > 70 — vùng overbought. Edge gần 0, cân nhắc chốt lời.`,
     });
   }
 
@@ -1257,7 +1271,7 @@ function TradingStrategyTab({
             <p className="text-[11px] leading-relaxed" style={{ color: '#c8d4e0' }}>
               {activeSignals.length === 0
                 ? 'Chưa có tín hiệu kỹ thuật rõ ràng từ backtest. Nên chờ RSI về vùng oversold (<35) hoặc pullback trong uptrend.'
-                : `${buySignals.length} tín hiệu mua + ${sellSignals.length} cảnh báo từ backtest 29,327 quan sát (Aug'25–Mar'26).`
+                : `${buySignals.length} tín hiệu mua + ${sellSignals.length} cảnh báo từ backtest 493,695 quan sát (Oct'22–Mar'26).`
               }
             </p>
           </div>
@@ -1391,7 +1405,7 @@ function TradingStrategyTab({
       <div className="rounded-xl p-3" style={{ background: '#0a0f14', border: '1px solid #1e2832' }}>
         <div className="flex items-center justify-between mb-2.5">
           <div className="text-[10px] font-semibold tracking-widest" style={{ color: '#4a5a6a' }}>
-            ✅ ENTRY CHECKLIST — BACKTEST v4
+            ✅ ENTRY CHECKLIST — BACKTEST v5 (493K obs)
           </div>
           <div className="font-mono text-[11px] font-bold"
             style={{ color: passCount >= 6 ? '#00ff88' : passCount >= 4 ? '#ffcc00' : '#ff3366' }}>
