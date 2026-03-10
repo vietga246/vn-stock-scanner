@@ -45,6 +45,15 @@ export interface Stock {
   plus_di14?: number;
   minus_di14?: number;
   
+  // Backtest v2 indicators
+  stoch_k?: number;
+  stoch_d?: number;
+  cci20?: number;
+  williams_r?: number;
+  mfi14?: number;
+  bb_pct?: number;
+  mean_reversion_score?: number;
+  
   // Smart Money (billion VND)
   foreign_net_7d?: number;
   foreign_net_30d?: number;
