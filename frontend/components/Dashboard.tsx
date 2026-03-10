@@ -614,7 +614,7 @@ export default function Dashboard() {
                       }}>
                         {s.foreign_net_7d == null
                           ? '—'
-                          : `${s.foreign_net_7d >= 0 ? '+' : ''}${Math.abs(s.foreign_net_7d) >= 1000 ? (s.foreign_net_7d / 1000).toFixed(2) + 'T' : s.foreign_net_7d.toFixed(1) + 'B'}`}
+                          : `${s.foreign_net_7d >= 0 ? '+' : ''}${new Intl.NumberFormat('vi-VN').format(Math.round(s.foreign_net_7d))} tỷ`}
                       </td>
                       <td className="p-2 text-right">
                         {s.adx14 != null ? (
