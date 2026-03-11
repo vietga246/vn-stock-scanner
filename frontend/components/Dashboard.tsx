@@ -5,6 +5,7 @@ import { Search, Star, BarChart3, X } from 'lucide-react';
 import type { Stock, Sector, AIAnalysis, ICTSignal, ICTSignalsResponse, SummaryResponse, PriceBoardResponse } from '@/lib/types';
 import { getDashboardData, getSummary, loadPrices, getPriceBoard, formatPrice, formatPercent, getScoreColor, getTierColor, getICTSignals } from '@/lib/api';
 import { getStockSignal } from '@/lib/signals';
+import { generateAnalysis, getRecommendationDisplay } from '@/lib/analysis';
 import IndustryFlow from './IndustryFlow';
 import ICTDashboard from './ICTDashboard';
 import MarketBreadth from './MarketBreadth';
@@ -66,23 +67,35 @@ function PriceChange({ value }: { value?: number }) {
   );
 }
 
-function SignalBadge({ stock, ict, regimeBullWeight }: { stock: Stock; ict?: import('@/lib/types').ICTSignal; regimeBullWeight?: number }) {
+function SignalBadge({ stock, ict, regimeBullWeight, preloadedAnalysis }: {
+  stock: Stock;
+  ict?: import('@/lib/types').ICTSignal;
+  regimeBullWeight?: number;
+  preloadedAnalysis?: AIAnalysis;
+}) {
+  // ── EXACT SAME logic as StockModal header ──
+  const bullWeight = ict?.bull_weight ?? regimeBullWeight;
+  const analysis = preloadedAnalysis || generateAnalysis(stock, undefined, bullWeight);
+  const rec = getRecommendationDisplay(analysis.recommendation);
+
+  // Tooltip reason from computeSignal
+  const bw = bullWeight ?? 0.5;
   const sig = getStockSignal(stock, ict, undefined, regimeBullWeight);
-  const convColor = sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8';
+
   return (
     <span className="strat-tip-wrap">
       <span
         className="px-1.5 py-0.5 rounded font-bold text-[9px] tracking-wide whitespace-nowrap cursor-help"
-        style={{ color: sig.color, background: sig.bg, border: `1px solid ${sig.border}`, boxShadow: `0 0 8px ${sig.color}20` }}
+        style={{ color: rec.color, background: `${rec.color}18`, border: `1px solid ${rec.color}40`, boxShadow: `0 0 8px ${rec.color}20` }}
       >
-        {sig.label}
+        {rec.text}
       </span>
       {sig.reason && (
         <div className="strat-tip" style={{ width: 260 }}>
           <div style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: 10, height: 10, background: '#0f1519', borderRight: '1px solid #2a3642', borderBottom: '1px solid #2a3642' }} />
           <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #1e2832', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: sig.color }}>{sig.label}</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: convColor, padding: '2px 6px', borderRadius: 4, background: `${convColor}15`, border: `1px solid ${convColor}30` }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: rec.color }}>{rec.text}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8', padding: '2px 6px', borderRadius: 4, background: `${sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8'}15` }}>
               {sig.conviction}
             </span>
           </div>
@@ -785,7 +798,7 @@ export default function Dashboard() {
                       <td className="p-2 text-right"><PriceChange value={s.change_20d} /></td>
                       <td className="p-2 text-right"><ScoreBadge value={s.composite_score} /></td>
                       <td className="p-2 text-center">
-                        <SignalBadge stock={s} ict={ictMap[s.symbol]} regimeBullWeight={ictData?.regime?.bull_weight} />
+                        <SignalBadge stock={s} ict={ictMap[s.symbol]} regimeBullWeight={ictData?.regime?.bull_weight} preloadedAnalysis={aiAnalyses[s.symbol]} />
                       </td>
                       <td className="p-2 text-right font-mono text-[10px]" style={{
                         color: s.foreign_net_7d == null ? '#2a3642' : s.foreign_net_7d >= 0 ? '#00ff88' : '#ff3366',
