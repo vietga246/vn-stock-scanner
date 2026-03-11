@@ -238,14 +238,17 @@ export function computeSignal(
 
 /**
  * Convenience wrapper — nhận thẳng Stock + ICTSignal objects
+ * v5: thêm regimeBullWeight để Dashboard + Modal dùng cùng bull_weight
  */
 export function getStockSignal(
   stock: Stock,
   ict?: ICTSignal | null,
   groups?: SignalGroup[],
+  regimeBullWeight?: number,
 ): SignalConfig {
   const composite = stock.composite_score ?? 50;
-  const bullWeight = ict?.bull_weight ?? 0.5;
+  // Priority: stock ICT bull_weight > market regime bull_weight > 0.5 (neutral)
+  const bullWeight = ict?.bull_weight ?? regimeBullWeight ?? 0.5;
   const foreignNet7d = stock.foreign_net_7d;
   return computeSignal(composite, bullWeight, groups, foreignNet7d, stock);
 }

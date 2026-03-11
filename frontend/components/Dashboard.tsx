@@ -66,8 +66,8 @@ function PriceChange({ value }: { value?: number }) {
   );
 }
 
-function SignalBadge({ stock, ict }: { stock: Stock; ict?: import('@/lib/types').ICTSignal }) {
-  const sig = getStockSignal(stock, ict);
+function SignalBadge({ stock, ict, regimeBullWeight }: { stock: Stock; ict?: import('@/lib/types').ICTSignal; regimeBullWeight?: number }) {
+  const sig = getStockSignal(stock, ict, undefined, regimeBullWeight);
   const convColor = sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8';
   return (
     <span className="strat-tip-wrap">
@@ -785,7 +785,7 @@ export default function Dashboard() {
                       <td className="p-2 text-right"><PriceChange value={s.change_20d} /></td>
                       <td className="p-2 text-right"><ScoreBadge value={s.composite_score} /></td>
                       <td className="p-2 text-center">
-                        <SignalBadge stock={s} ict={ictMap[s.symbol]} />
+                        <SignalBadge stock={s} ict={ictMap[s.symbol]} regimeBullWeight={ictData?.regime?.bull_weight} />
                       </td>
                       <td className="p-2 text-right font-mono text-[10px]" style={{
                         color: s.foreign_net_7d == null ? '#2a3642' : s.foreign_net_7d >= 0 ? '#00ff88' : '#ff3366',
