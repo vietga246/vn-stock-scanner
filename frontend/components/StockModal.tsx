@@ -565,7 +565,7 @@ function FinanceTab({ detail, detailLoading }: { detail: StockDetail | null; det
   const cf = [...detail.cashflow].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)).slice(0, 6);
   const bal = [...detail.balance].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter));
   const latestBal = bal[0] ?? null;
-  const annual = bal.filter((b) => b.quarter === 4).slice(0, 5).reverse();
+  const annual = bal.filter((b) => b.quarter === 4).slice(0, 5);
   const totalAssets = latestBal ? (latestBal.total_assets || 1) : 1;
 
   return (
@@ -857,7 +857,7 @@ function CapitalTab({ detail, detailLoading }: { detail: StockDetail | null; det
   };
 
   const bal = detail ? [...detail.balance].sort((a, b) => b.year * 10 + b.quarter - (a.year * 10 + a.quarter)) : [];
-  const annual = bal.filter((b) => b.quarter === 4).slice(0, 5).reverse();
+  const annual = bal.filter((b) => b.quarter === 4).slice(0, 5);
   const latest = bal[0] ?? null;
   const totalAssets = latest ? (latest.total_assets || 1) : 1;
 
