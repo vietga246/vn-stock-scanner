@@ -11,6 +11,7 @@ import ICTDashboard from './ICTDashboard';
 import MarketBreadth from './MarketBreadth';
 import StockModal from './StockModal';
 import Sparkline from './Sparkline';
+import VirtualPortfolio from './VirtualPortfolio';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -223,7 +224,7 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState<SortableKey>('rank');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
-  const [activeTab, setActiveTab] = useState<'screener' | 'ict'>('screener');
+  const [activeTab, setActiveTab] = useState<'screener' | 'ict' | 'portfolio'>('screener');
 
   // P5: Watchlist persisted to localStorage
   const [watchlist, setWatchlist] = useState<Set<string>>(() => {
@@ -529,15 +530,16 @@ export default function Dashboard() {
             {([
               { key: 'screener', label: 'SCREENER' },
               { key: 'ict',      label: '🧠 ICT' },
-            ] as { key: 'screener' | 'ict'; label: string }[]).map(({ key, label }) => (
+              { key: 'portfolio', label: '💰 PORTFOLIO' },
+            ] as { key: 'screener' | 'ict' | 'portfolio'; label: string }[]).map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
                 className="px-3 py-1 rounded text-[10px] font-bold transition-all"
                 style={{
-                  background: activeTab === key ? (key === 'ict' ? '#a78bfa25' : '#00d4ff15') : 'transparent',
-                  color: activeTab === key ? (key === 'ict' ? '#a78bfa' : '#00d4ff') : '#4a5a6a',
-                  border: activeTab === key ? `1px solid ${key === 'ict' ? '#a78bfa40' : '#00d4ff30'}` : '1px solid transparent',
+                  background: activeTab === key ? (key === 'ict' ? '#a78bfa25' : key === 'portfolio' ? '#ffcc0015' : '#00d4ff15') : 'transparent',
+                  color: activeTab === key ? (key === 'ict' ? '#a78bfa' : key === 'portfolio' ? '#ffcc00' : '#00d4ff') : '#4a5a6a',
+                  border: activeTab === key ? `1px solid ${key === 'ict' ? '#a78bfa40' : key === 'portfolio' ? '#ffcc0040' : '#00d4ff30'}` : '1px solid transparent',
                 }}
               >
                 {label}
@@ -728,6 +730,8 @@ export default function Dashboard() {
         <div className="p-3">
           <ICTDashboard />
         </div>
+      ) : activeTab === 'portfolio' ? (
+        <VirtualPortfolio stocks={stocks} />
       ) : (
       <div className="flex gap-3 p-3">
         {/* Industry Flow Panel */}
