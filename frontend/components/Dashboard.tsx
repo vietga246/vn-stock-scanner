@@ -78,9 +78,23 @@ function SignalBadge({ stock, ict, regimeBullWeight, preloadedAnalysis }: {
   const analysis = preloadedAnalysis || generateAnalysis(stock, undefined, bullWeight);
   const rec = getRecommendationDisplay(analysis.recommendation);
 
-  // Tooltip reason from computeSignal
+  // Build explanation matching the recommendation
+  const rsi = stock.rsi14 ?? 50;
+  const p20d = stock.price_change_20d ?? stock.change_20d ?? 0;
+  const pma20 = stock.pct_from_ma20 ?? 0;
   const bw = bullWeight ?? 0.5;
-  const sig = getStockSignal(stock, ict, undefined, regimeBullWeight);
+  const isBear = bw <= 0.3;
+
+  // Detailed reason that matches WHY this recommendation was given
+  let reason = analysis.summary || '';
+  const indicators: string[] = [];
+  if (rsi < 30) indicators.push(`RSI ${rsi.toFixed(0)} (oversold)`);
+  else if (rsi > 70) indicators.push(`RSI ${rsi.toFixed(0)} (overbought)`);
+  if (p20d < -15) indicators.push(`20D: ${p20d.toFixed(1)}%`);
+  else if (p20d > 15) indicators.push(`20D: +${p20d.toFixed(1)}%`);
+  if (pma20 < -10) indicators.push(`MA20: ${pma20.toFixed(1)}%`);
+  if (isBear) indicators.push(`BEAR (bw ${(bw * 100).toFixed(0)}%)`);
+  const indicatorLine = indicators.length > 0 ? indicators.join(' · ') : '';
 
   return (
     <span className="strat-tip-wrap">
@@ -90,20 +104,33 @@ function SignalBadge({ stock, ict, regimeBullWeight, preloadedAnalysis }: {
       >
         {rec.text}
       </span>
-      {sig.reason && (
-        <div className="strat-tip" style={{ width: 260 }}>
-          <div style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: 10, height: 10, background: '#0f1519', borderRight: '1px solid #2a3642', borderBottom: '1px solid #2a3642' }} />
-          <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #1e2832', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="strat-tip" style={{ width: 280 }}>
+        <div style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: 10, height: 10, background: '#0f1519', borderRight: '1px solid #2a3642', borderBottom: '1px solid #2a3642' }} />
+        {/* Header */}
+        <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #1e2832', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 13 }}>{rec.icon === 'up' ? '🟢' : rec.icon === 'down' ? '🔴' : '🟡'}</span>
             <span style={{ fontSize: 12, fontWeight: 800, color: rec.color }}>{rec.text}</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8', padding: '2px 6px', borderRadius: 4, background: `${sig.conviction === 'HIGH' ? '#00ff88' : sig.conviction === 'MEDIUM' ? '#ffcc00' : '#8b99a8'}15` }}>
-              {sig.conviction}
-            </span>
           </div>
-          <div style={{ padding: '8px 12px 10px' }}>
-            <p style={{ fontSize: 10.5, color: '#b8c8d8', lineHeight: 1.65, margin: 0 }}>{sig.reason}</p>
-          </div>
+          <span className="font-mono text-[10px] font-bold" style={{ color: getScoreColor(stock.composite_score) }}>
+            {stock.composite_score.toFixed(1)}
+          </span>
         </div>
-      )}
+        {/* Reason */}
+        <div style={{ padding: '8px 12px', borderBottom: indicatorLine ? '1px solid #1e2832' : 'none' }}>
+          <p style={{ fontSize: 10.5, color: '#b8c8d8', lineHeight: 1.65, margin: 0 }}>{reason}</p>
+        </div>
+        {/* Indicator chips */}
+        {indicatorLine && (
+          <div style={{ padding: '6px 12px 10px', display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {indicators.map((ind, i) => (
+              <span key={i} style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: '#1e2832', color: '#8b99a8', fontFamily: "'JetBrains Mono', monospace" }}>
+                {ind}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </span>
   );
 }
