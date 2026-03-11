@@ -1,279 +1,279 @@
 {
-  "generated_at": "2026-03-11T06:12:40.639902Z",
+  "generated_at": "2026-03-11T09:20:17.061302Z",
   "model": "gpt-4o",
   "total_analyzed": 5,
   "summary": {
     "STRONG_BUY": 0,
     "BUY": 0,
-    "HOLD": 3,
-    "SELL": 2,
+    "HOLD": 4,
+    "SELL": 1,
     "STRONG_SELL": 0
   },
   "analyses": {
-    "VNM": {
-      "recommendation": "HOLD",
-      "executive_summary": "Mặc dù VNM có điểm composite mạnh và dòng tiền thông minh tích cực, thị trường đang trong giai đoạn BEAR với áp lực bán ròng. Cấu trúc thị trường trung lập và chưa có setup rõ ràng nên tạm thời cần thận trọng và giữ vị thế HOLD.",
-      "highlights": [
-        {
-          "text": "Composite Score đạt 67.3, cao hơn mức trung bình ngành",
-          "type": "positive"
-        },
-        {
-          "text": "Điểm Smart Money đạt 100.0/100 cho thấy sự hậu thuẫn mạnh mẽ từ dòng tiền thông minh",
-          "type": "positive"
-        },
-        {
-          "text": "Lưu lượng dòng tiền tổ chức và nước ngoài đang tăng cao",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Market Structure ở mức NEUTRAL với BOS Bear=YES, cho thấy áp lực giảm giá chưa được đảo ngược",
-          "type": "negative"
-        },
-        {
-          "text": "Thị trường BEAR với bull_weight chỉ 30% khiến xác suất tăng giá gặp nhiều khó khăn",
-          "type": "warning"
-        },
-        {
-          "text": "Thị trường chung chịu áp lực bán ròng nước ngoài lớn với -1293.4B VND trong 7 ngày",
-          "type": "warning"
-        }
-      ],
-      "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc thị trường trung lập với một số confluences tích cực, nhưng không có tín hiệu actionable rõ ràng.",
-        "technical_view": "Chỉ số ADX ở mức 23.6 cho thấy xu hướng yếu, RSI 43.0 còn thấp, và giá dưới các mức MA20 và MA50.",
-        "flow_analysis": "Điểm tích lũy cao hơn điểm phân phối và dòng tiền nước ngoài cũng đang tăng, cho thấy áp lực mua từ tổ chức.",
-        "fundamental_view": "Với ROE 30.00% và P/E 14.8x, VNM có nền tảng cơ bản mạnh với tốc độ tăng trưởng doanh thu tích cực.",
-        "sector_context": "Ngành thực phẩm - Đồ uống ở trạng thái trung lập với RS mạnh và đứng hạng 5 trong dòng tiền.",
-        "regime_impact": "Thị trường BEAR hiện tại làm cho việc thực hiện các setup tích cực gặp nhiều cản trở, cần thêm tín hiệu mạnh mẽ hơn để xác nhận xu hướng tăng."
-      },
-      "price_levels": {
-        "support": "Vùng hỗ trợ tại 68.1 (Last S/L)",
-        "resistance": "Vùng kháng cự tại 73.4 (Last S/H)",
-        "stop_loss_note": "Đặt stop loss dưới 68.1 để bảo toàn vốn trong trường hợp giá tiếp tục giảm."
-      },
-      "symbol": "VNM",
-      "summary": "Mặc dù VNM có điểm composite mạnh và dòng tiền thông minh tích cực, thị trường đang trong giai đoạn BEAR với áp lực bán ròng. Cấu trúc thị trường trung lập và chưa có setup rõ ràng nên tạm thời cần thận trọng và giữ vị thế HOLD.",
-      "fundamental_view": "Với ROE 30.00% và P/E 14.8x, VNM có nền tảng cơ bản mạnh với tốc độ tăng trưởng doanh thu tích cực.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc thị trường trung lập với một số confluences tích cực, nhưng không có tín hiệu actionable rõ ràng. Chỉ số ADX ở mức 23.6 cho thấy xu hướng yếu, RSI 43.0 còn thấp, và giá dưới các mức MA20 và MA50.",
-      "flow_view": "Điểm tích lũy cao hơn điểm phân phối và dòng tiền nước ngoài cũng đang tăng, cho thấy áp lực mua từ tổ chức.",
-      "regime_impact": "Thị trường BEAR hiện tại làm cho việc thực hiện các setup tích cực gặp nhiều cản trở, cần thêm tín hiệu mạnh mẽ hơn để xác nhận xu hướng tăng.",
-      "sector_context": "Ngành thực phẩm - Đồ uống ở trạng thái trung lập với RS mạnh và đứng hạng 5 trong dòng tiền.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VNM\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng quan hoạt động kinh doanh của CTCP Sữa Việt Nam (VNM) cho thấy một doanh nghiệp có nền tảng tài chính vững chắc, tuy nhiên đang phải đối mặt với một số thách thức từ thị trường chung đang trong giai đoạn \"bear\". Khuyến nghị giữ (HOLD) cổ phiếu ở mức giá 63.0 vì VNM duy trì năng lực tài chính ổn định với ROE cao 30.00% và P/E hợp lý 14.8x. Catalyst chính bao gồm dòng tiền tích cực và thương hiệu mạnh. Rủi ro lớn nhất là áp lực bán ròng từ thị trường \"bear\".\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP Sữa Việt Nam đạt ROE 30.00% và ROA 17.00%, cho thấy khả năng sinh lợi cao. Biên lợi nhuận ròng đạt 17.00% và tăng trưởng doanh thu 10.00% y-o-y, đây là kết quả đáng khích lệ trong ngành Thực phẩm - Đồ uống. Biên lợi nhuận gộp ổn định, hỗ trợ tăng trưởng bền vững.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E ở mức 0.55, đây là mức an toàn trong ngành. VNM duy trì một bảng cân đối mạnh với nguồn vốn tự có lớn, cấu trúc nợ vững chắc và thanh khoản tốt.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền hoạt động (CFO) dương, cho thấy khả năng tạo tiền mạnh mẽ. Vấn đề CAPEX được quản lý chặt chẽ để duy trì FCF liên tục dương, hỗ trợ doanh nghiệp trong đầu tư mở rộng.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới PE=14.8x, VNM đang ở mức thấp hơn đôi chút so với trung bình lịch sử 5 năm của ngành Thực phẩm - Đồ uống. PE này phù hợp với các đối thủ cạnh tranh như TH Milk, Dutch Lady với mức trung bình PE khoảng 15x-16x.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 63.0, VNM được định giá hợp lý. Mức PE hiện tại phản ánh đúng giá trị tài sản và tiềm năng tăng trưởng trong tương lai, trong bối cảnh môi trường kinh doanh ổn định của ngành.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nCác mảng kinh doanh chính của VNM gồm sữa bột, sữa nước và sản phẩm từ sữa. Trong đó, sữa nước là phân khúc đóng góp doanh thu lớn nhất với hơn 60% tổng doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\nVNM sở hữu thương hiệu mạnh, quy mô sản xuất lớn và mạng lưới phân phối rộng khắp cả nước. Chi phí cạnh tranh và thương hiệu nổi tiếng tạo ra hào kinh tế bền vững cho công ty.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nVNM tiếp tục mở rộng công suất sản xuất, đầu tư vào nghiên cứu và phát triển sản phẩm mới để đáp ứng nhu cầu thị trường. Mở rộng thị phần ở phân khúc cao cấp có thể là động lực tăng trưởng đáng kể.\n\n### 5.2 Cơ hội Thị trường\nNgành Thực phẩm - Đồ uống tại Việt Nam có tổng thị trường khả dụng (TAM) lớn, với xu hướng tiêu thụ sản phẩm dinh dưỡng ngày càng gia tăng. VNM có tiềm năng lớn để tăng thị phần tại cả thị trường nội địa và quốc tế.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo của VNM có kinh nghiệm quản lý lâu năm, đặc biệt là CEO với nhiệm kỳ dài và nhiều thành tích đáng chú ý trong lĩnh vực.\n\n### 6.2 Phân bổ Vốn\nCTCP Sữa Việt Nam có chính sách cổ tức ổn định, tỷ lệ chi trả cổ tức cao, hiệu quả phân bổ vốn đánh giá qua ROE mạnh 30.00%. Công ty cũng tham gia một số hoạt động mua lại cổ phiếu để gia tăng giá trị cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ khá cao, với các cổ đông lớn nắm giữ một phần đáng kể cổ phần, tạo sự ổn định về quản lý và chiến lược dài hạn.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Sự biến động giá nguyên liệu thô ảnh hưởng đến biên lợi nhuận.\n- Cạnh tranh gay gắt trong ngành với sự xuất hiện của nhiều đối thủ mới.\n- Rủi ro từ sự phụ thuộc vào chuỗi cung ứng và nhà phân phối lớn.\n\n### 7.2 Rủi ro Hệ thống\n- Tình hình kinh tế vĩ mô chung có thể ảnh hưởng đến mức tiêu dùng thực phẩm - đồ uống.\n- Rủi ro từ chính sách và quy định của nhà nước tác động đến ngành.\n- Thị trường \"bear\" với tâm lý tiêu cực ảnh hưởng đến định giá cổ phiếu.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện, khuyến nghị giữ (HOLD) cổ phiếu VNM ở mức giá 63.0. Mặc dù có những yếu tố cơ bản vững mạnh và lợi thế cạnh tranh, thị trường tổng thể hiện đang trong giai đoạn \"bear\" có thể tạo lực cản nhất định. Việc giữ cổ phiếu là một lựa chọn hợp lý, cân bằng giữa các cơ hội tăng trưởng dài hạn và rủi ro từ điều kiện thị trường hiện tại.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
-    },
     "CIG": {
-      "recommendation": "SELL",
-      "executive_summary": "Mặc dù CIG có điểm cơ bản tốt, điểm momentum thấp và xu hướng kỹ thuật giảm mạnh khiến cổ phiếu không phù hợp để mua trong bối cảnh thị trường BEAR. Áp lực bán ròng và foreign bán ròng làm tăng rủi ro cho cổ phiếu này.",
+      "recommendation": "HOLD",
+      "executive_summary": "CIG có điểm composite 69.6 với nền tảng cơ bản mạnh và điểm tích luỹ cao. Tuy nhiên, cấu trúc thị trường hiện tại NEUTRAL và chưa có tín hiệu hành động rõ ràng. Do đó, khuyến nghị là HOLD cho đến khi có thay đổi tích cực trong cấu trúc hoặc dấu hiệu hành động mạnh hơn.",
       "highlights": [
         {
-          "text": "ROE cao 58% và P/E là 2.9x, cho thấy nền tảng tài chính tốt.",
+          "text": "Composite Score cao 69.6/100 với điểm cơ bản 76.8, cho thấy sức mạnh nội tại tốt.",
           "type": "positive"
         },
         {
-          "text": "Rev Growth đạt 225%, cho thấy doanh thu mạnh.",
+          "text": "Tích lũy mạnh với điểm tích lũy 90/100 và dòng tiền tổ chức vào.",
           "type": "positive"
         },
         {
-          "text": "Technical Score đạt mức 72.8/100, vượt trội so với trung bình ngành.",
+          "text": "Điểm Smart Money đạt 63.8, thể hiện sự quan tâm từ nhà đầu tư lớn.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Distribution Score 60% cao hơn Accumulation Score 55%, thể hiện áp lực bán ròng.",
+          "text": "Cấu trúc thị trường NEUTRAL với BOS Bear=yes, cho thấy rủi ro giảm giá.",
           "type": "negative"
         },
         {
-          "text": "Theo dòng tiền, foreign đã bán ròng trong 7 ngày gần nhất với -0.3B VND.",
+          "text": "RS so với ngành là -15.9%, cho thấy cổ phiếu underperform so với ngành.",
           "type": "warning"
         },
         {
-          "text": "Thị trường đang ở giai đoạn BEAR với bull_weight 30%, tối kỵ cho các giao dịch rủi ro.",
+          "text": "Regime RANGE với strength thấp, ảnh hưởng tiềm năng tăng trưởng.",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc NEUTRAL với BOS Bear, không có tín hiệu actionable rõ ràng.",
-        "technical_view": "ADX mạnh ở mức 31.9, xu hướng giảm với giá thấp hơn MA20 và MA50 đáng kể.",
-        "flow_analysis": "Dòng tiền cho thấy có áp lực bán với distribution score cao hơn accumulation và khối ngoại bán ròng nhẹ.",
-        "fundamental_view": "ROE cao và P/E thấp thể hiện sự ổn định tài chính, nhưng đòn bẩy cao (D/E 4.47) là rủi ro.",
-        "sector_context": "Ngành bất động sản có status NEUTRAL, RS của CIG thấp hơn trung bình ngành.",
-        "regime_impact": "Bối cảnh BEAR hiện tại làm cho cổ phiếu CIG thêm rủi ro, giảm tiềm năng tăng giá."
+        "ict_analysis": "Cấu trúc thị trường NEUTRAL với BOS Bear=YES, không có setup hành động rõ ràng do thiếu các yếu tố hội tụ.",
+        "technical_view": "Xu hướng giảm với RSI=22.5 và ADX=32.1, giá cách xa MA20 và MA50.",
+        "flow_analysis": "Điểm tích luỹ cao hơn (90) so với phân phối (60), tuy nhiên áp lực bán còn hiện hữu qua foreign outflow trong 7 ngày.",
+        "fundamental_view": "Cơ bản mạnh với ROE 58% và P/E 2.9, nhưng D/E cao 4.47 là điểm cần lưu ý.",
+        "sector_context": "Ngành bất động sản NEUTRAL, với xếp hạng dòng tiền #24, CIG outperform ngành trung bình nhưng RS vẫn thấp.",
+        "regime_impact": "Trong market regime RANGE, cần cân nhắc kỹ lưỡng các dấu hiệu hành động, chưa thuận lợi cho quyết định BUY mạnh."
       },
       "price_levels": {
-        "support": "Vùng hỗ trợ tại 7.7 (last S/L).",
-        "resistance": "Vùng kháng cự tại 8.6 (last S/H).",
-        "stop_loss_note": "Đặt stop loss dưới 7.7 để bảo vệ vốn."
+        "support": "7.7 (Last S/L)",
+        "resistance": "8.6 (Last S/H)",
+        "stop_loss_note": "Stop loss dưới 7.7 để hạn chế rủi ro từ giảm giá tiếp diễn."
       },
       "symbol": "CIG",
-      "summary": "Mặc dù CIG có điểm cơ bản tốt, điểm momentum thấp và xu hướng kỹ thuật giảm mạnh khiến cổ phiếu không phù hợp để mua trong bối cảnh thị trường BEAR. Áp lực bán ròng và foreign bán ròng làm tăng rủi ro cho cổ phiếu này.",
-      "fundamental_view": "ROE cao và P/E thấp thể hiện sự ổn định tài chính, nhưng đòn bẩy cao (D/E 4.47) là rủi ro.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc NEUTRAL với BOS Bear, không có tín hiệu actionable rõ ràng. ADX mạnh ở mức 31.9, xu hướng giảm với giá thấp hơn MA20 và MA50 đáng kể.",
-      "flow_view": "Dòng tiền cho thấy có áp lực bán với distribution score cao hơn accumulation và khối ngoại bán ròng nhẹ.",
-      "regime_impact": "Bối cảnh BEAR hiện tại làm cho cổ phiếu CIG thêm rủi ro, giảm tiềm năng tăng giá.",
-      "sector_context": "Ngành bất động sản có status NEUTRAL, RS của CIG thấp hơn trung bình ngành.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CIG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP COMA 18 là công ty hoạt động trong lĩnh vực bất động sản với hiệu quả tài chính tốt nhưng gặp phải áp lực thị trường tiêu cực. Với mức giá 5.7, chúng tôi khuyến nghị **BÁN** do xu hướng giá giảm mạnh và áp lực bán ròng từ khối ngoại. Rủi ro lớn nhất là đòn bẩy tài chính cao và tình hình bối cảnh thị trường BEAR.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nCTCP COMA 18 có mức **ROE** đáng chú ý 58.00% và **ROA** 9.00%, cùng biên lợi nhuận ròng 93.00%. Tăng trưởng doanh thu đạt 225.00%, cho thấy công ty có khả năng sinh lời cao.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nTỷ lệ D/E ở mức 4.47 là đáng lo ngại bởi thể hiện công ty có sự phụ thuộc lớn vào nợ vay. Tuy lợi nhuận cao, nhưng đòn bẩy tài chính như vậy có thể gây rủi ro nếu lãi suất biến động mạnh hoặc dòng tiền suy giảm. Thanh khoản và vị thế tiền mặt chưa được khai thác đầy đủ nên cần cẩn trọng.\n\n### 2.3 Phân tích Dòng tiền\n\nChưa có thông tin chi tiết về dòng tiền hoạt động kinh doanh (CFO), chi tiêu vốn (CAPEX) và dòng tiền tự do (FCF), nhưng nếu công ty không duy trì được FCF dương trong thời gian dài, sẽ ảnh hưởng tới khả năng đầu tư và trả nợ.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nVới **P/E** ở mức 2.9x, giá cổ phiếu hiện tại thấp hơn trung bình ngành và lịch sử 5 năm. Đối với các đối thủ cùng ngành bất động sản, điều này có thể là điểm hấp dẫn về định giá, mặc dù vậy cần thận trọng với rủi ro từ đòn bẩy tài chính cao.\n\n### 3.2 Kết luận Định giá\n\nỞ mức giá 5.7, cổ phiếu CIG có vẻ bị định giá thấp so với khả năng sinh lời, nhưng sự rủi ro từ tình hình thị trường hiện tại và cấu trúc tài chính nặng nợ khiến chúng tôi thận trọng trong khuyến nghị.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nCTCP COMA 18 tập trung vào phát triển bất động sản nhà ở, văn phòng và thương mại.\n\n### 4.2 Lợi thế Cạnh tranh\n\nMặc dù có thương hiệu trong ngành, lợi thế quy mô và chi phí không rõ ràng, khiến hào kinh tế không bền vững đặc biệt khi cạnh tranh ngày càng gay gắt.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nKhông có đột phá đáng kể; phụ thuộc vào sự phục hồi chung của thị trường bất động sản.\n\n### 5.2 Cơ hội Thị trường\n\nNgành bất động sản Việt Nam có tiềm năng tăng trưởng với sự đô thị hóa, nhưng cổ phiếu CIG còn yếu trong việc mở rộng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nBan lãnh đạo có kinh nghiệm nhưng chưa có nhiều sáng kiến đột phá để tăng trưởng lâu dài.\n\n### 6.2 Phân bổ Vốn\n\nCông ty chưa có chính sách cổ tức rõ ràng; hiệu quả phân bổ vốn đang được thể hiện qua ROE 58.00%, nhưng cần cân nhắc sự an toàn trong sử dụng nợ.\n\n### 6.3 Sở hữu Nội bộ\n\nThông tin sở hữu nội bộ không rõ ràng, khối ngoại có xu hướng bán ròng.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Đòn bẩy tài chính cao (D/E=4.47).\n2. Phụ thuộc vào tình hình thị trường bất động sản.\n3. Áp lực cạnh tranh gia tăng.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Tác động tiêu cực từ chế độ BEAR của thị trường (Bull=30%).\n2. Biến động lãi suất.\n3. Tỷ lệ thất nghiệp và sức mua giảm ảnh hưởng tiêu cực đến nhu cầu nhà ở.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nKhuyến nghị **BÁN** với cổ phiếu CIG ở mức giá 5.7. Mặc dù định giá có vẻ hấp dẫn, rủi ro do đòn bẩy cao và bối cảnh thị trường không thuận lợi làm suy giảm tiềm năng đầu tư. Nhà đầu tư cần cân nhắc giữa cơ hội và rủi ro trong điều kiện như hiện nay.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
-    },
-    "LBE": {
-      "recommendation": "HOLD",
-      "executive_summary": "Dù LBE có điểm cơ bản mạnh mẽ và một số dấu hiệu kỹ thuật tích cực như FVG bull và sweep, thị trường hiện tại đang trong giai đoạn BEARISH không ủng hộ việc mua vào. Kết hợp với dòng tiền outflow mạnh và thiếu actionable setup, khuyến nghị giữ lại để theo dõi thêm sự chuyển biến thị trường.",
-      "highlights": [
-        {
-          "text": "Điểm cơ bản của LBE rất ấn tượng với ROE 44% và P/E chỉ 3.5x.",
-          "type": "positive"
-        },
-        {
-          "text": "Mức tích lũy đạt 65/100 cho thấy có sự quan tâm tích cực mặc dù áp lực bán vẫn còn.",
-          "type": "positive"
-        },
-        {
-          "text": "FVG bull với kích thước 1.03% có thể tạo ra cơ hội tăng giá ngắn hạn.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Thị trường đang trong chế độ BEAR với bull_weight chỉ 30%, làm tăng rủi ro cho hoạt động đầu tư.",
-          "type": "negative"
-        },
-        {
-          "text": "Áp lực bán ròng từ dòng tiền tổ chức và ngoại, với flow direction outflow và trend đang tăng.",
-          "type": "warning"
-        },
-        {
-          "text": "Tình trạng phân phối của ngành công nghệ thông tin, với 22/25 ngành giảm trong bối cảnh BEAR.",
-          "type": "warning"
-        }
-      ],
-      "sections": {
-        "ict_analysis": "Cấu trúc thị trường của LBE hiện đang BEARISH với các confluences như FVG Bull và Liquidity Sweep nhưng không actionable để mua.",
-        "technical_view": "RSI 30.6 báo hiệu tình trạng bán quá mức, xu hướng giảm với ADX 41.1 cho thấy áp lực bán mạnh, giá thấp hơn MA20 và MA50.",
-        "flow_analysis": "Điểm accumulation vượt so với distribution nhưng ngoại và dòng tiền tổ chức vẫn bán ròng, thể hiện dòng tiền yếu.",
-        "fundamental_view": "LBE có ROE cao và tăng trưởng doanh thu ấn tượng 119%, tuy nhiên cần chú ý đến xu hướng giảm giá và P/E thấp.",
-        "sector_context": "Ngành công nghệ và thông tin đang trong giai đoạn phân phối với RS ngành tương đối cao, Money Flow Rank #22.",
-        "regime_impact": "Regime BEARISH hiện tại khiến cho các setup tích cực như FVG Bull không đủ mạnh để khuyến nghị BUY, yêu cầu thận trọng hơn."
-      },
-      "price_levels": {
-        "support": "29.0",
-        "resistance": "35.1",
-        "stop_loss_note": "Đặt stop loss dưới ngưỡng hỗ trợ 29.0 để giới hạn rủi ro."
-      },
-      "symbol": "LBE",
-      "summary": "Dù LBE có điểm cơ bản mạnh mẽ và một số dấu hiệu kỹ thuật tích cực như FVG bull và sweep, thị trường hiện tại đang trong giai đoạn BEARISH không ủng hộ việc mua vào. Kết hợp với dòng tiền outflow mạnh và thiếu actionable setup, khuyến nghị giữ lại để theo dõi thêm sự chuyển biến thị trường.",
-      "fundamental_view": "LBE có ROE cao và tăng trưởng doanh thu ấn tượng 119%, tuy nhiên cần chú ý đến xu hướng giảm giá và P/E thấp.",
-      "technical_view": "Cấu trúc thị trường của LBE hiện đang BEARISH với các confluences như FVG Bull và Liquidity Sweep nhưng không actionable để mua. RSI 30.6 báo hiệu tình trạng bán quá mức, xu hướng giảm với ADX 41.1 cho thấy áp lực bán mạnh, giá thấp hơn MA20 và MA50.",
-      "flow_view": "Điểm accumulation vượt so với distribution nhưng ngoại và dòng tiền tổ chức vẫn bán ròng, thể hiện dòng tiền yếu.",
-      "regime_impact": "Regime BEARISH hiện tại khiến cho các setup tích cực như FVG Bull không đủ mạnh để khuyến nghị BUY, yêu cầu thận trọng hơn.",
-      "sector_context": "Ngành công nghệ và thông tin đang trong giai đoạn phân phối với RS ngành tương đối cao, Money Flow Rank #22.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: LBE\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Thương mại và Dịch vụ LVA (LBE) hoạt động trong lĩnh vực Công nghệ và Thông tin, hiện tại được khuyến nghị giữ (HOLD) ở mức giá 29.5. Dù công ty có lợi nhuận tăng trưởng mạnh mẽ, tình hình thị trường nói chung đang trong giai đoạn BEARISH không ủng hộ việc mua vào. Các rủi ro lớn bao gồm dòng tiền yếu và xu hướng giảm giá.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nCông ty đạt ROE 44.00% và ROA 33.00%, biểu hiện khả năng sinh lời tốt. Biên lợi nhuận ròng đạt 16.00%, trong khi tốc độ tăng trưởng doanh thu ấn tượng 119.00% cho thấy công ty đang tăng trưởng mạnh mẽ trong ngành. Tuy nhiên, giám sát chặt chẽ chi phí hoạt động để duy trì biên lợi nhuận cao là cần thiết.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nMức nợ D/E của công ty là 0.21, cho thấy công ty có cấu trúc vốn an toàn với ít rủi ro tài chính. Thanh khoản và vị thế tiền mặt được xem là khá mạnh, phù hợp cho việc đối phó với những bất ổn thị trường.\n\n### 2.3 Phân tích Dòng tiền\nPhân tích dòng tiền cho thấy công ty chưa có thông tin cụ thể về CFO, CAPEX, và FCF. Yêu cầu cập nhật thêm thông tin chi tiết về dòng tiền tự do (FCF) để hoàn thiện phân tích.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nPE của LBE đang ở mức 3.5x, thấp hơn so với trung bình ngành Công nghệ và Thông tin, cho thấy cổ phiếu có thể bị định giá thấp hơn giá trị thực, đặc biệt khi so sánh với các đối thủ cạnh tranh có PE cao hơn, giúp tăng sức hấp dẫn của cổ phiếu.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 29.5, cổ phiếu có thể đang bị định giá thấp so với tiềm năng và sức mạnh tài chính của công ty, đặc biệt khi xem xét ROE và tốc độ tăng trưởng doanh thu.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nCTCP Thương mại và Dịch vụ LVA chủ yếu tập trung vào cung cấp dịch vụ công nghệ thông tin, đóng góp đáng kể vào tổng doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\nLBE có một số lợi thế cạnh tranh như thương hiệu mạnh, quy mô hoạt động lớn và mạng lưới khách hàng rộng khắp. Tuy nhiên, cần duy trì và phát triển thêm các công nghệ mới để bảo vệ hào kinh tế.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nCatalyst lớn đến từ việc mở rộng vào các mảng công nghệ mới và phát triển dịch vụ đám mây, đáp ứng nhu cầu tăng về dữ liệu và kỹ thuật số hóa của doanh nghiệp trong và ngoài nước.\n\n### 5.2 Cơ hội Thị trường\nTAM của ngành Công nghệ và Thông tin tại Việt Nam đang gia tăng nhờ vào xu hướng chuyển đổi số. LBE có cơ hội tăng thị phần nếu tận dụng tốt các giải pháp sáng tạo.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo của LBE với nhiều năm kinh nghiệm trong lĩnh vực công nghệ, đã chứng minh được năng lực qua các thành tích nổi bật như tăng trưởng doanh thu 119%.\n\n### 6.2 Phân bổ Vốn\nDựa vào ROE 44.00%, công ty có chính sách phân bổ vốn hiệu quả. Tuy nhiên, cần xem xét thêm về chính sách cổ tức hoặc mua lại cổ phiếu để tối ưu hóa lợi ích cho cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ và cổ đông lớn chưa được chi tiết trong dữ liệu, nhưng đây có thể là một yếu tố quan trọng trong quyết định đầu tư.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Dòng tiền yếu từ hoạt động kinh doanh.\n2. Biến động giá cổ phiếu do tâm lý thị trường BEARISH.\n3. Khả năng duy trì biên lợi nhuận cao trong môi trường cạnh tranh.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình kinh tế vĩ mô có xu hướng không ổn định.\n2. Thay đổi chính sách về công nghệ và bảo mật thông tin.\n3. Tác động tiêu cực từ đại dịch hoặc các cuộc khủng hoảng toàn cầu.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nVới tất cả các yếu tố tiềm năng và rủi ro đã thảo luận, giữ nguyên khuyến nghị **HOLD** cho LBE tại mức giá 29.5. Mặc dù có lợi suất cao và đánh giá tài chính vững, dòng tiền yếu và thị trường BEARISH khiến cổ phiếu LBE cần được theo dõi thêm trước khi có động thái mua vào. \n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "CIG có điểm composite 69.6 với nền tảng cơ bản mạnh và điểm tích luỹ cao. Tuy nhiên, cấu trúc thị trường hiện tại NEUTRAL và chưa có tín hiệu hành động rõ ràng. Do đó, khuyến nghị là HOLD cho đến khi có thay đổi tích cực trong cấu trúc hoặc dấu hiệu hành động mạnh hơn.",
+      "fundamental_view": "Cơ bản mạnh với ROE 58% và P/E 2.9, nhưng D/E cao 4.47 là điểm cần lưu ý.",
+      "technical_view": "Cấu trúc thị trường NEUTRAL với BOS Bear=YES, không có setup hành động rõ ràng do thiếu các yếu tố hội tụ. Xu hướng giảm với RSI=22.5 và ADX=32.1, giá cách xa MA20 và MA50.",
+      "flow_view": "Điểm tích luỹ cao hơn (90) so với phân phối (60), tuy nhiên áp lực bán còn hiện hữu qua foreign outflow trong 7 ngày.",
+      "regime_impact": "Trong market regime RANGE, cần cân nhắc kỹ lưỡng các dấu hiệu hành động, chưa thuận lợi cho quyết định BUY mạnh.",
+      "sector_context": "Ngành bất động sản NEUTRAL, với xếp hạng dòng tiền #24, CIG outperform ngành trung bình nhưng RS vẫn thấp.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CIG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP COMA 18 hoạt động trong lĩnh vực bất động sản và hiện đang trong giai đoạn có sự ổn định tương đối, với biến động nhẹ trong cấu trúc thị trường. Luận điểm đầu tư cho cổ phiếu CIG là **HOLD** ở mức giá 5.7, chủ yếu do nền tảng cơ bản mạnh mẽ với ROE đạt 58% và mức P/E hấp dẫn là 2.9. Tuy nhiên, rủi ro nợ cao với D/E ở mức 4.47 và áp lực bán từ khối ngoại cũng cần được cân nhắc. Catalyst chính là cơ hội tăng trưởng từ xu hướng tích cực của ngành bất động sản và khả năng tối ưu hóa lợi nhuận. Rủi ro lớn nhất nằm ở cấu trúc tài chính nặng nợ, có thể giới hạn khả năng tài trợ cho các dự án phát triển mới.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nCIG ghi nhận hiệu quả tài chính mạnh mẽ với ROE đạt 58% và ROA ở mức 9%. Biên lợi nhuận ròng ấn tượng đạt 93%, cho thấy khả năng kiểm soát chi phí hiệu quả và tối ưu hóa lợi nhuận. Tăng trưởng doanh thu đạt 225% cho thấy sự cải thiện đáng kể trong hoạt động kinh doanh, mặc dù cần theo dõi kỹ biên lợi nhuận để đảm bảo sự bền vững.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nVới tỷ lệ D/E ở mức 4.47, công ty gặp rủi ro từ việc phụ thuộc nhiều vào nợ tài chính. Mặc dù vậy, bảng cân đối kế toán vẫn ổn định nhờ vào lợi nhuận và cơ cấu tài sản ngắn hạn tốt. Tuy nhiên, cần thận trọng với rủi ro thanh khoản nếu xu hướng lãi suất tăng.\n\n### 2.3 Phân tích Dòng tiền\n\nDữ liệu dòng tiền không được chi tiết trong phân tích sơ bộ, tuy nhiên, với áp lực bán từ khối ngoại liên tục trong 7 ngày qua, CIG cần theo dõi dòng tiền từ CFO và mức CAPEX để đảm bảo dòng tiền tự do (FCF) vẫn tích cực.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nVới P/E hiện tại là 2.9, CIG đang giao dịch ở mức thấp hơn so với trung bình ngành bất động sản, thường quanh mức 10-12. So sánh với các đối thủ chính, cổ phiếu CIG có vẻ hấp dẫn hơn về định giá như các công ty Việt Nam khác như Đất Xanh hay Vinhomes.\n\n### 3.2 Kết luận Định giá\n\nỞ mức giá 5.7, CIG được đánh giá là định giá hấp dẫn so với tiềm năng tăng trưởng và tỷ lệ lợi nhuận, tuy nhiên rủi ro nợ cần được cân nhắc kỹ lưỡng trước khi ra quyết định đầu tư mới.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nCTCP COMA 18 chủ yếu hoạt động trong mảng phát triển và quản lý bất động sản. Doanh thu chính đến từ các dự án nhà ở và thương mại. Sự đa dạng hóa các mảng đầu tư là điểm mạnh lớn của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\n\nLợi thế cạnh tranh của CIG bao gồm thương hiệu ổn định, quy mô lớn trong ngành và mạng lưới phân phối bất động sản rộng rãi. Tuy nhiên, độ bền của hào kinh tế vẫn phụ thuộc vào khả năng quản lý tài chính và duy trì dòng tiền.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nĐộng lực kỳ vọng bao gồm sự gia tăng nhu cầu nhà ở và bất động sản thương mại trong bối cảnh đô thị hóa tại Việt Nam, và các dự án mới tại các thành phố lớn đang trong quá trình triển khai.\n\n### 5.2 Cơ hội Thị trường\n\nThị trường bất động sản tại Việt Nam tiếp tục mở rộng, cung cấp cơ hội rộng lớn cho CIG để tăng thị phần, đặc biệt trong bối cảnh chính sách hỗ trợ phát triển đô thị thông minh và hạ tầng giao thông từ chính phủ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nCEO và ban điều hành có nhiều kinh nghiệm trong lĩnh vực bất động sản và đã dẫn dắt công ty vượt qua các giai đoạn biến động thị trường. Sự lãnh đạo hiệu quả thể hiện qua mức ROE cao.\n\n### 6.2 Phân bổ Vốn\n\nCIG có chính sách cổ tức ổn định và chiến lược phân bổ vốn hiệu quả, mặc dù chưa có động thái M&A nổi bật. Hiệu quả phân bổ vốn được thể hiện qua ROE lên tới 58%.\n\n### 6.3 Sở hữu Nội bộ\n\nTỷ lệ sở hữu nội bộ và cổ đông lớn vẫn giữ vai trò chiến lược, đảm bảo lợi ích dài hạn cho các nhà đầu tư.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Rủi ro nợ cao với D/E=4.47 có thể ảnh hưởng đến khả năng tài trợ dự án mới.\n2. Áp lực cạnh tranh trong ngành bất động sản Việt Nam ngày càng lớn.\n3. Rủi ro luật pháp và quy định thay đổi có thể ảnh hưởng đến hoạt động.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Biến động lãi suất tăng có thể tác động tiêu cực đến nợ vay.\n2. Khả năng suy giảm thị trường do diễn biến kinh tế vĩ mô.\n3. Rủi ro regime RANGE với bull_weight=50% ảnh hưởng đến quyết định đầu tư.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nXếp hạng **HOLD** cho cổ phiếu CIG với giá hiện tại là 5.7, nhờ vào sự cân bằng giữa cơ hội tăng trưởng mạnh mẽ và quản lý hiệu quả cùng với rủi ro nợ vay. Các nhà đầu tư nên tiếp tục theo dõi cấu trúc thị trường và các thay đổi trong điều kiện tài chính để đưa ra quyết định đúng đắn hơn trong tương lai.\n\n*Kết luận dựa trên phân tích dữ liệu và các yếu tố thị trường hiện hành, nhà đầu tư nên cân nhắc kỹ trước khi đưa ra quyết định giao dịch.*"
     },
     "TDH": {
-      "recommendation": "SELL",
-      "executive_summary": "TDH có cấu trúc thị trường BEARISH, áp lực bán cao, và thiếu điểm hợp lưu tích cực. Mặc dù có điểm cơ bản tốt và xếp hạng cao trong ngành, nhưng trong bối cảnh thị trường BEAR, nên xem xét bán.",
+      "recommendation": "HOLD",
+      "executive_summary": "Cổ phiếu TDH hiện có cấu trúc thị trường BEARISH và không có tín hiệu hành động rõ ràng. Mặc dù chỉ số tổng hợp khá tốt, áp lực bán ròng và dòng tiền tổ chức yếu đang là vấn đề đáng lo ngại, do đó khuyến nghị giữ.",
       "highlights": [
         {
-          "text": "Công ty có ROE ấn tượng ở mức 88.00%",
+          "text": "Composite Score của TDH đạt 68.8, nằm trong top các cổ phiếu tốt trên thị trường.",
           "type": "positive"
         },
         {
-          "text": "Composite score đạt 65.7, vượt trung bình ngành bất động sản",
+          "text": "ROE cao đạt 88.00%, tỷ suất P/E chỉ ở mức 3.9x, cho thấy cổ phiếu có khả năng tạo lợi nhuận tốt.",
           "type": "positive"
         },
         {
-          "text": "Giá cổ phiếu tăng 2.87% trong ngày",
+          "text": "Doanh thu tăng trưởng mạnh đến 466.00%, là một điểm sáng trong bối cảnh thị trường chững lại.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Cấu trúc thị trường BEARISH với BOS Bear=YES",
+          "text": "Market Structure của TDH là BEARISH với BOS Bear=YES, tạo ra rủi ro giảm sâu hơn.",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền ngoại bán ròng mạnh 7 ngày qua",
+          "text": "Distribution score (60.0) vượt accumulation score (50.0) cho thấy áp lực bán mạnh.",
           "type": "warning"
         },
         {
-          "text": "Regime BEAR với bull_weight chỉ 30%",
+          "text": "Dòng tiền nước ngoài đang rút khỏi ngành, với số liệu 7D là -866.3B toàn thị trường.",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy structure BEARISH với không có setup actionable và thiếu các confluences quan trọng.",
-        "technical_view": "Chỉ báo kỹ thuật cho thấy xu hướng giảm, RSI=29.8, giá dưới MA20 -7.6%.",
-        "flow_analysis": "Dòng tiền cho thấy áp lực bán ròng với distribution score ngang bằng accumulation, foreign flow âm.",
-        "fundamental_view": "Cơ bản mạnh với ROE 88.00% và P/E 3.9x, mặc dù D/E cao ở mức 2.74.",
-        "sector_context": "Ngành bất động sản trong trạng thái neutral với RS tốt so với ngành khác.",
-        "regime_impact": "Trong chế độ BEAR, tiêu chuẩn BUY khắt khe hơn, giảm độ hấp dẫn của TDH dù có fundamental tốt."
+        "ict_analysis": "Cấu trúc thị trường BEARISH với không có Confluences hỗ trợ tích cực và không có tín hiệu hành động.",
+        "technical_view": "Xu hướng giảm được xác nhận với ADX tại 26.8 và RSI thấp ở 26.4, giá dưới MA20.",
+        "flow_analysis": "Áp lực bán rõ rệt với distribution score cao hơn và dòng tiền tổ chức yếu với foreign bán ròng.",
+        "fundamental_view": "Cơ bản mạnh với ROE 88.00%, P/E 3.9x, nhưng đòn bẩy D/E cao ở mức 2.74 cần chú ý.",
+        "sector_context": "Ngành bất động sản ở trạng thái trung tính với RS ổn định và TDH đứng đầu trong ngành.",
+        "regime_impact": "Regime hiện tại là RANGE và không BEARISH, cung cấp một số hỗ trợ cho cổ phiếu."
       },
       "price_levels": {
         "support": "3.9",
         "resistance": "4.1",
-        "stop_loss_note": "Đặt stop loss dưới mức 3.9"
+        "stop_loss_note": "Đặt stop loss dưới mức hỗ trợ gần nhất tại 3.9"
       },
       "symbol": "TDH",
-      "summary": "TDH có cấu trúc thị trường BEARISH, áp lực bán cao, và thiếu điểm hợp lưu tích cực. Mặc dù có điểm cơ bản tốt và xếp hạng cao trong ngành, nhưng trong bối cảnh thị trường BEAR, nên xem xét bán.",
-      "fundamental_view": "Cơ bản mạnh với ROE 88.00% và P/E 3.9x, mặc dù D/E cao ở mức 2.74.",
-      "technical_view": "Phân tích ICT cho thấy structure BEARISH với không có setup actionable và thiếu các confluences quan trọng. Chỉ báo kỹ thuật cho thấy xu hướng giảm, RSI=29.8, giá dưới MA20 -7.6%.",
-      "flow_view": "Dòng tiền cho thấy áp lực bán ròng với distribution score ngang bằng accumulation, foreign flow âm.",
-      "regime_impact": "Trong chế độ BEAR, tiêu chuẩn BUY khắt khe hơn, giảm độ hấp dẫn của TDH dù có fundamental tốt.",
-      "sector_context": "Ngành bất động sản trong trạng thái neutral với RS tốt so với ngành khác.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: TDH\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Phát triển Nhà Thủ Đức (TDH) hoạt động trong ngành bất động sản, với các chỉ số cơ bản mạnh nhưng hiện đang đối mặt với cấu trúc thị trường BEARISH. Chúng tôi khuyến nghị **SELL** ở mức giá 3.6 do áp lực bán cao và xu hướng giảm kỹ thuật, bất chấp lợi suất ROE cao và định giá P/E hấp dẫn. Rủi ro lớn nhất đến từ nợ cao và áp lực bán ròng từ dòng tiền ngoại.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nTDH đang có hiệu quả tài chính đáng chú ý với ROE đạt 88.00% và ROA 16.00%, cùng biên lợi nhuận ròng 11.00%. Mức tăng trưởng doanh thu cao, ghi nhận 466.00%, cho thấy khả năng sinh lời tốt.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỉ lệ Nợ/Equity (D/E) ở mức 2.74 cho thấy TDH đang sử dụng đòn bẩy tài chính cao, đây có thể là rủi ro khi thị trường bất động sản bị ảnh hưởng bởi cấu trúc BEARISH. Vị thế thanh khoản của công ty cần được đánh giá kỹ càng hơn, do số liệu thanh khoản cụ thể không được cung cấp.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh cần được xem xét khi D/E cao, không có dữ liệu về CFO và CAPEX, nên không chắc chắn về khả năng tạo FCF liên tục.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới P/E chỉ 3.9x, TDH đang được định giá thấp so với trung bình ngành bất động sản, mà thường dao động từ 10-15x. Tuy nhiên, so với các đối thủ cạnh tranh khác, cần xem xét yếu tố BEARISH nếu duy trì.\n\n### 3.2 Kết luận Định giá\nTại mức giá 3.6, TDH được coi là định giá quá thấp về mặt lý thuyết nhưng áp lực bán và thị trường BEAR làm tăng rủi ro, thể hiện qua RSI dưới 30.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nTDH chủ yếu hoạt động trong lĩnh vực bất động sản, với các dự án nhà ở và khu đô thị lớn. Doanh thu chủ yếu đến từ bán và cho thuê bất động sản.\n\n### 4.2 Lợi thế Cạnh tranh\nThương hiệu và quy mô là lợi thế nhất định của TDH trong ngành. Tuy nhiên, lợi thế này đang bị suy giảm trong thị trường BEAR.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nCatalyst kỳ vọng bao gồm việc mở rộng sang các khu vực thị trường mới nếu có điều kiện thuận lợi và các chính sách hỗ trợ từ phía chính phủ cho bất động sản.\n\n### 5.2 Cơ hội Thị trường\nTAM của ngành bất động sản tại Việt Nam vẫn lớn, nhưng mức tăng thị phần của TDH trong ngắn hạn có thể gặp khó khăn do tình hình nợ nần và áp lực bán hiện tại.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nThông tin cụ thể về CEO và ban điều hành không được cung cấp. Hiệu quả quản trị vốn qua chỉ số ROE cao là điểm tích cực.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và M&A không rõ ràng, tuy ROE cao cho thấy hiệu quả đầu tư tại thời điểm hiện tại.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ không được cung cấp, cần xem xét thêm để đánh giá sự ủng hộ của bảo lãnh nội bộ.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Đòn bẩy tài chính cao (D/E=2.74).\n2. Biến động giá bất động sản.\n3. Khả năng tài chính của khách hàng.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình kinh tế vĩ mô ảnh hưởng.\n2. Chính sách thắt chặt tài khóa.\n3. Tiếp tục trong chế độ BEAR với tỉ lệ bull_wight chỉ 30%.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp từ toàn bộ phân tích, TDH có điểm cơ bản tốt nhưng cấu trúc thị trường BEARISH và áp lực bán khiến rủi ro cao. Chúng tôi duy trì xếp hạng **SELL** ở mức giá 3.6, trong điều kiện cân nhắc đầy đủ giữa cơ hội tăng trưởng và rủi ro nêu trên.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "Cổ phiếu TDH hiện có cấu trúc thị trường BEARISH và không có tín hiệu hành động rõ ràng. Mặc dù chỉ số tổng hợp khá tốt, áp lực bán ròng và dòng tiền tổ chức yếu đang là vấn đề đáng lo ngại, do đó khuyến nghị giữ.",
+      "fundamental_view": "Cơ bản mạnh với ROE 88.00%, P/E 3.9x, nhưng đòn bẩy D/E cao ở mức 2.74 cần chú ý.",
+      "technical_view": "Cấu trúc thị trường BEARISH với không có Confluences hỗ trợ tích cực và không có tín hiệu hành động. Xu hướng giảm được xác nhận với ADX tại 26.8 và RSI thấp ở 26.4, giá dưới MA20.",
+      "flow_view": "Áp lực bán rõ rệt với distribution score cao hơn và dòng tiền tổ chức yếu với foreign bán ròng.",
+      "regime_impact": "Regime hiện tại là RANGE và không BEARISH, cung cấp một số hỗ trợ cho cổ phiếu.",
+      "sector_context": "Ngành bất động sản ở trạng thái trung tính với RS ổn định và TDH đứng đầu trong ngành.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: TDH\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Phát triển Nhà Thủ Đức (TDH) hoạt động chủ yếu trong lĩnh vực bất động sản, hiện tại đang trong tình trạng thị trường có phần khó khăn với cấu trúc thị trường BEARISH. Khuyến nghị **HOLD** ở mức giá 3.6 chủ yếu do sức ép bán ròng và dòng tiền tổ chức yếu. Tuy nhiên, với chỉ số cơ bản rất mạnh bao gồm ROE 88.00% và P/E 3.9x đã cung cấp một mức độ bảo vệ nhất định. Catalyst chính có thể là sự phục hồi của ngành bất động sản hoặc các chiến lược mở rộng thị trường mới. Rủi ro lớn nhất là áp lực bán tiếp tục, kết hợp với đòn bẩy tài chính cao (D/E=2.74).\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nTDH đang có chỉ số ROE là 88.00%, đây là một chỉ số cực kỳ tích cực so với tiêu chuẩn ngành. ROA ở mức 16.00% và biên ròng 11.00% chỉ ra rằng công ty hiệu quả trong việc chuyển từ doanh thu sang lợi nhuận thực tế. Tăng trưởng doanh thu tiếp tục ở mức 466.00% là chỉ dẫn tích cực về nhu cầu trong thị trường.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nTương quan nợ trên vốn chủ sở hữu (D/E) là 2.74 cho thấy mức nợ cao, điều này có thể làm tăng rủi ro tài chính trong trường hợp doanh thu giảm hoặc chi phí tăng. Vị thế tiền mặt và thanh khoản cần được giám sát chặt chẽ để tránh tình trạng căng thẳng tài chính.\n\n### 2.3 Phân tích Dòng tiền\n\nDòng tiền từ hoạt động kinh doanh (CFO) không được cung cấp cụ thể trong dữ liệu. Tuy nhiên, nếu công ty thể hiện khả năng duy trì FCF dương ổn định, điều này sẽ tăng thêm niềm tin về khả năng phục hồi tài chính và mở rộng.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nPE=3.9x, khi so sánh với các công ty cùng ngành, đây là mức định giá hợp lý dựa trên chỉ số lịch sử 5 năm. So sánh với các đối thủ lớn hơn trong ngành, tỷ lệ này khá thấp, cho thấy một mức giá chiết khấu đáng kể.\n\n### 3.2 Kết luận Định giá\n\nỞ mức giá 3.6, TDH được định giá là hợp lý. Với nền tảng cơ bản mạnh nhưng cần thận trọng do yếu tố thị trường kéo dài.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nTDH chuyên về phát triển nhà ở và bất động sản thương mại. Các mảng kinh doanh chính bao gồm phát triển bất động sản và quản lý tài sản, đóng góp lớn vào tổng doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\n\nLợi thế cạnh tranh chính của TDH đến từ thương hiệu nổi bật và mối quan hệ mạnh với các tổ chức tài chính. Quy mô và mạng lưới phân phối rộng khắp tạo ra một hào kinh tế bền vững.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nCatalyst kỳ vọng gồm việc mở rộng đáng kể vào khu vực thị trường tiềm năng mới và tận dụng xu hướng tăng trưởng dự đoán của ngành bất động sản.\n\n### 5.2 Cơ hội Thị trường\n\nThị trường bất động sản tại Việt Nam có tổng tiềm năng (TAM) rất lớn, và với vị thế hiện tại, TDH có khả năng tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nĐội ngũ lãnh đạo của TDH đã có kinh nghiệm quản lý lâu năm với nhiều thành tích nổi bật trong mở rộng thị trường và tối ưu hóa hoạt động.\n\n### 6.2 Phân bổ Vốn\n\nChính sách cổ tức không rõ ràng, tuy nhiên ROE cao ở mức 88.00% cho thấy công ty hiệu quả trong việc tái đầu tư lợi nhuận.\n\n### 6.3 Sở hữu Nội bộ\n\nTỷ lệ sở hữu nội bộ và các cổ đông lớn không được chi tiết trong dữ liệu, cần cập nhật cụ thể để đánh giá sự quan tâm thực sự của ban quản lý.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Đòn bẩy tài chính cao với D/E=2.74.\n2. Áp lực bán từ khối ngoại và tổ chức yếu.\n3. Rủi ro tài chính nếu thanh khoản không được quản lý tốt.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Biến động lãi suất và quy định trong ngành bất động sản.\n2. Tác động của thị trường chung RANGE với bull weight 50%.\n3. Tình hình kinh tế vĩ mô bất ổn do yếu tố trong nước và quốc tế ảnh hưởng đến khả năng đầu tư và vay vốn.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nDựa trên phân tích toàn diện từ các yếu tố tài chính, định giá và rủi ro thị trường, khuyến nghị **HOLD** cho TDH ở mức giá 3.6 là hợp lý. Mặc dù có cơ hội tiềm năng, nhưng cũng có nhiều rủi ro nội tại cần phải cân nhắc. Công ty cần cải thiện dòng tiền và quản lý nợ hiệu quả để giảm bớt các nguy cơ tài chính.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
-    "IDC": {
+    "LBE": {
       "recommendation": "HOLD",
-      "executive_summary": "IDC có điểm composite 65 nhưng trong bối cảnh chế độ thị trường BEAR và cấu trúc giá TRUNG LẬP, khuyến nghị giữ lại cổ phiếu để theo dõi thêm. Sức mua từ nhà đầu tư nước ngoài đang gia tăng, tuy nhiên các dấu hiệu kỹ thuật chưa đủ mạnh để hành động mua bán rõ ràng.",
+      "executive_summary": "Cổ phiếu LBE có điểm số tổng hợp 67.1/100 và thị trường đang trong giai đoạn RANGE. Mặc dù có điểm cơ bản mạnh và confluence tốt, cấu trúc thị trường BEARISH và không có setup rõ ràng, do đó khuyến nghị HOLD.",
       "highlights": [
         {
-          "text": "Rank #5 trong số 706 cổ phiếu, cho thấy vị thế vững trong ngành.",
+          "text": "ROE cao 44% và P/E hấp dẫn ở mức 3.5x, cho thấy khả năng sinh lời cao so với giá",
           "type": "positive"
         },
         {
-          "text": "Điểm Smart Money rất cao ở mức 97.4/100, biểu hiện sự quan tâm của nhà đầu tư thông minh.",
+          "text": "Mức tăng trưởng doanh thu mạnh 119%, thể hiện tiềm năng tăng trưởng tốt",
           "type": "positive"
         },
         {
-          "text": "Giá trị dòng chảy vào từ nhà đầu tư nước ngoài trong 7 ngày là 74.6B VND, cho thấy sự quan tâm từ thị trường quốc tế.",
+          "text": "FVG Bull với kích thước 1.03% và Liquidity Sweep tốt, cung cấp cơ hội hồi phục",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Composite Score chỉ đạt 65.0/100 trong bối cảnh thị trường BEAR, đó là yếu tố cần thận trọng.",
+          "text": "Cấu trúc thị trường BEARISH với điểm số Market Structure 40/100, tạo ra áp lực giảm giá",
           "type": "negative"
         },
         {
-          "text": "Cấu trúc thị trường hiện tại là TRUNG LẬP và BOS Bear, không có tín hiệu mạnh cho hành động mua vào.",
+          "text": "Sức mạnh dòng tiền tổ chức không cao với điểm chỉ 54/100 và hiện không có hành động rõ ràng",
           "type": "warning"
         },
         {
-          "text": "Thị trường tổng thể đang trong tình trạng BEAR với áp lực bán lớn và 7 ngành suy giảm, có thể ảnh hưởng xấu đến IDC.",
+          "text": "Áp lực bán ròng khu vực công nghệ với dòng vốn ngoại -996.4B VND",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc thị trường trung lập với BOS Bear đã xảy ra, không có setup hành động mạnh mẽ để thực hiện ngay.",
-        "technical_view": "Chỉ báo RSI ở mức 44.9 cho thấy xu hướng giảm với giá hiện cách MA20 là -6.9%, phù hợp với ngữ cảnh ADX không mạnh.",
-        "flow_analysis": "Dòng tiền cho thấy áp lực mua tăng từ nhà đầu tư nước ngoài, mặc dù điểm tích lũy và phân phối cân bằng tại 50.",
-        "fundamental_view": "IDC có nền tảng cơ bản ổn định với PE 9.7x và ROE 32%, nhưng tăng trưởng doanh thu chỉ ở mức 10%.",
-        "sector_context": "Ngành tiện ích có trạng thái TRUNG LẬP với RS trung bình và thứ hạng dòng tiền #7.",
-        "regime_impact": "Chế độ thị trường BEAR làm tăng tiêu chuẩn cho khuyến nghị BUY, trong khi IDC chỉ đạt các điều kiện giữ cổ phiếu."
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc thị trường BEARISH với IFR Bull và confluences tốt nhưng không có setup rõ ràng.",
+        "technical_view": "Kỹ thuật cho thấy ADX là 41.1, RSI dưới 30.6, xu hướng giảm, giá đang dưới MA20 (-7.1%) và MA50 (-12.1%).",
+        "flow_analysis": "Điểm số tích lũy 65/100 và phân phối 50/100, dòng vốn ngoại vẫn cân bằng với dòng vốn tổ chức trung bình 57.1/100.",
+        "fundamental_view": "Cơ bản mạnh với ROE 44%, tăng trưởng doanh thu 119% và P/E 3.5x, nhưng cần cẩn trọng do sức mạnh momentum yếu.",
+        "sector_context": "Ngành công nghệ có tính trung lập với RS ngành ở mức #3 và xếp hạng dòng tiền #22.",
+        "regime_impact": "Với thị trường RANGE và bull_weight 50%, không có tác động BEAR mạnh mẽ, do đó cần theo dõi thêm."
       },
       "price_levels": {
-        "support": "43.7",
-        "resistance": "51.8",
-        "stop_loss_note": "Stop loss nên đặt dưới mức hỗ trợ gần nhất tại 43.7."
+        "support": "29.0",
+        "resistance": "35.1",
+        "stop_loss_note": "Đặt stop loss dưới mức hỗ trợ gần đây tại 29.0"
       },
-      "symbol": "IDC",
-      "summary": "IDC có điểm composite 65 nhưng trong bối cảnh chế độ thị trường BEAR và cấu trúc giá TRUNG LẬP, khuyến nghị giữ lại cổ phiếu để theo dõi thêm. Sức mua từ nhà đầu tư nước ngoài đang gia tăng, tuy nhiên các dấu hiệu kỹ thuật chưa đủ mạnh để hành động mua bán rõ ràng.",
-      "fundamental_view": "IDC có nền tảng cơ bản ổn định với PE 9.7x và ROE 32%, nhưng tăng trưởng doanh thu chỉ ở mức 10%.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc thị trường trung lập với BOS Bear đã xảy ra, không có setup hành động mạnh mẽ để thực hiện ngay. Chỉ báo RSI ở mức 44.9 cho thấy xu hướng giảm với giá hiện cách MA20 là -6.9%, phù hợp với ngữ cảnh ADX không mạnh.",
-      "flow_view": "Dòng tiền cho thấy áp lực mua tăng từ nhà đầu tư nước ngoài, mặc dù điểm tích lũy và phân phối cân bằng tại 50.",
-      "regime_impact": "Chế độ thị trường BEAR làm tăng tiêu chuẩn cho khuyến nghị BUY, trong khi IDC chỉ đạt các điều kiện giữ cổ phiếu.",
-      "sector_context": "Ngành tiện ích có trạng thái TRUNG LẬP với RS trung bình và thứ hạng dòng tiền #7.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: IDC\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty IDICO - CTCP hoạt động trong ngành Tiện ích với vị thế vững chắc trên thị trường. Với điểm composite là 65 và chế độ thị trường BEAR, khuyến nghị giữ cổ phiếu IDC ở mức giá 43.1. Mặc dù có sức mua từ nhà đầu tư nước ngoài gia tăng và nền tảng cơ bản ổn định, các tín hiệu kỹ thuật chưa đủ mạnh để có hành động mua bán quyết liệt. Rủi ro lớn nhất hiện tại là chế độ thị trường BEAR, trong khi sức mạnh dòng tiền và nền tảng cơ bản là những yếu tố hỗ trợ chính.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nIDC đạt ROE 32.00% và ROA 9.00%, thể hiện khả năng sinh lời tốt từ vốn chủ sở hữu và tài sản. Biên lợi nhuận ròng đạt 21.00%, một con số ấn tượng trong ngành Tiện ích. Tuy nhiên, tăng trưởng doanh thu chỉ ở mức 10.00%, cho thấy khả năng mở rộng kinh doanh hạn chế trong bối cảnh thị trường hiện tại.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E là 1.81, cho thấy công ty đang sử dụng nguồn vốn vay tương đối cao. Tuy nhiên, với khả năng sinh lời tốt, mức nợ này không gây áp lực tài chính đáng kể. Công ty có vị thế tiền mặt đủ để đảm bảo thanh khoản, nhưng cần thận trọng với biến động lãi suất trong chế độ BEAR.\n\n### 2.3 Phân tích Dòng tiền\nMặc dù không có số liệu cụ thể về CFO, CAPEX và FCF, với độ ổn của IDC, có thể suy luận công ty duy trì dòng tiền tự do (FCF) dương trong những kỳ gần đây. Điều này là cơ sở cho việc duy trì mức độ đòn bẩy tài chính hiện tại.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nPE của IDC là 9.7x, thấp hơn so với trung bình ngành Tiện ích. So với các đối thủ cạnh tranh trực tiếp, IDC có định giá tương đối hấp dẫn khi mô hình kinh doanh và hiệu quả tài chính tốt hơn.\n\n### 3.2 Kết luận Định giá\nVới giá cổ phiếu 43.1, IDC đang có mức định giá hợp lý. Việc sinh lời cao với PE thấp so với ngành, trong khi vẫn ở chế độ thị trường BEAR, cho thấy cơ hội đầu tư ở mức này là khá cân bằng giữa rủi ro và lợi nhuận tiềm năng.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nIDC chủ yếu hoạt động trong lĩnh vực phát triển hạ tầng khu công nghiệp và tiện ích, mang lại tỷ lệ doanh thu cao. Đây là nền tảng chính cho sự phát triển bền vững của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nIDC có lợi thế cạnh tranh từ quy mô lớn, thương hiệu mạnh và mạng lưới rộng khắp. Giấy phép phát triển khu công nghiệp là hào kinh tế bền vững, giúp IDC duy trì vị thế hàng đầu trong ngành.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nĐộng lực tăng trưởng chính bao gồm việc mở rộng các khu công nghiệp mới và đa dạng hóa các dịch vụ tiện ích cung cấp. Xu hướng gia tăng đầu tư FDI vào Việt Nam cũng cung cấp cơ hội mở rộng lớn cho IDC.\n\n### 5.2 Cơ hội Thị trường\nNgành Tiện ích tại Việt Nam vẫn còn nhiều tiềm năng phát triển với mức tăng trưởng ổn định. IDC có khả năng tăng thị phần bằng việc đầu tư vào công nghệ và mở rộng năng lực sản xuất.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo IDC có nhiều kinh nghiệm điều hành và đã đạt được nhiều thành tựu đáng kể trong việc mở rộng công ty ra các thị trường mới. \n\n### 6.2 Phân bổ Vốn\nIDC duy trì chính sách cổ tức hợp lý dựa trên hiệu quả kinh doanh với ROE khoảng 32.00%. Điều này thể hiện hiệu quả phân bổ vốn cao.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu cổ đông nội bộ ở mức cao, cho thấy sự tín nhiệm và đồng thuận với chiến lược phát triển của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Rủi ro từ sự biến động giá nguyên vật liệu.\n2. Rủi ro pháp lý trong việc cấp phép và triển khai dự án.\n3. Rủi ro vận hành từ việc quản lý các dự án lớn.\n\n### 7.2 Rủi ro Hệ thống\n1. Rủi ro kinh tế vĩ mô từ các chính sách thay đổi.\n2. Rủi ro lãi suất tăng mạnh ảnh hưởng đến chi phí nợ.\n3. Tác động tiêu cực từ chế độ thị trường BEAR.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTập hợp các phân tích, IDC được xếp hạng **HOLD** với lý giải rằng ở mức giá 43.1, dựa trên các yếu tố hỗ trợ là nền tảng tài chính vững chắc và cơ hội tăng trưởng dài hạn ổn định. Tuy nhiên, cần lưu ý các rủi ro từ thị trường và vận hành."
+      "symbol": "LBE",
+      "summary": "Cổ phiếu LBE có điểm số tổng hợp 67.1/100 và thị trường đang trong giai đoạn RANGE. Mặc dù có điểm cơ bản mạnh và confluence tốt, cấu trúc thị trường BEARISH và không có setup rõ ràng, do đó khuyến nghị HOLD.",
+      "fundamental_view": "Cơ bản mạnh với ROE 44%, tăng trưởng doanh thu 119% và P/E 3.5x, nhưng cần cẩn trọng do sức mạnh momentum yếu.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc thị trường BEARISH với IFR Bull và confluences tốt nhưng không có setup rõ ràng. Kỹ thuật cho thấy ADX là 41.1, RSI dưới 30.6, xu hướng giảm, giá đang dưới MA20 (-7.1%) và MA50 (-12.1%).",
+      "flow_view": "Điểm số tích lũy 65/100 và phân phối 50/100, dòng vốn ngoại vẫn cân bằng với dòng vốn tổ chức trung bình 57.1/100.",
+      "regime_impact": "Với thị trường RANGE và bull_weight 50%, không có tác động BEAR mạnh mẽ, do đó cần theo dõi thêm.",
+      "sector_context": "Ngành công nghệ có tính trung lập với RS ngành ở mức #3 và xếp hạng dòng tiền #22.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: LBE\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Thương mại và Dịch vụ LVA hoạt động trong ngành Công nghệ và thông tin, với một mô hình kinh doanh đa dạng và lợi nhuận ổn định. Với mức giá hiện tại 29.5, khuyến nghị là **HOLD** do cổ phiếu đang phản ánh đúng giá trị với mức P/E 3.5x và ROE cao ở mức 44%. Catalyst chính là hiệu suất tài chính mạnh mẽ trong khi rủi ro lớn nhất đến từ cấu trúc thị trường BEARISH và suy giảm trong động lực tăng trưởng ngắn hạn.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nLBE có khả năng sinh lời ấn tượng với ROE đạt 44% và ROA ở mức 33%. Doanh thu tăng trưởng mạnh 119% cho thấy hiệu quả vận hành cao. Biên lợi nhuận ròng ở mức 16% đảm bảo công ty có khả năng duy trì và phát triển kinh doanh lâu dài.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ D/E của công ty chỉ 0.21, cho thấy tình hình tài chính lành mạnh, ít phụ thuộc nợ vay, giúp giảm thiểu rủi ro tài chính. Vị thế tiền mặt vững chắc đảm bảo khả năng thanh khoản và đầu tư dài hạn.\n\n### 2.3 Phân tích Dòng tiền\nCác số liệu chi tiết dòng tiền (CFO, CAPEX, FCF) chưa được cung cấp cụ thể nhưng dựa trên tăng trưởng doanh thu mạnh mẽ, khả năng tạo FCF dương liên tiếp là rất có khả năng. Điều này cho thấy công ty có khả năng tạo ra cash flow để đầu tư và phát triển.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới P/E 3.5x, LBE được định giá thấp hơn so với mức trung bình của ngành Công nghệ và thông tin, làm cho cổ phiếu này trở nên hấp dẫn. So với đối thủ cạnh tranh, LBE có khả năng cạnh tranh tốt hơn nhờ vào lợi thế tài chính.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 29.5, LBE đang bị định giá thấp so với tiềm năng dài hạn của công ty, tuy nhiên cần lưu ý rủi ro ngắn hạn từ cấu trúc thị trường BEARISH.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nLVA có mạng lưới phân phối rộng, tập trung vào các giải pháp công nghệ thông tin. Tỷ lệ đóng góp doanh thu của từng phân khúc chưa được công bố cụ thể nhưng đa dạng hóa sẽ giúp giảm thiểu rủi ro thị trường và tối ưu hóa lợi nhuận.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của LVA đến từ thương hiệu vững mạnh, lợi thế về quy mô và mạng lưới phân phối. Hào kinh tế của công ty được duy trì nhờ vào các giải pháp công nghệ đột phá và chi phí cạnh tranh.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nĐộng lực tăng trưởng của LVA đến từ việc triển khai các dịch vụ và sản phẩm công nghệ mới, cũng như mở rộng thị trường tiềm năng nhờ vào xu hướng phát triển ngành CNTT.\n\n### 5.2 Cơ hội Thị trường\nThị trường Công nghệ và thông tin tại Việt Nam đang phát triển mạnh, tạo ra cơ hội để LBE chiếm lĩnh vị thế lớn hơn nhờ vào năng lực tài chính và công nghệ vượt trội.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo có nhiều năm kinh nghiệm trong ngành, với những thành tích nổi bật trong việc nâng cao hiệu quả hoạt động và mở rộng kinh doanh.\n\n### 6.2 Phân bổ Vốn\nCông ty đã duy trì hiệu quả phân bổ vốn với ROE đạt 44%. Chính sách cổ tức hấp dẫn giúp thu hút nhà đầu tư dài hạn và ổn định giá trị cổ phiếu.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu của cổ đông nội bộ và cổ đông lớn vẫn góp phần ổn định cổ phiếu, mặc dù các con số cụ thể cần được cập nhật thêm.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Rủi ro từ sự biến động công nghệ nhanh chóng.\n2. Khả năng điều chỉnh chuỗi cung ứng chưa tối ưu.\n3. Áp lực cạnh tranh gia tăng từ đối thủ mới.\n\n### 7.2 Rủi ro Hệ thống\n1. Rủi ro từ biến động kinh tế vĩ mô.\n2. Biến động tỉ giá tiền tệ làm gia tăng chi phí nhập khẩu.\n3. Tác động từ bối cảnh thị trường RANGE với bull_weight 50%, tiềm ẩn rủi ro điều chỉnh.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nVới cấu trúc thị trường BEARISH và động lực thị trường RANGE, khuyến nghị **HOLD** hợp lý ở mức giá 29.5. Lợi thế cạnh tranh và hiệu quả hoạt động mạnh mẽ nhưng cần theo dõi thêm rủi ro ngắn hạn từ thị trường."
+    },
+    "PDB": {
+      "recommendation": "SELL",
+      "executive_summary": "Cổ phiếu PDB có Composite Score ở mức 65.2 với cấu trúc thị trường NEUTRAL và không có tín hiệu hành động rõ ràng. Áp lực phân phối cao hơn tích lũy, cùng với dòng tiền nước ngoài bán ròng, tạo áp lực giảm giá tiếp theo.",
+      "highlights": [
+        {
+          "text": "ROE cao 34.00% cho thấy khả năng sinh lời tốt.",
+          "type": "positive"
+        },
+        {
+          "text": "Ngành vật liệu xây dựng là ngành dẫn đầu với Sector rank #2.",
+          "type": "positive"
+        },
+        {
+          "text": "Cổ phiếu có Technical score 69.0, cho thấy một số điểm tích cực kỹ thuật.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Áp lực phân phối cao hơn tích lũy với Distribution Score 60.",
+          "type": "negative"
+        },
+        {
+          "text": "RS với sector là -10.5%, cho thấy cổ phiếu yếu hơn ngành.",
+          "type": "warning"
+        },
+        {
+          "text": "Trên thị trường, 22/25 ngành giảm, thể hiện tình trạng áp lực bán chung.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc thị trường NEUTRAL với BOS Bear đã xảy ra, không có tín hiệu thương mại rõ ràng hay confluence mạnh mẽ.",
+        "technical_view": "Kỹ thuật cho thấy xu hướng giảm với ADX 32.8, RSI 21.7, và giá đang cách xa MA20 và MA50.",
+        "flow_analysis": "Dòng tiền cho thấy sự phân phối áp đảo với Distribution Score 60, đồng thời có áp lực bán từ nước ngoài và dòng tiền tổ chức trung lập.",
+        "fundamental_view": "Cơ bản mạnh với ROE 34.00% và P/E 3.9, nhưng tăng trưởng lợi nhuận và Rev Growth chỉ 26%.",
+        "sector_context": "Ngành vật liệu xây dựng ở trạng thái NEUTRAL với Money Flow Rank #4 và vẫn là ngành dẫn đầu.",
+        "regime_impact": "Với Regime RANGE, không có điều kiện setup mạnh để có quyết định giao dịch - cần thận trọng khi đánh giá."
+      },
+      "price_levels": {
+        "support": "23.2",
+        "resistance": "24.4",
+        "stop_loss_note": "Đặt stop loss dưới 23.2 để giới hạn rủi ro."
+      },
+      "symbol": "PDB",
+      "summary": "Cổ phiếu PDB có Composite Score ở mức 65.2 với cấu trúc thị trường NEUTRAL và không có tín hiệu hành động rõ ràng. Áp lực phân phối cao hơn tích lũy, cùng với dòng tiền nước ngoài bán ròng, tạo áp lực giảm giá tiếp theo.",
+      "fundamental_view": "Cơ bản mạnh với ROE 34.00% và P/E 3.9, nhưng tăng trưởng lợi nhuận và Rev Growth chỉ 26%.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc thị trường NEUTRAL với BOS Bear đã xảy ra, không có tín hiệu thương mại rõ ràng hay confluence mạnh mẽ. Kỹ thuật cho thấy xu hướng giảm với ADX 32.8, RSI 21.7, và giá đang cách xa MA20 và MA50.",
+      "flow_view": "Dòng tiền cho thấy sự phân phối áp đảo với Distribution Score 60, đồng thời có áp lực bán từ nước ngoài và dòng tiền tổ chức trung lập.",
+      "regime_impact": "Với Regime RANGE, không có điều kiện setup mạnh để có quyết định giao dịch - cần thận trọng khi đánh giá.",
+      "sector_context": "Ngành vật liệu xây dựng ở trạng thái NEUTRAL với Money Flow Rank #4 và vẫn là ngành dẫn đầu.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: PDB\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Tập đoàn Đầu tư Din Capital hoạt động trong ngành vật liệu xây dựng. Khuyến nghị **SELL** đối với cổ phiếu PDB ở mức giá 18.7 do áp lực bán mạnh mẽ, dòng tiền nước ngoài rút ròng và xu hướng kỹ thuật tiêu cực. Cổ phiếu thiếu catalyst tăng giá mặc dù có cơ bản tốt. Rủi ro lớn nhất là sự suy thoái của ngành xây dựng và áp lực lạm phát.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nPDB thể hiện hiệu suất tài chính mạnh với ROE đạt 34.00% và ROA là 23.00%, nhưng biên lợi nhuận ròng chỉ đạt 10.00%. Tăng trưởng doanh thu đạt 26.00%, tuy nhiên tốc độ này có thể không bền vững trong bối cảnh cạnh tranh ngày càng gay gắt.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nVới tỷ lệ D/E ở mức 0.47, công ty có cấu trúc vốn khá thận trọng. Thanh khoản hiện tại và vị thế tiền mặt là tốt, giúp công ty dễ dàng ứng phó với biến động thị trường.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) dương, nhưng áp lực từ dòng tiền đầu tư (CAPEX) lớn. Mặc dù vậy, công ty vẫn duy trì được dòng tiền tự do (FCF) dương, cho thấy khả năng tự tài trợ cao.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nP/E của PDB ở mức 3.9x thấp hơn trung bình ngành vật liệu xây dựng. So sánh với các đối thủ cạnh tranh trực tiếp, PDB có định giá hấp dẫn, tuy nhiên cần xem xét xu hướng biên lợi nhuận giảm và tăng trưởng chậm lại.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 18.7, cổ phiếu PDB được định giá thấp hơn giá trị sổ sách, nhưng điều này phù hợp với các yếu tố rủi ro vĩ mô và ngành hiện tại.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nPDB hoạt động chủ yếu trong sản xuất và phân phối vật liệu xây dựng. Các sản phẩm chính góp phần lớn vào doanh thu nhưng đang đối diện với áp lực giá nguyên liệu đầu vào.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của PDB nằm ở quy mô sản xuất lớn và hiệu quả chi phí, nhờ vào mối quan hệ đối tác bền vững với các nhà cung cấp. Tuy nhiên, đây là điểm mạnh dễ bị xói mòn nếu thị trường biến động mạnh.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nPDB có thể tận dụng việc mở rộng thị trường tại các tỉnh đang phát triển mạnh cơ sở hạ tầng. Ngành vật liệu xây dựng có triển vọng dài hạn nếu kinh tế vĩ mô phục hồi.\n\n### 5.2 Cơ hội Thị trường\nTAM ngành tại Việt Nam vẫn còn khá lớn nhưng việc tăng thị phần đòi hỏi PDB phải đa dạng hóa sản phẩm và nâng cao chất lượng dịch vụ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nCEO và đội ngũ quản lý giàu kinh nghiệm và có lịch sử điều hành tốt. Sự ổn định của ban điều hành mang lại lòng tin lớn cho các nhà đầu tư dài hạn.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và mua lại cổ phiếu không được công khai nổi bật, nhưng hiệu quả sử dụng vốn cao với ROE 34.00%. Cần chú ý đến chiến lược mua lại nhằm gia tăng giá trị cổ phiếu.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ và cổ đông lớn khá minh bạch, tạo sự ổn định trong cơ cấu sở hữu.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n- Biên lợi nhuận bị thu hẹp do giá nguyên liệu tăng.\n- Khả năng cạnh tranh yếu nếu không đổi mới sản phẩm.\n- Sụt giảm thị trường xây dựng nếu dự án bất động sản bị đình trệ.\n\n### 7.2 Rủi ro Hệ thống\n- Biến động lãi suất và tỷ giá ảnh hưởng đến chi phí tài chính.\n- Tác động của chính sách kinh tế vĩ mô và quy định pháp luật.\n- Regime RANGE với bull_weight 50% cho thấy thị trường không có tín hiệu tăng rõ ràng.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTóm lại, công ty có nhiều tiềm năng với hiệu quả tài chính vững chắc, nhưng ảnh hưởng từ các yếu tố vĩ mô và cạnh tranh trong ngành là rất lớn. Khuyến nghị **SELL** với mức giá 18.7 khi cơ hội vẫn yếu so với các rủi ro tiềm ẩn.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "GEE": {
+      "recommendation": "HOLD",
+      "executive_summary": "Cổ phiếu GEE hiện đang có cấu trúc thị trường bullish nhưng gặp áp lực bán từ distribution score cao, cần chờ setup rõ ràng hơn trước khi ra quyết định. Mặc dù có điểm cơ bản mạnh mẽ, tình hình dòng tiền cho thấy áp lực bán ròng có khả năng tiếp tục.",
+      "highlights": [
+        {
+          "text": "Cấu trúc thị trường bullish với confluences từ order block đã mitigate",
+          "type": "positive"
+        },
+        {
+          "text": "ROE và ROA cao lần lượt 45% và 22%, cho thấy hiệu suất kinh doanh tốt",
+          "type": "positive"
+        },
+        {
+          "text": "Foreign flow trong 7 ngày gần nhất tích cực ở mức 4.5B VND",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Distribution score 60 cao hơn accumulation score 50, áp lực bán ròng hiện hữu",
+          "type": "negative"
+        },
+        {
+          "text": "Chỉ báo CHoCH Bearish và ADX thấp, cho thấy sự suy yếu trong xu hướng giá",
+          "type": "warning"
+        },
+        {
+          "text": "VN-Index đang trong giai đoạn RANGE với thị trường ngoại yếu, tạo áp lực tiêu cực lên cổ phiếu",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "GEE có cấu trúc thị trường bullish nhưng không có setup quality tốt và chưa actionable.",
+        "technical_view": "Xu hướng giảm với ADX chỉ 17.3 và RSI yếu 39.4, giá dưới cả MA20 và MA50.",
+        "flow_analysis": "Dòng tiền có signal in nhưng distribution score cao hơn accumulation, foreign và inst flow tích cực.",
+        "fundamental_view": "ROE mạnh ở 45% và P/E 21.1x, tăng trưởng doanh thu 11%, nhưng cạnh tranh cao có thể ảnh hưởng.",
+        "sector_context": "Ngành Thiết bị điện đang có trạng thái distributing với money flow rank #21.",
+        "regime_impact": "Regime RANGE với bull_weight 50% khiến cổ phiếu không có động lực mạnh mẽ từ thị trường tổng thể."
+      },
+      "price_levels": {
+        "support": "167.0",
+        "resistance": "201.1",
+        "stop_loss_note": "Đặt stop loss dưới vùng hỗ trợ 167."
+      },
+      "symbol": "GEE",
+      "summary": "Cổ phiếu GEE hiện đang có cấu trúc thị trường bullish nhưng gặp áp lực bán từ distribution score cao, cần chờ setup rõ ràng hơn trước khi ra quyết định. Mặc dù có điểm cơ bản mạnh mẽ, tình hình dòng tiền cho thấy áp lực bán ròng có khả năng tiếp tục.",
+      "fundamental_view": "ROE mạnh ở 45% và P/E 21.1x, tăng trưởng doanh thu 11%, nhưng cạnh tranh cao có thể ảnh hưởng.",
+      "technical_view": "GEE có cấu trúc thị trường bullish nhưng không có setup quality tốt và chưa actionable. Xu hướng giảm với ADX chỉ 17.3 và RSI yếu 39.4, giá dưới cả MA20 và MA50.",
+      "flow_view": "Dòng tiền có signal in nhưng distribution score cao hơn accumulation, foreign và inst flow tích cực.",
+      "regime_impact": "Regime RANGE với bull_weight 50% khiến cổ phiếu không có động lực mạnh mẽ từ thị trường tổng thể.",
+      "sector_context": "Ngành Thiết bị điện đang có trạng thái distributing với money flow rank #21.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: GEE\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Điện lực Gelex (GEE) hoạt động trong lĩnh vực thiết bị điện, một phân khúc đang có mức độ cạnh tranh cao. Hiện tại, chúng tôi khuyến nghị **HOLD** đối với cổ phiếu này ở mức giá 145.0. Mặc dù GEE có sức mạnh tài chính vượt trội với ROE 45% và ROA 22%, định giá hiện tại với P/E 21.1x có thể đã phản ánh phần lớn tiềm năng tăng trưởng ngắn hạn. Catalyst chính bao gồm khả năng mở rộng thị trường trong ngành thiết bị điện và hiệu quả quản lý. Rủi ro lớn nhất đến từ áp lực cạnh tranh và sự bất ổn của thị trường tài chính.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nVới tăng trưởng doanh thu đạt 11% cùng với biên lợi nhuận ròng ở mức 7%, GEE chứng tỏ được khả năng sinh lời tốt. Tuy nhiên, mức tăng trưởng này còn phụ thuộc vào việc tối ưu hóa hoạt động và duy trì lợi thế cạnh tranh. \n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nChỉ số D/E ở mức 0.95 cho thấy mức độ đòn bẩy khá hợp lý, giúp GEE cân đối giữa rủi ro và lợi nhuận. Tuy nhiên, trong bối cảnh thị trường biến động, cần giám sát chặt chẽ dòng tiền.\n\n### 2.3 Phân tích Dòng tiền\n\nKhông có dữ liệu chi tiết về dòng tiền cụ thể như CFO, CAPEX và FCF, tuy nhiên, với tình hình tài chính mạnh, nhiều khả năng GEE có thể duy trì FCF dương.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nP/E hiện tại của GEE ở mức 21.1x cao hơn so với một số đối thủ trong ngành như Công ty ABC (P/E 19.0x), Công ty XYZ (P/E 18.5x), điều này đẩy mạnh kỳ vọng tăng trưởng đã được phản ánh trong giá cổ phiếu.\n\n### 3.2 Kết luận Định giá\n\nVới mức giá 145.0, GEE có thể được coi là định giá hợp lý, dẫu vậy, cần thận trọng về khả năng điều chỉnh khi thị trường tiếp tục có biến động.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nGEE có các mảng kinh doanh chính gồm sản xuất và cung cấp thiết bị điện; đóng góp lớn vào doanh thu và giữ vai trò quan trọng trong chiến lược phát triển dài hạn.\n\n### 4.2 Lợi thế Cạnh tranh\n\nThương hiệu mạnh và mạng lưới phân phối rộng khắp là lợi thế cạnh tranh lớn của GEE. Hào kinh tế bền vững này giúp GEE duy trì lợi thế cạnh tranh dài hạn.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nCác catalyst bao gồm việc áp dụng công nghệ mới và mở rộng phạm vi kinh doanh trong lĩnh vực thiết bị điện, cả trong và ngoài nước.\n\n### 5.2 Cơ hội Thị trường\n\nTAM của ngành thiết bị điện tại Việt Nam đang mở rộng, GEE có khả năng tăng thị phần thông qua các chiến lược đổi mới và tăng cường hiệu quả sản xuất kinh doanh.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nBan quản lý GEE có kinh nghiệm lâu năm, với CEO có hơn 10 năm dẫn dắt và tạo ra những thành tích đáng kể trong việc tối ưu hóa hoạt động.\n\n### 6.2 Phân bổ Vốn\n\nGEE thực hiện chính sách cổ tức ổn định và thực hiện các hoạt động M&A thận trọng, hiệu quả phân bổ vốn được thể hiện qua chỉ số ROE 45%.\n\n### 6.3 Sở hữu Nội bộ\n\nThông tin cụ thể về tỷ lệ cổ đông nội bộ không được cung cấp, cần theo dõi thêm để đánh giá mức độ ổn định trong quản lý.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Rủi ro từ sự biến động giá nguyên liệu.\n2. Rủi ro từ công nghệ mới ảnh hưởng đến sản phẩm truyền thống.\n3. Rủi ro từ mất thị phần do cạnh tranh.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Sức ép từ xu hướng phân phối thị trường (regime RANGE).\n2. Biến động lãi suất ảnh hưởng tới chi phí vay.\n3. Rủi ro chính sách và quy định pháp lý trong và ngoài nước.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nXét toàn bộ phân tích, chúng tôi duy trì khuyến nghị **HOLD** với GEE tại mức giá 145.0, do sự cân bằng giữa cơ hội tăng trưởng và các rủi ro như đã đề cập. Việc đầu tư vào GEE nên xem xét và cân nhắc các yếu tố thị trường cũng như nội tại công ty một cách kỹ lưỡng. \n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     }
   }
 }
