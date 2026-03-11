@@ -801,12 +801,9 @@ export default function Dashboard() {
                       </td>
                       <td className="p-2 text-center font-mono text-[10px]" style={{ color: '#4a5a6a' }}>{s.rank}</td>
                       <td className="p-2 text-left">
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1.5">
                           <span className="font-semibold text-xs">{s.symbol}</span>
                           <TierBadge tier={s.tier} />
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[10px] truncate max-w-[120px]" style={{ color: '#8b99a8' }}>{s.name}</span>
                           <span
                             onClick={(e) => {
                               e.stopPropagation();
@@ -817,6 +814,9 @@ export default function Dashboard() {
                           >
                             {s.industry}
                           </span>
+                        </div>
+                        <div className="mt-0.5">
+                          <span className="text-[10px]" style={{ color: '#8b99a8' }}>{s.name}</span>
                         </div>
                       </td>
                       <td className="p-2 text-right font-mono font-semibold text-[11px]">{formatPrice(s.close || s.price)}</td>
