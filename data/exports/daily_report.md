@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 11/03/2026
 
-> Cập nhật lúc 05:55 ICT
+> Cập nhật lúc 06:12 ICT
 
 ---
 
