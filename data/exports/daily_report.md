@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 12/03/2026
 
-> Cập nhật lúc 05:57 ICT
+> Cập nhật lúc 06:14 ICT
 
 ---
 
@@ -22,7 +22,7 @@
 |---|-----|-----|-------|-------|------|-------------|
 | 1 | VNM | CTCP Sữa Việt Nam | Thực phẩm - Đồ  | 67.7 | B | Giữ |
 | 2 | CIG | CTCP COMA 18 | Bất động sản | 66.8 | B | Bán |
-| 3 | TDH | CTCP Phát triển Nhà  | Bất động sản | 66.6 | B | Giữ |
+| 3 | TDH | CTCP Phát triển Nhà  | Bất động sản | 66.6 | B | Bán |
 | 4 | IDC | Tổng Công ty IDICO - | Tiện ích | 65.9 | B | Giữ |
 | 5 | PDB | CTCP Tập đoàn Đầu tư | Vật liệu xây dự | 64.9 | B | Bán |
 | 6 | KSF | CTCP Tập đoàn Sunshi | Bất động sản | 64.7 | B | Giữ |
