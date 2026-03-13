@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 13/03/2026
 
-> Cập nhật lúc 09:17 ICT
+> Cập nhật lúc 09:35 ICT
 
 ---
 
@@ -21,7 +21,7 @@
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
 | 1 | CIG | CTCP COMA 18 | Bất động sản | 68.5 | B | Bán |
-| 2 | TDH | CTCP Phát triển Nhà  | Bất động sản | 67.5 | B | Giữ |
+| 2 | TDH | CTCP Phát triển Nhà  | Bất động sản | 67.5 | B | Bán |
 | 3 | VNM | CTCP Sữa Việt Nam | Thực phẩm - Đồ  | 65.0 | B | Giữ |
 | 4 | IDC | Tổng Công ty IDICO - | Tiện ích | 64.4 | B | Giữ |
 | 5 | PNJ | CTCP Vàng bạc Đá quý | Bán lẻ | 63.5 | B | Giữ |
