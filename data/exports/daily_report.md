@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 16/03/2026
 
-> Cập nhật lúc 06:54 ICT
+> Cập nhật lúc 09:32 ICT
 
 ---
 
@@ -10,9 +10,9 @@
 |--------|---------|
 | Tổng số cổ phiếu | 706 |
 | Tier A (≥70 điểm) | 0 |
-| Tier B (55-69) | 183 |
-| Tier C (40-54) | 507 |
-| Score TB | 52.2 |
+| Tier B (55-69) | 182 |
+| Tier C (40-54) | 508 |
+| Score TB | 52.0 |
 
 ---
 
@@ -20,42 +20,42 @@
 
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
-| 1 | CIG | CTCP COMA 18 | Bất động sản | 69.0 | B | Giữ |
-| 2 | TDH | CTCP Phát triển Nhà  | Bất động sản | 68.3 | B | Mua |
-| 3 | VCK | CTCP Chứng khoán VPS | Chứng khoán | 68.0 | B | Giữ |
+| 1 | CIG | CTCP COMA 18 | Bất động sản | 69.5 | B | Bán |
+| 2 | MCH | CTCP Hàng tiêu dùng  | Thực phẩm - Đồ  | 69.3 | B | Mua |
+| 3 | TDH | CTCP Phát triển Nhà  | Bất động sản | 68.5 | B | Mua |
 | 4 | VNM | CTCP Sữa Việt Nam | Thực phẩm - Đồ  | 67.3 | B | Mua |
-| 5 | MCH | CTCP Hàng tiêu dùng  | Thực phẩm - Đồ  | 65.7 | B | Mua |
-| 6 | IDC | Tổng Công ty IDICO - | Tiện ích | 65.3 | B | Mua |
-| 7 | PDB | CTCP Tập đoàn Đầu tư | Vật liệu xây dự | 65.0 | B | Giữ |
-| 8 | KSF | CTCP Tập đoàn Sunshi | Bất động sản | 64.9 | B | Giữ |
-| 9 | HGM | CTCP Cơ khí và Khoán | Khai khoáng | 64.4 | B | Giữ |
-| 10 | MWG | CTCP Đầu tư Thế giới | Bán lẻ | 64.3 | B | Giữ |
+| 5 | IDC | Tổng Công ty IDICO - | Tiện ích | 65.8 | B | Mua |
+| 6 | NCT | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 64.7 | B | Giữ |
+| 7 | KSF | CTCP Tập đoàn Sunshi | Bất động sản | 64.7 | B | Giữ |
+| 8 | HGM | CTCP Cơ khí và Khoán | Khai khoáng | 64.7 | B | Giữ |
+| 9 | PDB | CTCP Tập đoàn Đầu tư | Vật liệu xây dự | 64.6 | B | Giữ |
+| 10 | PNJ | CTCP Vàng bạc Đá quý | Bán lẻ | 64.4 | B | Giữ |
 
 ---
 
 ## 🔥 Ngành nổi bật
 
 ### Dòng tiền vào mạnh nhất
-- **Thực phẩm - Đồ uống**: +737693705720.0B VND (Score: 54.4)
-- **Tài chính khác**: +134222000.0B VND (Score: 53.9)
-- **SX Nhựa - Hóa chất**: +422828277720.0B VND (Score: 53.0)
-- **Vận tải - kho bãi**: +65489537730.0B VND (Score: 53.0)
-- **Chế biến Thủy sản**: +62811871910.0B VND (Score: 52.4)
+- **Thực phẩm - Đồ uống**: +797608813270.0B VND (Score: 54.4)
+- **Tài chính khác**: +26172000.0B VND (Score: 53.1)
+- **SX Nhựa - Hóa chất**: +437044750720.0B VND (Score: 53.0)
+- **Vận tải - kho bãi**: +72079800230.0B VND (Score: 52.8)
+- **Chế biến Thủy sản**: +64912437910.0B VND (Score: 52.4)
 
 ### Dòng tiền ra
-- **Tiện ích**: -190848899050.0B VND (Score: 53.7)
-- **Bất động sản**: -1512212553490.0B VND (Score: 53.5)
-- **SX Thiết bị, máy móc**: -333708300.0B VND (Score: 52.6)
-- **Chăm sóc sức khỏe**: -12537335360.0B VND (Score: 52.5)
-- **Dịch vụ tư vấn, hỗ trợ**: -2697868000.0B VND (Score: 52.2)
+- **Tiện ích**: -244492390050.0B VND (Score: 53.6)
+- **Bất động sản**: -1732105731740.0B VND (Score: 53.3)
+- **SX Thiết bị, máy móc**: -341898300.0B VND (Score: 52.4)
+- **Chăm sóc sức khỏe**: -16688609360.0B VND (Score: 52.1)
+- **Dịch vụ tư vấn, hỗ trợ**: -1512363000.0B VND (Score: 51.9)
 
 ---
 
 ## 📊 Tín hiệu kỹ thuật
 
 - **RSI Overbought (>70)**: 17 cổ phiếu
-- **RSI Oversold (<30)**: 44 cổ phiếu
-- **Uptrend**: 164 | **Downtrend**: 542
+- **RSI Oversold (<30)**: 41 cổ phiếu
+- **Uptrend**: 166 | **Downtrend**: 540
 
 ### Top Gainers (5D)
 - ATS: +53.9%
@@ -76,7 +76,7 @@
 ## ⚠️ Cảnh báo
 
 ⚠️ 17 cổ phiếu RSI > 70 - thị trường có thể điều chỉnh
-📢 44 cổ phiếu RSI < 30 - có thể là cơ hội mua
+📢 41 cổ phiếu RSI < 30 - có thể là cơ hội mua
 ⚠️ Số cổ phiếu downtrend nhiều hơn uptrend - cẩn trọng
 
 ---
