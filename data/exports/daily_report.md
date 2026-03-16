@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 16/03/2026
 
-> Cập nhật lúc 09:32 ICT
+> Cập nhật lúc 10:00 ICT
 
 ---
 
@@ -28,7 +28,7 @@
 | 6 | NCT | CTCP Dịch vụ Hàng hó | Vận tải - kho b | 64.7 | B | Giữ |
 | 7 | KSF | CTCP Tập đoàn Sunshi | Bất động sản | 64.7 | B | Giữ |
 | 8 | HGM | CTCP Cơ khí và Khoán | Khai khoáng | 64.7 | B | Giữ |
-| 9 | PDB | CTCP Tập đoàn Đầu tư | Vật liệu xây dự | 64.6 | B | Giữ |
+| 9 | PDB | CTCP Tập đoàn Đầu tư | Vật liệu xây dự | 64.6 | B | Bán |
 | 10 | PNJ | CTCP Vàng bạc Đá quý | Bán lẻ | 64.4 | B | Giữ |
 
 ---
