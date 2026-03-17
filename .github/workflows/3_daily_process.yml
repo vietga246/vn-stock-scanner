@@ -1,14 +1,19 @@
 name: "③ Daily Process — Scoring & Sector (sau Daily Collect)"
 
+# ============================================================
+# CHẠY KHI:
+# 1. Tự động sau ② Daily Collect hoàn thành (2 lần/ngày T2-T6)
+#    → Phiên sáng: ~11:47-12:00 ICT (sau cron 04:46 UTC)
+#    → Phiên chiều: ~15:17-15:30 ICT (sau cron 08:16 UTC)
+# 2. Manual trigger (workflow_dispatch)
+#
+# KHÔNG dùng fallback schedule — chain ② → ③ → ⑥ là nguồn duy nhất
+# ============================================================
+
 on:
   workflow_run:
     workflows: ["② Daily Collect — Giá & Dòng tiền (2x/ngày T2-T6)"]
     types: [completed]
-  # Fallback schedule: đảm bảo process chạy ngay cả khi workflow_run bị miss
-  # workflow_run chỉ trigger trên default branch và có thể bị skip nếu ② fail
-  schedule:
-    - cron: "30 5 * * 1-5"   # 12:30 ICT — fallback sau phiên sáng
-    - cron: "0 9 * * 1-5"    # 16:00 ICT — fallback sau phiên chiều
   workflow_dispatch:
 
 jobs:
@@ -18,7 +23,6 @@ jobs:
 
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'schedule' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     steps:
