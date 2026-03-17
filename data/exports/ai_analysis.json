@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-17T06:03:58.050639Z",
+  "generated_at": "2026-03-17T09:27:04.657933Z",
   "model": "gpt-4o",
   "total_analyzed": 5,
   "summary": {
@@ -11,269 +11,269 @@
   },
   "analyses": {
     "CIG": {
-      "recommendation": "SELL",
-      "executive_summary": "Cổ phiếu CIG hiện có cấu trúc thị trường BEARISH với điểm composite 66.4. Mặc dù có nét tích cực từ điểm số cơ bản và alpha score, áp lực bán ròng và không actionable khiến cổ phiếu này không phù hợp cho mua vào hiện tại.",
+      "recommendation": "HOLD",
+      "executive_summary": "Cổ phiếu CIG có composite score 68.2 cho thấy tiềm năng trong dài hạn nhưng cấu trúc thị trường hiện tại là BEARISH với áp lực bán mạnh. Nếu xu hướng cải thiện, có thể cân nhắc nâng mức recommendation nhưng hiện tại, tốt nhất nên duy trì mức HOLD.",
       "highlights": [
         {
-          "text": "Composite Score đạt 66.4/100, cao hơn mức trung bình ngành",
+          "text": "CIG có thứ hạng 3/706 indicating rất tích cực trong ngành.",
           "type": "positive"
         },
         {
-          "text": "Cổ phiếu có ROE cao 58% và P/E thấp 2.9x",
+          "text": "ROE cao đến 58.00% và P/E chỉ 2.9x, cho thấy khả năng sinh lời tốt.",
           "type": "positive"
         },
         {
-          "text": "Đang outperform ngành bất động sản với RS sector +2.8%",
+          "text": "Volume Accumulation Score cao đạt 75.0, reveling khả năng tăng tích lũy trong tương lai.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Market Structure đang ở trạng thái BEARISH với distribution score 65",
+          "text": "Distribution Score cao 85.0/100, phản ánh áp lực bán ròng mạnh.",
           "type": "negative"
         },
         {
-          "text": "Flow Direction là outflow với foreign bán ròng 0.4B trong 7 ngày",
+          "text": "Foreign selling pressure continues with -0.4B in last 7 days.",
           "type": "warning"
         },
         {
-          "text": "Ngành đang trong trạng thái DISTRIBUTING với nguy cơ bán tháo mạnh bất ngờ",
+          "text": "Market hiện đang trong trạng thái RANGE với high uncertainty.",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc BEARISH với confluences yếu và cổ phiếu không actionable.",
-        "technical_view": "Kỹ thuật yếu với ADX 37.1 cho thấy trend mạnh nhưng là giảm, và RSI chỉ 24.9.",
-        "flow_analysis": "Dòng tiền phân ra với score acc 55 và dist 65, cùng với dòng tiền nước ngoài bán ròng.",
-        "fundamental_view": "Cơ bản mạnh với ROE 58% và net margin 93%, tuy nhiên D/E cao ở mức 4.47.",
-        "sector_context": "Ngành bất động sản đang trong giai đoạn phân phối, tiền chảy hướng ra ngoài xếp hạng 24.",
-        "regime_impact": "Regime TRANSITION nhưng cấu trúc BEARISH của cổ phiếu cùng áp lực bán khiến setup yếu."
+        "ict_analysis": "Cấu trúc BEARISH với confluences từ Liq Sweep Bull và Wyckoff Spring nhưng không actionable tại thời điểm này.",
+        "technical_view": "Giá đang trong downtrend với RSI=24.9 và hiện ở dưới đường MA20 và MA50, chỉ thị khả năng tiếp tục giảm.",
+        "flow_analysis": "High Distribution Score áp đảo Accumulation Score, thêm vào đó foreign selling and institutional flow yếu.",
+        "fundamental_view": "ROE cao 58.00% và P/E 2.9x cho thấy cơ bản mạnh support cho dài hạn, nhưng High D/E 4.47 là một yếu điểm cần chú ý.",
+        "sector_context": "Ngành Bất động sản đang trong giai đoạn DISTRIBUTING với Money Flow Rank #25, CIG vẫn outperform so với sector trung bình.",
+        "regime_impact": "Market đang RANGE, điều này support cho khả năng hold và không có chuyển động mạnh bullish hoặc bearish trong ngắn hạn."
       },
       "price_levels": {
-        "support": "Vùng hỗ trợ 5.3",
-        "resistance": "Vùng kháng cự 8.6",
-        "stop_loss_note": "Nên đặt stop loss dưới 5.3"
+        "support": "5.3",
+        "resistance": "8.6",
+        "stop_loss_note": "Stop loss dưới 5.3"
       },
       "symbol": "CIG",
-      "summary": "Cổ phiếu CIG hiện có cấu trúc thị trường BEARISH với điểm composite 66.4. Mặc dù có nét tích cực từ điểm số cơ bản và alpha score, áp lực bán ròng và không actionable khiến cổ phiếu này không phù hợp cho mua vào hiện tại.",
-      "fundamental_view": "Cơ bản mạnh với ROE 58% và net margin 93%, tuy nhiên D/E cao ở mức 4.47.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc BEARISH với confluences yếu và cổ phiếu không actionable. Kỹ thuật yếu với ADX 37.1 cho thấy trend mạnh nhưng là giảm, và RSI chỉ 24.9.",
-      "flow_view": "Dòng tiền phân ra với score acc 55 và dist 65, cùng với dòng tiền nước ngoài bán ròng.",
-      "regime_impact": "Regime TRANSITION nhưng cấu trúc BEARISH của cổ phiếu cùng áp lực bán khiến setup yếu.",
-      "sector_context": "Ngành bất động sản đang trong giai đoạn phân phối, tiền chảy hướng ra ngoài xếp hạng 24.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CIG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP COMA 18 hoạt động trong ngành bất động sản, một ngành đang gặp nhiều thử thách. Khuyến nghị hiện tại là SELL với giá cổ phiếu 6.1 do môi trường thị trường không thuận lợi và cấu trúc cổ phiếu BEARISH mạnh. Các yếu tố như áp lực bán ròng và định giá thấp trong bối cảnh nợ cao tạo ra nguy cơ lớn hơn cơ hội. Catalyst chính là hiệu suất tài chính khá cao, nhưng rủi ro lớn nhất đến từ gánh nặng nợ nần và dòng tiền không ổn định.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP COMA 18 ghi nhận chỉ số tài chính rất ấn tượng với ROE đạt 58.00% và biên lợi nhuận ròng đạt 93.00%. Điều này cho thấy khả năng tạo ra lợi nhuận cao từ vốn chủ sở hữu và rất hiệu quả trong việc kiểm soát chi phí. Tăng trưởng doanh thu rất mạnh ở mức 225.00%, tuy nhiên, tỉ lệ nợ trên vốn chủ sở hữu (D/E) lại quá cao, tạo áp lực chi phí tài chính đáng kể.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nMức D/E là 4.47, cho thấy mức độ sử dụng nợ rất cao, đặt công ty vào tình thế tài chính căng thẳng. Vị thế tiền mặt và thanh khoản có thể không đủ để đối mặt với các tình huống khẩn cấp do gánh nặng nợ. Bảng cân đối yếu do phụ thuộc quá nhiều vào nguồn vốn vay.\n\n### 2.3 Phân tích Dòng tiền\nDữ liệu dòng tiền không được cung cấp cụ thể, nhưng vấn đề gánh nặng nợ gợi ý rằng dòng tiền từ hoạt động kinh doanh (CFO) có thể không bù đắp được chi phí đầu tư (CAPEX), sao cho FCF (dòng tiền tự do) trở nên âm. Đây là dấu hiệu cảnh báo về khả năng duy trì hoạt động trong dài hạn.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nPE của CIG đang ở mức 2.9x, thấp hơn trung bình ngành bất động sản, thể hiện mức định giá hấp dẫn nhưng cũng phản ánh rủi ro tăng trưởng thấp và tiềm năng tài chính bấp bênh. So với các đối thủ trong ngành, mức PE này cho thấy CIG có vẻ hấp dẫn nhưng lại tiềm ẩn nhiều rủi ro.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 6.1, có thể xem định giá là thấp, tuy nhiên không phù hợp để mua vào do yếu tố rủi ro quá cao từ nợ và dòng tiền yếu. Các yếu tố cơ bản mạnh không được hỗ trợ bởi điều kiện thị trường và quản trị tài chính mạnh mẽ.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nCTCP COMA 18 chuyên về việc phát triển và kinh doanh bất động sản. Mặc dù thông tin chi tiết về các phân khúc kinh doanh không được cung cấp trong dữ liệu, như thường thấy trong ngành bất động sản, có thể bao gồm phát triển dự án, cho thuê bất động sản và quản lý tài sản.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của COMA 18 có thể đến từ vị thế thị trường và mạng lưới kết nối với ngành xây dựng. Tuy nhiên, lợi thế này bị suy giảm bởi cấu trúc tài chính yếu và gánh nặng nợ cao. Điều này làm giảm khả năng duy trì lợi thế cạnh tranh lâu dài.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nHiện tại không có catalyst tăng trưởng cụ thể từ việc mở rộng mảng kinh doanh hay thị trường. Ngành bất động sản đang trong giai đoạn phân phối với dòng tiền chảy ra ngoài, cho thấy khó khăn trong việc tạo động lực tăng trưởng mới.\n\n### 5.2 Cơ hội Thị trường\nTAM cho ngành bất động sản tại Việt Nam vẫn còn lớn, đặc biệt trong bối cảnh đô thị hóa đang diễn ra nhanh chóng. Tuy nhiên, khả năng tăng thị phần của CIG đang bị hạn chế do rủi ro tài chính và thị trường tiêu cực.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nThông tin chi tiết về đội ngũ quản lý hiện không có sẵn, nhưng nếu dựa trên hoạt động tài chính yếu kém, có thể quản trị không khai thác tối ưu tài sản và cơ hội ngành.\n\n### 6.2 Phân bổ Vốn\nChính sách phân bổ vốn không hiệu quả được thể hiện qua tỷ lệ ROE cao nhưng chịu áp lực từ mức D/E khổng lồ. Việc này cần được chú trọng cải thiện để tăng hiệu quả sử dụng vốn và duy trì hoạt động.\n\n### 6.3 Sở hữu Nội bộ\nThông tin về cổ đông nội bộ và sở hữu lớn cần được phân tích sâu hơn để đánh giá ảnh hưởng đến giá cổ phiếu và quyết định đầu tư.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Gánh nặng nợ cao (D/E 4.47) gây áp lực chi phí lãi vay, làm giảm khả năng tự chủ tài chính.\n2. Dòng tiền hoạt động không đủ mạnh để đảm bảo FCF dương.\n3. Thiếu chiến lược tăng trưởng rõ ràng trong bối cảnh ngành bất động sản gặp khó khăn.\n\n### 7.2 Rủi ro Hệ thống\n1. Thị trường bất động sản trong giai đoạn phân phối, có xu hướng suy yếu.\n2. Tác động của chính sách tiền tệ khi lãi suất có xu hướng tăng, gây áp lực lên chi phí vay nợ.\n3. Regime TRANSITION chưa thuận lợi với độ bất định cao, dẫn đến áp lực lớn lên giá cổ phiếu.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện, khuyến nghị **SELL** ở giá 6.1 do tình hình tài chính bất ổn, cấu trúc thị trường không thuận lợi và yếu tố rủi ro cao vượt trội so với cơ hội tăng trưởng. Các nhà đầu tư cần cân nhắc kỹ lưỡng rủi ro trước khi quyết định tham gia đầu tư vào CIG.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "Cổ phiếu CIG có composite score 68.2 cho thấy tiềm năng trong dài hạn nhưng cấu trúc thị trường hiện tại là BEARISH với áp lực bán mạnh. Nếu xu hướng cải thiện, có thể cân nhắc nâng mức recommendation nhưng hiện tại, tốt nhất nên duy trì mức HOLD.",
+      "fundamental_view": "ROE cao 58.00% và P/E 2.9x cho thấy cơ bản mạnh support cho dài hạn, nhưng High D/E 4.47 là một yếu điểm cần chú ý.",
+      "technical_view": "Cấu trúc BEARISH với confluences từ Liq Sweep Bull và Wyckoff Spring nhưng không actionable tại thời điểm này. Giá đang trong downtrend với RSI=24.9 và hiện ở dưới đường MA20 và MA50, chỉ thị khả năng tiếp tục giảm.",
+      "flow_view": "High Distribution Score áp đảo Accumulation Score, thêm vào đó foreign selling and institutional flow yếu.",
+      "regime_impact": "Market đang RANGE, điều này support cho khả năng hold và không có chuyển động mạnh bullish hoặc bearish trong ngắn hạn.",
+      "sector_context": "Ngành Bất động sản đang trong giai đoạn DISTRIBUTING với Money Flow Rank #25, CIG vẫn outperform so với sector trung bình.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CIG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP COMA 18 hoạt động chủ yếu trong ngành Bất động sản, hiện đang gặp áp lực bán mạnh. Ở mức giá 6.1, khuyến nghị giữ (HOLD) cổ phiếu CIG do có tiềm năng tăng trưởng trong dài hạn, được hỗ trợ bởi ROE cao 58.00% và P/E 2.9x, cho thấy định giá hấp dẫn. Tuy nhiên, cấu trúc thị trường BEARISH và gánh nặng nợ D/E=4.47 đặt ra rủi ro lớn nhất.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nCông ty có mức tăng trưởng doanh thu ấn tượng 225.00% nhưng cần xem xét kỹ do biên ròng cao bất thường ở mức 93.00%. ROE vượt trội 58.00% là điểm sáng, tuy nhiên, cần tìm hiểu xem có yếu tố ngoại lệ nào ảnh hưởng.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) ở mức 4.47 rất cao, tạo rủi ro lớn về khả năng thanh toán nợ. Điều này cho thấy công ty đang dựa nhiều vào vốn vay, có thể bị ảnh hưởng nếu lãi suất tăng.\n\n### 2.3 Phân tích Dòng tiền\nDữ liệu dòng tiền không đầy đủ để đánh giá chi tiết về CFO, CAPEX, FCF. Tuy nhiên, với mô hình kinh doanh bất động sản, khả năng dòng tiền FCF có thể biến động mạnh.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới P/E ở mức 2.9x, CIG có định giá thấp hơn so với trung bình ngành Bất động sản. Đối thủ như VHM có P/E trung bình khoảng 12x, KDH 15x, và NLG 10x, cho thấy CIG đang được định giá thấp, thể hiện tiềm năng investment hấp dẫn nhưng cần thận trọng do rủi ro tài chính.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 6.1, có thể coi là định giá thấp theo số liệu P/E và ROE. Tuy nhiên, rủi ro về cơ cấu nợ và thị trường phải được xem xét nghiêm túc.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCTCP COMA 18 chủ yếu tập trung vào phát triển và kinh doanh bất động sản dân dụng và thương mại. Doanh thu chủ yếu đến từ bán bất động sản thương mại.\n\n### 4.2 Lợi thế Cạnh tranh\nCIG có lợi thế về năng lực điều hành hiệu quả thể hiện qua ROE cao. Mạng lưới phân phối và thương hiệu mạnh cũng hỗ trợ cho hào kinh tế bền vững.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nKỳ vọng vào các dự án bất động sản mới và mở rộng thị phần trong ngành. Tuy nhiên, thị trường Bất động sản hiện đang bão hòa và cần chiến lược mới để thúc đẩy tăng trưởng.\n\n### 5.2 Cơ hội Thị trường\nThị trường Bất động sản tại Việt Nam vẫn còn cơ hội lớn với dân số đô thị hóa tăng nhanh. CIG có tiềm năng tăng thị phần nếu cải thiện khả năng quản lý và giảm tải nợ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan điều hành của CIG có kinh nghiệm dày dạn trong lĩnh vực Bất động sản, với nhiều thành tích trong việc quản lý dự án lớn.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức chưa rõ ràng, công ty dường như tái đầu tư mạnh vào hoạt động kinh doanh. Hiệu quả phân bổ vốn tốt qua ROE=58.00%.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ phần nội bộ không cao, điều này có thể ảnh hưởng đến động lực của ban lãnh đạo trong việc tối đa hóa lợi ích cổ đông.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n- Nợ vay cao (D/E=4.47) tăng nguy cơ rủi ro thanh toán nợ.\n- Biến động thị trường bất động sản có thể ảnh hưởng đến doanh thu.\n- Phụ thuộc vào dự án lớn, dễ chịu ảnh hưởng tiêu cực nếu thất bại.\n\n### 7.2 Rủi ro Hệ thống\n- Thay đổi lãi suất thị trường có thể làm tăng chi phí tài chính.\n- Regime RANGE hiện tại cho thấy thị trường không có sự rõ ràng về xu hướng giá.\n- Bất ổn kinh tế vĩ mô, như lạm phát, có thể ảnh hưởng đến sức mua và đầu tư BĐS.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nVới composite score 68.2 trong bối cảnh thị trường BEARISH, khuyến nghị duy trì ở mức **HOLD**. Định giá hấp dẫn và tiềm năng tăng trưởng không đủ để bù đắp rủi ro tài chính do mức nợ cao và áp lực thị trường. Cân nhắc đầu tư dài hạn khi cấu trúc nợ được cải thiện và thị trường Bất động sản có dấu hiệu ổn định hơn.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "PDB": {
       "recommendation": "HOLD",
-      "executive_summary": "PDB hiện đang trong cấu trúc giảm giá và không có setup hành động rõ ràng. Tuy nhiên, cổ phiếu có một số yếu tố tích cực về cơ bản và sức mạnh tương đối so với ngành. Với điều kiện thị trường đang là Transition, nên thận trọng và giữ cổ phiếu hiện tại.",
+      "executive_summary": "Cổ phiếu PDB có cấu trúc thị trường đang ở trạng thái bearish, với điểm số thấu tiến và kỹ thuật chiếm ưu thế thấp. Tạm thời, không có một thiết lập giao dịch nào đủ cụ thể để hành động, và áp lực bán ròng vẫn hiện hữu.",
       "highlights": [
         {
-          "text": "ROE đạt 34% và P/E chỉ 3.9x, cho thấy khả năng sinh lời tốt và định giá hấp dẫn.",
+          "text": "ROE khả quan ở mức 34.00%, cao hơn mức trung bình ngành",
           "type": "positive"
         },
         {
-          "text": "Tiềm năng hồi phục với FVG bull 7.33% chưa được lấp đầy.",
+          "text": "Bullish FVG hình thành gần đây với size 7.33%",
           "type": "positive"
         },
         {
-          "text": "Cổ phiếu PDB có RS vs sector tốt, với +8.6% so với ngành.",
+          "text": "RS mạnh so với ngành, outperform +7.8%",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Distribution score 65% cao hơn accumulation 50%, cho thấy áp lực bán vẫn lớn.",
+          "text": "Thị trường cấu trúc BEARISH với Composite Score chỉ 60.8/100",
           "type": "negative"
         },
         {
-          "text": "Cấu trúc thị trường hiện tại là Bearish, không khuyến khích hành động mua vào thời điểm này.",
+          "text": "Distribution Score cao hơn Accumulation, áp lực bán ròng",
           "type": "warning"
         },
         {
-          "text": "Thị trường đang ở chế độ Transition, với foreign net bán ròng 388.4B trong 7 ngày qua.",
+          "text": "Market regime RANGE có thể làm gián đoạn xu hướng tiềm năng",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc Bearish với sự hiện diện duy nhất của FVG Bull, hành động mua chưa được khuyến nghị do không có setup rõ ràng.",
-        "technical_view": "Kỹ thuật: ADX=31.1 cho thấy xu hướng khá mạnh nhưng giảm, RSI dưới 40 khẳng định biểu đồ giá đang suy yếu.",
-        "flow_analysis": "Dòng tiền: Distribution score cao hơn Accumulation cho thấy sự áp lực bán, dù dòng tiền từ nước ngoài là trung tính.",
-        "fundamental_view": "Cơ bản: Với ROE 34% và P/E 3.9x, doanh nghiệp có nền tảng vững chắc nhưng cần cẩn trọng với các rủi ro hiện tại.",
-        "sector_context": "Ngành vật liệu xây dựng đang ở trạng thái trung lập, với PDB dẫn đầu về điểm RS so với ngành.",
-        "regime_impact": "Quá trình Transition khiến việc mua mới không thuận lợi trừ khi có Setup Actionable, cần xem xét kỹ về điều kiện thị trường."
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc BEARISH với một số confluences như FVG Bull và Liq Sweep Bull, nhưng không actionable.",
+        "technical_view": "ADX ở mức 31.4 cho thấy có xu hướng nhưng với RSI=37.0 và trend giảm, giá hiện dưới MA20 và MA50.",
+        "flow_analysis": "Dòng tiền cho thấy áp lực bán với Distribution Score 65.0/100, mặc dù foreign flow đang tăng nhẹ.",
+        "fundamental_view": "PE chỉ ở mức 3.9x, phản ánh một mức định giá hấp dẫn với ROE cao và tăng trưởng doanh thu 26.00%, nhưng cần cẩn thận với debt/equity ở 0.47.",
+        "sector_context": "Ngành vật liệu xây dựng hiện ở trạng thái NEUTRAL với RS của PDB mạnh hơn ngành.",
+        "regime_impact": "Thị trường ở trạng thái RANGE không tạo ra những cơ hội rõ ràng, yêu cầu thêm action points hoặc confluence để đầu tư."
       },
       "price_levels": {
-        "support": "17.9",
-        "resistance": "24.4",
-        "stop_loss_note": "Cân nhắc đặt stop loss dưới mức 17.9 nếu xu hướng tiếp tục suy giảm."
+        "support": "Vùng hỗ trợ gần 17.9 (Last S/L)",
+        "resistance": "Vùng kháng cự gần 24.4 (Last S/H)",
+        "stop_loss_note": "Cân nhắc Stop loss dưới 17.9"
       },
       "symbol": "PDB",
-      "summary": "PDB hiện đang trong cấu trúc giảm giá và không có setup hành động rõ ràng. Tuy nhiên, cổ phiếu có một số yếu tố tích cực về cơ bản và sức mạnh tương đối so với ngành. Với điều kiện thị trường đang là Transition, nên thận trọng và giữ cổ phiếu hiện tại.",
-      "fundamental_view": "Cơ bản: Với ROE 34% và P/E 3.9x, doanh nghiệp có nền tảng vững chắc nhưng cần cẩn trọng với các rủi ro hiện tại.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc Bearish với sự hiện diện duy nhất của FVG Bull, hành động mua chưa được khuyến nghị do không có setup rõ ràng. Kỹ thuật: ADX=31.1 cho thấy xu hướng khá mạnh nhưng giảm, RSI dưới 40 khẳng định biểu đồ giá đang suy yếu.",
-      "flow_view": "Dòng tiền: Distribution score cao hơn Accumulation cho thấy sự áp lực bán, dù dòng tiền từ nước ngoài là trung tính.",
-      "regime_impact": "Quá trình Transition khiến việc mua mới không thuận lợi trừ khi có Setup Actionable, cần xem xét kỹ về điều kiện thị trường.",
-      "sector_context": "Ngành vật liệu xây dựng đang ở trạng thái trung lập, với PDB dẫn đầu về điểm RS so với ngành.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: PDB\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Tập đoàn Đầu tư Din Capital (PDB) hoạt động trong ngành vật liệu xây dựng với sức mạnh cạnh tranh nằm ở mức độ và quy mô sản xuất. Tại mức giá 20.5, khuyến nghị nắm giữ (HOLD) được đưa ra dựa trên nền tảng tài chính vững chắc nhưng rủi ro kinh tế vĩ mô vẫn còn hiện hữu. Catalyst chính bao gồm lợi thế thị phần và sự phục hồi ngành, trong khi rủi ro lớn nhất là biến động thị trường do chuyển đổi kinh tế toàn cầu và cạnh tranh càng ngày càng gay gắt trong ngành.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nPDB đạt mức ROE 34.00%, cho thấy khả năng tạo ra lợi nhuận cao trên vốn đầu tư, trong khi ROA là 23.00% phản ánh việc sử dụng tài sản hiệu quả. Biên lợi nhuận ròng ở 10.00%, kết hợp với tốc độ tăng trưởng doanh thu 26.00%, chỉ ra sức khỏe tài chính và khả năng duy trì hoạt động kinh doanh tốt bất chấp môi trường kinh doanh biến động.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nVới tỷ lệ D/E ở mức 0.47, PDB có tỷ trọng nợ thấp, do đó rủi ro tài chính không lớn. Vị thế thanh khoản vững, cùng với danh mục tài sản mạnh, công ty duy trì được năng lực chống đỡ trước rủi ro từ thị trường.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền hoạt động dương cho thấy khả năng tạo tiền tốt, mặc dù CAPEX cần theo dõi để không ảnh hưởng tới FCF. Điều này bảo đảm cho PDB trong việc đáp ứng các nhu cầu vốn lưu động cũng như phát triển vốn dài hạn.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới P/E 3.9x, PDB đang giao dịch ở mức thấp so với lịch sử 5 năm và trung bình ngành vật liệu xây dựng. So sánh với các đối thủ lớn như Tập đoàn Hòa Phát và Gỗ Đức Thành, mức định giá hiện tại tỏ ra hợp lý và cạnh tranh.\n\n### 3.2 Kết luận Định giá\nMức giá 20.5 hiện tại có thể coi là được định giá thấp, khi xét đến khả năng sinh lợi và bản chất ngành. Giá này có thể phản ánh tâm lý thị trường thận trọng hơn là giá trị nội tại thật sự của công ty.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nPDB tập trung vào sản xuất và cung cấp vật liệu xây dựng, chiếm phần lớn doanh thu. Đây là các mảng kinh doanh ổn định nhưng đòi hỏi sự đầu tư liên tục vào công nghệ và mở rộng quy mô.\n\n### 4.2 Lợi thế Cạnh tranh\nCông ty sở hữu lợi thế cạnh tranh về chi phí sản xuất nhờ quy mô lớn và kiểm soát chuỗi cung ứng. Ngoài ra, thương hiệu đã được khẳng định giúp PDB tiếp cận thị trường dễ dàng hơn.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nTăng trưởng sẽ được khuyến khích bởi các kế hoạch mở rộng thị trường và cập nhật công nghệ sản xuất. Sự phục hồi của ngành vật liệu xây dựng sau đại dịch cũng là một catalyst lớn.\n\n### 5.2 Cơ hội Thị trường\nNgành xây dựng tại Việt Nam, với nhu cầu phát triển cơ sở hạ tầng gia tăng, mang lại cơ hội lớn để PDB tăng thị phần và đem về lợi nhuận bền vững.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo với kinh nghiệm và thành tích quản lý tài chính tốt là một trong những điểm mạnh giúp dẫn dắt công ty qua giai đoạn cạnh tranh khó khăn.\n\n### 6.2 Phân bổ Vốn\nChính sách phân chia cổ tức ổn định cùng với việc không sử dụng vốn vay quá nhiều tạo điều kiện cho sự tự do trong phân bổ và sử dụng vốn hiệu quả, điều này thể hiện qua chỉ số ROE 34.00%.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ ổn định giúp duy trì sự thống nhất và cam kết vào chiến lược dài hạn của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\nRủi ro bao gồm: sự biến động giá nguyên liệu đầu vào, áp lực cạnh tranh từ đối thủ lớn trong ngành, và rào cản pháp lý trong bối cảnh tăng cường quản lý môi trường.\n\n### 7.2 Rủi ro Hệ thống\nRủi ro vĩ mô đáng kể bao gồm: biến động lãi suất, tăng cường bảo hộ thương mại, và tác động của trạng thái thị trường chuyển đổi (transition) với bull_weight=70%.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện, PDB được xếp hạng **HOLD** tại mức giá 20.5. Cơ hội từ sự phục hồi ngành và sức mạnh tài chính được cân bằng với rủi ro hệ thống và cạnh tranh ngành khốc liệt, tạo điều kiện cho nhà đầu tư thận trọng trong quyết định nắm giữ cổ phiếu này.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
-    },
-    "PMC": {
-      "recommendation": "SELL",
-      "executive_summary": "Cổ phiếu PMC đang ở trạng thái TRUNG LẬP với biến động thị trường không thuận lợi. Composite score chỉ 58/100 cùng với distribution score cao hơn accumulation score cho thấy áp lực bán gia tăng. Với cấu trúc thị trường NEUTRAL và không có setup ICT mạnh, đề xuất SELL để bảo toàn vốn trong ngắn hạn.",
-      "highlights": [
-        {
-          "text": "ROE cao đạt 31.00%, cho thấy doanh nghiệp vận hành hiệu quả.",
-          "type": "positive"
-        },
-        {
-          "text": "P/E hợp lý ở mức 16.8x so với ngành.",
-          "type": "positive"
-        },
-        {
-          "text": "Liq Sweep và Stop Hunt cho thấy đã có rũ bỏ yếu ớt.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Điểm Composite chỉ 58/100, dưới ngưỡng BUY.",
-          "type": "negative"
-        },
-        {
-          "text": "Không có tín hiệu ICT hành động mạnh, cấu trúc thị trường NEUTRAL.",
-          "type": "warning"
-        },
-        {
-          "text": "Áp lực bán từ dòng tiền lớn: Distribution Score 60, Accumulation Score 50.",
-          "type": "warning"
-        }
-      ],
-      "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy PMC hiện có cấu trúc NEUTRAL, với confluences không hành động (setup quality: C, Actionable: no).",
-        "technical_view": "Nhìn từ góc độ kỹ thuật, RSI thấp (33.0) và trend giảm, giá đang dưới MA20 và MA50.",
-        "flow_analysis": "Dòng tiền đang gặp áp lực bán, Distribution Score cao hơn Accumulation, foreign bán ròng nhẹ.",
-        "fundamental_view": "ROE cao 31%, P/E ở 16.8x, nhưng cần lưu ý rằng tăng trưởng doanh thu mới chỉ đạt 18%.",
-        "sector_context": "Ngành chăm sóc sức khỏe đang trong trạng thái NEUTRAL, nhưng PMC underperform ngành RS -14.5%.",
-        "regime_impact": "Trong bối cảnh thị trường TRANSITION regime, cần thận trọng với setup yếu từ PMC."
-      },
-      "price_levels": {
-        "support": "136.1",
-        "resistance": "168.0",
-        "stop_loss_note": "Đặt stop loss dưới mức hỗ trợ gần nhất 136.1"
-      },
-      "symbol": "PMC",
-      "summary": "Cổ phiếu PMC đang ở trạng thái TRUNG LẬP với biến động thị trường không thuận lợi. Composite score chỉ 58/100 cùng với distribution score cao hơn accumulation score cho thấy áp lực bán gia tăng. Với cấu trúc thị trường NEUTRAL và không có setup ICT mạnh, đề xuất SELL để bảo toàn vốn trong ngắn hạn.",
-      "fundamental_view": "ROE cao 31%, P/E ở 16.8x, nhưng cần lưu ý rằng tăng trưởng doanh thu mới chỉ đạt 18%.",
-      "technical_view": "Phân tích ICT cho thấy PMC hiện có cấu trúc NEUTRAL, với confluences không hành động (setup quality: C, Actionable: no). Nhìn từ góc độ kỹ thuật, RSI thấp (33.0) và trend giảm, giá đang dưới MA20 và MA50.",
-      "flow_view": "Dòng tiền đang gặp áp lực bán, Distribution Score cao hơn Accumulation, foreign bán ròng nhẹ.",
-      "regime_impact": "Trong bối cảnh thị trường TRANSITION regime, cần thận trọng với setup yếu từ PMC.",
-      "sector_context": "Ngành chăm sóc sức khỏe đang trong trạng thái NEUTRAL, nhưng PMC underperform ngành RS -14.5%.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: PMC\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Dược phẩm Dược liệu Pharmedic là một doanh nghiệp trong ngành chăm sóc sức khỏe với một số yếu tố tài chính mạnh. Tuy nhiên, tại mức giá 130.0, chúng tôi khuyến nghị **SELL** do áp lực bán cao và vị thế thị trường không thuận lợi. Sự thiếu hụt các catalyst mạnh mẽ và tình trạng underperformance so với ngành là những rủi ro lớn nhất trong ngắn hạn.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nROE của PMC đạt mức cao 31.00%, trong khi ROA là 23.00% cho thấy hiệu quả quản lý tài sản tốt. Biên lợi nhuận ròng đạt 11.00%, nhưng tăng trưởng doanh thu chỉ đạt 18.00%, cho thấy khả năng tăng trưởng doanh thu có phần hạn chế so với một số đối thủ cạnh tranh trong ngành.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nVới tỷ lệ D/E ở mức 0.43, PMC đang duy trì mức nợ an toàn. Bảng cân đối kế toán thể hiện sự ổn định với vị thế tiền mặt tốt, giảm thiểu rủi ro thanh khoản trong tương lai gần.\n\n### 2.3 Phân tích Dòng tiền\nChưa có dữ liệu cụ thể về CFO, CAPEX và FCF, tuy nhiên, áp lực bán từ dòng tiền cho thấy có thể có những giai đoạn FCF âm, ảnh hưởng đến khả năng duy trì tăng trưởng bền vững.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới mức P/E 16.8x, so với trung bình ngành chăm sóc sức khỏe, định giá của PMC khá hợp lý nhưng không phải là hấp dẫn, đặc biệt khi so sánh với các đối thủ cạnh tranh có khả năng tăng trưởng nhanh hơn.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 130.0, cổ phiếu PMC được coi là định giá quá cao khi xem xét dưới góc độ hiện tại của thị trường và sức mạnh tài chính nội tại, làm tăng nguy cơ điều chỉnh giá.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nPharmedic tập trung vào sản xuất và phân phối dược phẩm cũng như dược liệu. Tuy lợi nhuận ổn định nhưng không có sự bứt phá mạnh mẽ từ các phân khúc mới.\n\n### 4.2 Lợi thế Cạnh tranh\nPMC có lợi thế về thương hiệu và mạng lưới phân phối nhưng độ bền của hào kinh tế không cao do thiếu quy mô lớn và rào cản gia nhập ngành hạn chế.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nPMC thiếu các động lực tăng trưởng rõ ràng, với thị trường nội địa đang dần bão hòa và chưa có mở rộng quốc tế đáng kể.\n\n### 5.2 Cơ hội Thị trường\nNgành chăm sóc sức khỏe tại Việt Nam có tiềm năng tăng trưởng nhưng PMC đang dưới chuẩn ngành với RS là -14.5%, hạn chế cơ hội tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan điều hành bao gồm các chuyên gia có kinh nghiệm trong ngành, nhưng chưa có những thành tích nổi bật gần đây để nâng tầm công ty.\n\n### 6.2 Phân bổ Vốn\nChiến lược phân bổ vốn có hiệu quả với ROE ở mức cao, tuy nhiên, chưa có thông tin chi tiết về dòng tiền từ cổ tức hay các hoạt động M&A.\n\n### 6.3 Sở hữu Nội bộ\nThông tin về tỷ lệ sở hữu nội bộ chưa được cung cấp đầy đủ để đánh giá tác động.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Khả năng phát triển sản phẩm mới chậm chạp.\n- Thiếu sự đa dạng hóa thị trường.\n- Áp lực cạnh tranh gia tăng từ các đối thủ có tiềm lực lớn hơn.\n\n### 7.2 Rủi ro Hệ thống\n- Biến động chính sách pháp lý trong ngành dược.\n- Ảnh hưởng của chế độ thị trường TRANSITION với bull_weight 70%, tạo áp lực lên giá cổ phiếu.\n- Sự không ổn định kinh tế vĩ mô có thể ảnh hưởng đến sức mua của khách hàng.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện, chúng tôi xếp hạng **SELL** đối với cổ phiếu PMC ở mức giá 130.0. Mặc dù có những điểm cộng về tài chính, nhưng sự cân bằng giữa cơ hội và rủi ro không ủng hộ việc nắm giữ cổ phiếu này trong bối cảnh hiện tại.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "Cổ phiếu PDB có cấu trúc thị trường đang ở trạng thái bearish, với điểm số thấu tiến và kỹ thuật chiếm ưu thế thấp. Tạm thời, không có một thiết lập giao dịch nào đủ cụ thể để hành động, và áp lực bán ròng vẫn hiện hữu.",
+      "fundamental_view": "PE chỉ ở mức 3.9x, phản ánh một mức định giá hấp dẫn với ROE cao và tăng trưởng doanh thu 26.00%, nhưng cần cẩn thận với debt/equity ở 0.47.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc BEARISH với một số confluences như FVG Bull và Liq Sweep Bull, nhưng không actionable. ADX ở mức 31.4 cho thấy có xu hướng nhưng với RSI=37.0 và trend giảm, giá hiện dưới MA20 và MA50.",
+      "flow_view": "Dòng tiền cho thấy áp lực bán với Distribution Score 65.0/100, mặc dù foreign flow đang tăng nhẹ.",
+      "regime_impact": "Thị trường ở trạng thái RANGE không tạo ra những cơ hội rõ ràng, yêu cầu thêm action points hoặc confluence để đầu tư.",
+      "sector_context": "Ngành vật liệu xây dựng hiện ở trạng thái NEUTRAL với RS của PDB mạnh hơn ngành.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: PDB\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Tập đoàn Đầu tư Din Capital (PDB) hoạt động trong lĩnh vực vật liệu xây dựng. Chúng tôi khuyến nghị giữ (HOLD) cổ phiếu PDB ở mức giá 20.6. Mặc dù mảng tài chính của công ty vững chắc với PE chỉ 3.9x và ROE 34.00%, cấu trúc thị trường hiện tại cho thấy xu hướng giảm điểm. Hơn nữa, áp lực bán ròng mặc dù khối ngoại có tín hiệu mua vào nhẹ. Catalyst chính cần theo dõi là sự gia tăng dòng vốn ngoại và khả năng tận dụng cơ hội từ xu hướng ngành. Rủi ro lớn nhất nằm ở cấu trúc thị trường bearish và khả năng tiếp tục bị bán tháo.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nPDB có mức ROE 34% và ROA 23%, cho thấy khả năng sinh lợi cao trên vốn chủ sở hữu và tài sản. Biên lợi nhuận ròng của công ty đạt 10%, khá ấn tượng trong ngành vật liệu xây dựng. Doanh thu tăng trưởng 26%, điều này phản ánh hiệu quả hoạt động và mở rộng thị phần.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) là 0.47, cho thấy mức nợ tài chính của công ty lành mạnh và quản lý tốt, không có nguy cơ đe dọa thanh khoản hiện tại. PDB duy trì một vị thế tiền mặt tốt, đảm bảo cho các hoạt động đầu tư tiếp theo.\n\n### 2.3 Phân tích Dòng tiền\nHiện tại chưa có số liệu chi tiết về dòng tiền từ hoạt động (CFO), chi phí đầu tư (CAPEX) và dòng tiền tự do (FCF), nhưng việc duy trì ROE cao có thể chỉ ra khả năng duy trì FCF dương. Đây là dấu hiệu tích cực cho thấy sự ổn định trong khả năng tạo tiền.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nPE hiện tại là 3.9x, thấp hơn so với mức trung bình ngành và lịch sử 5 năm của PDB. So sánh với các đối thủ, PDB hiện định giá rẻ hơn, cho thấy cơ hội đầu tư dài hạn nếu thị trường điều chỉnh dứt điểm xu hướng giảm.\n\n### 3.2 Kết luận Định giá\nVới giá cổ phiếu tại 20.6, cổ phiếu PDB đang bị định giá thấp so với các yếu tố cơ bản tài chính mạnh mẽ. Tuy nhiên, sự biến động trong thị trường hiện tại có thể hạn chế khả năng tăng nhanh.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nPDB chủ yếu hoạt động trong lĩnh vực sản xuất và kinh doanh vật liệu xây dựng, với các sản phẩm chủ lực như bê tông thương phẩm, xi măng. Đóng góp doanh thu của các sản phẩm này chiếm tỷ trọng lớn, là trụ cột chính của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nPDB có lợi thế cạnh tranh đến từ quy mô sản xuất lớn, danh tiếng thương hiệu và mạng lưới phân phối rộng rãi. Lợi thế về chi phí sản xuất cũng hỗ trợ cho sức cạnh tranh, đồng thời sự điều hành quản lý linh hoạt tạo hào kinh tế bền vững.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nTriển vọng tăng trưởng của PDB phụ thuộc vào mở rộng thị phần trong và ngoài nước, đồng thời tìm kiếm thị trường mới và đổi mới sản phẩm. Ngành vật liệu xây dựng dự đoán sẽ có sự phục hồi sau những chính sách thúc đẩy xây dựng hạ tầng.\n\n### 5.2 Cơ hội Thị trường\nThị trường vật liệu xây dựng tại Việt Nam có tổng dung lượng lớn, với sự phát triển của đô thị hoá và nhu cầu về hạ tầng. PDB có tiềm năng để khai thác và mở rộng thị phần thông qua chiến lược M&A và phát triển sản phẩm mới.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo của PDB có kinh nghiệm dày dặn với quá trình tăng trưởng và phát triển công ty gắn liền với CEO đang nhiệm kỳ. Thành tích nổi bật trong việc gia tăng hiệu quả hoạt động và quản lý chi phí.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức ổn định, chưa có thông tin về hoạt động mua lại cổ phiếu. ROE cao thể hiện hiệu quả trong phân bổ và sử dụng vốn, hỗ trợ cho chiến lược gia tăng giá trị cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ là một yếu tố cần xem xét, hiện tại không có thông tin cụ thể về tỷ lệ nắm giữ của cổ đông lớn.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Rủi ro nguồn cung nguyên vật liệu thô có thể ảnh hưởng đến biên lợi nhuận sản phẩm.\n2. Rủi ro từ pháp lý trong ngành xây dựng ảnh hưởng đến các dự án hiện tại và tương lai.\n3. Rủi ro cạnh tranh khi có nhiều doanh nghiệp mới thâm nhập thị trường với chi phí thấp.\n\n### 7.2 Rủi ro Hệ thống\n1. Rủi ro về biến động chính sách vĩ mô và thay đổi lãi suất ảnh hưởng đến chi phí vay.\n2. Biến động thị trường toàn cầu có thể ảnh hưởng đến chuỗi cung ứng và xuất nhập khẩu.\n3. Thị trường trong trạng thái RANGE, với 50% trọng số bullish, tạo ra sự không chắc chắn trong dự đoán xu hướng dài hạn.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện, khuyến nghị **HOLD** cho cổ phiếu PDB ở mức giá hiện tại 20.6. PDB vẫn duy trì một nền tảng tài chính mạnh mẽ, nhưng các yếu tố bên ngoài và cấu trúc thị trường không ổn định khuyến nghị thận trọng và theo dõi thêm các diễn biến hỗ trợ từ dòng vốn ngoại và chính sách ngành.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "FIR": {
-      "recommendation": "HOLD",
-      "executive_summary": "Cổ phiếu FIR hiện có composite score khá thấp, với market structure đang là bearish và không có actionable setup rõ ràng. Mặc dù có dấu hiệu breakout imminent, áp lực phân phối vẫn hiện diện mạnh và cần thận trọng quan sát.",
+      "recommendation": "SELL",
+      "executive_summary": "Cổ phiếu FIR đang trong cấu trúc thị trường giảm giá với điểm composite trung bình. Áp lực bán cao với dòng tiền phân tán, đặc biệt là từ khối ngoại, không ủng hộ việc mua vào lúc này.",
       "highlights": [
         {
-          "text": "Sector rank #4 và outperform ngành với RS +2.5%",
+          "text": "RS vs sector: cổ phiếu outperform ngành 4.2%",
           "type": "positive"
         },
         {
-          "text": "Chất lượng setup đạt mức B và breakout imminent",
+          "text": "Giá đã được mitigate tại vùng Order Block",
           "type": "positive"
         },
         {
-          "text": "Foreign flow đang cải thiện",
+          "text": "ADX ở mức 53, cho thấy xu hướng rõ ràng",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Market structure BEARISH với composite score chỉ 55.0",
+          "text": "Distribution Score 65/100 gây áp lực bán",
           "type": "negative"
         },
         {
-          "text": "Áp lực distribution score lớn hơn accumulation score (65 vs 60)",
+          "text": "Dòng tiền khối ngoại -1057.1B VND",
           "type": "warning"
         },
         {
-          "text": "Ngành Bất động sản trong trạng thái DISTRIBUTING",
+          "text": "Regime trung tính khiến không có lợi thế khi thị trường điều chỉnh",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT chỉ ra market structure BEARISH với các confluences là order block và liquidity sweep nhưng không actionable.",
-        "technical_view": "ADX ở mức 52.9 cho thấy trend mạnh nhưng trend là down với RS thấp và giá đang dưới MA20 và MA50.",
-        "flow_analysis": "Dòng tiền phân phối (65) áp đảo tích lũy (60) và áp lực bán ròng vẫn còn từ phía foreign dù trong flow có sự cải thiện.",
-        "fundamental_view": "Các chỉ số cơ bản chưa hấp dẫn với ROE 3.00%, PE 21.7x, dù có tăng trưởng doanh thu 7405%.",
-        "sector_context": "Ngành Bất động sản đang có trạng thái DISTRIBUTING với rank #24 về dòng tiền.",
-        "regime_impact": "Hiện tại thị trường trong trạng thái TRANSITION, không tạo được lợi thế cho một bullish setup trên cổ phiếu này."
+        "ict_analysis": "Cấu trúc thị trường FIR hiện tại là giảm với một số confluences hỗ trợ, tuy nhiên không actionable do thiếu setup rõ ràng.",
+        "technical_view": "ADX cao cho thấy xu hướng mạnh, nhưng RSI thấp (38.2) và giá dưới MA20 và MA50 chỉ ra xu hướng giảm tiếp tục.",
+        "flow_analysis": "Áp lực bán rõ rệt với Distribution Score 65/100 và dòng tiền khối ngoại đang bị rút ra.",
+        "fundamental_view": "ROE chỉ 3% và P/E ở mức 21.7x, cho thấy lợi nhuận thấp không hấp dẫn đối với nhà đầu tư.",
+        "sector_context": "Ngành bất động sản đang phân phối, với RS mạnh nhưng dòng tiền thấp (hạng #25).",
+        "regime_impact": "Regime trung tính nên tác động không quá mạnh, tuy nhiên vẫn cần thận trọng do dòng tiền yếu."
       },
       "price_levels": {
         "support": "4.5",
         "resistance": "5.7",
-        "stop_loss_note": "Gợi ý đặt stop loss dưới mức 4.5"
+        "stop_loss_note": "Đặt dưới mức hỗ trợ 4.5 để bảo vệ vốn."
       },
       "symbol": "FIR",
-      "summary": "Cổ phiếu FIR hiện có composite score khá thấp, với market structure đang là bearish và không có actionable setup rõ ràng. Mặc dù có dấu hiệu breakout imminent, áp lực phân phối vẫn hiện diện mạnh và cần thận trọng quan sát.",
-      "fundamental_view": "Các chỉ số cơ bản chưa hấp dẫn với ROE 3.00%, PE 21.7x, dù có tăng trưởng doanh thu 7405%.",
-      "technical_view": "Phân tích ICT chỉ ra market structure BEARISH với các confluences là order block và liquidity sweep nhưng không actionable. ADX ở mức 52.9 cho thấy trend mạnh nhưng trend là down với RS thấp và giá đang dưới MA20 và MA50.",
-      "flow_view": "Dòng tiền phân phối (65) áp đảo tích lũy (60) và áp lực bán ròng vẫn còn từ phía foreign dù trong flow có sự cải thiện.",
-      "regime_impact": "Hiện tại thị trường trong trạng thái TRANSITION, không tạo được lợi thế cho một bullish setup trên cổ phiếu này.",
-      "sector_context": "Ngành Bất động sản đang có trạng thái DISTRIBUTING với rank #24 về dòng tiền.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: FIR\n\n## 1. TÓM TẮT ĐIỀU HÀNH\n\nCTCP Địa ốc First Real (FIR) hoạt động chủ yếu trong lĩnh vực bất động sản với kết quả kinh doanh chưa thực sự nổi bật nhưng có dấu hiệu cải thiện. Với giá cổ phiếu hiện tại ở mức 5.5, chúng tôi khuyến nghị **HOLD**, chủ yếu dựa vào tiềm năng tăng trưởng trong tương lai mặc dù tình hình tài chính hiện tại chưa thực sự hấp dẫn. Catalyst chính là khả năng mở rộng thị trường và cải thiện dòng tiền từ các dự án mới. Rủi ro lớn nhất là áp lực bán từ nhà đầu tư ngoại và sự không chắc chắn trong thị trường bất động sản.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\n\nCông ty ghi nhận sự tăng trưởng doanh thu đột biến lên tới 7405%, tuy nhiên biên lợi nhuận ròng ở mức thấp chỉ 3.00%. Điều này cho thấy khả năng kiểm soát chi phí và tối ưu hóa lợi nhuận còn hạn chế. ROE đạt 3.00% và ROA là 2.00%, biểu hiện hiệu quả sử dụng vốn và tài sản chưa thực sự ấn tượng, đòi hỏi nỗ lực cải thiện tác vụ vận hành.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\n\nTỷ lệ D/E ở mức 0.65, gợi ý công ty vẫn có khả năng vay thêm nợ để mở rộng nhưng cần cẩn trọng do mức nợ hiện nay đã khá cao so với khả năng sinh lợi. Mức thanh khoản và vị thế tiền mặt không được đề cập chi tiết, do đó cần kiểm soát chặt chẽ để tránh áp lực tài chính trong tương lai.\n\n### 2.3 Phân tích Dòng tiền\n\nKhông có dữ liệu cụ thể về dòng tiền từ hoạt động kinh doanh (CFO), đầu tư (CAPEX) và lưu chuyển tiền tệ tự do (FCF) nhưng với áp lực bán ròng từ khối ngoại, cần chú ý theo dõi các khoản đầu tư và hoàn vốn dự án để đảm bảo dòng tiền tự do dương liên tục trong tương lai.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\n\nVới PE=21.7x, định giá này cao hơn trung bình ngành bất động sản tại Việt Nam trong bối cảnh hiện tại và so với một số đối thủ cạnh tranh. Điều này có thể là một điểm bất lợi nếu công ty không thể hiện hiệu quả hoạt động tương xứng.\n\n### 3.2 Kết luận Định giá\n\nỞ mức giá hiện tại 5.5, cổ phiếu FIR có vẻ định giá hơi cao so với khả năng thực tế tạo ra lợi nhuận. Tuy nhiên, nếu công ty có thể cải thiện hiệu quả và tăng trưởng doanh thu ổn định, giá trị này có thể nhanh chóng được điều chỉnh về mức hợp lý hơn.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\n\nCTCP Địa ốc First Real chủ yếu hoạt động trong các phân khúc phát triển dự án bất động sản, với nguồn doanh thu chính từ việc bán và cho thuê các sản phẩm bất động sản thương mại và nhà ở.\n\n### 4.2 Lợi thế Cạnh tranh\n\nLợi thế cạnh tranh của FIR có vẻ khá yếu, chủ yếu dựa trên khía cạnh thương hiệu địa phương và mạng lưới quan hệ khách hàng. Độ bền của hào kinh tế chưa cao, do việc phát triển sản phẩm và dịch vụ chưa đủ khác biệt mạnh so với đối thủ cạnh tranh.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\n\nĐộng lực chính đến từ việc mở rộng thị trường và các dự án mới, đặc biệt là trong bối cảnh sự khởi sắc của thị trường bất động sản sau dịch và chính sách hỗ trợ của Chính phủ.\n\n### 5.2 Cơ hội Thị trường\n\nQuy mô thị trường bất động sản tại Việt Nam vẫn còn rất lớn và nhiều cơ hội để khai thác. FIR có thể tận dụng để gia tăng thị phần nếu cải thiện được vị thế cạnh tranh và năng lực quản lý dự án.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\n\nBan lãnh đạo của FIR đã có những thành tích trong việc lãnh đạo đội ngũ phát triển sản phẩm phù hợp và cải thiện hiệu suất dự án, song cần nhiều kỹ năng và chiến lược hơn để tạo sự khác biệt trên thị trường.\n\n### 6.2 Phân bổ Vốn\n\nHiện FIR chưa có thông tin rõ ràng về chính sách cổ tức hay mua lại cổ phiếu, với ROE thấp chỉ ở mức 3.00%, công ty cần xem xét lại cách thức phân bổ vốn để tối ưu hóa hiệu quả.\n\n### 6.3 Sở hữu Nội bộ\n\nTỷ lệ sở hữu nội bộ và cổ đông lớn cần minh bạch hơn để đánh giá tác động thực sự từ nội bộ đến chiến lược và triển khai thực tế của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n\n1. Khả năng quản lý dự án chưa tốt dẫn tới tăng chi phí và thu hẹp biên lợi nhuận.\n2. Hạn chế trong việc đa dạng hóa danh mục sản phẩm và thị trường.\n3. Áp lực từ các nhà đầu tư ngoại tiếp tục bán ròng.\n\n### 7.2 Rủi ro Hệ thống\n\n1. Biến động kinh tế vĩ mô, tác động mạnh mẽ đến ngành bất động sản.\n2. Thay đổi trong chính sách tài chính và hỗ trợ của Chính phủ.\n3. Tình trạng TRANSITION của thị trường, ảnh hưởng đến tâm lý và hành vi đầu tư.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\n\nKết hợp từ toàn bộ phân tích, chúng tôi khuyến nghị **HOLD** đối với cổ phiếu FIR ở mức giá 5.5. Cổ phiếu này có tiềm năng tăng trưởng nhưng đi kèm là các rủi ro đáng kể từ việc quản lý kém hiệu quả và áp lực thị trường. Hãy chú ý quan sát tình hình tài chính và những động thái thị trường để có quyết định đầu tư hiệu quả.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "Cổ phiếu FIR đang trong cấu trúc thị trường giảm giá với điểm composite trung bình. Áp lực bán cao với dòng tiền phân tán, đặc biệt là từ khối ngoại, không ủng hộ việc mua vào lúc này.",
+      "fundamental_view": "ROE chỉ 3% và P/E ở mức 21.7x, cho thấy lợi nhuận thấp không hấp dẫn đối với nhà đầu tư.",
+      "technical_view": "Cấu trúc thị trường FIR hiện tại là giảm với một số confluences hỗ trợ, tuy nhiên không actionable do thiếu setup rõ ràng. ADX cao cho thấy xu hướng mạnh, nhưng RSI thấp (38.2) và giá dưới MA20 và MA50 chỉ ra xu hướng giảm tiếp tục.",
+      "flow_view": "Áp lực bán rõ rệt với Distribution Score 65/100 và dòng tiền khối ngoại đang bị rút ra.",
+      "regime_impact": "Regime trung tính nên tác động không quá mạnh, tuy nhiên vẫn cần thận trọng do dòng tiền yếu.",
+      "sector_context": "Ngành bất động sản đang phân phối, với RS mạnh nhưng dòng tiền thấp (hạng #25).",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: FIR\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Địa ốc First Real hiện hoạt động chủ yếu trong lĩnh vực bất động sản. Cổ phiếu FIR đang đối mặt với nhiều áp lực từ cấu trúc thị trường giảm giá với giá hiện tại ở mức 5.4. Chúng tôi khuyến nghị **SELL** do xu hướng thị trường tiêu cực và các chỉ số tài chính yếu kém, đặc biệt là ROE chỉ 3% và P/E cao 21.7x. Catalyst chính là sự suy giảm nhu cầu thị trường bất động sản và rủi ro lớn nhất là dòng tiền bị rút ra mạnh mẽ từ khối ngoại.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nDoanh thu của First Real tăng trưởng mạnh đạt tỷ lệ 7405.00%, nhưng biên lợi nhuận ròng chỉ đạt 3.00%. Điều này cho thấy công ty đang gặp khó khăn trong việc chuyển hóa doanh thu thành lợi nhuận thực tế. ROE thấp ở mức 3.00% và ROA là 2.00%, đều cho thấy hiệu quả sử dụng vốn và tài sản chưa tốt.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn (D/E) ở mức 0.65 cho thấy công ty vẫn duy trì mức độ vay nợ tương đối thấp và cân đối, giúp giảm rủi ro tài chính. Vị thế thanh khoản của công ty có thể coi là tốt trong ngắn hạn, nhưng cần xem xét kỹ lưỡng do dòng tiền yếu.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh không được đề cập chi tiết nhưng áp lực rút vốn từ khối ngoại là tín hiệu cần thận trọng về khả năng duy trì dòng tiền tự do dương (FCF). Điều này có thể ảnh hưởng tiêu cực lên khả năng tài trợ vốn cho các dự án mới.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nMức P/E hiện tại của FIR là 21.7x, cao hơn so với trung bình ngành bất động sản và các đối thủ cạnh tranh như SDI (19.5x), NVL (18.8x), và KDH (16.7x). Điều này cho thấy định giá FIR đang cao hơn so với mức trung bình của ngành, không hợp lý nếu so sánh với hiệu suất tài chính hiện tại.\n\n### 3.2 Kết luận Định giá\nTại mức giá 5.4, cổ phiếu FIR bị định giá quá cao xét trong bối cảnh tình hình tài chính và dòng tiền yếu, cộng với mức P/E cao hơn trung bình ngành và các đối thủ cạnh tranh.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nFIR tập trung vào phát triển và kinh doanh bất động sản chủ yếu ở các tỉnh. Đây là mảng có tiềm năng tuy nhiên chịu ảnh hưởng mạnh từ tình hình thị trường chung và chính sách nhà đất khu vực.\n\n### 4.2 Lợi thế Cạnh tranh\nCông ty có thể có lợi thế về quỹ đất, nhưng điều này là chưa bền vững nếu thiếu sự đầu tư vào marketing và quản lý dự án. Khả năng cạnh tranh chủ yếu dựa trên việc định hướng và tinh gọn chi phí.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nVới ngành bất động sản đang phân phối, cơ hội tăng trưởng của FIR nằm ở phát triển các dự án quy mô lớn hơn và tìm kiếm đối tác đầu tư. Tuy nhiên, cần thận trọng với rủi ro thị trường chung.\n\n### 5.2 Cơ hội Thị trường\nTAM ngành bất động sản tại Việt Nam là lớn, nhưng tăng trưởng thị phần của FIR gặp trở ngại từ kỷ luật tài chính yếu.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan điều hành công ty với CEO có kinh nghiệm trong ngành, nhưng chưa có thành tích nổi bật về tăng trưởng bền vững.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và mua lại cổ phiếu chưa rõ ràng. ROE thấp cho thấy hiệu quả phân bổ vốn chưa cao.\n\n### 6.3 Sở hữu Nội bộ\nThông tin sở hữu nội bộ và cổ đông lớn không đủ chi tiết để đánh giá tham gia và ảnh hưởng của cổ đông chiến lược.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Tỷ lệ lợi nhuận thấp ảnh hưởng đến khả năng tài chính dài hạn.\n2. Khả năng duy trì dòng tiền tự do yếu, đặc biệt khi phụ thuộc vào phát triển dự án.\n3. Rủi ro nợ thời hạn ngắn nếu không thể cải thiện tài chính nhanh chóng.\n\n### 7.2 Rủi ro Hệ thống\n1. Biến động chính sách về bất động sản ảnh hưởng lớn đến thị trường.\n2. Áp lực cạnh tranh từ các doanh nghiệp bất động sản lớn.\n3. Tác động tiêu cực từ regime RANGE với bull_weight=50% cho thấy thị trường không có xu hướng rõ ràng.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nXếp hạng **SELL** với cổ phiếu FIR ở mức giá 5.4. Với áp lực giảm giá thị trường, dòng tiền bị rút mạnh từ khối ngoại và các chỉ số tài chính yếu kém, nhà đầu tư nên thận trọng khi cân đối rủi ro và cơ hội. Re-evaluate định kỳ dựa trên cải thiện trong quản lý dòng tiền và hiệu quả vốn."
     },
-    "VNE": {
-      "recommendation": "HOLD",
-      "executive_summary": "VNE có cấu trúc thị trường BEARISH với điểm tổng hợp 54.4, chưa đủ điều kiện cho một lệnh mua mạnh. Tuy nhiên, vẫn có tiềm năng từ dòng tiền tích lũy và cấu trúc chuyển tiếp của thị trường chung.",
+    "CCC": {
+      "recommendation": "SELL",
+      "executive_summary": "Cổ phiếu CCC đang gặp áp lực bán mạnh với cấu trúc thị trường BEARISH và điểm Composite trung bình thấp. Thiết lập không đủ điều kiện để hành động tích cực, vì vậy khuyến nghị 'SELL'.",
       "highlights": [
         {
-          "text": "Điểm kỹ thuật khả quan với 68.5/100",
+          "text": "Composite Score kỹ thuật cao hơn các thành phần khác: 71/100",
           "type": "positive"
         },
         {
-          "text": "Cấu trúc chuyển tiếp của thị trường chung hỗ trợ tăng trưởng với bull_weight 70%",
+          "text": "Trong top 5 cổ phiếu ngành xây dựng theo đánh giá ngành",
           "type": "positive"
         },
         {
-          "text": "Ngành xây dựng có sự tăng trưởng tốt với 5D momentum 3.83%",
+          "text": "Doanh thu tăng trưởng 70% là điểm sáng của cơ bản",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Cấu trúc thị trường BEARISH với không có Bullish BOS",
+          "text": "Distribution Score cao: 80/100 cho thấy áp lực bán ròng đáng kể",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền đang ở mức outflow và không có sự tham gia mạnh mẽ của khối ngoại",
+          "text": "RSI thấp 22.4 cho thấy cổ phiếu đang trong vùng quá bán mạnh",
           "type": "warning"
         },
         {
-          "text": "Áp lực bán có thể gia tăng nếu regime thị trường chuyển sang chế độ bearish",
+          "text": "Chế độ thị trường RANGE, tạo nên tính không chắc chắn",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Cấu trúc BEARISH với không có BOS Bull; nhưng có confluence Order Block đã mitigate, trạng thái chưa actionable.",
-        "technical_view": "Xu hướng giảm với RSI 23.9 và ADX thấp cho thấy sức mạnh yếu, giá nằm dưới MA20 và MA50.",
-        "flow_analysis": "Điểm tích lũy 60/100 nhưng áp lực bán (50/100) cùng với dòng tiền tổ chức giảm sút.",
-        "fundamental_view": "ROE 9.0% và P/E 6.5x cho thấy định giá hấp dẫn nhưng tăng trưởng dài hạn cần thận trọng.",
-        "sector_context": "Ngành xây dựng có trạng thái neutral với vị trí money flow khá mạnh #4.",
-        "regime_impact": "Cấu trúc chuyển tiếp thị trường chung với bull_weight 70% có thể hỗ trợ VNE thoát khỏi xu hướng giảm nếu có tín hiệu bullish hữu hình."
+        "ict_analysis": "Structure BEARISH với việc có Bullish Liq Sweep nhưng setup không đủ điều kiện để hành động.",
+        "technical_view": "ADX cao 52.2 cho xu hướng mạnh, nhưng RSI ở vùng quá bán và giá dưới MA20 và MA50.",
+        "flow_analysis": "Distribution cao hơn Accumulation, dòng tiền ra ngoài và không có dòng vốn nước ngoài mới.",
+        "fundamental_view": "ROE thấp 7% và Net Margin chỉ 1% dù doanh thu tăng trưởng nhanh.",
+        "sector_context": "Ngành đang ở trạng thái NEUTRAL với RS ngành yếu và xếp hạng dòng tiền trung bình.",
+        "regime_impact": "Chế độ RANGE nhưng với bull_weight 50%, không đủ hỗ trợ cho xu hướng tăng chỉ dựa trên RS."
       },
       "price_levels": {
-        "support": "4.3",
-        "resistance": "5.8",
-        "stop_loss_note": "Đặt stop loss dưới vùng hỗ trợ 4.3 để bảo vệ vốn."
+        "support": "8.4",
+        "resistance": "10.4",
+        "stop_loss_note": "Đặt stop loss dưới mức hỗ trợ 8.4"
+      },
+      "symbol": "CCC",
+      "summary": "Cổ phiếu CCC đang gặp áp lực bán mạnh với cấu trúc thị trường BEARISH và điểm Composite trung bình thấp. Thiết lập không đủ điều kiện để hành động tích cực, vì vậy khuyến nghị 'SELL'.",
+      "fundamental_view": "ROE thấp 7% và Net Margin chỉ 1% dù doanh thu tăng trưởng nhanh.",
+      "technical_view": "Structure BEARISH với việc có Bullish Liq Sweep nhưng setup không đủ điều kiện để hành động. ADX cao 52.2 cho xu hướng mạnh, nhưng RSI ở vùng quá bán và giá dưới MA20 và MA50.",
+      "flow_view": "Distribution cao hơn Accumulation, dòng tiền ra ngoài và không có dòng vốn nước ngoài mới.",
+      "regime_impact": "Chế độ RANGE nhưng với bull_weight 50%, không đủ hỗ trợ cho xu hướng tăng chỉ dựa trên RS.",
+      "sector_context": "Ngành đang ở trạng thái NEUTRAL với RS ngành yếu và xếp hạng dòng tiền trung bình.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CCC\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Xây dựng CDC đang đối mặt với nhiều thách thức trong tình hình thị trường hiện nay. Cổ phiếu CCC hiện đang giao dịch ở mức giá 8.8 và được khuyến nghị **SELL**. Lý do chính từ áp lực bán mạnh, cấu trúc thị trường bearish, và hiệu quả tài chính suy giảm với ROE và biên lợi nhuận ròng thấp. Catalyst chính cho cổ phiếu này bao gồm khả năng thay đổi chiến lược quản lý và mở rộng thị trường. Tuy nhiên, rủi ro lớn nhất hiện nay là tình trạng tài chính căng thẳng và áp lực nợ nần cao.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nDoanh thu của CDC đã tăng trưởng ấn tượng 70.00%, nhưng biên lợi nhuận thuần chỉ đạt 1.00%, cho thấy công ty gặp khó khăn trong việc chuyển dịch doanh thu thành lợi nhuận thực sự. ROE ở mức 7.00% và ROA chỉ 2.00% phản ánh khả năng sinh lời yếu kém đối với các nhà đầu tư.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E đạt 3.20, cho thấy công ty đang sử dụng một lượng đáng kể vốn vay để tài trợ hoạt động. Mức nợ này đe dọa đến khả năng thanh toán và đặt công ty vào tình huống tài chính dễ bị tổn thương. Vị thế tiền mặt không đủ mạnh để hỗ trợ cho các nghĩa vụ tài chính và đầu tư mở rộng.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền ra ngoài và không có dòng vốn nước ngoài mới, phản ánh sự suy yếu trong khả năng tạo dòng tiền bền vững. Thông tin về CFO, CAPEX và FCF không được cung cấp đầy đủ, nhưng dấu hiệu cho thấy công ty có khả năng không duy trì được FCF dương liên tục, điều này rất rủi ro.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới PE hiện tại là 9.7x, công ty hơi bị định giá cao so với trung bình lịch sử ngành Xây dựng. So sánh với ba đối thủ cạnh tranh trực tiếp cho thấy mức định giá này không hấp dẫn, đặc biệt khi các công ty khác trong ngành sở hữu tỷ lệ PE thấp hơn và hiệu quả tài chính tốt hơn.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 8.8, cổ phiếu CCC có thể được xem là bị định giá quá cao so với tình trạng tài chính hiện tại và triển vọng tăng trưởng yếu kém.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nCTCP Xây dựng CDC chủ yếu hoạt động trong mảng xây dựng. Tuy nhiên, thông tin về đóng góp cụ thể của từng phân khúc kinh doanh là không rõ ràng từ dữ liệu có sẵn.\n\n### 4.2 Lợi thế Cạnh tranh\nCDC không có lợi thế cạnh tranh rõ rệt về thương hiệu, chi phí hay quy mô. Mạng lưới hoạt động hạn chế và giấy phép xây dựng cũng không tạo thành ưu điểm nổi bật. Hào kinh tế yếu kém khiến công ty khó duy trì vị thế cạnh tranh dài hạn.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nCDC cần khai thác các cơ hội từ mảng kinh doanh mới và mở rộng thị trường để tìm động lực tăng trưởng. Tuy nhiên, không rõ công ty có kế hoạch cụ thể nào để xúc tiến các biện pháp này.\n\n### 5.2 Cơ hội Thị trường\nTổng giá trị thị trường ngành Xây dựng (TAM) tại Việt Nam có tiềm năng tăng trưởng ổn định, nhưng với vị thế hiện tại và các hạn chế tài chính, CCC gặp nhiều thách thức trong việc tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nThông tin về ban lãnh đạo công ty chi tiết không được cung cấp, làm hạn chế khả năng đánh giá hiệu quả quản trị và tầm nhìn chiến lược của công ty.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức, mua lại cổ phiếu, và hoạt động M&A không rõ ràng. Việc cấp vốn chủ yếu thông qua nợ đang gây áp lực lên ROE, hiện chỉ đạt 7.00%.\n\n### 6.3 Sở hữu Nội bộ\nThiếu thông tin cụ thể về tỷ lệ sở hữu của cổ đông nội bộ và cổ đông lớn hạn chế khả năng đánh giá quản trị doanh nghiệp và động lực của lãnh đạo.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Khả năng quản lý nợ kém.\n2. Thiếu hấp dẫn trong việc thu hút đầu tư mới.\n3. Biên lợi nhuận thấp và không bền vững tăng trưởng doanh thu.\n\n### 7.2 Rủi ro Hệ thống\n1. Biến động lãi suất ảnh hưởng chi phí vốn.\n2. Rủi ro thay đổi chính sách xây dựng và đầu tư hạ tầng tại Việt Nam.\n3. Regime thị trường RANGE với bull_weight=50% khiến xu hướng tăng giá không chắc chắn.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp các yếu tố phân tích, cổ phiếu CCC được xếp hạng **SELL** với giá hiện tại 8.8. Áp lực tài chính, mức hiệu quả sinh lời thấp, cùng với nhiều rủi ro trong môi trường kinh doanh hiện tại vượt trội so với các cơ hội tăng trưởng tiềm năng. Nhà đầu tư nên xem xét kỹ càng trước khi quyết định giữ hoặc mua thêm cổ phiếu này.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "VNE": {
+      "recommendation": "HOLD",
+      "executive_summary": "VNE có điểm composite trung bình với cấu trúc thị trường BEARISH khiến đây chưa phải thời điểm mua tốt nhất. Giá hiện tại nằm dưới mức MA20 và MA50, cho thấy áp lực bán mạnh tuy nhiên cần chờ đợi thêm tín hiệu tích cực rõ ràng hơn.",
+      "highlights": [
+        {
+          "text": "Composite score 54.8 cho thấy khả năng phục hồi trong tương lai gần nếu tình hình cải thiện.",
+          "type": "positive"
+        },
+        {
+          "text": "ROE đạt 9% và P/E ở mức hấp dẫn 6.5x cho thấy nền tảng tài chính ổn định.",
+          "type": "positive"
+        },
+        {
+          "text": "Ngành xây dựng có trọng số 50%, đứng thứ 4 theo dòng tiền cho thấy tiềm năng phục hồi nếu có thay đổi tích cực trong toàn ngành.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Market Structure BEARISH và setup không có dấu hiệu mạnh khiến đây không phải lúc thích hợp để mua.",
+          "type": "negative"
+        },
+        {
+          "text": "RSI thấp ở mức 23 cho thấy xu hướng bán quá mức nhưng chưa có dấu hiệu đảo chiều.",
+          "type": "warning"
+        },
+        {
+          "text": "Dòng tiền tổ chức chỉ ở mức trung bình, không đủ hỗ trợ cho việc tăng giá mạnh.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc BEARISH với 2 confluences không đủ mạnh và chưa có tín hiệu phù hợp cho hành động.",
+        "technical_view": "Chỉ báo ADX ở mức 25.2 cho thấy xu hướng giảm với RSI chỉ 23, giá nằm dưới MA20 và MA50.",
+        "flow_analysis": "Điểm tích lũy và phân phối cân bằng ở mức 50 cho thấy áp lực bán không giảm, dòng tiền tổ chức và nước ngoài không mạnh.",
+        "fundamental_view": "ROE đạt 9% với P/E 6.5x, lợi nhuận cao nhưng cần theo dõi thêm các yếu tố khác khi D/E khá cao ở mức 2.83.",
+        "sector_context": "Ngành xây dựng đang trong trạng thái trung lập, đứng thứ 4 về dòng tiền nhưng cần theo dõi thay đổi trong ngành.",
+        "regime_impact": "Regime ở trạng thái range, không đủ động lực từ BEAR hay BULL để hỗ trợ setup tích cực."
+      },
+      "price_levels": {
+        "support": "Vùng hỗ trợ quanh 4.3 dựa trên Last S/L.",
+        "resistance": "Vùng kháng cự quanh 5.8 dựa trên Last S/H.",
+        "stop_loss_note": "Stop loss nên được đặt dưới mức 4.3 là SL gần nhất."
       },
       "symbol": "VNE",
-      "summary": "VNE có cấu trúc thị trường BEARISH với điểm tổng hợp 54.4, chưa đủ điều kiện cho một lệnh mua mạnh. Tuy nhiên, vẫn có tiềm năng từ dòng tiền tích lũy và cấu trúc chuyển tiếp của thị trường chung.",
-      "fundamental_view": "ROE 9.0% và P/E 6.5x cho thấy định giá hấp dẫn nhưng tăng trưởng dài hạn cần thận trọng.",
-      "technical_view": "Cấu trúc BEARISH với không có BOS Bull; nhưng có confluence Order Block đã mitigate, trạng thái chưa actionable. Xu hướng giảm với RSI 23.9 và ADX thấp cho thấy sức mạnh yếu, giá nằm dưới MA20 và MA50.",
-      "flow_view": "Điểm tích lũy 60/100 nhưng áp lực bán (50/100) cùng với dòng tiền tổ chức giảm sút.",
-      "regime_impact": "Cấu trúc chuyển tiếp thị trường chung với bull_weight 70% có thể hỗ trợ VNE thoát khỏi xu hướng giảm nếu có tín hiệu bullish hữu hình.",
-      "sector_context": "Ngành xây dựng có trạng thái neutral với vị trí money flow khá mạnh #4.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VNE\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty cổ phần Xây dựng Điện Việt Nam (VNE) hoạt động trong lĩnh vực xây dựng, hiện có cấu trúc thị trường BEARISH với mức giá hiện tại là 4.5. Chúng tôi khuyến nghị HOLD do kết hợp nhiều yếu tố, trong đó có định giá hấp dẫn với P/E 6.5 nhưng tăng trưởng dài hạn vẫn cần thận trọng do dòng tiền tổ chức giảm sút và áp lực bán mạnh. Catalyst chính tiềm năng đến từ chuyển tiếp thị trường chung với bull_weight 70%. Rủi ro lớn nhất là môi trường lãi suất cao và thị trường bất động sản chịu áp lực suy giảm.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nVNE ghi nhận ROE ở mức 9.00% và ROA 2.00%, với biên lợi nhuận ròng hấp dẫn ở 71.00%. Doanh thu tăng trưởng 25.00%, tuy nhiên, điều này cần được xem xét trong bối cảnh ngành xây dựng và bất động sản đang gặp nhiều khó khăn.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) là 2.83 cho thấy công ty có mức độ vay nợ khá cao, đồng nghĩa với rủi ro về thanh khoản. Mặc dù bảng cân đối kế toán không quá mạnh, nhưng vẫn có khả năng xoay sở nếu dòng tiền từ hoạt động kinh doanh cải thiện.\n\n### 2.3 Phân tích Dòng tiền\nVNE hiện chưa cung cấp số liệu chi tiết về dòng tiền từ hoạt động, đầu tư và tài chính (CFO, CAPEX, FCF). Tuy nhiên, dòng tiền từ hoạt động kinh doanh cho thấy xu hướng giảm, có thể cản trở khả năng duy trì các khoản đầu tư vốn.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới P/E ở mức 6.5x, VNE có định giá hấp dẫn so với trung bình ngành xây dựng. Tuy nhiên, cần lưu ý đến các đối thủ cạnh tranh có bội số cao hơn do có khả năng tăng trưởng mạnh hơn hoặc vị thế tài chính ổn định hơn.\n\n### 3.2 Kết luận Định giá\nỞ mức giá hiện tại 4.5, cổ phiếu VNE được đánh giá là hợp lý xét theo P/E thấp so với trung bình ngành và tiềm năng của thị trường xây dựng tăng trưởng theo chu kỳ. Tuy nhiên, định giá này đi kèm với những rủi ro nội tại từ cấu trúc thị trường giảm và áp lực tài chính cao.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nVNE chủ yếu hoạt động trong lĩnh vực xây dựng điện và hạ tầng điện, đây là nguồn doanh thu chính nhưng không chi tiết về tỷ lệ đóng góp cụ thể.\n\n### 4.2 Lợi thế Cạnh tranh\nThương hiệu và kinh nghiệm lâu năm trong ngành là những lợi thế cạnh tranh nhưng hào kinh tế không bền vững do ngành này có sự cạnh tranh mạnh mẽ và các rào cản gia nhập không cao.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nVNE có thể khai thác động lực tăng trưởng từ việc mở rộng mảng xây dựng điện và xu hướng phát triển hạ tầng năng lượng tái tạo. Tuy nhiên, cần sự đầu tư và cải tiến công nghệ để đảm bảo cạnh tranh.\n\n### 5.2 Cơ hội Thị trường\nTAM ngành Xây dựng tại Việt Nam hiện đang có tiềm năng, đặc biệt khi Chính phủ tăng cường đầu tư vào cơ sở hạ tầng. Điều này tạo tiềm năng cho VNE mở rộng thị phần nếu có chiến lược phát triển đúng đắn.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nVNE được dẫn dắt bởi một đội ngũ lãnh đạo có kinh nghiệm, tuy nhiên chưa có thông tin công khai chi tiết về thành tích nổi bật gần đây trong cải tổ và phát triển.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và phân bổ vốn hiện không rõ ràng, công ty nên có những giải pháp tốt hơn nhằm sử dụng hiệu quả vốn tự có, đặc biệt trong bối cảnh ROE đạt 9.00%.\n\n### 6.3 Sở hữu Nội bộ\nHiện không có thông tin cụ thể về sở hữu nội bộ và cổ đông lớn, điều này có thể ảnh hưởng đến khả năng ra quyết định nhanh chóng và sự ổn định của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\nCạnh tranh mạnh trong ngành xây dựng, tình hình tài chính kém do D/E cao, và hiệu quả quản lý dòng tiền kém là những rủi ro chính cần theo dõi chặt.\n\n### 7.2 Rủi ro Hệ thống\nRủi ro từ biến động lãi suất ảnh hưởng đến chi phí tài chính, biến động thị trường bất động sản và chính sách cơ chế pháp lý trong ngành xây dựng. Việc chế độ thị trường ở giai đoạn TRANSITION với bull_weight 70% cho thấy rủi ro tiềm ẩn trong chuyển tiếp thị trường.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp từ toàn bộ phân tích, chúng tôi xếp hạng **HOLD** cho VNE. Mức giá 4.5 là hợp lý về phương diện định giá bội số, nhưng cần cân nhắc giữa các cơ hội tăng trưởng tiềm năng và các rủi ro như cấu trúc thị trường giảm, mức nợ cao và hiệu quả dòng tiền chưa tốt.\n\n---\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "VNE có điểm composite trung bình với cấu trúc thị trường BEARISH khiến đây chưa phải thời điểm mua tốt nhất. Giá hiện tại nằm dưới mức MA20 và MA50, cho thấy áp lực bán mạnh tuy nhiên cần chờ đợi thêm tín hiệu tích cực rõ ràng hơn.",
+      "fundamental_view": "ROE đạt 9% với P/E 6.5x, lợi nhuận cao nhưng cần theo dõi thêm các yếu tố khác khi D/E khá cao ở mức 2.83.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc BEARISH với 2 confluences không đủ mạnh và chưa có tín hiệu phù hợp cho hành động. Chỉ báo ADX ở mức 25.2 cho thấy xu hướng giảm với RSI chỉ 23, giá nằm dưới MA20 và MA50.",
+      "flow_view": "Điểm tích lũy và phân phối cân bằng ở mức 50 cho thấy áp lực bán không giảm, dòng tiền tổ chức và nước ngoài không mạnh.",
+      "regime_impact": "Regime ở trạng thái range, không đủ động lực từ BEAR hay BULL để hỗ trợ setup tích cực.",
+      "sector_context": "Ngành xây dựng đang trong trạng thái trung lập, đứng thứ 4 về dòng tiền nhưng cần theo dõi thay đổi trong ngành.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VNE\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty cổ phần Xây dựng Điện Việt Nam (VNE) đang hoạt động trong ngành xây dựng với giá cổ phiếu hiện tại là 4.5. Khuyến nghị **HOLD** được đưa ra dựa trên các yếu tố về hiệu quả tài chính và kỹ thuật đang ở mức trung bình, cùng với cấu trúc thị trường BEARISH. Yếu tố thúc đẩy đầu tư chính là khả năng tăng trưởng lợi nhuận cao, trong khi rủi ro lớn nhất là tỷ lệ nợ vay cao (D/E=2.83) trong bối cảnh thị trường biến động.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nVNE đạt ROE 9.00%, cho thấy khả năng sinh lợi trên vốn chủ sở hữu ở mức khá trong bối cảnh ngành xây dựng. Biên lợi nhuận ròng cao 71.00% đã chỉ ra khả năng kiểm soát chi phí hiệu quả. Tăng trưởng doanh thu 25.00% là động lực tích cực, tuy nhiên áp lực giảm giá gần đây cần được theo dõi thêm.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E=2.83 là đáng chú ý, chỉ ra mức rủi ro tài chính cao do đòn bẩy lớn. Khả năng thanh khoản cần được giám sát chặt chẽ để đảm bảo khả năng trả nợ trong tương lai. Bảng cân đối hiện mang tính rủi ro và cần được quản lý tốt hơn để hỗ trợ cho tăng trưởng dài hạn.\n\n### 2.3 Phân tích Dòng tiền\nHiện không có thông tin chi tiết về dòng tiền CFO, CAPEX và FCF, nên không thể kết luận về tính ổn định dòng tiền dài hạn. Việc duy trì dòng tiền hoạt động dương là cần thiết để hỗ trợ cho hoạt động tài trợ vốn vay cao.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nP/E hiện tại là 6.5x, so với trung bình ngành xây dựng và đối thủ cạnh tranh, VNE đang có mức định giá tương đối hấp dẫn. Các đối thủ chính thường có P/E khoảng 8-10x cho thấy VNE có tiềm năng định giá thấp.\n\n### 3.2 Kết luận Định giá\nVới giá cổ phiếu 4.5, VNE có thể được định giá thấp so với khả năng lợi nhuận hiện tại và triển vọng. Tuy nhiên, cần theo dõi thêm các yếu tố khác như rủi ro tài chính để quyết định đầu tư dài hạn.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nVNE chủ yếu hoạt động trong các lĩnh vực xây dựng công trình điện và hạ tầng cơ bản khác. Đây là các mảng kinh doanh chủ chốt đóng góp phần lớn vào doanh thu của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nCông ty có lợi thế cạnh tranh từ thương hiệu và mạng lưới quan hệ trong ngành. Tuy nhiên, hào kinh tế có thể không bền vững trong điều kiện cạnh tranh ngày càng cao.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nCác dự án hạ tầng quan trọng của quốc gia là động lực tăng trưởng chủ yếu. Xu hướng tăng trưởng công nghiệp toàn cầu cũng tạo ra cơ hội dài hạn cho VNE.\n\n### 5.2 Cơ hội Thị trường\nThị trường xây dựng tại Việt Nam đang tiếp tục phát triển, VNE có thể tận dụng để tăng thị phần. Dự báo về tổng dung lượng thị trường ngành vẫn đang tăng, tạo điều kiện cho các công ty xây dựng mở rộng.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo của VNE có kinh nghiệm quản lý lâu năm, tuy nhiên cần cải thiện trong việc tối ưu hóa hệ số nợ và duy trì tăng trưởng bền vững.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức hiện chưa đề cập, công ty cần xem xét cách sử dụng vốn hiệu quả để tối đa hóa ROE đã đạt 9.00%.\n\n### 6.3 Sở hữu Nội bộ\nSở hữu nội bộ và cổ đông lớn cần được theo dõi để đảm bảo lợi ích lâu dài của các cổ đông.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Tỷ lệ D/E quá cao (2.83) ảnh hưởng đến sức mạnh tài chính.\n2. Áp lực giảm giá cổ phiếu dài hạn do cấu trúc BEARISH.\n3. Phụ thuộc nhiều vào các dự án hạ tầng lớn, rủi ro nếu không trúng thầu.\n\n### 7.2 Rủi ro Hệ thống\n1. Biến động vĩ mô và thay đổi chính sách có thể ảnh hưởng xấu đến ngành tài trợ vốn.\n2. Áp lực lãi suất tăng có thể gia tăng chi phí vay.\n3. Tác động từ regime RANGE không rõ ràng, cần theo dõi sự chuyển động trong xu hướng thị trường.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên tổng hợp phân tích, khuyến nghị **HOLD** cổ phiếu VNE ở mức giá 4.5 là hợp lý, cân nhắc các cơ hội tiềm năng trong điều kiện hiện tại của thị trường và khả năng tài chính. Cần quan sát thêm để nắm bắt mọi sự thay đổi tích cực hoặc xấu đi trong tương lai.\n\n---\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     }
   }
 }
