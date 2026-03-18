@@ -1,279 +1,279 @@
 {
-  "generated_at": "2026-03-18T06:05:31.891795Z",
+  "generated_at": "2026-03-18T09:27:20.156298Z",
   "model": "gpt-4o",
   "total_analyzed": 5,
   "summary": {
     "STRONG_BUY": 0,
-    "BUY": 1,
-    "HOLD": 3,
+    "BUY": 2,
+    "HOLD": 2,
     "SELL": 1,
     "STRONG_SELL": 0
   },
   "analyses": {
     "MCH": {
-      "recommendation": "HOLD",
-      "executive_summary": "MCH hiện có vị thế NEUTRAL với Composite Score 68.6 và không có setup actionable rõ ràng trong bối cảnh thị trường BEAR. Khả năng tích lũy mạnh mẽ và dòng tiền tổ chức hỗ trợ là điểm cộng, tuy nhiên thị trường bị chi phối bởi áp lực bán ròng từ ngoại hối.",
+      "recommendation": "BUY",
+      "executive_summary": "MCH có cơ hội đầu tư tốt nhờ dòng tiền thông minh mạnh và khả năng tích lũy tích cực. Dù thị trường BEAR, cổ phiếu thể hiện sự vượt trội ngành, có FVG bull hưởng lợi thêm. Setup BUY mạnh mẽ khi cân nhắc các yếu tố tích cực và hướng dòng tiền nước ngoài ủng hộ.",
       "highlights": [
         {
-          "text": "Smart Money Score đạt 100.0/100 cho thấy sự quan tâm lớn từ dòng tiền tổ chức.",
+          "text": "Smart Money Score đạt tối đa 100, cho thấy sự quan tâm mạnh từ dòng tiền tổ chức.",
           "type": "positive"
         },
         {
-          "text": "Stock outperforms ngành với RS vs sector tăng 8.4%.",
+          "text": "Cổ phiếu tăng 11.03% trong 5 ngày qua, thể hiện sự vượt trội so với VN-Index.",
           "type": "positive"
         },
         {
-          "text": "Foreign Flow: Extremely high foreign buying pressure at 303.2B VND over 7D.",
+          "text": "Foreign flow net buy trong 7 ngày đạt 312.9B VND, cho thấy sức mua từ nhà đầu tư nước ngoài.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Regime Score thấp ở mức 30/100, chỉ ra môi trường BEAR.",
+          "text": "Composite Score chỉ đạt 69.3, chưa đến ngưỡng STRONG_BUY.",
           "type": "negative"
         },
         {
-          "text": "Không có tín hiệu actionable do thị trường NEUTRAL và không có setup FVG tác động.",
+          "text": "Setup chưa actionnable ngay lập tức, cần chờ xác nhận thêm.",
           "type": "warning"
         },
         {
-          "text": "Chỉ số VNIndex và các chỉ số liên quan đều đang giảm, phản ánh bối cảnh thị trường bear tổng thể.",
+          "text": "Thị trường chung đang trong trạng thái BEAR, gây áp lực lên xu hướng cổ phiếu.",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Chỉ số ICT ở mức trung bình 52.9/100 với lien kết không đủ mạnh để hành động do market structure NEUTRAL và không có setup actionable rõ ràng.",
-        "technical_view": "Xu hướng giá tổng thể là trend up, ADX ở mức 27.4 chỉ ra xu hướng tăng nhẹ nhưng giá hiện higher tại 7.9% trên MA20.",
-        "flow_analysis": "Dòng tiền cho thấy điểm tích lũy 60/100 so với điểm phân phối 50/100, cùng với dòng tiền ngoại tích cực 303.2B VND.",
-        "fundamental_view": "Các yếu tố cơ bản tốt với ROE 46.00% và P/E 25.5x, tuy vậy tăng trưởng doanh thu chỉ 4%.",
-        "sector_context": "Ngành thực phẩm - đồ uống hiện trạng NEUTRAL, với RS của MCH cao trong nhóm ngành.",
-        "regime_impact": "Thị trường BEAR ảnh hưởng xấu đến tiềm năng tăng giá, chỉ kỳ vọng cao hơn nếu có setup FVG và các tín hiệu tích cực khác rõ ràng."
+        "ict_analysis": "Phân tích ICT cho thấy thị trường ở trạng thái NEUTRAL, với không có BOS rõ ràng, tuy nhiên có FVG bull và dòng tiền thông minh mạnh ủng hộ.",
+        "technical_view": "RSI 59.1 cho thấy sức mạnh, với xu hướng tăng và giá đang ở trên MA20 và MA50.",
+        "flow_analysis": "Dòng tiền tích cực với Accumulation Score 60, inst flow mạnh và flow nước ngoài tăng nhanh.",
+        "fundamental_view": "MCH có ROE 46%, PE 25.5x và tăng trưởng doanh thu 4%, cho thấy nền tảng tài chính vững vàng.",
+        "sector_context": "Ngành thực phẩm - đồ uống đang ở trạng thái NEUTRAL với vị trí MCH đứng top đầu.",
+        "regime_impact": "Thị trường BEAR yêu cầu setup cần thêm các yếu tố tích cực hỗ trợ, MCH được hưởng lợi nhờ RS tốt trong ngành."
       },
       "price_levels": {
         "support": "132.2",
         "resistance": "166.0",
-        "stop_loss_note": "Dưới mức 132.2 để tránh rủi ro giảm quá mức."
+        "stop_loss_note": "Đặt stop loss dưới 132.2 để bảo vệ vốn."
       },
       "symbol": "MCH",
-      "summary": "MCH hiện có vị thế NEUTRAL với Composite Score 68.6 và không có setup actionable rõ ràng trong bối cảnh thị trường BEAR. Khả năng tích lũy mạnh mẽ và dòng tiền tổ chức hỗ trợ là điểm cộng, tuy nhiên thị trường bị chi phối bởi áp lực bán ròng từ ngoại hối.",
-      "fundamental_view": "Các yếu tố cơ bản tốt với ROE 46.00% và P/E 25.5x, tuy vậy tăng trưởng doanh thu chỉ 4%.",
-      "technical_view": "Chỉ số ICT ở mức trung bình 52.9/100 với lien kết không đủ mạnh để hành động do market structure NEUTRAL và không có setup actionable rõ ràng. Xu hướng giá tổng thể là trend up, ADX ở mức 27.4 chỉ ra xu hướng tăng nhẹ nhưng giá hiện higher tại 7.9% trên MA20.",
-      "flow_view": "Dòng tiền cho thấy điểm tích lũy 60/100 so với điểm phân phối 50/100, cùng với dòng tiền ngoại tích cực 303.2B VND.",
-      "regime_impact": "Thị trường BEAR ảnh hưởng xấu đến tiềm năng tăng giá, chỉ kỳ vọng cao hơn nếu có setup FVG và các tín hiệu tích cực khác rõ ràng.",
-      "sector_context": "Ngành thực phẩm - đồ uống hiện trạng NEUTRAL, với RS của MCH cao trong nhóm ngành.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: MCH\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Hàng tiêu dùng Masan (MCH) là một công ty hàng đầu trong ngành Thực phẩm - Đồ uống tại Việt Nam. Chúng tôi khuyến nghị **HOLD** cổ phiếu MCH ở mức giá 160.2, do công ty có nền tảng tài chính vững mạnh với ROE 46.00% và dòng tiền ngoại tích cực, nhưng đối mặt với áp lực bán ròng từ thị trường quốc tế. Catalyst chính bao gồm sự tích cực trong dòng tiền ngoại và xu hướng ngành ổn định, trong khi rủi ro lớn nhất là sự tác động tiêu cực từ bối cảnh thị trường BEAR hiện tại.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nMCH đạt được ROE 46.00% và ROA 22.00%, cho thấy hiệu quả cao trong việc sử dụng vốn tự có và tài sản. Biên lợi nhuận ròng duy trì ổn định ở mức 22.00%. Tuy nhiên, tăng trưởng doanh thu chỉ đạt 4.00%, cho thấy sự chững lại trong tăng trưởng kinh doanh.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) của MCH là 0.82, một chỉ số tương đối an toàn trong ngành. Mức nợ này không gây quá nhiều rủi ro, nhờ vào khả năng thanh khoản tốt và vị thế tiền mặt mạnh mẽ.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền hoạt động (CFO) của MCH cho thấy sự tích cực với dòng tiền tự do (FCF) thường xuyên dương, hỗ trợ các chiến lược tái đầu tư và chi trả cổ tức ổn định.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới P/E ở mức 25.5x, định giá này cao hơn một chút so với trung bình ngành Thực phẩm - Đồ uống. So với các đối thủ như Vinamilk và Sabeco, MCH có bội số tương đối cạnh tranh nhưng cao hơn một chút so với mức trung bình lịch sử của chính mình.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 160.2, cổ phiếu MCH có vẻ được định giá hợp lý, nhưng tiềm năng tăng giá bị hạn chế nếu thị trường không có sự cải thiện rõ rệt. Sự ổn định trong hoạt động tài chính là ưu điểm lớn nhất.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nMCH chủ yếu hoạt động trong các mảng thực phẩm và đồ uống, với sản phẩm chủ lực là nước mắm, cà phê, và các sản phẩm thịt chế biến sẵn. Mỗi mảng này đóng góp đáng kể vào doanh thu tổng thể của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nMCH có lợi thế cạnh tranh lớn nhờ vào thương hiệu mạnh mẽ và mạng lưới phân phối rộng khắp, kết hợp với quy mô hoạt động lớn. Điều này tạo ra một hào kinh tế bền vững, bảo vệ công ty trước các sức ép cạnh tranh.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nMCH kỳ vọng sẽ tiếp tục mở rộng thị trường và phát triển thêm các sản phẩm mới nhằm nắm bắt xu hướng tiêu dùng ngày càng thay đổi. Sự phát triển của kinh tế tiêu dùng trong nước là một động lực mạnh cho công ty.\n\n### 5.2 Cơ hội Thị trường\nTổng thị trường khả dụng (TAM) trong ngành Thực phẩm - Đồ uống tại Việt Nam tiếp tục tăng trưởng, mở ra cơ hội cho MCH tăng thị phần thông qua mở rộng sản xuất và tối đa hóa mạng lưới phân phối.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo của MCH, đứng đầu là CEO hiện hành với nhiều năm kinh nghiệm trong ngành, đã ghi dấu với nhiều thành công nổi bật trong việc gia tăng thị phần và cải thiện lợi nhuận.\n\n### 6.2 Phân bổ Vốn\nMCH duy trì chính sách cổ tức ổn định và có chiến lược mua lại cổ phiếu khi cần thiết. Hiệu quả phân bổ vốn cao với ROE đạt 46.00%, cho thấy khả năng quản lý tài sản rất tốt.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu cổ đông nội bộ và các cổ đông lớn trong MCH đảm bảo cho việc định hướng và chiến lược phát triển dài hạn.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Sự phụ thuộc vào một số ít sản phẩm chủ lực.\n- Khả năng chịu tác động từ biến động giá nguyên liệu đầu vào.\n- Sức ép cạnh tranh từ các đối thủ trong và ngoài nước.\n\n### 7.2 Rủi ro Hệ thống\n- Tác động từ thị trường tài chính toàn cầu với xu hướng bán ròng từ nhà đầu tư nước ngoài.\n- Biến động kinh tế vĩ mô có thể ảnh hưởng đến tiêu dùng nội địa.\n- Áp lực từ chính sách và quy định của nhà nước đòi hỏi phải thích nghi liên tục.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện, chúng tôi giữ đánh giá **HOLD** đối với cổ phiếu MCH ở mức giá 160.2. Mặc dù công ty có nền tảng tài chính vững mạnh và tiềm năng tăng trưởng dài hạn tích cực, nhưng rủi ro thị trường hiện tại và áp lực cạnh tranh khiến cơ hội thu lợi bị cân bằng với rủi ro. Như vậy, nhà đầu tư nên tiếp tục theo dõi các động thái từ thị trường và công ty để đưa ra quyết định đầu tư hợp lý trong tương lai.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
-    },
-    "VNM": {
-      "recommendation": "HOLD",
-      "executive_summary": "VNM có điểm composite tương đối cao ở mức 66, nhưng market structure tiếp tục là BEARISH với distribution vượt accumulation. Dù có Order Block Bull unmitigated và Liq Sweep Bull, setup không actionable trong bối cảnh thị trường BEAR.",
-      "highlights": [
-        {
-          "text": "Smart Money Score đạt mức cao nhất 100/100, cho thấy sự quan tâm từ các nhà đầu tư lớn.",
-          "type": "positive"
-        },
-        {
-          "text": "Order Block Bull đã hình thành nhưng chưa được mitigate, tạo cơ hội cho mức giá hỗ trợ tiềm năng.",
-          "type": "positive"
-        },
-        {
-          "text": "Liq Sweep Bull gần đây, cho thấy khả năng hồi phục ngắn hạn.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Distribution Score đạt 65, cao hơn Accumulation Score, cho thấy áp lực bán ròng đáng kể.",
-          "type": "negative"
-        },
-        {
-          "text": "Market structure vẫn ở trạng thái BEARISH, không hỗ trợ cho một quyết định mua mạnh ở thời điểm này.",
-          "type": "warning"
-        },
-        {
-          "text": "Regime BEAR với bull_weight chỉ 30% hạn chế tiềm năng tăng giá của thị trường.",
-          "type": "warning"
-        }
-      ],
-      "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc BEARISH với confluence của Order Block Bull và Liq Sweep Bull, nhưng setup hiện tại không actionable.",
-        "technical_view": "Chỉ báo kỹ thuật cho thấy xu hướng giảm với ADX chỉ 20.6 và RSI ở mức 42.3, giá hiện đang thấp hơn MA20 và MA50.",
-        "flow_analysis": "Dòng tiền cho thấy Distribution Score vượt Accumulation, mặc dù có dòng vốn nước ngoài dương 484.4B VND trong 7 ngày qua.",
-        "fundamental_view": "VNM có chỉ số cơ bản mạnh với ROE 30% và P/E 14.8x, tuy nhiên, bị hạn chế bởi tốc độ tăng trưởng doanh thu chỉ 10%.",
-        "sector_context": "Ngành thực phẩm - đồ uống ở trạng thái NEUTRAL với vị trí của VNM là thứ 2 về Money Flow, cho thấy dòng tiền khá tốt trong ngành.",
-        "regime_impact": "Thị trường đang trong chế độ BEAR khiến cho việc hành động mua cần cẩn trọng dù có các yếu tố tích cực trong phân tích."
-      },
-      "price_levels": {
-        "support": "58.1",
-        "resistance": "63.7",
-        "stop_loss_note": "Đặt stop loss dưới 58.1 trong trường hợp giá tiếp tục giảm."
-      },
-      "symbol": "VNM",
-      "summary": "VNM có điểm composite tương đối cao ở mức 66, nhưng market structure tiếp tục là BEARISH với distribution vượt accumulation. Dù có Order Block Bull unmitigated và Liq Sweep Bull, setup không actionable trong bối cảnh thị trường BEAR.",
-      "fundamental_view": "VNM có chỉ số cơ bản mạnh với ROE 30% và P/E 14.8x, tuy nhiên, bị hạn chế bởi tốc độ tăng trưởng doanh thu chỉ 10%.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc BEARISH với confluence của Order Block Bull và Liq Sweep Bull, nhưng setup hiện tại không actionable. Chỉ báo kỹ thuật cho thấy xu hướng giảm với ADX chỉ 20.6 và RSI ở mức 42.3, giá hiện đang thấp hơn MA20 và MA50.",
-      "flow_view": "Dòng tiền cho thấy Distribution Score vượt Accumulation, mặc dù có dòng vốn nước ngoài dương 484.4B VND trong 7 ngày qua.",
-      "regime_impact": "Thị trường đang trong chế độ BEAR khiến cho việc hành động mua cần cẩn trọng dù có các yếu tố tích cực trong phân tích.",
-      "sector_context": "Ngành thực phẩm - đồ uống ở trạng thái NEUTRAL với vị trí của VNM là thứ 2 về Money Flow, cho thấy dòng tiền khá tốt trong ngành.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VNM\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Sữa Việt Nam (VNM) là một trong những công ty hàng đầu trong ngành Thực phẩm - Đồ uống tại Việt Nam. Với hoạt động kinh doanh ổn định và khả năng sinh lời cao, công ty đang duy trì một vị thế vững chắc trên thị trường. Ở mức giá 61.5, khuyến nghị **HOLD** chủ yếu dựa vào các chỉ số cơ bản mạnh mẽ và dòng tiền tích cực từ khối ngoại. Tuy nhiên, thị trường đang ở trong chế độ BEAR khiến cho các hoạt động mua bán cần được thực hiện một cách thận trọng. Catalyst chính bao gồm sự gia tăng dòng vốn nước ngoài và các sáng kiến chiến lược trong mở rộng danh mục sản phẩm, trong khi rủi ro lớn nhất đến từ áp lực thị trường giảm giá.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nVới ROE đạt 30% và ROA ở mức 17%, VNM thể hiện khả năng sinh lời ấn tượng so với nhiều công ty cùng ngành. Biên lợi nhuận ròng ở mức 17% cho thấy hiệu quả quản lý chi phí và tối ưu hóa hoạt động kinh doanh. Tốc độ tăng trưởng doanh thu ở mức 10% là ổn định, tuy nhiên chưa thực sự nổi bật trong môi trường cạnh tranh đang gia tăng.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E là 0.55 cho thấy mức độ nợ ở mức thấp và ít rủi ro, tạo sự linh hoạt tài chính cho công ty. VNM đang giữ vị thế tài chính mạnh với thanh khoản khả quan để đối phó với các biến động thị trường ngắn hạn.\n\n### 2.3 Phân tích Dòng tiền\nDòng vốn từ hoạt động (CFO) mạnh mẽ và các khoản đầu tư hạ tầng (CAPEX) được quản lý tốt giúp VNM duy trì dòng tiền tự do (FCF) dương liên tục, tạo khả năng chi trả cổ tức ổn định và hỗ trợ cho các chiến lược mở rộng kinh doanh.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVới P/E hiện tại là 14.8x, VNM được định giá là khá hợp lý so với trung bình ngành Thực phẩm - Đồ uống trong 5 năm gần đây. So sánh với các đối thủ như NutiFood, TH True Milk, và IDP, VNM có lợi thế nhờ bội số khả năng sinh lời tốt và hoà vốn nhanh hơn.\n\n### 3.2 Kết luận Định giá\nMức giá hiện tại 61.5 có thể coi là hợp lý khi xét tới các chỉ số cơ bản và bối cảnh thị trường hiện tại. Mặc dù không hấp dẫn ngay lập tức để mua vào, giá này vẫn phản ánh tổng thể sự vững vàng và tiềm năng tăng trưởng ổn định của VNM.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nVNM hoạt động trong các phân khúc sữa bột, sữa tươi và các sản phẩm từ sữa khác. Đóng góp lớn nhất vào doanh thu của VNM là từ sản phẩm sữa bột với tỷ lệ phần trăm chiếm ưu thế.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của VNM đến từ thương hiệu mạnh mẽ, mạng lưới phân phối rộng khắp và khả năng kiểm soát chi phí hiệu quả. Các yếu tố này tạo ra một hào kinh tế bền vững cho công ty trong bối cảnh cạnh tranh tăng cao.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nMở rộng thị trường quốc tế và phát triển dòng sản phẩm mới là những động lực tăng trưởng chính. VNM cũng đang tận dụng xu hướng tiêu thụ sản phẩm sạch và hữu cơ trong ngành Thực phẩm - Đồ uống.\n\n### 5.2 Cơ hội Thị trường\nThị trường ngành Thực phẩm - Đồ uống tại Việt Nam có quy mô đáng kể và tiềm năng tăng trưởng khả quan, đặc biệt là trong phân khúc sản phẩm từ sữa. VNM có khả năng gia tăng thị phần thông qua chiến lược hợp tác và liên doanh.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nVNM được lãnh đạo bởi CEO giàu kinh nghiệm và đội ngũ quản lý có thành tích nổi bật trong ngành. Họ đã duy trì chiến lược phát triển bền vững và hiệu quả.\n\n### 6.2 Phân bổ Vốn\nVNM có chính sách cổ tức hấp dẫn và luôn tìm cách tối ưu hóa ROE ở mức 30%. Công ty không chỉ giữ lại lợi nhuận để tái đầu tư mà còn trả cổ tức đều đặn, tạo niềm tin cho cổ đông.\n\n### 6.3 Sở hữu Nội bộ\nCổ đông nội bộ và cổ đông lớn giữ một lượng lớn cổ phần, làm gia tăng sự ổn định và quyết tâm trong chiến lược phát triển dài hạn của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Rủi ro liên quan đến biến động giá nguyên liệu đầu vào.\n2. Áp lực từ đối thủ cạnh tranh mới gia nhập thị trường.\n3. Rủi ro quản lý chuỗi cung ứng trong bối cảnh đa dạng hóa sản phẩm.\n\n### 7.2 Rủi ro Hệ thống\n1. Biến động vĩ mô và chính sách kinh tế ảnh hưởng đến hành vi tiêu dùng.\n2. Sức ép từ thị trường chứng khoán đang trong chế độ BEAR.\n3. Rủi ro từ biến đổi khí hậu ảnh hưởng đến nguồn cung nguyên liệu nông sản.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nVới những phân tích và đánh giá ở trên, chúng tôi khuyến nghị **HOLD** đối với cổ phiếu VNM ở mức giá 61.5. Các yếu tố cơ bản bền vững và triển vọng tích cực phần nào bù trừ được những rủi ro thị trường hiện nay, khiến cho VNM là một sự lựa chọn thận trọng nhưng có tiềm năng trong danh mục đầu tư dài hạn.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
-    },
-    "CIG": {
-      "recommendation": "SELL",
-      "executive_summary": "Cổ phiếu CIG hiện có cấu trúc thị trường BEARISH với điểm số composite 65.9, không có setup rõ ràng để mua trong bối cảnh áp lực bán ròng cao. Nên cẩn trọng khi có bán khống mạnh và dòng tiền tổ chức yếu ớt.",
-      "highlights": [
-        {
-          "text": "CTCP COMA 18 đạt điểm cơ bản ấn tượng 76.8/100 với ROE 58.00% và P/E chỉ 2.9x.",
-          "type": "positive"
-        },
-        {
-          "text": "Đứng đầu ngành bất động sản với composite cao nhất trong nhóm, xếp hạng #3/706.",
-          "type": "positive"
-        },
-        {
-          "text": "Net margin cực kỳ cao ở mức 93.00%, thể hiện hiệu quả hoạt động doanh nghiệp.",
-          "type": "positive"
-        }
-      ],
-      "risks": [
-        {
-          "text": "Market Structure BEARISH với Distribution Score 60/100, cho thấy áp lực bán cao.",
-          "type": "negative"
-        },
-        {
-          "text": "Dòng tiền giảm với flow_direction=out và foreign net -0.4B VND trong 7 ngày qua.",
-          "type": "warning"
-        },
-        {
-          "text": "Regime BEAR với bull_weight chỉ 30% giới hạn khả năng cổ phiếu hồi phục.",
-          "type": "warning"
-        }
-      ],
-      "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc BEARISH với confluences hạn chế và không có setup actionable để mua.",
-        "technical_view": "Xu hướng giảm mạnh với ADX 38.2 và RSI 14 ở mức rất thấp 23.8, giá dưới MA20 -14.8%.",
-        "flow_analysis": "Áp lực bán ròng thể hiện rõ với Distribution Score 60 và dòng tiền nước ngoài rút ra.",
-        "fundamental_view": "Điểm cơ bản mạnh với ROE 58% và P/E 2.9x, tuy nhiên D/E cao 4.47 là một yếu điểm.",
-        "sector_context": "Ngành bất động sản đang trong giai đoạn phân phối với money flow rank #25.",
-        "regime_impact": "Regime BEAR ảnh hưởng tiêu cực đến giá cổ phiếu và hạn chế cơ hội hồi phục trong ngắn hạn."
-      },
-      "price_levels": {
-        "support": "5.3",
-        "resistance": "8.6",
-        "stop_loss_note": "Đặt stop loss dưới mức 5.3 để bảo vệ vốn trong trường hợp giá tiếp tục giảm."
-      },
-      "symbol": "CIG",
-      "summary": "Cổ phiếu CIG hiện có cấu trúc thị trường BEARISH với điểm số composite 65.9, không có setup rõ ràng để mua trong bối cảnh áp lực bán ròng cao. Nên cẩn trọng khi có bán khống mạnh và dòng tiền tổ chức yếu ớt.",
-      "fundamental_view": "Điểm cơ bản mạnh với ROE 58% và P/E 2.9x, tuy nhiên D/E cao 4.47 là một yếu điểm.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc BEARISH với confluences hạn chế và không có setup actionable để mua. Xu hướng giảm mạnh với ADX 38.2 và RSI 14 ở mức rất thấp 23.8, giá dưới MA20 -14.8%.",
-      "flow_view": "Áp lực bán ròng thể hiện rõ với Distribution Score 60 và dòng tiền nước ngoài rút ra.",
-      "regime_impact": "Regime BEAR ảnh hưởng tiêu cực đến giá cổ phiếu và hạn chế cơ hội hồi phục trong ngắn hạn.",
-      "sector_context": "Ngành bất động sản đang trong giai đoạn phân phối với money flow rank #25.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CIG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP COMA 18 hoạt động trong lĩnh vực bất động sản và hiện đối mặt với cấu trúc thị trường BEARISH. Tại mức giá 6.1, khuyến nghị **SELL** dựa trên áp lực bán ròng cao và dòng tiền tổ chức yếu. Catalyst chính là khả năng duy trì biên lợi nhuận cao, tuy nhiên, rủi ro lớn nhất là cấu trúc nợ cao với D/E=4.47, khiến công ty dễ tổn thương trước biến động thị trường.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP COMA 18 có tỷ lệ ROE cao 58% và ROA 9%, cho thấy khả năng tối ưu hóa vốn khá tốt. Tuy nhiên, biên lợi nhuận ròng lên tới 93% là dấu hiệu cảnh báo về chất lượng thu nhập, có thể do khoản mục không thường xuyên hoặc cấu trúc nợ bị đẩy lên cao. Tốc độ tăng trưởng doanh thu 225% cần xem xét kỹ về khả năng bền vững.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nD/E ở mức 4.47 cho thấy công ty đang sử dụng đòn bẩy tài chính rất cao, mang lại rủi ro về khả năng thanh toán nợ. Vị thế tiền mặt có thể mỏng, cần được cải thiện để nâng cao khả năng chịu đựng trước những bất ổn thị trường.\n\n### 2.3 Phân tích Dòng tiền\nDữ liệu về dòng tiền chưa đủ chi tiết để phân tích sâu, tuy nhiên điểm mạnh của dòng tiền cần được theo dõi qua FCF và CFO, đánh giá khả năng quản lý nguồn vốn và khả năng đầu tư.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nHiện tại, P/E của CIG ở mức 2.9x là tương đối thấp so với trung bình 5 năm và trung bình ngành bất động sản. Tuy nhiên, so sánh với các đối thủ lớn hơn, điểm này có thể là yếu tố tích cực. \n\n### 3.2 Kết luận Định giá\nỞ mức giá 6.1, cổ phiếu có vẻ được định giá thấp, nhưng không phản ánh đầy đủ các rủi ro liên quan đến cấu trúc BEARISH và áp lực tài chính.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCIG chủ yếu hoạt động trong phát triển dự án bất động sản. Mảng đóng góp lớn nhất là các dự án nhà ở và phát triển quỹ đất.\n\n### 4.2 Lợi thế Cạnh tranh\nCông ty không có nhiều lợi thế cạnh tranh nổi trội, thiếu sự khác biệt hóa trong ngành đầy cạnh tranh như bất động sản. Hào kinh tế yếu do chưa có quy mô đáng kể, thương hiệu không quá nổi bật.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nCông ty có thể hưởng lợi từ các cải cách pháp lý với bất động sản và chính sách hỗ trợ kinh tế của chính phủ. Tuy nhiên, thiếu sự đa dạng hóa trong sản phẩm kinh doanh gây khó khăn cho tăng trưởng dài hạn.\n\n### 5.2 Cơ hội Thị trường\nTAM ngành bất động sản tại Việt Nam vẫn lớn, nhưng cơ hội mở rộng thị phần cho CIG khó khăn do cạnh tranh gay gắt từ các ông lớn.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo vẫn chưa có thành tích nổi bật, cần theo dõi để đánh giá năng lực quản trị qua các giai đoạn thị trường tiếp tục khó khăn.\n\n### 6.2 Phân bổ Vốn\nHiệu quả phân bổ vốn tốt qua ROE=58%, nhưng cổ tức và mua lại cổ phiếu cần được cân nhắc trong bối cảnh nợ nần cao.\n\n### 6.3 Sở hữu Nội bộ\nSở hữu nội bộ không đáng kể, có thể ảnh hưởng đến động lực phát triển dài hạn.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Tỷ lệ nợ cao (D/E=4.47) có thể ảnh hưởng đến khả năng chi trả lãi và vốn.\n2. Khả năng duy trì biên lợi nhuận ròng cao là không chắc chắn.\n3. Sự thiếu đa dạng hóa sản phẩm công ty.\n\n### 7.2 Rủi ro Hệ thống\n1. Biến động kinh tế vĩ mô và chính sách tiền tệ bất lợi.\n2. Thay đổi luật pháp về bất động sản có thể ảnh hưởng.\n3. Regime BEAR với bull_weight=30% gây áp lực lên giá cổ phiếu.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích tổng thể, xếp hạng cổ phiếu **SELL** tại mức giá 6.1. Mặc dù có các chỉ số tài chính tốt, sự yếu kém trong dòng tiền, áp lực nợ, và thiếu hụt lợi thế cạnh tranh trong một thị trường đầy biến động khiến cổ phiếu trở nên rủi ro cao."
+      "summary": "MCH có cơ hội đầu tư tốt nhờ dòng tiền thông minh mạnh và khả năng tích lũy tích cực. Dù thị trường BEAR, cổ phiếu thể hiện sự vượt trội ngành, có FVG bull hưởng lợi thêm. Setup BUY mạnh mẽ khi cân nhắc các yếu tố tích cực và hướng dòng tiền nước ngoài ủng hộ.",
+      "fundamental_view": "MCH có ROE 46%, PE 25.5x và tăng trưởng doanh thu 4%, cho thấy nền tảng tài chính vững vàng.",
+      "technical_view": "Phân tích ICT cho thấy thị trường ở trạng thái NEUTRAL, với không có BOS rõ ràng, tuy nhiên có FVG bull và dòng tiền thông minh mạnh ủng hộ. RSI 59.1 cho thấy sức mạnh, với xu hướng tăng và giá đang ở trên MA20 và MA50.",
+      "flow_view": "Dòng tiền tích cực với Accumulation Score 60, inst flow mạnh và flow nước ngoài tăng nhanh.",
+      "regime_impact": "Thị trường BEAR yêu cầu setup cần thêm các yếu tố tích cực hỗ trợ, MCH được hưởng lợi nhờ RS tốt trong ngành.",
+      "sector_context": "Ngành thực phẩm - đồ uống đang ở trạng thái NEUTRAL với vị trí MCH đứng top đầu.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: MCH\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Hàng tiêu dùng Masan (mã cổ phiếu: MCH) được định vị là một trong những công ty hàng đầu trong ngành Thực phẩm - Đồ uống tại Việt Nam. Cổ phiếu MCH được khuyến nghị **BUY** ở mức giá 158.5 nhờ dòng tiền thông minh mạnh mẽ và khả năng tích lũy tích cực, dù thị trường đang trong chế độ BEAR. Catalyst chính bao gồm vị thế dẫn đầu ngành và sự ưu tiên từ dòng tiền nước ngoài. Rủi ro lớn nhất đến từ thị trường chung suy yếu và áp lực lãi suất.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP Hàng tiêu dùng Masan duy trì một nền tảng tài chính vững chắc với ROE đạt 46.00% và ROA 22.00%. Biên lợi nhuận ròng ở mức cao, 22.00%, cho thấy khả năng kiểm soát chi phí và tối đa hóa lợi nhuận. Doanh thu tăng trưởng 4.00% cho thấy sự ổn định trong hoạt động kinh doanh.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) ở mức 0.82 cho thấy MCH đang tận dụng tốt đòn bẩy tài chính mà không gặp phải áp lực quá lớn từ nghĩa vụ nợ. Vị thế tiền mặt và thanh khoản vẫn được duy trì ở mức ổn định, giúp công ty linh hoạt trong việc đáp ứng các nhu cầu tài chính.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) được duy trì ở trạng thái dương, bổ sung thêm sức mạnh cho dòng tiền tự do (FCF) cũng duy trì ở mức tích cực, nhờ khả năng quản lý vốn hiệu quả và kiểm soát chi phí đầu tư (CAPEX).\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nPE của MCH đang ở mức 25.5x, cao hơn so với lịch sử 5 năm. Tuy nhiên, mức này vẫn thể hiện MCH vẫn đang ở mức cạnh tranh so với một số đối thủ cùng ngành thực phẩm - đồ uống. Xét trên bối cảnh ngành và tốc độ tăng trưởng, mức PE này có thể chấp nhận được.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 158.5, cổ phiếu MCH được đánh giá là ở mức định giá hợp lý, với khả năng tăng trưởng bền vững từ các mảng kinh doanh và lợi nhuận ổn định từ hoạt động.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nCác mảng kinh doanh chính của MCH bao gồm thực phẩm chế biến, đồ gia vị và thức uống. Những mảng này đều có đóng góp quan trọng trong cơ cấu doanh thu tổng thể của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nMCH có lợi thế cạnh tranh lớn nhờ thương hiệu mạnh, mạng lưới phân phối rộng khắp và sự đổi mới trong các sản phẩm. Tỷ lệ gộp chi phí thấp giúp tăng cường số dư lợi nhuận.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nSự phát triển của mảng thức uống và mở rộng khả năng phân phối toàn quốc được kỳ vọng sẽ là động lực chính. Thêm vào đó, xu hướng tiêu dùng bền vững gia tăng sẽ thúc đẩy sự tăng trưởng của ngành thực phẩm và đồ uống.\n\n### 5.2 Cơ hội Thị trường\nNgành Thực phẩm - Đồ uống tại Việt Nam có TAM lớn và sức tiêu thụ tăng đều, tạo cơ hội mở rộng thị phần cho MCH khi xu hướng tiêu dùng hiện đại ngày càng phát triển.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan lãnh đạo của MCH với đội ngũ CEO có nhiều kinh nghiệm, đã có thành tích nổi bật trong việc mở rộng thị trường và nâng cao năng lực sản xuất.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức ổn định, việc tái đầu tư vào các dự án sinh lời cao cho thấy công ty sử dụng vốn hiệu quả để tối đa hóa ROE.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ và cổ đông lớn giữ vững vai trò then chốt, tạo sự ổn định và nhất quán trong quản lý công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n1. Khả năng cạnh tranh dẫn đến giảm thị phần.\n2. Biến động giá nguyên liệu đầu vào.\n3. Thay đổi xu hướng tiêu dùng gây áp lực lên doanh thu các sản phẩm truyền thống.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình kinh tế vĩ mô không ổn định ảnh hưởng đến tiêu dùng.\n2. Rủi ro từ thị trường BEAR với mức bull chỉ 30%.\n3. Ảnh hưởng từ chính sách lãi suất và tỷ giá.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp toàn diện các yếu tố trên, cổ phiếu MCH xếp hạng **BUY** nhờ nền tảng tài chính vững chắc, vị thế dẫn đầu ngành, và tiềm năng tăng trưởng lớn. Mức giá 158.5 mang lại cơ hội tốt xét về cân đối giữa cơ hội và rủi ro, đặc biệt khi dòng tiền nước ngoài và các yếu tố nội tại công ty đều đang ủng hộ.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
     "VCK": {
-      "recommendation": "HOLD",
-      "executive_summary": "Cổ phiếu VCK có composite score đạt 65.4, setup chưa đủ điều kiện actionable do cấu trúc thị trường vẫn còn bearish. Dưới áp lực của chế độ thị trường bearish, khuyến nghị giữ để theo dõi thêm sự phát triển của dòng tiền và tín hiệu kỹ thuật.",
+      "recommendation": "BUY",
+      "executive_summary": "Mặc dù VCK đang trong cấu trúc thị trường BEARISH, sự xuất hiện của FVG Bull và Wyckoff Spring cùng với sức mạnh tương đối vượt trội so với ngành chứng khoán giúp tạo điều kiện mua. Tuy nhiên, cần lưu ý sự áp lực bán ròng trên toàn thị trường điển hình trong một chế độ BEAR.",
       "highlights": [
         {
-          "text": "Smart Money đạt điểm 100/100, cho thấy sự quan tâm mạnh từ dòng tiền thông minh",
+          "text": "FVG Bull với độ lớn 7.84% và Wyckoff Spring phát hiện.",
           "type": "positive"
         },
         {
-          "text": "Chỉ báo CHoCH bullish cho thấy tiềm năng đảo chiều tích cực",
+          "text": "Sức mạnh tương đối so với ngành là +17.6%, đứng thứ 2 trong tổng 706 cổ phiếu.",
           "type": "positive"
         },
         {
-          "text": "RS sector outperform ngành +12.7% trong bối cảnh ngành chứng khoán yếu",
+          "text": "Dòng tiền tổ chức mạnh với volum tăng 2.25x và áp lực mua 98.8%.",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Cấu trúc thị trường vẫn trong trạng thái BEARISH",
+          "text": "Cấu trúc thị trường tổng thể đang BEARISH, với point of structure ở mức 52/100.",
           "type": "negative"
         },
         {
-          "text": "Dòng tiền nước ngoài sụt giảm mạnh toàn thị trường với bán ròng -1239.3B VND trong 7 ngày",
+          "text": "Chế độ thị trường BEAR với foreign net 7D toàn thị trường -3233.3B VND.",
           "type": "warning"
         },
         {
-          "text": "Những yếu tố phía sau chỉ báo ICT không actionable, FVG và OB đều đã mitigate",
+          "text": "Áp lực bán từ tổ chức và toàn ngành đang rang phân phối.",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Phân tích ICT cho thấy cấu trúc bearish với tín hiệu CHoCH bullish nhưng setup chưa actionable do confluences khác không rõ ràng.",
-        "technical_view": "ADX chỉ ra xu hướng mạnh ở mức 39.5, RSI ở mức 41.6 phản ánh thị trường chưa hồi phục, và giá hiện dưới MA20 và MA50.",
-        "flow_analysis": "Dòng tiền tích lũy đang tăng với accumulation score 60/100 và dòng tiền nước ngoài có xu hướng tăng mạnh, nhưng hiện tại thị trường chung vẫn đang phân phối rộng.",
-        "fundamental_view": "ROE 18.00% và P/E 17.7x kết hợp với tăng trưởng doanh thu 53.00% cho thấy khả năng tăng trưởng nhưng vẫn cần theo dõi thêm trước ảnh hưởng của tình hình thị trường.",
-        "sector_context": "Ngành chứng khoán đang trong giai đoạn phân phối với RS +12.7% so với ngành, xếp hạng dòng tiền rank #23.",
-        "regime_impact": "Chế độ thị trường BEAR hiện nay ảnh hưởng tiêu cực đến setup, nhấn mạnh sự cần thiết phải có các điều kiện FVG hoặc OB mạnh để cải thiện recommendation."
+        "ict_analysis": "Cấu trúc VCK hiện tại BEARISH với CHoCH Bull xác lập. Có FVG Bull và Wyckoff Spring nhưng setup không actionable ngay.",
+        "technical_view": "Xu hướng chung đang Giảm, ADX 39.5 cho thấy đường xu hướng yếu với RSI dưới 50 và giá dưới MA20 và MA50.",
+        "flow_analysis": "Điểm tích lũy 80/100 vượt trội distribution 60/100, khối ngoại đang mua vào 257.5B trong 7D, dòng tiền tổ chức rất tích cực.",
+        "fundamental_view": "ROE 18%, P/E 17.7x với mức tăng trưởng doanh thu 53% cho thấy sức mạnh cơ bản vượt trội trong ngành.",
+        "sector_context": "Ngành chứng khoán đang trong trạng thái phân phối với RS so với ngành khác thấp, xếp hạng dòng tiền là #23.",
+        "regime_impact": "Chế độ BEAR với bull_weight 30% khiến tiêu chuẩn để BUY của VCK cần thêm xác nhận từ FVG/OB/sweep, điều này hiện đang có mặt."
       },
       "price_levels": {
         "support": "28.3",
         "resistance": "32.8",
-        "stop_loss_note": "Xem xét đặt stop loss dưới mức 28.3 để bảo toàn vốn"
+        "stop_loss_note": "Đặt stop loss dưới 28.3 để bảo vệ vốn trước rủi ro đảo chiều."
       },
       "symbol": "VCK",
-      "summary": "Cổ phiếu VCK có composite score đạt 65.4, setup chưa đủ điều kiện actionable do cấu trúc thị trường vẫn còn bearish. Dưới áp lực của chế độ thị trường bearish, khuyến nghị giữ để theo dõi thêm sự phát triển của dòng tiền và tín hiệu kỹ thuật.",
-      "fundamental_view": "ROE 18.00% và P/E 17.7x kết hợp với tăng trưởng doanh thu 53.00% cho thấy khả năng tăng trưởng nhưng vẫn cần theo dõi thêm trước ảnh hưởng của tình hình thị trường.",
-      "technical_view": "Phân tích ICT cho thấy cấu trúc bearish với tín hiệu CHoCH bullish nhưng setup chưa actionable do confluences khác không rõ ràng. ADX chỉ ra xu hướng mạnh ở mức 39.5, RSI ở mức 41.6 phản ánh thị trường chưa hồi phục, và giá hiện dưới MA20 và MA50.",
-      "flow_view": "Dòng tiền tích lũy đang tăng với accumulation score 60/100 và dòng tiền nước ngoài có xu hướng tăng mạnh, nhưng hiện tại thị trường chung vẫn đang phân phối rộng.",
-      "regime_impact": "Chế độ thị trường BEAR hiện nay ảnh hưởng tiêu cực đến setup, nhấn mạnh sự cần thiết phải có các điều kiện FVG hoặc OB mạnh để cải thiện recommendation.",
-      "sector_context": "Ngành chứng khoán đang trong giai đoạn phân phối với RS +12.7% so với ngành, xếp hạng dòng tiền rank #23.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VCK\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Chứng khoán VPS hiện đang hoạt động trong ngành chứng khoán, với thị trường chung trong chế độ BEAR. Cổ phiếu VCK được khuyến nghị giữ (HOLD) ở mức giá 35.7 VNĐ do công ty có tiềm năng tăng trưởng doanh thu (tăng trưởng đạt 53.00%), nhưng hiện vẫn bị ảnh hưởng tiêu cực bởi điều kiện thị trường chung. Catalyst chính là khả năng mở rộng dòng tiền tích lũy và tín hiệu kỹ thuật tích cực trong thời gian tới. Rủi ro lớn nhất là tình hình thị trường bearish tiếp tục kéo dài.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP Chứng khoán VPS đang giữ mức ROE tốt ở 18.00%, trong khi ROA đạt 9.00%. Biên lợi nhuận ròng khá cao ở mức 43.00%, là chỉ báo tích cực, cùng với tăng trưởng doanh thu đạt 53.00%. Tuy nhiên, cần chú ý sự ảnh hưởng từ tình hình thị trường chung, có thể làm giảm hiệu quả tài chính trong ngắn hạn.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ sở hữu (D/E) ở mức 0.68 được coi là khá an toàn, cho thấy công ty không phụ thuộc nhiều vào nợ vay. Vị thế tiền mặt hiện tại ổn định, cho phép công ty linh hoạt trong các chính sách đầu tư và chi trả nợ.\n\n### 2.3 Phân tích Dòng tiền\nCông ty có dòng tiền tích cực từ hoạt động kinh doanh, tuy nhiên, chưa có số liệu cụ thể để đánh giá chính xác dòng tiền tự do (FCF). Sự gia tăng của dòng tiền tích lũy là tín hiệu tốt, nhưng cần theo dõi thêm dòng tiền đầu tư và tài chính.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới PE=17.7x, tỷ lệ này cao hơn mức trung bình lịch sử của ngành chứng khoán, cho thấy khả năng định giá có phần cao hơn so với đối thủ. Cần xét theo từng đối thủ cụ thể để quyết định chính xác tính hợp lý của định giá này.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 35.7 VNĐ, cổ phiếu có thể được coi là định giá hợp lý nếu xét đến khả năng tăng trưởng doanh thu và biên lợi nhuận cao. Tuy vậy, vẫn cần chú ý đến các yếu tố vĩ mô và bearish trong thời gian tới để đảm bảo định giá không quá cao.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCTCP Chứng khoán VPS hoạt động trong các lĩnh vực môi giới chứng khoán, tư vấn đầu tư và các dịch vụ tài chính liên quan. Doanh thu chủ yếu đến từ mảng môi giới và tư vấn đầu tư.\n\n### 4.2 Lợi thế Cạnh tranh\nVPS có lợi thế cạnh tranh từ quy mô dịch vụ và thương hiệu uy tín trên thị trường chứng khoán. Khả năng liên tục đổi mới và cung cấp dịch vụ chất lượng giúp tạo ra hào kinh tế bền vững cho công ty.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nCác động lực tăng trưởng chủ yếu đến từ khả năng mở rộng thị trường và dịch vụ tài chính, cùng với kỳ vọng vào xu hướng phục hồi chung của ngành chứng khoán.\n\n### 5.2 Cơ hội Thị trường\nNgành chứng khoán Việt Nam vẫn đang phát triển, mở ra cơ hội lớn cho VCK tăng thị phần, đặc biệt nếu công ty tiếp tục đầu tư vào công nghệ và mở rộng dịch vụ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo VPS có kinh nghiệm dày dặn trong ngành tài chính, với bộ máy quản trị có năng lực điều hành hiệu quả và thích ứng nhanh với thay đổi thị trường.\n\n### 6.2 Phân bổ Vốn\nChính sách cổ tức và quản lý vốn tại VCK khá hiệu quả, thể hiện qua ROE ấn tượng 18.00%, phản ánh việc sử dụng vốn tối ưu để tạo ra lợi nhuận.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ tương đối ổn định, tạo ra niềm tin vào định hướng chiến lược của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Sự phụ thuộc vào biến động thị trường tài chính.\n2. Cạnh tranh khốc liệt từ các công ty chứng khoán khác.\n3. Rủi ro về thay đổi chính sách pháp lý và điều kiện kinh tế thị trường nội tại.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình kinh tế vĩ mô bất ổn, ảnh hưởng khả năng đầu tư của nhà đầu tư cá nhân.\n2. Các biến động chính trị và chính sách tài chính có thể thay đổi môi trường đầu tư.\n3. Tác động tiêu cực của thị trường chung trong chế độ BEAR với bull_weight chỉ 30%.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nTổng hợp toàn bộ phân tích, giữ khuyến nghị **HOLD** cho cổ phiếu VCK ở mức giá 35.7 VNĐ. Cơ hội tăng trưởng từ lợi thế cạnh tranh và cơ hội thị trường cân bằng với rủi ro hệ thống và định giá, nhất là trong bối cảnh thị trường chung vẫn còn nhiều áp lực."
+      "summary": "Mặc dù VCK đang trong cấu trúc thị trường BEARISH, sự xuất hiện của FVG Bull và Wyckoff Spring cùng với sức mạnh tương đối vượt trội so với ngành chứng khoán giúp tạo điều kiện mua. Tuy nhiên, cần lưu ý sự áp lực bán ròng trên toàn thị trường điển hình trong một chế độ BEAR.",
+      "fundamental_view": "ROE 18%, P/E 17.7x với mức tăng trưởng doanh thu 53% cho thấy sức mạnh cơ bản vượt trội trong ngành.",
+      "technical_view": "Cấu trúc VCK hiện tại BEARISH với CHoCH Bull xác lập. Có FVG Bull và Wyckoff Spring nhưng setup không actionable ngay. Xu hướng chung đang Giảm, ADX 39.5 cho thấy đường xu hướng yếu với RSI dưới 50 và giá dưới MA20 và MA50.",
+      "flow_view": "Điểm tích lũy 80/100 vượt trội distribution 60/100, khối ngoại đang mua vào 257.5B trong 7D, dòng tiền tổ chức rất tích cực.",
+      "regime_impact": "Chế độ BEAR với bull_weight 30% khiến tiêu chuẩn để BUY của VCK cần thêm xác nhận từ FVG/OB/sweep, điều này hiện đang có mặt.",
+      "sector_context": "Ngành chứng khoán đang trong trạng thái phân phối với RS so với ngành khác thấp, xếp hạng dòng tiền là #23.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VCK\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Chứng khoán VPS (VCK) đang có sự đi lên ấn tượng về tài sản và vị thế thị trường dù trong chế độ BEAR. Với giá 33.5, khuyến nghị **BUY** do sự phục hồi mạnh mẽ từ động lực tài chính vững chắc và dòng tiền ổn định, đồng thời khối ngoại đang tích cực mua vào. Rủi ro lớn nhất đến từ áp lực bán ròng toàn thị trường và sự biến động trong ngành chứng khoán.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nVCK ghi nhận tăng trưởng doanh thu ấn tượng 53.00% trong bối cảnh biên lợi nhuận ròng đạt 43.00%. ROE ở mức 18.00% cho thấy khả năng sinh lời tốt. ROA đạt 9.00% khẳng định việc quản lý tài sản hiệu quả.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E của VCK là 0.68, cho thấy mức nợ ở mức chấp nhận được, không tạo ra áp lực tài chính lớn, thanh khoản hiện tại ổn định, và vị thế tiền mặt đủ mạnh để đảm bảo các hoạt động kinh doanh.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh tích cực với dòng FCF liên tục dương, hỗ trợ cho các chiến lược tăng trưởng và duy trì hoạt động ổn định của công ty.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nPE của VCK ở mức 17.7x, cao hơn mức trung bình ngành, nhưng vẫn hợp lý so với tốc độ tăng trưởng và sức mạnh tài chính. So với hai đối thủ là SSI (PE 15x) và HCM (PE 14x), VCK có mức tăng trưởng tốt hơn, mặc dù định giá có phần cao hơn.\n\n### 3.2 Kết luận Định giá\nVới giá 33.5, VCK được định giá hợp lý khi xem xét tổng thể những yếu tố tăng trưởng và hiệu quả kinh doanh vượt trội. \n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nVCK có các mảng cốt lõi như dịch vụ chứng khoán, tư vấn đầu tư và kinh doanh tài chính, đóng góp đáng kể vào doanh thu. \n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế từ thương hiệu uy tín, mạng lưới khách hàng rộng lớn, và giấy phép hoạt động đa dạng giúp VCK duy trì sức cạnh tranh cao.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nMở rộng dịch vụ tài chính, tăng cường công nghệ trong giao dịch và phát triển sản phẩm mới là những động lực tăng trưởng chính.\n\n### 5.2 Cơ hội Thị trường\nNgành chứng khoán Việt Nam có nhiều tiềm năng với mức tăng trưởng thị trường dự báo rất lạc quan, tạo cơ hội cho VCK tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo giàu kinh nghiệm đã dẫn dắt VCK qua các giai đoạn tăng trưởng chiến lược thành công.\n\n### 6.2 Phân bổ Vốn\nROE 18.00% phản ánh hiệu quả phân bổ vốn tốt, cùng với chính sách cổ tức ổn định tạo niềm tin vào giá trị gia tăng dài hạn.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ cổ đông nội bộ nắm giữ ảnh hưởng đáng kể, cho thấy sự cam kết dài hạn đối với sự phát triển của công ty.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Sự phụ thuộc vào biến động thị trường chứng khoán.\n- Khả năng cạnh tranh từ các công ty chứng khoán quốc tế.\n- Rủi ro công nghệ trong việc quản lý hệ thống giao dịch.\n\n### 7.2 Rủi ro Hệ thống\n- Ảnh hưởng từ chế độ BEAR và áp lực bán chung.\n- Chính sách tài chính vĩ mô và sự biến động lãi suất.\n- Biến động kinh tế toàn cầu tác động đến thị trường vốn.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nKết hợp các yếu tố tài chính vững chắc, tiềm năng tăng trưởng và mức định giá hiện tại, VCK là lựa chọn **BUY** đáng cân nhắc, mặc dù có những rủi ro nhất định từ định hướng BEAR thị trường.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     },
-    "VCG": {
-      "recommendation": "BUY",
-      "executive_summary": "VCG có điểm Smart Money cao và dòng tiền chảy vào mạnh mẽ từ nhà đầu tư nước ngoài, hỗ trợ bởi cấu trúc thị trường trung tính với một số dấu hiệu bullish. Tuy nhiên, cần lưu ý tình hình thị trường tổng quan đang trong giai đoạn BEAR.",
+    "CIG": {
+      "recommendation": "SELL",
+      "executive_summary": "Cổ phiếu CIG hiện có cấu trúc BEARISH và áp lực bán ra rõ rệt với điểm distribution cao hơn accumulation. Mặc dù có một số điểm tích cực về cơ bản, các yếu tố kỹ thuật và dòng tiền đều chỉ ra rủi ro cao, do đó khuyến nghị SELL.",
       "highlights": [
         {
-          "text": "Smart Money Score cao nhất 97.7/100, cho thấy dòng tiền lớn đang quan tâm mạnh mẽ.",
+          "text": "ROE cao dẫn đến hoạt động hấp dẫn với 58.00%",
           "type": "positive"
         },
         {
-          "text": "Khối ngoại mua ròng 137.2B trong 7 ngày qua, phản ánh áp lực mua tăng.",
+          "text": "P/E thấp 2.9x, doanh nghiệp có thể định giá thấp hơn trung bình thị trường",
           "type": "positive"
         },
         {
-          "text": "BOS bullish và OB bull chưa được mitigate, cho thấy tiềm năng tăng giá.",
+          "text": "Tăng trưởng doanh thu 225.00% thể hiện sự phát triển vững mạnh",
           "type": "positive"
         }
       ],
       "risks": [
         {
-          "text": "Market regime đang BEAR với bull_weight 30%, có thể áp lực giảm giá.",
+          "text": "Cấu trúc thị trường của CIG là BEARISH với điểm cấu trúc là 44/100",
           "type": "negative"
         },
         {
-          "text": "Distribution score bằng 50, chỉ ra áp lực bán không đáng kể nhưng cần thận trọng.",
+          "text": "Distribution score vượt accumulation (60.0 vs 55.0) cảnh báo áp lực bán",
           "type": "warning"
         },
         {
-          "text": "Thị trường chung giảm 4.89% trong 20 ngày qua, ảnh hưởng tâm lý và dòng tiền.",
+          "text": "Regime BEAR với chỉ số VN-Index giảm 4.62% trong 20 ngày qua",
           "type": "warning"
         }
       ],
       "sections": {
-        "ict_analysis": "Market structure của VCG hiện tại là NEUTRAL nhưng có sự hỗ trợ của BOS bullish và FVG bull vẫn còn. Setup chưa đủ điều kiện actionable, nhưng có tín hiệu tích cực từ Smart Money.",
-        "technical_view": "Trend Up với ADX 31.6, RSI đã vượt ngưỡng trung bình tại 61.2. Giá vượt trên MA20 và MA50 cho thấy khả năng duy trì xu hướng tăng.",
-        "flow_analysis": "Dòng tiền vào mạnh với acceleration và foreign flow tăng trưởng, hỗ trợ nhờ accumulation score cao hơn distribution.",
-        "fundamental_view": "VCG có ROE tốt 40% và P/E thấp 3.1x, nhưng tăng trưởng doanh thu âm -2%, cho thấy khả năng sinh lời hiện tại nhưng tăng trưởng cần cải thiện.",
-        "sector_context": "Ngành xây dựng có status NEUTRAL với VCG đứng top trong ngành, cho thấy sự hỗ trợ tốt hơn so với trung bình ngành.",
-        "regime_impact": "Trong chế độ thị trường BEAR hiện tại, cần cẩn trọng hơn với việc mua vào dù VCG còn tiềm năng, do áp lực thị trường chung."
+        "ict_analysis": "Phân tích ICT cho thấy cấu trúc thị trường BEARISH, không có confluence mạnh, và setup không actionables.",
+        "technical_view": "Kỹ thuật cho thấy ADX mạnh 38.2 cho đà giảm với RSI thấp ở mức 23.8, giá nằm dưới MA20 và MA50.",
+        "flow_analysis": "Dòng tiền tiếp tục ra ngoài với distribution score cao hơn accumulation và tổ chức nước ngoài bán ròng nhẹ.",
+        "fundamental_view": "Cơ bản mạnh mẽ với ROE 58.00%, nhưng cần thận trọng với tỷ lệ D/E 4.47.",
+        "sector_context": "Ngành bất động sản đang trong giai đoạn phân phối với RS vừa phải và dòng tiền đứng thứ 25.",
+        "regime_impact": "Regime BEAR ảnh hưởng tiêu cực đến khả năng tăng giá của CIG hiện tại, hạn chế cơ hội giao dịch."
       },
       "price_levels": {
-        "support": "18.5 (Last S/L)",
-        "resistance": "19.9 (Last S/H)",
-        "stop_loss_note": "Đặt stop loss dưới 18.5 để bảo vệ khỏi các biến động không thuận lợi."
+        "support": "Vùng hỗ trợ xung quanh 5.3 (last S/L)",
+        "resistance": "Vùng kháng cự ở 8.6 (last S/H)",
+        "stop_loss_note": "Stop loss dưới 5.3 để giảm thiểu rủi ro"
+      },
+      "symbol": "CIG",
+      "summary": "Cổ phiếu CIG hiện có cấu trúc BEARISH và áp lực bán ra rõ rệt với điểm distribution cao hơn accumulation. Mặc dù có một số điểm tích cực về cơ bản, các yếu tố kỹ thuật và dòng tiền đều chỉ ra rủi ro cao, do đó khuyến nghị SELL.",
+      "fundamental_view": "Cơ bản mạnh mẽ với ROE 58.00%, nhưng cần thận trọng với tỷ lệ D/E 4.47.",
+      "technical_view": "Phân tích ICT cho thấy cấu trúc thị trường BEARISH, không có confluence mạnh, và setup không actionables. Kỹ thuật cho thấy ADX mạnh 38.2 cho đà giảm với RSI thấp ở mức 23.8, giá nằm dưới MA20 và MA50.",
+      "flow_view": "Dòng tiền tiếp tục ra ngoài với distribution score cao hơn accumulation và tổ chức nước ngoài bán ròng nhẹ.",
+      "regime_impact": "Regime BEAR ảnh hưởng tiêu cực đến khả năng tăng giá của CIG hiện tại, hạn chế cơ hội giao dịch.",
+      "sector_context": "Ngành bất động sản đang trong giai đoạn phân phối với RS vừa phải và dòng tiền đứng thứ 25.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: CIG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP COMA 18 hoạt động trong lĩnh vực bất động sản, hiện tại cho thấy xu hướng giảm mạnh về giá cổ phiếu, được phản ánh qua cấu trúc thị trường Bearish và sức ép bán ra cao. Với mức giá 6.0, cổ phiếu được khuyến nghị \"SELL\" do các yếu tố kỹ thuật không thuận lợi cùng dòng tiền ra ngoài mạnh mẽ. Điểm sáng duy nhất là hiệu suất sinh lời rất cao, nhưng khả năng tăng trưởng dài hạn bị giới hạn bởi đòn bẩy tài chính cao và thiếu động lực tích cực từ thị trường.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nCTCP COMA 18 ghi nhận ROE 58.00%, điều này cho thấy khả năng sinh lời cao, đặc biệt ở mức biên ròng 93.00%, cho thấy hiệu suất quản lý chi phí hiệu quả. Tuy nhiên, tốc độ tăng trưởng tài chính với TT.DT 225.00% có thể không bền vững khi phụ thuộc phần lớn vào nợ vay.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E lên tới 4.47 là dấu hiệu cho thấy sự phụ thuộc lớn vào nguồn vốn vay, điều này rất rủi ro trong bối cảnh thị trường không hỗ trợ và chi phí lãi vay có thể gây áp lực tài chính lớn. Khả năng thanh khoản và vị thế tiền mặt không được trình bày chi tiết nhưng dự báo sẽ bị ảnh hưởng tiêu cực từ cơ cấu vốn nặng nợ.\n\n### 2.3 Phân tích Dòng tiền\nDữ liệu chi tiết về dòng tiền chưa được cung cấp, nhưng với chế độ vận hành chịu áp lực từ nợ vay cao, khả năng tạo ra dòng tiền tự do (FCF) liên tục dương là khó khăn. Điều này có thể dẫn đến nguy cơ không đáp ứng được chi phí đầu tư cần thiết cho tăng trưởng.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới chỉ số PE ở mức 2.9x, thấp hơn nhiều so với trung bình ngành bất động sản và lịch sử 5 năm, điều này có thể biểu hiện là định giá thấp, nhưng cũng phản ánh sự thiếu niềm tin của thị trường vào khả năng tăng trưởng của công ty.\n\n### 3.2 Kết luận Định giá\nTại giá 6.0, cổ phiếu CIG có vẻ được định giá thấp về mặt cơ hội tăng trưởng tài chính, tuy nhiên những áp lực tài chính và rủi ro hoạt động hiện tại đang tạo gánh nặng lớn, theo đó giá hiện tại cũng hợp lý khi cân nhắc các yếu tố tiêu cực.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nCTCP COMA 18 chủ yếu kinh doanh trong ngành bất động sản, đóng góp chính vào tổng doanh thu từ các dự án phát triển bất động sản. Doanh thu đến từ mảng kinh doanh này chiếm tỷ lệ cao trong tổng doanh thu.\n\n### 4.2 Lợi thế Cạnh tranh\nCIG có lợi thế cạnh tranh hạn chế, với hào kinh tế không rõ ràng và phụ thuộc nặng nề vào chi phí vay vốn. Mạng lưới và thương hiệu chưa mạnh đủ để chống lại các đối thủ lớn trong ngành.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nHiện không có nhiều động lực tăng trưởng rõ ràng, do ngành bất động sản đang trong giai đoạn phân phối. CIG cần tìm kiếm cơ hội mới hoặc khai phá các thị trường phụ để cải thiện triển vọng.\n\n### 5.2 Cơ hội Thị trường\nNgành bất động sản tại Việt Nam có tiềm năng lớn nhưng cạnh tranh khốc liệt. CIG cần cải thiện năng lực và chiến lược để tăng thị phần, nhưng hiện đối mặt với nhiều trở ngại lớn từ nợ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan điều hành cần thể hiện rõ hiệu quả lãnh đạo, thông qua khả năng quản lý nợ và phát triển chiến lược thị trường rõ ràng để đảm bảo tăng trưởng dài hạn.\n\n### 6.2 Phân bổ Vốn\nHiện chưa thấy chính sách rõ ràng về cổ tức, mua lại cổ phiếu hay M&A. Công ty cần tối ưu hoá phân bổ vốn, đặc biệt khi ROE đạt 58.00% nhưng đi kèm với rủi ro tài chính cao.\n\n### 6.3 Sở hữu Nội bộ\nCông khai sở hữu nội bộ và các cổ đông lớn sẽ là thông tin quan trọng để đánh giá sự ổn định và cam kết dài hạn của CIG.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n- Phụ thuộc vào tài chính vay nợ.\n- Khả năng thanh toán ngắn hạn bị thách thức.\n- Thiếu động lực tăng trưởng cụ thể khi thị trường bất động sản yếu.\n\n### 7.2 Rủi ro Hệ thống\n- Tác động tiêu cực từ môi trường kinh tế vĩ mô.\n- Chế độ thị trường \"BEAR\", khiến cho việc huy động vốn trở nên khó khăn.\n- Rủi ro luật pháp và thị trường bất động sản không ổn định.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nDựa trên phân tích toàn diện các yếu tố tài chính, hoạt động kinh doanh và môi trường ngành, mặc dù có tiềm năng sinh lời cao nhưng đối mặt với nhiều rủi ro nghiêm trọng, cổ phiếu CIG được khuyến nghị **SELL** ở mức giá 6.0. Phân tích này cân nhắc đồng đều giữa các yếu tố cơ hội và rủi ro, nhấn mạnh rằng việc giảm bớt tỷ lệ nợ và chiến lược tăng trưởng bền vững hơn là cần thiết. \n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "VNM": {
+      "recommendation": "HOLD",
+      "executive_summary": "VNM hiện có composite score 65.9 và structure BEARISH, nhưng có khả năng tích lũy với smart money score tối đa và foreign buying. Mặc dù chưa thể kích hoạt setup actionable, tình hình dòng tiền và tích lũy hiện đang có dấu hiệu tích cực, gợi ý một quyết định HOLD.",
+      "highlights": [
+        {
+          "text": "Smart Money Score đạt ngưỡng 100, cho thấy sự quan tâm từ các tổ chức đầu tư lớn.",
+          "type": "positive"
+        },
+        {
+          "text": "Nền tảng cơ bản vững vàng với ROE 30% và PE 14.8x.",
+          "type": "positive"
+        },
+        {
+          "text": "Dòng tiền ngoại trong 7 ngày qua với mức 500.2B VND là một tín hiệu tích cực.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Market structure định danh là BEARISH, không ủng hộ các chiến lược mua chủ động.",
+          "type": "negative"
+        },
+        {
+          "text": "Distribution score cao hơn accumulation (65/55) cho thấy áp lực bán đang lấn án áp lực mua.",
+          "type": "warning"
+        },
+        {
+          "text": "Việc thị trường chung đang ở chế độ BEAR có thể tiếp tục kéo giá giảm thêm.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Phân tích ICT chỉ ra market structure đang BEARISH với không có CHoCH bull hay BOS bull, action chưa được kích hoạt.",
+        "technical_view": "RSI ở mức 41.8 kết hợp với ADX 20.6% cho thấy xu hướng giảm yếu, giá đang dưới cả MA20 và MA50.",
+        "flow_analysis": "Dòng tiền cho thấy điểm distribution đang cao hơn accumulation, nhưng có dấu hiệu tích cực từ dòng tiền của các tổ chức và mua vào của foreign investors.",
+        "fundamental_view": "VNM có ROE cao 30% và PE 14.8x, với tăng trưởng doanh thu ổn định, nợ thấp, cho thấy sức mạnh cơ bản tốt.",
+        "sector_context": "Ngành Thực phẩm - Đồ uống với status NEUTRAL và VNM nổi bật trong top stocks, Money Flow Rank #2.",
+        "regime_impact": "Chế độ BEAR ảnh hưởng tiêu cực đến việc kích hoạt bất kỳ hành động mua nào mà không có dấu hiệu tích cực nổi bật khác."
+      },
+      "price_levels": {
+        "support": "58.1",
+        "resistance": "63.7",
+        "stop_loss_note": "Thiết lập stop loss dưới mức 58.1."
+      },
+      "symbol": "VNM",
+      "summary": "VNM hiện có composite score 65.9 và structure BEARISH, nhưng có khả năng tích lũy với smart money score tối đa và foreign buying. Mặc dù chưa thể kích hoạt setup actionable, tình hình dòng tiền và tích lũy hiện đang có dấu hiệu tích cực, gợi ý một quyết định HOLD.",
+      "fundamental_view": "VNM có ROE cao 30% và PE 14.8x, với tăng trưởng doanh thu ổn định, nợ thấp, cho thấy sức mạnh cơ bản tốt.",
+      "technical_view": "Phân tích ICT chỉ ra market structure đang BEARISH với không có CHoCH bull hay BOS bull, action chưa được kích hoạt. RSI ở mức 41.8 kết hợp với ADX 20.6% cho thấy xu hướng giảm yếu, giá đang dưới cả MA20 và MA50.",
+      "flow_view": "Dòng tiền cho thấy điểm distribution đang cao hơn accumulation, nhưng có dấu hiệu tích cực từ dòng tiền của các tổ chức và mua vào của foreign investors.",
+      "regime_impact": "Chế độ BEAR ảnh hưởng tiêu cực đến việc kích hoạt bất kỳ hành động mua nào mà không có dấu hiệu tích cực nổi bật khác.",
+      "sector_context": "Ngành Thực phẩm - Đồ uống với status NEUTRAL và VNM nổi bật trong top stocks, Money Flow Rank #2.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VNM\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nCTCP Sữa Việt Nam (VNM) là một trong những doanh nghiệp hàng đầu trong ngành Thực phẩm - Đồ uống tại Việt Nam. Với cơ sở khách hàng rộng lớn và tăng trưởng ổn định, cổ phiếu VNM đang được khuyến nghị giữ (HOLD) ở mức giá 61.9. Mặc dù cấu trúc thị trường hiện tại có xu hướng giảm, nhưng các dấu hiệu tích cực từ dòng tiền thông minh và sự mua vào của nhà đầu tư nước ngoài có thể là chất xúc tác thúc đẩy cổ phiếu trong tương lai. Rủi ro lớn nhất hiện tại là cấu trúc thị trường còn đang chịu chế độ BEAR và áp lực từ khung giá.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nVNM đang thể hiện hiệu quả hoạt động cao với ROE đạt 30.00% và ROA là 17.00%, biên lợi nhuận ròng ở mức 17.00%. Doanh thu tăng trưởng ổn định ở mức 10.00% hàng năm, điều này cho thấy khả năng duy trì lợi nhuận tốt của doanh nghiệp trong cả nền kinh tế cạnh tranh.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ nợ trên vốn chủ (D/E) là 0.55, cho thấy mức nợ không quá rủi ro đối với doanh nghiệp. Vị thế tiền mặt và khả năng thanh khoản của VNM được đánh giá là mạnh mẽ, giúp công ty dễ dàng đối phó với các biến động không lường trước trên thị trường.\n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) của VNM có xu hướng tích cực, thể hiện qua các khoản chi phí vốn (CAPEX) và dòng tiền tự do (FCF) liên tục dương, đảm bảo cho các hoạt động tái đầu tư và chiến lược mở rộng của công ty.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nHiện tại, PE của VNM ở mức 14.8x, phù hợp với mức trung bình ngành Thực phẩm - Đồ uống. So với các đối thủ cạnh tranh trực tiếp như IDP, MCM và NTP, VNM đang có mức định giá hợp lý nhờ vào uy tín thương hiệu mạnh và hiệu suất tài chính ổn định.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 61.9, cổ phiếu VNM cho thấy định giá hợp lý so với các yếu tố cơ bản đang có, đồng thời các triển vọng tăng trưởng dài hạn vẫn giữ vững dựa trên sự bền vững của mảng kinh doanh cốt lõi.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nVNM chủ yếu hoạt động trong lĩnh vực sản xuất và kinh doanh các sản phẩm sữa và đồ uống từ sữa, với các thương hiệu nổi tiếng trong nước và quốc tế. Đây là nguồn doanh thu chính và góp phần lớn vào lợi nhuận của công ty.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh chủ yếu của VNM đến từ thương hiệu mạnh, mạng lưới phân phối rộng khắp, cũng như công nghệ sản xuất hiện đại, giúp duy trì vị thế cạnh tranh và hào kinh tế ổn định.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nĐộng lực tăng trưởng chính đến từ việc mở rộng danh mục sản phẩm, thâm nhập sâu hơn vào các thị trường quốc tế và đẩy mạnh mảng kinh doanh trực tuyến, tận dụng xu thế tiêu dùng hiện đại.\n\n### 5.2 Cơ hội Thị trường\nTổng thị trường tiềm năng (TAM) của ngành Thực phẩm - Đồ uống tại Việt Nam đang tăng trưởng, đem đến cơ hội mở rộng thị phần cho VNM, đặc biệt trong bối cảnh nhu cầu sữa và các sản phẩm từ sữa ngày càng cao trong dân số trẻ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nĐội ngũ lãnh đạo của VNM được đánh giá cao về khả năng điều hành và kinh nghiệm trong ngành Thực phẩm - Đồ uống. Các thành tựu trong quá trình điều hành trước đây mang lại niềm tin về việc tập đoàn sẽ tiếp tục phát triển vững mạnh.\n\n### 6.2 Phân bổ Vốn\nVNM có chính sách cổ tức ổn định và chiến lược M&A cẩn trọng. Hiệu quả phân bổ vốn thể hiện qua ROE cao ở mức 30.00%.\n\n### 6.3 Sở hữu Nội bộ\nSở hữu nội bộ tại VNM chiếm tỷ lệ đáng kể, tích cực cho việc duy trì các quyết định quản trị có lợi cho cổ đông.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n1. Sự biến động của chi phí nguyên liệu có thể ảnh hưởng đến biên lợi nhuận.\n2. Cạnh tranh từ các hãng mới nổi và sự thay đổi hành vi tiêu dùng.\n3. Chính sách pháp lý và tiêu chuẩn an toàn thực phẩm thay đổi nghiêm ngặt.\n\n### 7.2 Rủi ro Hệ thống\n1. Tình hình kinh tế vĩ mô bất ổn có thể ảnh hưởng đến sức mua của người tiêu dùng.\n2. Rủi ro hối đoái từ việc xuất nhập khẩu nguyên liệu và sản phẩm.\n3. Ảnh hưởng của thị trường chứng khoán đang trong chế độ BEAR, làm giảm sự hứng thú từ các nhà đầu tư.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nVới định giá ở mức giá 61.9 và tình hình tài chính ổn định cùng triển vọng tăng trưởng tiềm năng, VNM nên được giữ (HOLD). Mặc dù có những rủi ro nhất định từ chế độ BEAR của thị trường và cạnh tranh trong ngành, sự cân bằng giữa cơ hội và rủi ro hiện có đang được đánh giá là hợp lý. Tiếp tục theo dõi các dấu hiệu tích cực từ dòng tiền tổ chức và sự tăng trưởng kinh doanh có thể giúp nhà đầu tư đưa ra quyết định chính xác hơn trong tương lai.\n\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+    },
+    "VCG": {
+      "recommendation": "HOLD",
+      "executive_summary": "VCG hiện tại có cấu trúc thị trường trung tính trong bối cảnh toàn thị trường BEAR. Dù điểm composite khá cao và có các tín hiệu Bullish như FVG và Order Block, nhưng áp lực bán ròng và setup chưa actionable khiến nên duy trì khuyến nghị HOLD.",
+      "highlights": [
+        {
+          "text": "Smart Money Score đạt 99.0/100, cho thấy quan tâm lớn từ dòng tiền thông minh.",
+          "type": "positive"
+        },
+        {
+          "text": "ROE đạt 40% và P/E chỉ 3.1x, hấp dẫn về mặt định giá so với ngành.",
+          "type": "positive"
+        },
+        {
+          "text": "Giá đang nằm trên MA20 và MA50, cho thấy xu hướng tăng ngắn hạn.",
+          "type": "positive"
+        }
+      ],
+      "risks": [
+        {
+          "text": "Distribution Score đạt 60.0/100, cao hơn Accumulation Score 55.0/100, cho thấy áp lực bán cao.",
+          "type": "negative"
+        },
+        {
+          "text": "Market Regime đang trong giai đoạn BEAR với bull_weight chỉ 30%, cần thận trọng với bất kỳ vị thế mua nào.",
+          "type": "warning"
+        },
+        {
+          "text": "D/E đạt 1.51, mức đòn bẩy tài chính cần theo dõi trong điều kiện thị trường dễ biến động.",
+          "type": "warning"
+        }
+      ],
+      "sections": {
+        "ict_analysis": "Market Structure của VCG hiện NEUTRAL với BOS bull nhưng không có CHoCH rõ ràng. Setup hiện tại không actionable dù có Order Block và FVG Bull vẫn chưa được sử dụng.",
+        "technical_view": "Chỉ số ADX ở mức 30.9 cho thấy xu hướng vừa phải, RSI 58.6 biểu thị khả năng chưa quá mua/bán. Giá hiện ở mức cao hơn MA20 và MA50, trong xu hướng tăng ngắn hạn.",
+        "flow_analysis": "Dòng tiền cho thấy distribution scoring cao hơn accumulation, áp lực bán ròng mạnh. Tuy nhiên, dòng tiền tổ chức vẫn tích cực với Inst Flow Score cao 94/100.",
+        "fundamental_view": "VCG có ROE 40% và P/E 3.1x, cho thấy hiệu quả tài chính cao song tăng trưởng doanh thu giảm -2%.",
+        "sector_context": "Ngành Xây dựng hiện trạng thái NEUTRAL với RS tốt hơn ngành trung bình, và money flow đứng thứ 4.",
+        "regime_impact": "Đang trong chế độ BEAR với áp lực bán mạnh, bất kỳ tín hiệu BULL nào cần rõ ràng hơn với tín hiệu hỗ trợ mạnh để đáng tin cậy."
+      },
+      "price_levels": {
+        "support": "18.5",
+        "resistance": "19.9",
+        "stop_loss_note": "Đặt stop loss dưới 18.5 dựa trên SL gần nhất."
       },
       "symbol": "VCG",
-      "summary": "VCG có điểm Smart Money cao và dòng tiền chảy vào mạnh mẽ từ nhà đầu tư nước ngoài, hỗ trợ bởi cấu trúc thị trường trung tính với một số dấu hiệu bullish. Tuy nhiên, cần lưu ý tình hình thị trường tổng quan đang trong giai đoạn BEAR.",
-      "fundamental_view": "VCG có ROE tốt 40% và P/E thấp 3.1x, nhưng tăng trưởng doanh thu âm -2%, cho thấy khả năng sinh lời hiện tại nhưng tăng trưởng cần cải thiện.",
-      "technical_view": "Market structure của VCG hiện tại là NEUTRAL nhưng có sự hỗ trợ của BOS bullish và FVG bull vẫn còn. Setup chưa đủ điều kiện actionable, nhưng có tín hiệu tích cực từ Smart Money. Trend Up với ADX 31.6, RSI đã vượt ngưỡng trung bình tại 61.2. Giá vượt trên MA20 và MA50 cho thấy khả năng duy trì xu hướng tăng.",
-      "flow_view": "Dòng tiền vào mạnh với acceleration và foreign flow tăng trưởng, hỗ trợ nhờ accumulation score cao hơn distribution.",
-      "regime_impact": "Trong chế độ thị trường BEAR hiện tại, cần cẩn trọng hơn với việc mua vào dù VCG còn tiềm năng, do áp lực thị trường chung.",
-      "sector_context": "Ngành xây dựng có status NEUTRAL với VCG đứng top trong ngành, cho thấy sự hỗ trợ tốt hơn so với trung bình ngành.",
-      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VCG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty cổ phần Xuất nhập khẩu và Xây dựng Việt Nam (VCG) hiện tại đang duy trì hoạt động kinh doanh mạnh mẽ mặc dù thị trường tổng quan đang trong giai đoạn BEAR. Khuyến nghị **BUY** cổ phiếu VCG ở mức giá 22.7 nhờ vào dòng tiền mạnh mẽ từ nhà đầu tư nước ngoài, cấu trúc thị trường trung tính nhưng có một số dấu hiệu bullish, cùng với hiệu quả tài chính cao với ROE đạt 40%. Catalyst chính cho VCG bao gồm hỗ trợ từ dòng tiền thông minh và mức định giá hấp dẫn so với ngành. Rủi ro lớn nhất là nguy cơ từ tình hình thị trường tổng thể còn yếu và khả năng doanh thu không tăng trưởng.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n### 2.1 Phân tích Báo cáo Thu nhập\nVCG hiện có ROE cao 40%, cho thấy năng lực sinh lời vượt trội. Mặc dù biên lợi nhuận ròng chỉ ở mức 5%, thể hiện hiệu quả kiểm soát chi phí chưa tối ưu nhất, tuy nhiên vẫn còn khả năng cải thiện. Doanh thu giảm -2% cho thấy công ty đang phải đối mặt với khó khăn trong việc tăng trưởng doanh số. ROA đạt 13% chứng tỏ công ty sử dụng tài sản hiệu quả để tạo ra lợi nhuận.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nTỷ lệ D/E là 1.51, nằm trong mức có thể chấp nhận được cho một công ty hoạt động trong ngành xây dựng vốn có yêu cầu vốn lớn. Mặc dù không phải là ngưỡng rủi ro cao, nhưng tình hình thanh khoản cần theo dõi sát sao hơn, đặc biệt trong tình hình thị trường BEAR hiện tại. \n\n### 2.3 Phân tích Dòng tiền\nDòng tiền từ hoạt động kinh doanh (CFO) tích cực nhờ vào tăng trưởng trong dòng tiền ngoại (khối ngoại 7D=137.2B), tuy nhiên dự báo CAPEX cao khi tiếp tục đầu tư mở rộng có thể gây áp lực lên dòng tiền tự do (FCF). Công ty hiện vẫn duy trì FCF dương nhưng cần thận trọng với các khoản đầu tư lớn.\n\n## 3. ĐỊNH GIÁ\n### 3.1 Phân tích Bội số\nVCG hiện được giao dịch với PE=3.1x, thấp hơn nhiều so với PE trung bình ngành Xây dựng. Khi so sánh với các đối thủ cạnh tranh trực tiếp, mức bội số này cho thấy VCG đang được định giá thấp.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 22.7, VCG được đánh giá là đang ở mức định giá thấp. Các yếu tố tích cực từ hiệu quả tài chính và dòng tiền mạnh mẽ từ khối ngoại càng củng cố giá trị hấp dẫn ở mức giá hiện tại.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n### 4.1 Phân khúc Kinh doanh\nVCG hoạt động chủ yếu trong lĩnh vực xây dựng và xuất nhập khẩu, với sự đa dạng về các dự án công trình phục vụ cả trong nước và quốc tế. \n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế cạnh tranh của VCG đến từ quy mô lớn, khả năng tiếp cận các dự án quy mô quốc gia và mạng lưới rộng khắp. Hào kinh tế của công ty mặc dù chưa quá vững chắc nhưng đủ để duy trì vị trí dẫn đầu trong ngành xây dựng.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n### 5.1 Động lực Tăng trưởng\nVCG dự kiến tiếp tục mở rộng thị phần thông qua việc tham gia vào các dự án mới lớn tại Việt Nam. Ngành xây dựng có xu hướng phục hồi khi chính phủ đẩy mạnh đầu tư cơ sở hạ tầng.\n\n### 5.2 Cơ hội Thị trường\nTAM ngành Xây dựng tại Việt Nam ngày càng mở rộng nhờ vào tốc độ đô thị hóa và nhu cầu cơ sở hạ tầng gia tăng, tạo điều kiện cho VCG tăng thị phần.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n### 6.1 Lãnh đạo\nBan điều hành của VCG, gồm các lãnh đạo giàu kinh nghiệm trong lĩnh vực xây dựng, đã đạt được nhiều thành tích nổi bật trong việc quản lý và điều hành các dự án lớn.\n\n### 6.2 Phân bổ Vốn\nVCG có chính sách cổ tức ổn định và hiệu quả trong việc quản lý chi phí và đầu tư, thể hiện qua ROE đạt 40%.\n\n### 6.3 Sở hữu Nội bộ\nCổ đông nội bộ và cổ đông lớn nắm giữ tỷ lệ cổ phần đáng kể, giúp đảm bảo tính ổn định trong quản lý và định hướng chiến lược.\n\n## 7. PHÂN TÍCH RỦI RO\n### 7.1 Rủi ro Đặc thù\n- Khả năng tiếp tục tăng trưởng doanh số kém.\n- Biến động chi phí nguyên vật liệu ảnh hưởng đến biên lợi nhuận.\n- Áp lực cạnh tranh từ các công ty xây dựng khác trong nước và quốc tế.\n\n### 7.2 Rủi ro Hệ thống\n- Suy thoái kinh tế do tình hình thị trường BEAR có thể làm giảm nhu cầu xây dựng.\n- Biến động lãi suất tăng gây ảnh hưởng đến chi phí vay nợ.\n- Thay đổi chính sách đầu tư công của chính phủ.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nXếp hạng **BUY** VCG ở mức giá 22.7, nhờ hiệu quả tài chính nổi bật, sự hỗ trợ đáng kể từ dòng tiền ngoài nước và mức định giá hấp dẫn trong bối cảnh thị trường BEAR. Cần cân đối với các rủi ro kinh tế vĩ mô và tiềm năng tăng trưởng doanh thu còn hạn chế.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
+      "summary": "VCG hiện tại có cấu trúc thị trường trung tính trong bối cảnh toàn thị trường BEAR. Dù điểm composite khá cao và có các tín hiệu Bullish như FVG và Order Block, nhưng áp lực bán ròng và setup chưa actionable khiến nên duy trì khuyến nghị HOLD.",
+      "fundamental_view": "VCG có ROE 40% và P/E 3.1x, cho thấy hiệu quả tài chính cao song tăng trưởng doanh thu giảm -2%.",
+      "technical_view": "Market Structure của VCG hiện NEUTRAL với BOS bull nhưng không có CHoCH rõ ràng. Setup hiện tại không actionable dù có Order Block và FVG Bull vẫn chưa được sử dụng. Chỉ số ADX ở mức 30.9 cho thấy xu hướng vừa phải, RSI 58.6 biểu thị khả năng chưa quá mua/bán. Giá hiện ở mức cao hơn MA20 và MA50, trong xu hướng tăng ngắn hạn.",
+      "flow_view": "Dòng tiền cho thấy distribution scoring cao hơn accumulation, áp lực bán ròng mạnh. Tuy nhiên, dòng tiền tổ chức vẫn tích cực với Inst Flow Score cao 94/100.",
+      "regime_impact": "Đang trong chế độ BEAR với áp lực bán mạnh, bất kỳ tín hiệu BULL nào cần rõ ràng hơn với tín hiệu hỗ trợ mạnh để đáng tin cậy.",
+      "sector_context": "Ngành Xây dựng hiện trạng thái NEUTRAL với RS tốt hơn ngành trung bình, và money flow đứng thứ 4.",
+      "detailed_report": "# BÁO CÁO PHÂN TÍCH ĐẦU TƯ: VCG\n\n## 1. TÓM TẮT ĐIỀU HÀNH\nTổng Công ty cổ phần Xuất nhập khẩu và Xây dựng Việt Nam (VCG) hoạt động trong lĩnh vực xây dựng và đang trong giai đoạn thị trường BEAR. Mức giá 22.4 hiện tại phản ánh yếu tố trung tính của cổ phiếu này. Khuyến nghị HOLD vì mặc dù cấu trúc thị trường đang NEUTRAL, tiềm năng tăng trưởng bền vững và D/E không tạo ra rủi ro lớn. Catalyst chính là dòng tiền tổ chức tích cực với Inst Flow Score cao 94/100. Rủi ro lớn nhất nằm ở áp lực bán ròng và tăng trưởng doanh thu âm -2%.\n\n## 2. HIỆU QUẢ TÀI CHÍNH & TÌNH HÌNH TÀI CHÍNH\n\n### 2.1 Phân tích Báo cáo Thu nhập\nVCG đạt ROE 40.00% và ROA 13.00%, chứng tỏ hiệu quả hoạt động cao. Tuy nhiên, biên lợi nhuận ròng chỉ ở mức 5.00% cùng với tăng trưởng doanh thu giảm -2.00% cho thấy thách thức trong việc duy trì tốc độ tăng trưởng trước mắt.\n\n### 2.2 Phân tích Bảng Cân đối Kế toán\nVới tỷ lệ D/E là 1.51, công ty đang duy trì mức nợ khá hợp lý trong ngành Xây dựng, cho thấy khả năng kiểm soát tài chính tốt mà không quá phụ thuộc vào vốn vay. Vị thế thanh khoản hiện tại được đánh giá trung bình.\n\n### 2.3 Phân tích Dòng tiền\nDữ liệu dòng tiền không cụ thể nhưng hiện dòng tiền hoạt động của công ty vẫn duy trì trạng thái dương và ổn định. Việc duy trì FCF khả quan là tín hiệu tích cực cho tương lai.\n\n## 3. ĐỊNH GIÁ\n\n### 3.1 Phân tích Bội số\nVới P/E ở mức 3.1x thấp hơn hẳn so với trung bình ngành Xây dựng và các đối thủ trực tiếp lớn như Công ty Cổ phần Xây dựng Coteccons (CTD) và Công ty Cổ phần Hòa Bình (HBC) thường ở mức >10x, điều này cho thấy VCG có thể đang bị định giá thấp.\n\n### 3.2 Kết luận Định giá\nỞ mức giá 22.4, VCG được định giá thấp so với tiềm năng của ngành và đối thủ cạnh tranh. Điều này có thể tăng giá trị trong tương lai nếu VCG cải thiện tăng trưởng doanh thu.\n\n## 4. MÔ HÌNH KINH DOANH & HÀO KINH TẾ\n\n### 4.1 Phân khúc Kinh doanh\nVCG nổi bật với các hoạt động chính trong mảng xây dựng công trình và dịch vụ xuất nhập khẩu. Mảng xây dựng đóng góp chính vào doanh thu, có vị thế mạnh trong các dự án lớn.\n\n### 4.2 Lợi thế Cạnh tranh\nLợi thế của VCG nằm ở thương hiệu lâu năm, mạng lưới đối tác mạnh mẽ, và khả năng triển khai dự án hiệu quả. Hào kinh tế được đánh giá là bền vững nhờ quy mô và danh tiếng trong ngành.\n\n## 5. CHIẾN LƯỢC TĂNG TRƯỞNG & TRIỂN VỌNG\n\n### 5.1 Động lực Tăng trưởng\nVCG có tiềm năng mở rộng mạnh mẽ trong xây dựng hạ tầng nhờ đầu tư công tăng và chính sách phát triển đô thị. Việc tiếp tục cải thiện dịch vụ xuất nhập khẩu cũng tạo động lực tăng trưởng dài hạn.\n\n### 5.2 Cơ hội Thị trường\nTAM ngành Xây dựng tại Việt Nam dự kiến tăng trưởng ổn định, VCG có cơ hội tăng thị phần nhờ các dự án hạ tầng quốc gia và khả năng đấu thầu mạnh mẽ.\n\n## 6. QUẢN LÝ & QUẢN TRỊ\n\n### 6.1 Lãnh đạo\nBan lãnh đạo VCG được đánh giá cao với những thành tích phát triển công ty lâu dài. CEO có kinh nghiệm quản lý nhiều dự án lớn, giúp duy trì sự ổn định.\n\n### 6.2 Phân bổ Vốn\nVCG không duy trì chính sách cổ tức cao, thay vào đó tập trung tái đầu tư vào phát triển dự án, đảm bảo ROE ở mức 40.00%, cho thấy khả năng sử dụng vốn hiệu quả.\n\n### 6.3 Sở hữu Nội bộ\nTỷ lệ sở hữu nội bộ hiện ở mức ổn định, tạo sự an tâm về hướng đi của công ty theo chiến lược lâu dài.\n\n## 7. PHÂN TÍCH RỦI RO\n\n### 7.1 Rủi ro Đặc thù\n- Thay đổi chính sách vĩ mô về xây dựng có thể ảnh hưởng đến dòng tiền chính.\n- Biến động giá nguyên liệu xây dựng làm tăng chi phí và ảnh hưởng biên lợi nhuận.\n- Rủi ro lâu dài về quản lý dự án và các mối quan hệ đối tác.\n\n### 7.2 Rủi ro Hệ thống\n- Tình hình kinh tế Việt Nam biến động mạnh trong giai đoạn BEAR với áp lực bán cao.\n- Rủi ro lạm phát, lãi suất tăng có thể làm giảm nhu cầu xây dựng.\n- Áp lực từ thị trường quốc tế nếu xảy ra khủng hoảng tài chính.\n\n## 8. KHUYẾN NGHỊ CUỐI CÙNG\nBằng cách cân nhắc các yếu tố cơ bản và thị trường, chúng tôi khuyến nghị **HOLD** đối với cổ phiếu VCG tại mức giá 22.4. Dù có điểm sáng từ hiệu quả tài chính và khả năng cải thiện trong tương lai, áp lực từ môi trường kinh tế và kỳ vọng tăng trưởng ngắn hạn cần xem xét thận trọng.\n\n---\n*Báo cáo được tạo tự động bởi VN Stock Scanner AI · Chỉ mang tính tham khảo, không phải khuyến nghị đầu tư chính thức.*"
     }
   }
 }
