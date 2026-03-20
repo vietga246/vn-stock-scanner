@@ -1,6 +1,6 @@
 # 📊 Báo cáo thị trường - 20/03/2026
 
-> Cập nhật lúc 09:18 ICT
+> Cập nhật lúc 09:54 ICT
 
 ---
 
@@ -21,9 +21,9 @@
 | # | Mã | Tên | Ngành | Score | Tier | Khuyến nghị |
 |---|-----|-----|-------|-------|------|-------------|
 | 1 | MCH | CTCP Hàng tiêu dùng  | Thực phẩm - Đồ  | 71.4 | A | Giữ |
-| 2 | CIG | CTCP COMA 18 | Bất động sản | 69.7 | B | Bán |
+| 2 | CIG | CTCP COMA 18 | Bất động sản | 69.7 | B | Giữ |
 | 3 | TDH | CTCP Phát triển Nhà  | Bất động sản | 68.1 | B | Giữ |
-| 4 | VCK | CTCP Chứng khoán VPS | Chứng khoán | 67.0 | B | Giữ |
+| 4 | VCK | CTCP Chứng khoán VPS | Chứng khoán | 67.0 | B | Mua |
 | 5 | VNM | CTCP Sữa Việt Nam | Thực phẩm - Đồ  | 66.7 | B | Giữ |
 | 6 | VRE | CTCP Vincom Retail | Bất động sản | 66.2 | B | Mua |
 | 7 | SHS | CTCP Chứng khoán Sài | Chứng khoán | 66.0 | B | Mua |
