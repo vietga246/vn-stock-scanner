@@ -8,7 +8,7 @@ name: "⑥ AI Analysis — Phân tích AI (Auto-daily/Manual)"
 
 on:
   workflow_run:
-    workflows: ["③ Daily Process — Scoring & Sector (sau Daily Collect)"]
+    workflows: ["③ aily Process — Scoring & Sector (sau Daily Collect)"]
     types: [completed]
 
   workflow_dispatch:
