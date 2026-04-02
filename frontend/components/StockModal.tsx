@@ -1581,6 +1581,8 @@ function ModalInner({
   activeTab,
   setActiveTab,
   onClose,
+  onTrade,
+  holdingQty,
 }: {
   stock: Stock;
   sectorStatus?: 'accumulating' | 'distributing' | 'neutral';
