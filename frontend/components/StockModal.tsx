@@ -34,6 +34,8 @@ interface StockModalProps {
   ictSignal?: ICTSignal;
   regimeBullWeight?: number;
   onClose: () => void;
+  onTrade?: (symbol: string, action: 'BUY' | 'SELL') => void;
+  holdingQty?: number;
 }
 
 // ============ Module-level sub-components (Q5 fix) ============
@@ -1980,6 +1982,8 @@ export default function StockModal({
   ictSignal,
   regimeBullWeight,
   onClose,
+  onTrade,
+  holdingQty,
 }: StockModalProps) {
   const [visible, setVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('analysis');
@@ -2026,6 +2030,8 @@ export default function StockModal({
         setVisible(false);
         setTimeout(onClose, 150);
       }}
+      onTrade={onTrade}
+      holdingQty={holdingQty}
     />
   );
 }
