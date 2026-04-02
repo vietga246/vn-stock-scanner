@@ -1591,6 +1591,8 @@ function ModalInner({
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onClose: () => void;
+  onTrade?: (symbol: string, action: 'BUY' | 'SELL') => void;
+  holdingQty?: number;  // số CP đang sở hữu từ virtual portfolio
 }) {
   const close = () => {
     onClose();
@@ -1717,6 +1719,46 @@ function ModalInner({
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* Trade buttons + Holdings */}
+          <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid #1e2832' }}>
+            {/* Holdings info */}
+            <div className="flex items-center gap-2">
+              {(holdingQty ?? 0) > 0 ? (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: '#00d4ff10', border: '1px solid #00d4ff25' }}>
+                  <span className="text-[10px]" style={{ color: '#4a5a6a' }}>Đang giữ:</span>
+                  <span className="font-mono text-[11px] font-bold" style={{ color: '#00d4ff' }}>{(holdingQty ?? 0).toLocaleString('vi-VN')} CP</span>
+                  <span className="text-[10px]" style={{ color: '#4a5a6a' }}>
+                    ≈ {((holdingQty ?? 0) * (stock.close || stock.price || 0) * 1000).toLocaleString('vi-VN', { notation: 'compact', compactDisplay: 'short' } as any)}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-[10px]" style={{ color: '#2a3642' }}>Chưa sở hữu</span>
+              )}
+            </div>
+
+            {/* Trade buttons */}
+            {onTrade && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onTrade(stock.symbol, 'BUY')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                  style={{ background: '#00ff8818', color: '#00ff88', border: '1px solid #00ff8840' }}
+                >
+                  <TrendingUp size={13} /> MUA
+                </button>
+                {(holdingQty ?? 0) > 0 && (
+                  <button
+                    onClick={() => onTrade(stock.symbol, 'SELL')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all"
+                    style={{ background: '#ff336618', color: '#ff3366', border: '1px solid #ff336640' }}
+                  >
+                    <TrendingDown size={13} /> BÁN
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

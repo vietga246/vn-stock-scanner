@@ -22,12 +22,13 @@ function SBadge({ s }: { s?: string }) {
 // TRADE SCREEN
 // ═══════════════════════════════════════════════════════════════════════════
 
-function TradeScreen({ stocks, priceMap, portfolio, onExecute, onClose }: {
+export function TradeScreen({ stocks, priceMap, portfolio, onExecute, onClose, initialSymbol, initialAction }: {
   stocks: Stock[]; priceMap: Record<string, number>; portfolio: PType;
   onExecute: (p: Parameters<typeof openTrade>[1]) => string | undefined; onClose: () => void;
+  initialSymbol?: string; initialAction?: 'BUY' | 'SELL';
 }) {
-  const [action, setAction] = useState<'BUY'|'SELL'>('BUY');
-  const [symbol, setSymbol] = useState('');
+  const [action, setAction] = useState<'BUY'|'SELL'>(initialAction || 'BUY');
+  const [symbol, setSymbol] = useState(initialSymbol || '');
   const [search, setSearch] = useState('');
   const [showDrop, setShowDrop] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>('MARKET');

@@ -12,6 +12,8 @@ import MarketBreadth from './MarketBreadth';
 import StockModal from './StockModal';
 import Sparkline from './Sparkline';
 import VirtualPortfolio from './VirtualPortfolio';
+import { TradeScreen } from './VirtualPortfolio';
+import { loadPortfolio, getPositions, openTrade, fmtVND, type VirtualPortfolio as PType } from '@/lib/virtual-trading';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -225,6 +227,37 @@ export default function Dashboard() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'screener' | 'ict' | 'portfolio'>('screener');
+
+  // Virtual trading state
+  const [tradeScreen, setTradeScreen] = useState<{ symbol: string; action: 'BUY' | 'SELL' } | null>(null);
+  const [portfolio, setPortfolio] = useState<PType>(() => loadPortfolio());
+
+  // Holdings map: symbol → total open quantity
+  const holdingsMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    portfolio.trades.filter(t => t.status === 'OPEN' && t.type === 'BUY').forEach(t => {
+      m[t.symbol] = (m[t.symbol] || 0) + t.quantity;
+    });
+    return m;
+  }, [portfolio]);
+
+  // Price map for trade screen
+  const priceMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    stocks.forEach(s => { m[s.symbol] = s.close || s.price || 0; });
+    return m;
+  }, [stocks]);
+
+  const handleOpenTrade = useCallback((symbol: string, action: 'BUY' | 'SELL') => {
+    setTradeScreen({ symbol, action });
+  }, []);
+
+  const handleExecuteTrade = useCallback((params: Parameters<typeof openTrade>[1]) => {
+    const { portfolio: updated, error } = openTrade(portfolio, params, priceMap);
+    if (error) return error;
+    setPortfolio(updated);
+    return undefined;
+  }, [portfolio, priceMap]);
 
   // P5: Watchlist persisted to localStorage
   const [watchlist, setWatchlist] = useState<Set<string>>(() => {
@@ -967,6 +1000,21 @@ export default function Dashboard() {
           ictSignal={ictMap[selectedStock.symbol]}
           regimeBullWeight={ictData?.regime?.bull_weight}
           onClose={() => setSelectedStock(null)}
+          onTrade={handleOpenTrade}
+          holdingQty={holdingsMap[selectedStock.symbol] || 0}
+        />
+      )}
+
+      {/* Trade Screen (overlay above StockModal) */}
+      {tradeScreen && (
+        <TradeScreen
+          stocks={stocks}
+          priceMap={priceMap}
+          portfolio={portfolio}
+          onExecute={handleExecuteTrade}
+          onClose={() => { setTradeScreen(null); setPortfolio(loadPortfolio()); }}
+          initialSymbol={tradeScreen.symbol}
+          initialAction={tradeScreen.action}
         />
       )}
     </div>
